@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xeomsc WoodArt - Grawerowanie Laserowe i Drewno</title>
-    <!-- Tailwind CSS do stylizacji -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome do ikon -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -38,61 +38,30 @@
         body {
             font-family: 'Poppins', sans-serif;
             scroll-behavior: smooth;
-            opacity: 0;
-            transition: opacity 0.3s ease-in;
         }
-        body.loaded {
-            opacity: 1;
-        }
+        
         .gradient-text {
             background: linear-gradient(to right, #b45309, #d97706);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         
-        .white-outline-text {
-            text-shadow: 
-                -1px -1px 0 #fff,  
-                 1px -1px 0 #fff,
-                -1px  1px 0 #fff,
-                 1px  1px 0 #fff,
-                 0px  0px 8px rgba(255,255,255,0.8);
-        }
-
         .text-outline {
-            text-shadow: 
-                -1px -1px 2px rgba(0,0,0,0.4),  
-                 1px -1px 2px rgba(0,0,0,0.4),
-                -1px  1px 2px rgba(0,0,0,0.4),
-                 1px  1px 2px rgba(0,0,0,0.4),
-                 0px  2px 10px rgba(0,0,0,0.6);
+            text-shadow: 0px 2px 10px rgba(0,0,0,0.6);
         }
 
         .hero-bg {
             background-color: #fafaf9;
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
+        
         .fade-in {
-            animation: fadeIn 0.8s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
-        }
-        .lightbox-img {
-            max-height: 85vh;
-            max-width: 90vw;
-            object-fit: contain;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
-        .admin-controls, .delete-btn {
-            display: none !important;
-        }
-        body.is-admin .admin-controls, 
-        body.is-admin .delete-btn {
-            display: flex !important;
         }
 
         .hero-slide {
@@ -111,10 +80,6 @@
             color: white;
         }
 
-        #admin-panel.hidden {
-            display: none !important;
-        }
-
         .calc-input {
             background: #1c1917;
             border: 1px solid #444;
@@ -124,120 +89,71 @@
             width: 100%;
             outline: none;
         }
-        .calc-input:focus {
-            border-color: #d97706;
+
+        .admin-controls {
+            display: none !important;
+        }
+        body.is-admin .admin-controls {
+            display: flex !important;
         }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
 
-    <!-- EKRAN LOGOWANIA -->
+    <!-- PANEL LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[300] bg-stone-900 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 text-center">
-            <div class="mb-6 inline-block p-4 rounded-full bg-wood-100 text-wood-600 text-3xl">
-                <i class="fa-solid fa-user-lock"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-stone-900 mb-2">Panel Administratora</h2>
-            <p class="text-gray-500 mb-6">Zaloguj się, aby zarządzać stroną</p>
-            
+            <i class="fa-solid fa-user-lock text-wood-600 text-4xl mb-4"></i>
+            <h2 class="text-2xl font-bold mb-6">Panel Administratora</h2>
             <form id="admin-login-form" class="space-y-4 text-left">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Login</label>
-                    <input type="text" id="login-user" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="Wpisz login">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Hasło</label>
-                    <input type="password" id="login-pass" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="Wpisz hasło">
-                </div>
-                <div id="login-error" class="text-red-500 text-sm hidden text-center font-bold">Błędny login lub hasło!</div>
-                <button type="submit" class="w-full bg-wood-600 text-white py-3 rounded-lg font-bold hover:bg-wood-700 transition shadow-lg">Zaloguj się</button>
+                <input type="text" id="login-user" class="w-full border p-3 rounded-lg" placeholder="Login">
+                <input type="password" id="login-pass" class="w-full border p-3 rounded-lg" placeholder="Hasło">
+                <div id="login-error" class="text-red-500 text-sm hidden font-bold">Błędny login lub hasło!</div>
+                <button type="submit" class="w-full bg-wood-600 text-white py-3 rounded-lg font-bold">Zaloguj się</button>
             </form>
-            <button id="exit-login-btn" class="mt-6 text-sm text-gray-400 hover:text-wood-600 underline">Wróć do strony głównej</button>
+            <button id="exit-login-btn" class="mt-4 text-gray-400 underline text-sm">Powrót</button>
         </div>
     </div>
 
-    <!-- Pasek Admina -->
-    <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-4 fixed top-0 w-full z-[150] flex justify-between items-center shadow-md">
-        <div class="flex items-center gap-4">
-            <span class="hidden sm:inline font-semibold text-green-400"><i class="fa-solid fa-shield-halved mr-2"></i> Tryb Admina</span>
-            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-1.5 rounded text-xs font-bold transition flex items-center">
-                <i class="fa-solid fa-bars-staggered mr-2"></i> Menu Zarządzania
-            </button>
+    <!-- PASEK ADMINA -->
+    <div id="admin-bar" class="hidden bg-stone-900 text-white py-2 px-4 fixed top-0 w-full z-[150] flex justify-between items-center">
+        <span class="text-xs font-bold text-green-400"><i class="fa-solid fa-cloud mr-2"></i> Tryb Admina</span>
+        <div class="flex gap-4">
+            <button id="toggle-admin-panel-btn" class="bg-wood-600 px-3 py-1 rounded text-xs font-bold">Panel Sterowania</button>
+            <button id="logout-btn" class="text-xs hover:text-red-400">Wyloguj</button>
         </div>
-        <button id="logout-btn" class="hover:text-red-400 font-bold transition flex items-center"><i class="fa-solid fa-power-off mr-2"></i> Wyloguj</button>
     </div>
 
-    <!-- Nawigacja Strony -->
-    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300 top-0" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center">
-                    <a href="#" id="logo-link" class="text-2xl font-bold text-wood-600 tracking-tighter flex items-center">
-                        <i class="fa-solid fa-bolt mr-2"></i> Xeomsc WoodArt
-                    </a>
-                </div>
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#home" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">Start</a>
-                    <a href="#about" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">O ofercie</a>
-                    <a href="#portfolio" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">Realizacje</a>
-                    <a href="#contact" class="nav-link px-5 py-2.5 bg-wood-600 text-white rounded-lg hover:bg-wood-800 transition shadow-lg font-medium">Wycena</a>
-                </div>
+    <!-- NAWIGACJA -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm top-0 h-20 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 w-full flex justify-between items-center">
+            <a href="#" id="logo-link" class="text-2xl font-bold text-wood-600 flex items-center">
+                <i class="fa-solid fa-bolt mr-2"></i> Xeomsc WoodArt
+            </a>
+            <div class="hidden md:flex gap-8 items-center font-medium">
+                <a href="#home" class="hover:text-wood-600">Start</a>
+                <a href="#about" class="hover:text-wood-600">O ofercie</a>
+                <a href="#portfolio" class="hover:text-wood-600">Realizacje</a>
+                <a href="#contact" class="bg-wood-600 text-white px-5 py-2 rounded-lg shadow-md">Wycena</a>
             </div>
         </div>
     </nav>
 
-    <!-- KONTENER GŁÓWNY -->
-    <div id="main-content" class="pt-0 transition-all duration-300">
-        <!-- Hero Section -->
+    <!-- TREŚĆ GŁÓWNA -->
+    <div id="main-content" class="pt-0">
+        <!-- Hero -->
         <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden">
             <div class="absolute inset-0 z-0" id="hero-carousel-container"></div>
             <div class="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
-                <div class="w-full md:w-1/2 text-center md:text-left bg-white/20 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-8 md:p-0 rounded-3xl">
-                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100/90 text-wood-800 text-xs font-bold mb-6 border border-wood-200 uppercase tracking-widest shadow-sm">
-                        Pracownia Grawerska
-                    </span>
-                    <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6 text-white text-outline">
-                        Precyzja Lasera,<br>
-                        Ciepło <span class="gradient-text white-outline-text">Drewna</span>.
+            <div class="max-w-7xl mx-auto px-4 relative z-20 w-full">
+                <div class="max-w-xl text-center md:text-left">
+                    <h1 class="text-4xl md:text-6xl font-bold text-white text-outline leading-tight mb-6">
+                        Precyzja Lasera,<br>Ciepło <span class="gradient-text">Drewna</span>.
                     </h1>
-                    <p class="text-lg md:text-xl text-white mb-8 max-w-lg mx-auto md:mx-0 font-medium text-outline">
-                        Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="px-8 py-3.5 bg-wood-600 text-white rounded-xl hover:bg-wood-800 transition shadow-xl font-bold text-center">Zobacz nasze prace</a>
-                        <a href="#contact" class="px-8 py-3.5 bg-white/90 backdrop-blur-md text-wood-600 border border-white/50 rounded-xl hover:bg-white transition shadow-xl font-bold text-center">Wycena projektu</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Oferta -->
-        <section id="about" class="py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Co oferuję?</h2>
-                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16"></div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div class="p-10 bg-stone-50 rounded-3xl border border-stone-100 hover:shadow-xl transition-shadow group">
-                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-wood-600 group-hover:text-white transition-colors">
-                            <i class="fa-solid fa-wand-magic-sparkles text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4">Grawerowanie</h3>
-                        <p class="text-gray-600">Niezwykle precyzyjne nanoszenie detali na drewno, szkło i inne materiały.</p>
-                    </div>
-                    <div class="p-10 bg-stone-50 rounded-3xl border border-stone-100 hover:shadow-xl transition-shadow group">
-                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-wood-600 group-hover:text-white transition-colors">
-                            <i class="fa-solid fa-scissors text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4">Precyzyjne Cięcie</h3>
-                        <p class="text-gray-600">Wycinanie skomplikowanych kształtów, liter i elementów dekoracyjnych.</p>
-                    </div>
-                    <div class="p-10 bg-stone-50 rounded-3xl border border-stone-100 hover:shadow-xl transition-shadow group">
-                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-wood-600 group-hover:text-white transition-colors">
-                            <i class="fa-solid fa-gift text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4">Unikalne Prezenty</h3>
-                        <p class="text-gray-600">Pamiątki na każdą okazję: śluby, chrzciny, jubileusze i wiele innych.</p>
+                    <p class="text-lg text-white text-outline mb-8">Tworzymy unikalne projekty dopasowane do Twoich potrzeb.</p>
+                    <div class="flex gap-4 justify-center md:justify-start">
+                        <a href="#portfolio" class="bg-wood-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg">Portfolio</a>
+                        <a href="#contact" class="bg-white/90 text-wood-600 px-8 py-3 rounded-xl font-bold">Kontakt</a>
                     </div>
                 </div>
             </div>
@@ -245,469 +161,313 @@
 
         <!-- Realizacje -->
         <section id="portfolio" class="py-24 bg-stone-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Moje Realizacje</h2>
-                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16"></div>
-                <div id="main-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left"></div>
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold mb-12">Moje Realizacje</h2>
+                <div id="main-categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left"></div>
             </div>
         </section>
 
         <!-- Kontakt -->
-        <section id="contact" class="py-24 bg-white border-t border-stone-100">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                 <h2 class="text-4xl font-bold mb-8">Kontakt i Wycena</h2>
-                 <p class="mb-12 text-gray-600 text-lg">Napisz do mnie, a przygotuję dla Ciebie indywidualną wycenę.</p>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="flex flex-col items-center p-8 bg-stone-50 rounded-2xl border border-stone-100">
-                        <i class="fa-solid fa-envelope text-wood-600 text-3xl mb-4"></i>
-                        <span class="font-bold text-xl">pkatlowski@gmail.com</span>
-                    </div>
-                    <div class="flex flex-col items-center p-8 bg-stone-50 rounded-2xl border border-stone-100">
-                        <i class="fa-solid fa-phone text-wood-600 text-3xl mb-4"></i>
-                        <span class="font-bold text-xl">+48 123 456 789</span>
-                    </div>
-                 </div>
+        <section id="contact" class="py-24 bg-white border-t">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold mb-12">Kontakt</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-8 bg-stone-50 rounded-2xl"><i class="fa-solid fa-envelope text-3xl mb-4 text-wood-600"></i><p class="font-bold">pkatlowski@gmail.com</p></div>
+                    <div class="p-8 bg-stone-50 rounded-2xl"><i class="fa-solid fa-phone text-3xl mb-4 text-wood-600"></i><p class="font-bold">+48 123 456 789</p></div>
+                </div>
             </div>
         </section>
     </div>
 
     <!-- WIDOKI DYNAMICZNE -->
-    <div id="subcategory-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button id="back-to-main-btn" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
-            <h2 id="subcategory-title" class="text-4xl font-bold text-stone-900 mb-4">Wybierz produkt</h2>
-            <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></div>
+    <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in">
+        <div class="max-w-7xl mx-auto px-4">
+            <button id="back-to-main-btn" class="mb-8 font-bold text-wood-600"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
+            <h2 id="subcategory-title" class="text-4xl font-bold mb-8"></h2>
+            <div id="subcategory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
         </div>
     </div>
 
-    <div id="gallery-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button id="back-to-sub-btn" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
-            <div class="mb-10">
-                <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-2">Galeria</h2>
-                <div id="gallery-product-info" class="text-stone-500 text-lg"></div>
-            </div>
-            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in">
+        <div class="max-w-7xl mx-auto px-4">
+            <button id="back-to-sub-btn" class="mb-8 font-bold text-wood-600"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
+            <h2 id="gallery-title" class="text-4xl font-bold mb-8">Galeria</h2>
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
         </div>
     </div>
 
     <!-- LIGHTBOX -->
-    <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer">
-        <div class="lightbox-nav lightbox-prev absolute left-4 text-white text-4xl p-4"><i class="fa-solid fa-chevron-left"></i></div>
-        <div class="lightbox-nav lightbox-next absolute right-4 text-white text-4xl p-4"><i class="fa-solid fa-chevron-right"></i></div>
-        <div class="relative max-w-5xl max-h-screen w-full flex flex-col items-center justify-center">
-            <img id="lightbox-img" src="" alt="Powiększenie" class="lightbox-img rounded-lg">
-            <button class="absolute -top-12 right-0 text-white hover:text-wood-500" id="close-lightbox-btn"><i class="fa-solid fa-xmark text-4xl"></i></button>
-        </div>
+    <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden items-center justify-center p-4">
+        <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl">
+        <button id="close-lightbox-btn" class="absolute top-4 right-4 text-white text-4xl"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- PANEL ADMINISTRATORA -->
-    <div id="admin-panel" class="fixed inset-0 z-[2000] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-10">
-        <div class="bg-stone-900 text-white w-full max-w-6xl h-full max-h-[90vh] rounded-3xl overflow-hidden flex flex-col sm:row shadow-2xl border border-white/10">
-            <!-- Sidebar -->
-            <div class="w-full sm:w-64 bg-stone-950 border-r border-white/5 p-6 flex flex-col">
-                <h2 class="text-xl font-bold mb-10 text-wood-500 flex items-center gap-2 uppercase tracking-widest">
-                    <i class="fa-solid fa-gears"></i> Zarządzanie
-                </h2>
+    <!-- PANEL ADMINA (MODAL) -->
+    <div id="admin-panel" class="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-stone-900 text-white w-full max-w-5xl h-[80vh] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
+            <div class="w-full md:w-64 bg-stone-950 p-6 flex flex-col border-r border-white/5">
+                <h3 class="text-xl font-bold mb-8 text-wood-500">Zarządzanie</h3>
                 <nav class="space-y-2 flex-1">
-                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
-                        <i class="fa-solid fa-images"></i> Galeria Tytułowa
-                    </button>
-                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
-                        <i class="fa-solid fa-folder-tree"></i> Kategorie
-                    </button>
-                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
-                        <i class="fa-solid fa-box-open"></i> Produkty i Zdjęcia
-                    </button>
-                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
-                        <i class="fa-solid fa-calculator"></i> Kalkulator Lasera
-                    </button>
+                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Karuzela</button>
+                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Kategorie</button>
+                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Produkty</button>
+                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Kalkulator</button>
                 </nav>
-                <button id="close-admin-panel-btn" class="mt-auto pt-4 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10">
-                    <i class="fa-solid fa-xmark"></i> Zamknij Panel
-                </button>
+                <button id="close-admin-panel-btn" class="mt-4 text-sm text-stone-500 underline">Zamknij</button>
             </div>
-            
-            <div class="flex-1 overflow-y-auto p-6 sm:p-10 bg-stone-900 text-white">
-                <div id="admin-view-container"></div>
-            </div>
+            <div class="flex-1 p-8 overflow-y-auto" id="admin-view-container"></div>
         </div>
     </div>
 
-    <footer class="bg-stone-950 text-stone-500 py-16 text-center text-sm border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-4 space-y-6">
-            <h2 class="text-xl font-bold text-wood-600 italic">Xeomsc WoodArt</h2>
-            <p>&copy; 2024 Wszystkie prawa zastrzeżone. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-2">Panel Zarządzania</button></p>
-        </div>
+    <footer class="bg-stone-950 text-stone-500 py-12 text-center text-sm border-t border-white/5">
+        <p>&copy; 2024 Xeomsc WoodArt. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-2">Admin</button></p>
     </footer>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfiguracja Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
+        const firebaseConfig = JSON.parse(__firebase_config || '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let db, auth, siteData = {};
 
-        // --- DANE DOMYŚLNE (BACKUP) ---
         const initialData = {
-            heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2070&auto=format&fit=crop' }],
+            heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2070' }],
             categories: {},
             galleries: {},
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        // --- LOGIKA CACHE (BŁYSKAWICZNA) ---
-        let siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
-        const configDocPath = `artifacts/${appId}/public/data/siteConfig`;
-
-        // --- RENDEROWANIE NATYCHMIASTOWE ---
-        // Renderujemy od razu to co mamy w localStorage, bez czekania na DOMContentLoaded
-        renderAll();
-        document.body.classList.add('loaded');
-
-        // --- INICJALIZACJA ---
-        async function initAuth() {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        }
-
-        // --- NASŁUCHIWANIE W TLE (DANE) ---
-        function setupDataListener() {
-            const docRef = doc(db, configDocPath, 'main');
-            // Wykorzystujemy onSnapshot do cichej aktualizacji w tle
-            onSnapshot(docRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const newData = snapshot.data();
-                    // Tylko jeśli dane z chmury są inne niż te lokalne, przerysuj stronę
-                    if (JSON.stringify(newData) !== JSON.stringify(siteData)) {
-                        siteData = newData;
-                        localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                        renderAll();
-                    }
-                } else {
-                    // Jeśli baza pusta, inicjalizujemy ją
-                    saveDataToCloud(initialData);
-                }
-            });
-        }
-
-        async function saveDataToCloud(data) {
-            if (!auth.currentUser) return;
-            try {
-                await setDoc(doc(db, configDocPath, 'main'), data);
-                localStorage.setItem('xeomsc_cached_data', JSON.stringify(data));
-            } catch (e) { console.error(e); }
-        }
-
-        window.saveData = () => saveDataToCloud(siteData);
-        window.goHome = () => {
-            document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden'));
-            document.getElementById('main-content').classList.remove('hidden');
-        };
-
-        // --- RENDEROWANIE UI ---
-        function renderAll() {
-            renderHeroCarousel();
-            renderMainCategories();
-            if (document.body.classList.contains('is-admin')) refreshAdminUI();
-        }
-
-        function renderHeroCarousel() {
+        // --- FUNKCJE RENDERUJĄCE ---
+        function renderHero() {
             const container = document.getElementById('hero-carousel-container');
-            if (!container || !siteData.heroItems.length) return;
-            container.innerHTML = '';
-            siteData.heroItems.forEach((item, idx) => {
-                const slide = document.createElement('div');
-                slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-                slide.innerHTML = item.type === 'image' 
-                    ? `<img src="${item.url}" class="w-full h-full object-cover">` 
-                    : `<video src="${item.url}" class="w-full h-full object-cover" muted autoplay loop></video>`;
-                container.appendChild(slide);
-            });
+            if (!container || !siteData.heroItems) return;
+            container.innerHTML = siteData.heroItems.map((it, idx) => `
+                <div class="hero-slide ${idx === 0 ? 'active' : ''}">
+                    ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover">` : `<video src="${it.url}" class="w-full h-full object-cover" muted autoplay loop></video>`}
+                </div>
+            `).join('');
+            
+            let cur = 0;
+            setInterval(() => {
+                const slides = document.querySelectorAll('.hero-slide');
+                if (slides.length < 2) return;
+                slides[cur].classList.remove('active');
+                cur = (cur + 1) % slides.length;
+                slides[cur].classList.add('active');
+            }, 5000);
         }
 
-        function renderMainCategories() {
+        function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (!grid) return;
-            grid.innerHTML = '';
-            Object.keys(siteData.categories).forEach(k => {
-                const cat = siteData.categories[k];
-                const div = document.createElement('div');
-                div.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer border border-stone-100 fade-in";
-                div.onclick = () => openSubcategories(k);
-                div.innerHTML = `
-                    <div class="h-64 overflow-hidden"><img src="${cat.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover"></div>
+            grid.innerHTML = Object.entries(siteData.categories).map(([id, c]) => `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer border border-stone-100 fade-in" onclick="window.openSub('${id}')">
+                    <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-64 w-full object-cover">
                     <div class="p-6">
-                        <h3 class="font-bold text-xl">${cat.title}</h3>
-                        <p class="text-stone-500 text-sm">${cat.desc}</p>
+                        <h3 class="font-bold text-xl">${c.title}</h3>
+                        <p class="text-stone-500 text-sm">${c.desc || ''}</p>
                     </div>
-                `;
-                grid.appendChild(div);
-            });
+                </div>
+            `).join('');
         }
 
-        function openSubcategories(id) {
-            const cat = siteData.categories[id];
-            if (!cat) return;
-            document.getElementById('subcategory-title').textContent = cat.title;
-            const g = document.getElementById('subcategory-grid'); g.innerHTML = '';
-            cat.subcategories.forEach((s, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-white rounded-2xl overflow-hidden border border-stone-100 group cursor-pointer hover:shadow-lg transition relative";
-                div.onclick = () => openGallery(s.id, s.title, id, s.desc, s.price);
-                div.innerHTML = `
-                    <div class="h-48 overflow-hidden"><img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div>
+        window.openSub = (id) => {
+            const c = siteData.categories[id];
+            document.getElementById('subcategory-title').textContent = c.title;
+            document.getElementById('subcategory-grid').innerHTML = c.subcategories.map((s, i) => `
+                <div class="bg-white rounded-2xl overflow-hidden border border-stone-100 cursor-pointer hover:shadow-lg transition relative" onclick="window.openGal('${s.id}', '${s.title}', '${id}')">
+                    <img src="${s.image}" class="h-48 w-full object-cover">
                     <div class="p-4 flex justify-between items-center">
-                        <h4 class="font-bold">${s.title}</h4>
-                        <button onclick="event.stopPropagation(); window.deleteSub('${id}',${idx})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        <span class="font-bold">${s.title}</span>
+                        <button onclick="event.stopPropagation(); window.delSub('${id}',${i})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                `;
-                g.appendChild(div);
-            });
+                </div>
+            `).join('');
             document.getElementById('main-content').classList.add('hidden');
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
-        }
-
-        window.deleteSub = (cid, idx) => {
-            if(confirm("Usunąć produkt?")) {
-                siteData.categories[cid].subcategories.splice(idx,1);
-                window.saveData();
-                openSubcategories(cid);
-            }
         };
 
-        function openGallery(subId, title, catId, desc, price) {
-            const gal = siteData.galleries[subId] || { images: [] };
+        window.openGal = (sid, title, cid) => {
+            const g = siteData.galleries[sid] || { images: [] };
             document.getElementById('gallery-title').textContent = title;
-            document.getElementById('gallery-product-info').textContent = (price ? price + " | " : "") + (desc || "");
-            document.getElementById('back-to-sub-btn').onclick = () => openSubcategories(catId);
-            const g = document.getElementById('gallery-grid'); g.innerHTML = '';
-            gal.images.forEach((img, idx) => {
-                const div = document.createElement('div');
-                div.className = "relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md group";
-                div.onclick = () => openLightbox(idx, gal.images);
-                div.innerHTML = `
-                    <img src="${img.src}" class="w-full h-full object-cover">
-                    <button onclick="event.stopPropagation(); window.deleteImg('${subId}',${idx},'${catId}','${title}','${desc}','${price}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
-                `;
-                g.appendChild(div);
-            });
+            document.getElementById('back-to-sub-btn').onclick = () => window.openSub(cid);
+            document.getElementById('gallery-grid').innerHTML = g.images.map((img, i) => `
+                <div class="relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md group">
+                    <img src="${img.src}" class="w-full h-full object-cover" onclick="window.openLightbox('${img.src}')">
+                    <button onclick="window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
             document.getElementById('subcategory-view').classList.add('hidden');
             document.getElementById('gallery-view').classList.remove('hidden');
             window.scrollTo(0,0);
-        }
-
-        window.deleteImg = (sid, idx, cid, t, d, p) => {
-            if(confirm("Usunąć zdjęcie?")) {
-                siteData.galleries[sid].images.splice(idx,1);
-                window.saveData();
-                openGallery(sid, t, cid, d, p);
-            }
         };
 
-        // --- AUTH ---
-        onAuthStateChanged(auth, (u) => {
-            if (u) {
-                setupDataListener();
-                checkAdminSession();
-            }
-        });
-
-        function checkAdminSession() {
-            if (sessionStorage.getItem('xeomsc_admin') === 'true') {
-                document.body.classList.add('is-admin');
-                document.getElementById('admin-bar').classList.remove('hidden');
-                document.getElementById('admin-footer-btn').classList.remove('hidden');
-            } else if (window.location.hash === '#admin') {
-                document.getElementById('login-screen').classList.remove('hidden');
+        // --- ADMIN ---
+        async function saveData() {
+            localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+            if (auth.currentUser) {
+                await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
             }
         }
 
-        // --- ADMIN PANEL UI ---
-        const loginForm = document.getElementById('admin-login-form');
-        loginForm.onsubmit = (e) => {
-            e.preventDefault();
-            if (document.getElementById('login-user').value === 'admin' && document.getElementById('login-pass').value === '12345') {
-                sessionStorage.setItem('xeomsc_admin', 'true');
-                location.reload();
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        };
-
-        document.getElementById('logout-btn').onclick = () => {
-            sessionStorage.removeItem('xeomsc_admin');
-            location.reload();
-        };
-
-        document.getElementById('toggle-admin-panel-btn').onclick = () => toggleAdminPanel();
-        document.getElementById('admin-footer-btn').onclick = () => toggleAdminPanel();
-        document.getElementById('close-admin-panel-btn').onclick = () => toggleAdminPanel();
-
-        function toggleAdminPanel() {
-            const p = document.getElementById('admin-panel');
-            p.classList.toggle('hidden');
-            if (!p.classList.contains('hidden')) switchAdminView('hero-gallery');
-        }
-
-        function switchAdminView(viewId) {
-            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${viewId}`).classList.add('active');
-            renderAdminView(viewId);
-        }
-
-        ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
-            document.getElementById(`btn-${id}`).onclick = () => switchAdminView(id);
-        });
-
-        function renderAdminView(id) {
-            const container = document.getElementById('admin-view-container');
-            if (id === 'hero-gallery') {
-                container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6 text-white">Galeria Tytułowa</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
-                        <input id="new-hero-url" class="calc-input mb-4" placeholder="Link do zdjęcia/wideo">
-                        <select id="new-hero-type" class="calc-input mb-4 text-white"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Dodaj</button>
+        function switchView(view) {
+            const cont = document.getElementById('admin-view-container');
+            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.toggle('active', b.id === `btn-${view}`));
+            
+            if (view === 'hero-gallery') {
+                cont.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-wood-500">Karuzela</h4>
+                    <div class="space-y-4 mb-8">
+                        <input id="h-url" class="calc-input" placeholder="URL Zdjęcia/Wideo">
+                        <select id="h-type" class="calc-input"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
+                        <button id="add-h-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Dodaj</button>
                     </div>
-                    <div id="hero-admin-list" class="space-y-2 text-white"></div>
+                    <div class="space-y-2">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-3 rounded flex justify-between"><span>${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500">Usuń</button></div>`).join('')}</div>
                 `;
-                renderHeroAdminList();
-                document.getElementById('add-hero-btn').onclick = () => {
-                    const url = document.getElementById('new-hero-url').value;
-                    if(url) {
-                        siteData.heroItems.push({id: Date.now(), type: document.getElementById('new-hero-type').value, url});
-                        window.saveData(); renderAdminView('hero-gallery');
-                    }
+                document.getElementById('add-h-btn').onclick = () => {
+                    const url = document.getElementById('h-url').value;
+                    if(url) { siteData.heroItems.push({type: document.getElementById('h-type').value, url}); saveData(); switchView('hero-gallery'); }
                 };
-            } else if (id === 'calculator') {
-                container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6 text-white">Kalkulator</h3>
+            } else if (view === 'calculator') {
+                cont.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-wood-500">Kalkulator</h4>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-xs text-stone-400">SZEROKOŚĆ (MM)</label><input type="number" id="c-w" class="calc-input" value="100"></div>
-                        <div><label class="text-xs text-stone-400">WYSOKOŚĆ (MM)</label><input type="number" id="c-h" class="calc-input" value="100"></div>
+                        <input id="cw" class="calc-input" value="100" type="number" placeholder="Szerokość mm">
+                        <input id="ch" class="calc-input" value="100" type="number" placeholder="Wysokość mm">
                     </div>
-                    <div class="mt-4"><label class="text-xs text-stone-400">CZAS (MIN)</label><input type="number" id="c-t" class="calc-input" value="10"></div>
-                    <div class="mt-8 p-6 bg-stone-950 rounded-2xl text-center">
-                        <p class="text-stone-500 text-xs uppercase font-bold tracking-widest">Sugerowana cena</p>
-                        <div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
+                    <input id="ct" class="calc-input mt-4" value="10" type="number" placeholder="Czas min">
+                    <div class="mt-8 p-6 bg-black/40 rounded-2xl text-center">
+                        <p class="text-xs text-stone-500 uppercase">Cena sugerowana</p>
+                        <div id="c-res" class="text-5xl font-bold text-wood-500 mt-2">0.00 PLN</div>
                     </div>
                 `;
-                ['c-w', 'c-h', 'c-t'].forEach(id => document.getElementById(id).oninput = runCalc);
-                runCalc();
-            } else if (id === 'categories') {
-                container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6 text-white">Kategorie</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
-                        <input id="cat-t" class="calc-input mb-2" placeholder="Nazwa">
-                        <input id="cat-i" class="calc-input mb-2" placeholder="Okładka">
-                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Zapisz</button>
+                ['cw', 'ch', 'ct'].forEach(id => document.getElementById(id).oninput = () => {
+                    const w = parseFloat(document.getElementById('cw').value) || 0;
+                    const h = parseFloat(document.getElementById('ch').value) || 0;
+                    const t = parseFloat(document.getElementById('ct').value) || 0;
+                    const res = ((w * h / 100) * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.32;
+                    document.getElementById('c-res').textContent = res.toFixed(2) + " PLN";
+                });
+            } else if (view === 'categories') {
+                cont.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-wood-500">Kategorie</h4>
+                    <div class="space-y-4 mb-8">
+                        <input id="cat-t" class="calc-input" placeholder="Nazwa">
+                        <input id="cat-i" class="calc-input" placeholder="Okładka">
+                        <button id="add-cat-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Dodaj</button>
                     </div>
-                    <div id="cat-admin-list" class="space-y-2 text-white"></div>
+                    <div class="space-y-2">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-3 rounded flex justify-between"><span>${siteData.categories[k].title}</span><button onclick="window.delCat('${k}')" class="text-red-500">Usuń</button></div>`).join('')}</div>
                 `;
-                renderCatAdminList();
                 document.getElementById('add-cat-btn').onclick = () => {
                     const t = document.getElementById('cat-t').value;
                     if(t) {
-                        const id = 'cat-' + Date.now();
+                        const id = 'c' + Date.now();
                         siteData.categories[id] = { title: t, image: document.getElementById('cat-i').value, subcategories: [] };
-                        window.saveData(); renderAdminView('categories');
+                        saveData(); switchView('categories');
                     }
                 };
-            } else if (id === 'products') {
-                container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6 text-white">Produkty</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
-                        <select id="sel-cat" class="calc-input mb-2 text-white"></select>
-                        <input id="prod-t" class="calc-input mb-2" placeholder="Nazwa produktu">
-                        <input id="prod-i" class="calc-input mb-2" placeholder="Okładka">
-                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Dodaj</button>
-                    </div>
-                    <div class="bg-stone-800 p-6 rounded-2xl text-white">
-                        <select id="sel-prod" class="calc-input mb-2 text-white"></select>
-                        <input id="gal-i" class="calc-input mb-2" placeholder="Link do zdjęcia">
-                        <button id="add-gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold text-white">Dodaj do galerii</button>
-                    </div>
+            } else if (view === 'products') {
+                cont.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-wood-500">Dodaj Produkt</h4>
+                    <select id="p-cat" class="calc-input mb-2">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select>
+                    <input id="p-t" class="calc-input mb-2" placeholder="Nazwa produktu">
+                    <input id="p-i" class="calc-input mb-4" placeholder="Okładka">
+                    <button id="p-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Zapisz Produkt</button>
                 `;
-                refreshAdminUI();
-                document.getElementById('add-prod-btn').onclick = () => {
-                    const cid = document.getElementById('sel-cat').value;
-                    if(cid && document.getElementById('prod-t').value) {
-                        const sid = 'sub-' + Date.now();
-                        siteData.categories[cid].subcategories.push({ id: sid, title: document.getElementById('prod-t').value, image: document.getElementById('prod-i').value });
+                document.getElementById('p-btn').onclick = () => {
+                    const cid = document.getElementById('p-cat').value;
+                    const t = document.getElementById('p-t').value;
+                    if(cid && t) {
+                        const sid = 's' + Date.now();
+                        siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
                         siteData.galleries[sid] = { images: [] };
-                        window.saveData(); alert("Dodano!");
-                    }
-                };
-                document.getElementById('add-gal-btn').onclick = () => {
-                    const sid = document.getElementById('sel-prod').value;
-                    if(sid && document.getElementById('gal-i').value) {
-                        siteData.galleries[sid].images.push({ src: document.getElementById('gal-i').value });
-                        window.saveData(); alert("Dodano!");
+                        saveData(); alert("Dodano!");
                     }
                 };
             }
         }
 
-        function runCalc() {
-            const w = parseFloat(document.getElementById('c-w').value) || 0;
-            const h = parseFloat(document.getElementById('c-h').value) || 0;
-            const t = parseFloat(document.getElementById('c-t').value) || 0;
-            const cost = ((w * h / 100) * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.32;
-            document.getElementById('c-res').textContent = cost.toFixed(2) + " PLN";
-        }
+        window.delHero = (i) => { siteData.heroItems.splice(i,1); saveData(); switchView('hero-gallery'); renderHero(); };
+        window.delCat = (k) => { if(confirm("Usuń kategorię?")) { delete siteData.categories[k]; saveData(); switchView('categories'); renderMain(); }};
+        window.delSub = (cid, i) => { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); };
+        window.delImg = (sid, i, cid, t) => { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); };
 
-        function renderHeroAdminList() {
-            const l = document.getElementById('hero-admin-list'); if(!l) return;
-            l.innerHTML = siteData.heroItems.map((it, i) => `<div class="flex justify-between bg-stone-950 p-3 rounded-lg text-xs truncate"><span>${it.url}</span> <button onclick="window.delHero(${i})" class="text-red-500 ml-4">USUŃ</button></div>`).join('');
-        }
-        window.delHero = (i) => { siteData.heroItems.splice(i,1); window.saveData(); renderAdminView('hero-gallery'); };
-
-        function renderCatAdminList() {
-            const l = document.getElementById('cat-admin-list'); if(!l) return;
-            l.innerHTML = Object.keys(siteData.categories).map(id => `<div class="flex justify-between bg-stone-950 p-3 rounded-lg text-xs"><span>${siteData.categories[id].title}</span> <button onclick="window.delCat('${id}')" class="text-red-500 ml-4">USUŃ</button></div>`).join('');
-        }
-        window.delCat = (id) => { if(confirm("Usunąć?")) { delete siteData.categories[id]; window.saveData(); renderAdminView('categories'); }};
-
-        function refreshAdminUI() {
-            const m = document.getElementById('sel-cat'), s = document.getElementById('sel-prod');
-            if(!m || !s) return;
-            m.innerHTML = '<option value="">Wybierz kategorię</option>' + Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
-            s.innerHTML = '<option value="">Wybierz produkt</option>' + Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(sub => `<option value="${sub.id}">${siteData.categories[k].title} > ${sub.title}</option>`)).join('');
-        }
-
-        // --- LIGHTBOX ---
-        let currentGal = [], currentIdx = 0;
-        function openLightbox(idx, images) {
-            currentGal = images; currentIdx = idx;
-            document.getElementById('lightbox-img').src = images[idx].src;
-            const lb = document.getElementById('lightbox'); lb.classList.replace('hidden', 'flex');
-            setTimeout(() => lb.classList.replace('opacity-0', 'opacity-100'), 10);
-        }
-        document.getElementById('close-lightbox-btn').onclick = () => {
-            const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100', 'opacity-0');
-            setTimeout(() => lb.classList.replace('flex', 'hidden'), 300);
+        window.openLightbox = (src) => {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.replace('hidden','flex');
         };
-        document.querySelector('.lightbox-prev').onclick = (e) => { e.stopPropagation(); currentIdx = (currentIdx - 1 + currentGal.length) % currentGal.length; document.getElementById('lightbox-img').src = currentGal[currentIdx].src; };
-        document.querySelector('.lightbox-next').onclick = (e) => { e.stopPropagation(); currentIdx = (currentIdx + 1) % currentGal.length; document.getElementById('lightbox-img').src = currentGal[currentIdx].src; };
+        document.getElementById('close-lightbox-btn').onclick = () => document.getElementById('lightbox').classList.replace('flex','hidden');
 
-        // Start
-        initAuth();
-        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.goHome(); };
-        document.getElementById('back-to-main-btn').onclick = () => window.goHome();
+        // --- INICJALIZACJA ---
+        async function start() {
+            try {
+                const appObj = initializeApp(firebaseConfig);
+                auth = getAuth(appObj);
+                db = getFirestore(appObj);
+                
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (u) => {
+                    if (u) {
+                        const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
+                        onSnapshot(docRef, (snap) => {
+                            if (snap.exists()) {
+                                siteData = snap.data();
+                                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                renderHero();
+                                renderMain();
+                            }
+                        });
+                        if (sessionStorage.getItem('xeomsc_admin') === 'true') {
+                            document.body.classList.add('is-admin');
+                            document.getElementById('admin-bar').classList.remove('hidden');
+                            document.getElementById('admin-footer-btn').classList.remove('hidden');
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase init failed, using cache:", e);
+                renderHero();
+                renderMain();
+            }
+        }
+
+        // GUI Eventy
+        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden')); document.getElementById('main-content').classList.remove('hidden'); };
+        document.getElementById('back-to-main-btn').onclick = () => document.getElementById('logo-link').click();
+        document.getElementById('admin-footer-btn').onclick = () => document.getElementById('admin-panel').classList.remove('hidden');
+        document.getElementById('toggle-admin-panel-btn').onclick = () => { document.getElementById('admin-panel').classList.remove('hidden'); switchView('hero-gallery'); };
+        document.getElementById('close-admin-panel-btn').onclick = () => document.getElementById('admin-panel').classList.add('hidden');
+        document.getElementById('admin-login-form').onsubmit = (e) => {
+            e.preventDefault();
+            if(document.getElementById('login-user').value === 'admin' && document.getElementById('login-pass').value === '12345') {
+                sessionStorage.setItem('xeomsc_admin', 'true'); location.reload();
+            } else document.getElementById('login-error').classList.remove('hidden');
+        };
+        document.getElementById('logout-btn').onclick = () => { sessionStorage.removeItem('xeomsc_admin'); location.reload(); };
+
+        ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
+            const btn = document.getElementById(`btn-${id}`);
+            if(btn) btn.onclick = () => switchView(id);
+        });
+
+        // Uruchomienie
+        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        renderHero();
+        renderMain();
+        start();
+        
+        if (window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('exit-login-btn').onclick = () => { window.location.hash = ''; location.reload(); };
-
     </script>
 </body>
 </html>
