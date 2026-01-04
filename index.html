@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xeomsc WoodArt - Grawerowanie Laserowe i Drewno</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <script>
@@ -16,18 +13,8 @@
             theme: {
                 extend: {
                     colors: {
-                        wood: {
-                            100: '#fef3c7',
-                            500: '#d97706',
-                            600: '#b45309',
-                            800: '#92400e',
-                            900: '#78350f',
-                        },
-                        stone: {
-                            50: '#fafaf9',
-                            800: '#292524',
-                            900: '#1c1917',
-                        }
+                        wood: { 100: '#fef3c7', 500: '#d97706', 600: '#b45309', 800: '#92400e', 900: '#78350f' },
+                        stone: { 50: '#fafaf9', 800: '#292524', 900: '#1c1917' }
                     }
                 }
             }
@@ -35,200 +22,270 @@
     </script>
 
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-        }
-        
-        .gradient-text {
-            background: linear-gradient(to right, #b45309, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .text-outline {
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.6);
-        }
-
-        .hero-bg {
-            background-color: #fafaf9;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .hero-slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .hero-slide.active {
-            opacity: 1;
-            z-index: 10;
-        }
-        
-        .admin-sidebar-item.active {
-            background-color: #b45309;
-            color: white;
-        }
-
-        .calc-input {
-            background: #1c1917;
-            border: 1px solid #444;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            width: 100%;
-            outline: none;
-        }
-
-        .admin-controls {
-            display: none !important;
-        }
-        body.is-admin .admin-controls {
-            display: flex !important;
-        }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        .gradient-text { background: linear-gradient(to right, #b45309, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-outline { text-shadow: 0px 2px 10px rgba(0,0,0,0.6); }
+        .hero-bg { background-color: #fafaf9; background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E"); }
+        .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; }
+        .hero-slide.active { opacity: 1; z-index: 10; }
+        .admin-sidebar-item.active { background-color: #b45309; color: white; }
+        .calc-input { background: #1c1917; border: 1px solid #444; color: white; padding: 0.6rem; border-radius: 0.5rem; width: 100%; outline: none; }
+        .admin-controls { display: none !important; }
+        body.is-admin .admin-controls { display: flex !important; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
 
     <!-- PANEL LOGOWANIA -->
-    <div id="login-screen" class="fixed inset-0 z-[300] bg-stone-900 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 text-center">
-            <i class="fa-solid fa-user-lock text-wood-600 text-4xl mb-4"></i>
-            <h2 class="text-2xl font-bold mb-6">Panel Administratora</h2>
+    <div id="login-screen" class="fixed inset-0 z-[500] bg-stone-900 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
+            <i class="fa-solid fa-user-shield text-wood-600 text-5xl mb-6"></i>
+            <h2 class="text-2xl font-bold mb-6">Autoryzacja Pracowni</h2>
             <form id="admin-login-form" class="space-y-4 text-left">
-                <input type="text" id="login-user" class="w-full border p-3 rounded-lg" placeholder="Login">
-                <input type="password" id="login-pass" class="w-full border p-3 rounded-lg" placeholder="Hasło">
-                <div id="login-error" class="text-red-500 text-sm hidden font-bold">Błędny login lub hasło!</div>
-                <button type="submit" class="w-full bg-wood-600 text-white py-3 rounded-lg font-bold">Zaloguj się</button>
+                <input type="text" id="login-user" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Login">
+                <input type="password" id="login-pass" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Hasło">
+                <div id="login-error" class="text-red-500 text-sm hidden font-bold text-center">Dane nieprawidłowe</div>
+                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-wood-700 transition">Zaloguj się</button>
             </form>
-            <button id="exit-login-btn" class="mt-4 text-gray-400 underline text-sm">Powrót</button>
+            <button id="exit-login-btn" class="mt-6 text-gray-400 underline text-sm">Wróć do strony</button>
         </div>
     </div>
 
     <!-- PASEK ADMINA -->
-    <div id="admin-bar" class="hidden bg-stone-900 text-white py-2 px-4 fixed top-0 w-full z-[150] flex justify-between items-center">
-        <span class="text-xs font-bold text-green-400"><i class="fa-solid fa-cloud mr-2"></i> Tryb Admina</span>
+    <div id="admin-bar" class="hidden bg-stone-900 text-white py-3 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-xl">
+        <div class="flex items-center gap-4">
+            <div class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-xs font-bold uppercase tracking-widest text-stone-400">Panel Administratora</span>
+        </div>
         <div class="flex gap-4">
-            <button id="toggle-admin-panel-btn" class="bg-wood-600 px-3 py-1 rounded text-xs font-bold">Panel Sterowania</button>
-            <button id="logout-btn" class="text-xs hover:text-red-400">Wyloguj</button>
+            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 px-4 py-1.5 rounded-lg text-xs font-bold transition">Zarządzaj Treścią</button>
+            <button id="logout-btn" class="text-xs text-stone-400 hover:text-white transition">Wyloguj</button>
         </div>
     </div>
 
     <!-- NAWIGACJA -->
-    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm top-0 h-20 flex items-center">
-        <div class="max-w-7xl mx-auto px-4 w-full flex justify-between items-center">
-            <a href="#" id="logo-link" class="text-2xl font-bold text-wood-600 flex items-center">
-                <i class="fa-solid fa-bolt mr-2"></i> Xeomsc WoodArt
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm top-0 h-24 flex items-center transition-all duration-300" id="main-nav">
+        <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
+            <a href="#" id="logo-link" class="text-2xl font-bold text-wood-900 flex items-center gap-3">
+                <div class="bg-wood-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span>Xeomsc WoodArt</span>
             </a>
-            <div class="hidden md:flex gap-8 items-center font-medium">
-                <a href="#home" class="hover:text-wood-600">Start</a>
-                <a href="#about" class="hover:text-wood-600">O ofercie</a>
-                <a href="#portfolio" class="hover:text-wood-600">Realizacje</a>
-                <a href="#contact" class="bg-wood-600 text-white px-5 py-2 rounded-lg shadow-md">Wycena</a>
+            <div class="hidden lg:flex gap-10 items-center font-semibold text-stone-600">
+                <a href="#home" class="hover:text-wood-600 transition">Start</a>
+                <a href="#process" class="hover:text-wood-600 transition">Jak pracujemy</a>
+                <a href="#portfolio" class="hover:text-wood-600 transition text-wood-600">Nasze Realizacje</a>
+                <a href="#faq" class="hover:text-wood-600 transition">FAQ</a>
+                <a href="#contact" class="bg-wood-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-wood-800 transition">Wycena projektu</a>
             </div>
         </div>
     </nav>
 
-    <!-- TREŚĆ GŁÓWNA -->
-    <div id="main-content" class="pt-0">
-        <!-- Hero -->
-        <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden">
+    <!-- KONTENER GŁÓWNY -->
+    <div id="main-content">
+        <!-- Hero Section -->
+        <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden pt-20">
             <div class="absolute inset-0 z-0" id="hero-carousel-container"></div>
-            <div class="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-            <div class="max-w-7xl mx-auto px-4 relative z-20 w-full">
-                <div class="max-w-xl text-center md:text-left">
-                    <h1 class="text-4xl md:text-6xl font-bold text-white text-outline leading-tight mb-6">
-                        Precyzja Lasera,<br>Ciepło <span class="gradient-text">Drewna</span>.
+            <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
+            <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
+                <div class="max-w-2xl text-center md:text-left">
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100 text-wood-800 text-xs font-bold mb-6 uppercase tracking-widest">Najwyższa jakość graweru</span>
+                    <h1 class="text-5xl md:text-7xl font-bold text-white text-outline leading-tight mb-6">
+                        Twoje Pomysły<br>Wycięte w <span class="gradient-text">Drewnie</span>.
                     </h1>
-                    <p class="text-lg text-white text-outline mb-8">Tworzymy unikalne projekty dopasowane do Twoich potrzeb.</p>
-                    <div class="flex gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="bg-wood-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg">Portfolio</a>
-                        <a href="#contact" class="bg-white/90 text-wood-600 px-8 py-3 rounded-xl font-bold">Kontakt</a>
+                    <p class="text-xl text-white text-outline mb-10 font-light opacity-90 leading-relaxed">Personalizowane pamiątki, gadżety reklamowe i dekoracje tworzone z pasją przy użyciu najnowszej technologii laserowej.</p>
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                        <a href="#portfolio" class="bg-wood-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl hover:bg-wood-800 transition transform hover:scale-105">Zobacz Portfolio</a>
+                        <a href="#contact" class="bg-white text-stone-900 px-10 py-4 rounded-full font-bold shadow-xl hover:bg-stone-100 transition">Kontakt</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Realizacje -->
-        <section id="portfolio" class="py-24 bg-stone-50">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold mb-12">Moje Realizacje</h2>
-                <div id="main-categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left"></div>
+        <!-- Dlaczego My -->
+        <section class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-microchip"></i></div>
+                        <h3 class="text-xl font-bold mb-4">Precyzja co do mm</h3>
+                        <p class="text-stone-500">Wykorzystujemy profesjonalne plotery laserowe, które pozwalają na odwzorowanie nawet najdrobniejszych detali Twojego projektu.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-leaf"></i></div>
+                        <h3 class="text-xl font-bold mb-4">Ekologiczne Materiały</h3>
+                        <p class="text-stone-500">Pracujemy głównie na naturalnym drewnie, sklejce brzozowej i materiałach przyjaznych środowisku z certyfikowanych źródeł.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <h3 class="text-xl font-bold mb-4">Szybka Realizacja</h3>
+                        <p class="text-stone-500">Większość zleceń realizujemy w ciągu 3-5 dni roboczych, dbając o to, by Twój prezent dotarł na czas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proces Zamówienia -->
+        <section id="process" class="py-24 bg-stone-50 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Jak wygląda zamówienie?</h2>
+                    <p class="text-stone-500">Od pomysłu do gotowego produktu w 4 prostych krokach</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
+                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">01</span>
+                        <h4 class="font-bold text-lg mb-4 pt-4">Projekt i wycena</h4>
+                        <p class="text-sm text-stone-500">Przesyłasz nam swój pomysł, a my przygotowujemy darmową wycenę i wstępny projekt.</p>
+                    </div>
+                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
+                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">02</span>
+                        <h4 class="font-bold text-lg mb-4 pt-4">Akceptacja</h4>
+                        <p class="text-sm text-stone-500">Poprawiamy szczegóły projektu tak długo, aż będziesz w 100% zadowolony z efektu wizualnego.</p>
+                    </div>
+                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
+                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">03</span>
+                        <h4 class="font-bold text-lg mb-4 pt-4">Grawerowanie</h4>
+                        <p class="text-sm text-stone-500">Nasze lasery ruszają do pracy. Dbamy o to, by każdy kawałek drewna był idealnie wykończony.</p>
+                    </div>
+                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
+                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">04</span>
+                        <h4 class="font-bold text-lg mb-4 pt-4">Wysyłka</h4>
+                        <p class="text-sm text-stone-500">Starannie pakujemy Twoje zamówienie i wysyłamy kurierem prosto pod Twoje drzwi.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Grid -->
+        <section id="portfolio" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-4">Nasze Ostatnie Prace</h2>
+                <div class="w-20 h-1.5 bg-wood-600 mx-auto rounded-full mb-16"></div>
+                <div id="main-categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10 text-left"></div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-24 bg-stone-50">
+            <div class="max-w-3xl mx-auto px-6">
+                <h2 class="text-4xl font-bold mb-12 text-center">Częste pytania</h2>
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h4 class="font-bold mb-2">Czy mogę przesłać własny projekt?</h4>
+                        <p class="text-stone-500 text-sm">Tak! Przyjmujemy pliki wektorowe (.cdr, .svg, .pdf, .ai) oraz wysokiej jakości grafiki rastrowe.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h4 class="font-bold mb-2">Jaki jest czas oczekiwania?</h4>
+                        <p class="text-stone-500 text-sm">Standardowy czas realizacji to 3-5 dni roboczych. Przy większych zamówieniach termin ustalamy indywidualnie.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h4 class="font-bold mb-2">Czy grawerujecie na powierzonym materiale?</h4>
+                        <p class="text-stone-500 text-sm">Tak, po wcześniejszej konsultacji i sprawdzeniu, czy materiał nadaje się do obróbki laserowej.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Kontakt -->
-        <section id="contact" class="py-24 bg-white border-t">
-            <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold mb-12">Kontakt</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="p-8 bg-stone-50 rounded-2xl"><i class="fa-solid fa-envelope text-3xl mb-4 text-wood-600"></i><p class="font-bold">pkatlowski@gmail.com</p></div>
-                    <div class="p-8 bg-stone-50 rounded-2xl"><i class="fa-solid fa-phone text-3xl mb-4 text-wood-600"></i><p class="font-bold">+48 123 456 789</p></div>
+        <section id="contact" class="py-24 bg-white">
+            <div class="max-w-5xl mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-12">Zapytaj o wycenę</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="bg-stone-50 p-10 rounded-3xl border border-stone-100 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-wood-600 text-white rounded-full flex items-center justify-center mb-6 text-2xl shadow-lg"><i class="fa-solid fa-envelope"></i></div>
+                        <h4 class="text-xl font-bold mb-2">E-mail</h4>
+                        <p class="text-wood-600 font-bold text-lg">pkatlowski@gmail.com</p>
+                        <p class="text-stone-400 mt-4 text-sm">Odpowiadamy zazwyczaj w ciągu 24h</p>
+                    </div>
+                    <div class="bg-stone-50 p-10 rounded-3xl border border-stone-100 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-stone-900 text-white rounded-full flex items-center justify-center mb-6 text-2xl shadow-lg"><i class="fa-solid fa-phone"></i></div>
+                        <h4 class="text-xl font-bold mb-2">Telefon</h4>
+                        <p class="text-stone-900 font-bold text-lg">+48 123 456 789</p>
+                        <p class="text-stone-400 mt-4 text-sm">Dostępni od pon. do pt. (8:00 - 16:00)</p>
+                    </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- WIDOKI DYNAMICZNE -->
-    <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in">
-        <div class="max-w-7xl mx-auto px-4">
-            <button id="back-to-main-btn" class="mb-8 font-bold text-wood-600"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
-            <h2 id="subcategory-title" class="text-4xl font-bold mb-8"></h2>
-            <div id="subcategory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+    <!-- WIDOKI DYNAMICZNE (PODSTRONY) -->
+    <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <button id="back-to-main-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do galerii głównej</button>
+            <h2 id="subcategory-title" class="text-5xl font-bold mb-12"></h2>
+            <div id="subcategory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
         </div>
     </div>
 
-    <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in">
-        <div class="max-w-7xl mx-auto px-4">
-            <button id="back-to-sub-btn" class="mb-8 font-bold text-wood-600"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
-            <h2 id="gallery-title" class="text-4xl font-bold mb-8">Galeria</h2>
-            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do produktów</button>
+            <h2 id="gallery-title" class="text-4xl font-bold mb-12">Szczegóły realizacji</h2>
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
         </div>
     </div>
 
     <!-- LIGHTBOX -->
     <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden items-center justify-center p-4">
-        <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl">
-        <button id="close-lightbox-btn" class="absolute top-4 right-4 text-white text-4xl"><i class="fa-solid fa-xmark"></i></button>
+        <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl animate-fade-in">
+        <button id="close-lightbox-btn" class="absolute top-8 right-8 text-white text-5xl hover:text-wood-500 transition"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- PANEL ADMINA (MODAL) -->
-    <div id="admin-panel" class="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-stone-900 text-white w-full max-w-5xl h-[80vh] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
-            <div class="w-full md:w-64 bg-stone-950 p-6 flex flex-col border-r border-white/5">
-                <h3 class="text-xl font-bold mb-8 text-wood-500">Zarządzanie</h3>
-                <nav class="space-y-2 flex-1">
-                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Karuzela</button>
-                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Kategorie</button>
-                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Produkty</button>
-                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-4 py-2 rounded-lg">Kalkulator</button>
+    <!-- MODAL ADMINA -->
+    <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-900/90 backdrop-blur-md hidden items-center justify-center p-6">
+        <div class="bg-stone-900 text-white w-full max-w-6xl h-[85vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10">
+            <div class="w-full md:w-72 bg-black/40 p-8 flex flex-col border-r border-white/5">
+                <h3 class="text-2xl font-bold mb-10 text-wood-500 flex items-center gap-3"><i class="fa-solid fa-gears"></i> CMS</h3>
+                <nav class="space-y-3 flex-1">
+                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Karuzela Hero</button>
+                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Główne Galerie</button>
+                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Produkty</button>
+                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Kalkulator Laser</button>
                 </nav>
-                <button id="close-admin-panel-btn" class="mt-4 text-sm text-stone-500 underline">Zamknij</button>
+                <button id="close-admin-panel-btn" class="mt-8 text-sm text-stone-500 hover:text-white underline">Zamknij Panel</button>
             </div>
-            <div class="flex-1 p-8 overflow-y-auto" id="admin-view-container"></div>
+            <div class="flex-1 p-10 overflow-y-auto" id="admin-view-container"></div>
         </div>
     </div>
 
-    <footer class="bg-stone-950 text-stone-500 py-12 text-center text-sm border-t border-white/5">
-        <p>&copy; 2024 Xeomsc WoodArt. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-2">Admin</button></p>
+    <footer class="bg-stone-950 text-stone-500 py-20 text-center text-sm border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-left mb-12">
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Xeomsc WoodArt</h4>
+                <p class="leading-relaxed">Grawerowanie i wycinanie laserowe to nasza pasja. Tworzymy rzeczy trwałe i piękne z najlepszych naturalnych materiałów.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Szybkie linki</h4>
+                <div class="flex flex-col gap-3">
+                    <a href="#home" class="hover:text-white transition">Start</a>
+                    <a href="#portfolio" class="hover:text-white transition">Realizacje</a>
+                    <a href="#contact" class="hover:text-white transition">Wycena</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Social Media</h4>
+                <div class="flex gap-4 text-2xl">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="pt-12 border-t border-white/5 opacity-50">
+            &copy; 2024 Pracownia Xeomsc WoodArt. Wszystkie prawa zastrzeżone. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-4 text-xs">Administracja</button>
+        </div>
     </footer>
 
-    <!-- Firebase -->
+    <!-- LOGIKA SYSTEMU -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Konfiguracja Firebase
         const firebaseConfig = JSON.parse(__firebase_config || '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
         
@@ -241,7 +298,7 @@
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        // --- FUNKCJE RENDERUJĄCE ---
+        // --- RENDEROWANIE GŁÓWNE ---
         function renderHero() {
             const container = document.getElementById('hero-carousel-container');
             if (!container || !siteData.heroItems) return;
@@ -265,25 +322,35 @@
             const grid = document.getElementById('main-categories-grid');
             if (!grid) return;
             grid.innerHTML = Object.entries(siteData.categories).map(([id, c]) => `
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer border border-stone-100 fade-in" onclick="window.openSub('${id}')">
-                    <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-64 w-full object-cover">
-                    <div class="p-6">
-                        <h3 class="font-bold text-xl">${c.title}</h3>
-                        <p class="text-stone-500 text-sm">${c.desc || ''}</p>
+                <div class="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-stone-100 fade-in" onclick="window.openSub('${id}')">
+                    <div class="h-72 overflow-hidden relative">
+                        <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-full w-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute inset-0 bg-wood-900/20 opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
+                            <span class="bg-white text-wood-900 px-6 py-2 rounded-full font-bold shadow-xl">Odkryj produkty</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h3 class="font-bold text-2xl mb-2">${c.title}</h3>
+                        <p class="text-stone-400 text-sm leading-relaxed">${c.desc || 'Wybierz, aby zobaczyć nasze realizacje w tej kategorii.'}</p>
                     </div>
                 </div>
             `).join('');
         }
 
+        // --- GLOBALNE FUNKCJE OKIEN ---
         window.openSub = (id) => {
             const c = siteData.categories[id];
+            if(!c) return;
             document.getElementById('subcategory-title').textContent = c.title;
             document.getElementById('subcategory-grid').innerHTML = c.subcategories.map((s, i) => `
-                <div class="bg-white rounded-2xl overflow-hidden border border-stone-100 cursor-pointer hover:shadow-lg transition relative" onclick="window.openGal('${s.id}', '${s.title}', '${id}')">
-                    <img src="${s.image}" class="h-48 w-full object-cover">
-                    <div class="p-4 flex justify-between items-center">
-                        <span class="font-bold">${s.title}</span>
-                        <button onclick="event.stopPropagation(); window.delSub('${id}',${i})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
+                <div class="bg-white rounded-[2rem] overflow-hidden border border-stone-100 cursor-pointer hover:shadow-2xl transition relative" onclick="window.openGal('${s.id}', '${s.title}', '${id}')">
+                    <img src="${s.image}" class="h-64 w-full object-cover">
+                    <div class="p-6 flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-lg">${s.title}</span>
+                            <span class="text-xs text-stone-400 uppercase tracking-widest font-bold">Szczegóły</span>
+                        </div>
+                        <button onclick="event.stopPropagation(); window.delSub('${id}',${i})" class="admin-controls text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -297,9 +364,9 @@
             document.getElementById('gallery-title').textContent = title;
             document.getElementById('back-to-sub-btn').onclick = () => window.openSub(cid);
             document.getElementById('gallery-grid').innerHTML = g.images.map((img, i) => `
-                <div class="relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md group">
+                <div class="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all hover:scale-105 group">
                     <img src="${img.src}" class="w-full h-full object-cover" onclick="window.openLightbox('${img.src}')">
-                    <button onclick="window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-4 right-4 bg-red-500 text-white p-3 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
             document.getElementById('subcategory-view').classList.add('hidden');
@@ -307,7 +374,7 @@
             window.scrollTo(0,0);
         };
 
-        // --- ADMIN ---
+        // --- ZAPIS ---
         async function saveData() {
             localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
             if (auth.currentUser) {
@@ -315,19 +382,22 @@
             }
         }
 
+        // --- CMS PANEL LOGIKA ---
         function switchView(view) {
             const cont = document.getElementById('admin-view-container');
             document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.toggle('active', b.id === `btn-${view}`));
             
             if (view === 'hero-gallery') {
                 cont.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 text-wood-500">Karuzela</h4>
-                    <div class="space-y-4 mb-8">
-                        <input id="h-url" class="calc-input" placeholder="URL Zdjęcia/Wideo">
-                        <select id="h-type" class="calc-input"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                        <button id="add-h-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Dodaj</button>
+                    <h4 class="text-2xl font-bold mb-6 text-wood-500">Materiały na stronie głównej</h4>
+                    <div class="bg-black/20 p-8 rounded-3xl border border-white/5 space-y-6 mb-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input id="h-url" class="calc-input" placeholder="Wklej link URL do zdjęcia/wideo">
+                            <select id="h-type" class="calc-input text-white"><option value="image">Zdjęcie</option><option value="video">Wideo (bezpośredni link)</option></select>
+                        </div>
+                        <button id="add-h-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold hover:bg-wood-500 transition">Dodaj do karuzeli</button>
                     </div>
-                    <div class="space-y-2">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-3 rounded flex justify-between"><span>${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500">Usuń</button></div>`).join('')}</div>
+                    <div class="space-y-3">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex justify-between items-center"><span class="truncate max-w-[80%] opacity-60 text-sm">${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500 hover:text-white transition"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-h-btn').onclick = () => {
                     const url = document.getElementById('h-url').value;
@@ -335,15 +405,25 @@
                 };
             } else if (view === 'calculator') {
                 cont.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 text-wood-500">Kalkulator</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="cw" class="calc-input" value="100" type="number" placeholder="Szerokość mm">
-                        <input id="ch" class="calc-input" value="100" type="number" placeholder="Wysokość mm">
+                    <h4 class="text-2xl font-bold mb-6 text-wood-500">Kalkulator Laserowy</h4>
+                    <p class="text-stone-400 mb-8 text-sm italic">Ustawienia stawek zgodne z Twoim arkuszem kalkulacyjnym.</p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-black/20 p-6 rounded-2xl">
+                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Szerokość (mm)</label>
+                             <input id="cw" class="calc-input" value="100" type="number">
+                        </div>
+                        <div class="bg-black/20 p-6 rounded-2xl">
+                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Wysokość (mm)</label>
+                             <input id="ch" class="calc-input" value="100" type="number">
+                        </div>
                     </div>
-                    <input id="ct" class="calc-input mt-4" value="10" type="number" placeholder="Czas min">
-                    <div class="mt-8 p-6 bg-black/40 rounded-2xl text-center">
-                        <p class="text-xs text-stone-500 uppercase">Cena sugerowana</p>
-                        <div id="c-res" class="text-5xl font-bold text-wood-500 mt-2">0.00 PLN</div>
+                    <div class="bg-black/20 p-6 rounded-2xl mt-6">
+                         <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Czas pracy maszyny (min)</label>
+                         <input id="ct" class="calc-input" value="10" type="number">
+                    </div>
+                    <div class="mt-10 p-10 bg-gradient-to-br from-wood-900 to-stone-900 rounded-[2rem] text-center border-2 border-wood-600/30">
+                        <p class="text-xs text-wood-500 uppercase font-black tracking-[0.2em] mb-4">Sugerowana cena klienta</p>
+                        <div id="c-res" class="text-6xl font-black text-white mt-2 drop-shadow-2xl">0.00 PLN</div>
                     </div>
                 `;
                 ['cw', 'ch', 'ct'].forEach(id => document.getElementById(id).oninput = () => {
@@ -355,13 +435,13 @@
                 });
             } else if (view === 'categories') {
                 cont.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 text-wood-500">Kategorie</h4>
-                    <div class="space-y-4 mb-8">
-                        <input id="cat-t" class="calc-input" placeholder="Nazwa">
-                        <input id="cat-i" class="calc-input" placeholder="Okładka">
-                        <button id="add-cat-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Dodaj</button>
+                    <h4 class="text-2xl font-bold mb-6 text-wood-500 text-white">Zarządzanie Kategoriami</h4>
+                    <div class="bg-black/20 p-8 rounded-3xl space-y-4 mb-10 border border-white/5">
+                        <input id="cat-t" class="calc-input" placeholder="Nazwa kategorii (np. Tabliczki Ślubne)">
+                        <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia okładki">
+                        <button id="add-cat-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white hover:bg-wood-500 transition">Stwórz nową kategorię</button>
                     </div>
-                    <div class="space-y-2">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-3 rounded flex justify-between"><span>${siteData.categories[k].title}</span><button onclick="window.delCat('${k}')" class="text-red-500">Usuń</button></div>`).join('')}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex justify-between items-center"><div class="flex flex-col"><span class="font-bold">${siteData.categories[k].title}</span><span class="text-[10px] opacity-40">${k}</span></div><button onclick="window.delCat('${k}')" class="text-red-500 hover:text-white transition p-3"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-cat-btn').onclick = () => {
                     const t = document.getElementById('cat-t').value;
@@ -373,11 +453,19 @@
                 };
             } else if (view === 'products') {
                 cont.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 text-wood-500">Dodaj Produkt</h4>
-                    <select id="p-cat" class="calc-input mb-2">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select>
-                    <input id="p-t" class="calc-input mb-2" placeholder="Nazwa produktu">
-                    <input id="p-i" class="calc-input mb-4" placeholder="Okładka">
-                    <button id="p-btn" class="bg-wood-600 w-full p-3 rounded-lg font-bold">Zapisz Produkt</button>
+                    <h4 class="text-2xl font-bold mb-6 text-wood-500 text-white">Dodaj Produkt do Kategorii</h4>
+                    <div class="bg-black/20 p-8 rounded-3xl space-y-4 border border-white/5 mb-10">
+                        <select id="p-cat" class="calc-input text-white">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select>
+                        <input id="p-t" class="calc-input" placeholder="Nazwa konkretnego produktu">
+                        <input id="p-i" class="calc-input" placeholder="Okładka produktu">
+                        <button id="p-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-xl">Zapisz Produkt</button>
+                    </div>
+                    <div class="bg-black/20 p-8 rounded-3xl text-white border border-white/5">
+                        <h4 class="font-bold mb-4">Dodaj Zdjęcie do Galerii Produktu</h4>
+                        <select id="p-gal-select" class="calc-input mb-4 text-white">${Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} -> ${s.title}</option>`)).join('')}</select>
+                        <input id="gal-img-url" class="calc-input mb-4" placeholder="Wklej link do zdjęcia">
+                        <button id="gal-btn" class="bg-stone-600 w-full p-4 rounded-xl font-bold">Dodaj zdjęcie do galerii</button>
+                    </div>
                 `;
                 document.getElementById('p-btn').onclick = () => {
                     const cid = document.getElementById('p-cat').value;
@@ -386,24 +474,30 @@
                         const sid = 's' + Date.now();
                         siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
                         siteData.galleries[sid] = { images: [] };
-                        saveData(); alert("Dodano!");
+                        saveData(); alert("Produkt dodany pomyślnie!"); switchView('products');
+                    }
+                };
+                document.getElementById('gal-btn').onclick = () => {
+                    const sid = document.getElementById('p-gal-select').value;
+                    const url = document.getElementById('gal-img-url').value;
+                    if(sid && url) {
+                        if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
+                        siteData.galleries[sid].images.push({ src: url });
+                        saveData(); alert("Zdjęcie dodane!"); document.getElementById('gal-img-url').value = "";
                     }
                 };
             }
         }
 
+        // --- HANDLERY ---
         window.delHero = (i) => { siteData.heroItems.splice(i,1); saveData(); switchView('hero-gallery'); renderHero(); };
-        window.delCat = (k) => { if(confirm("Usuń kategorię?")) { delete siteData.categories[k]; saveData(); switchView('categories'); renderMain(); }};
-        window.delSub = (cid, i) => { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); };
-        window.delImg = (sid, i, cid, t) => { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); };
-
-        window.openLightbox = (src) => {
-            document.getElementById('lightbox-img').src = src;
-            document.getElementById('lightbox').classList.replace('hidden','flex');
-        };
+        window.delCat = (k) => { if(confirm("Usunąć całą kategorię wraz z produktami?")) { delete siteData.categories[k]; saveData(); switchView('categories'); renderMain(); }};
+        window.delSub = (cid, i) => { if(confirm("Usunąć ten produkt?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); }};
+        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie z galerii?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); }};
+        window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.replace('hidden','flex'); };
         document.getElementById('close-lightbox-btn').onclick = () => document.getElementById('lightbox').classList.replace('flex','hidden');
 
-        // --- INICJALIZACJA ---
+        // --- START SYSTEMU ---
         async function start() {
             try {
                 const appObj = initializeApp(firebaseConfig);
@@ -435,15 +529,14 @@
                     }
                 });
             } catch (e) {
-                console.error("Firebase init failed, using cache:", e);
-                renderHero();
-                renderMain();
+                console.error("Tryb offline - załadowano z cache", e);
+                renderHero(); renderMain();
             }
         }
 
-        // GUI Eventy
-        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden')); document.getElementById('main-content').classList.remove('hidden'); };
-        document.getElementById('back-to-main-btn').onclick = () => document.getElementById('logo-link').click();
+        // --- GUI EVENTY ---
+        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.location.hash = ''; window.location.reload(); };
+        document.getElementById('back-to-main-btn').onclick = () => { document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden'); };
         document.getElementById('admin-footer-btn').onclick = () => document.getElementById('admin-panel').classList.remove('hidden');
         document.getElementById('toggle-admin-panel-btn').onclick = () => { document.getElementById('admin-panel').classList.remove('hidden'); switchView('hero-gallery'); };
         document.getElementById('close-admin-panel-btn').onclick = () => document.getElementById('admin-panel').classList.add('hidden');
@@ -454,20 +547,19 @@
             } else document.getElementById('login-error').classList.remove('hidden');
         };
         document.getElementById('logout-btn').onclick = () => { sessionStorage.removeItem('xeomsc_admin'); location.reload(); };
+        document.getElementById('exit-login-btn').onclick = () => { window.location.hash = ''; location.reload(); };
 
         ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
             const btn = document.getElementById(`btn-${id}`);
             if(btn) btn.onclick = () => switchView(id);
         });
 
-        // Uruchomienie
+        // Start
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
-        renderHero();
-        renderMain();
+        renderHero(); renderMain();
         start();
         
         if (window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden');
-        document.getElementById('exit-login-btn').onclick = () => { window.location.hash = ''; location.reload(); };
     </script>
 </body>
 </html>
