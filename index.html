@@ -39,17 +39,17 @@
 <body class="text-stone-800 bg-stone-50">
 
     <!-- PANEL LOGOWANIA -->
-    <div id="login-screen" class="fixed inset-0 z-[500] bg-stone-900 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
+    <div id="login-screen" class="fixed inset-0 z-[500] bg-stone-900/95 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in">
             <i class="fa-solid fa-user-shield text-wood-600 text-5xl mb-6"></i>
-            <h2 class="text-2xl font-bold mb-6">Autoryzacja Pracowni</h2>
+            <h2 class="text-2xl font-bold mb-6">Panel Administratora</h2>
             <form id="admin-login-form" class="space-y-4 text-left">
-                <input type="text" id="login-user" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Login">
-                <input type="password" id="login-pass" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Hasło">
-                <div id="login-error" class="text-red-500 text-sm hidden font-bold text-center">Dane nieprawidłowe</div>
+                <input type="text" id="login-user" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Login (admin)">
+                <input type="password" id="login-pass" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Hasło (12345)">
+                <div id="login-error" class="text-red-500 text-sm hidden font-bold text-center">Błędne dane logowania</div>
                 <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-wood-700 transition">Zaloguj się</button>
             </form>
-            <button id="exit-login-btn" class="mt-6 text-gray-400 underline text-sm">Wróć do strony</button>
+            <button id="exit-login-btn" class="mt-6 text-gray-400 underline text-sm">Wróć do strony głównej</button>
         </div>
     </div>
 
@@ -57,16 +57,16 @@
     <div id="admin-bar" class="hidden bg-stone-900 text-white py-3 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-xl">
         <div class="flex items-center gap-4">
             <div class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-xs font-bold uppercase tracking-widest text-stone-400">Panel Administratora</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-stone-400">Tryb Administratora</span>
         </div>
         <div class="flex gap-4">
-            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 px-4 py-1.5 rounded-lg text-xs font-bold transition">Zarządzaj Treścią</button>
+            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 px-4 py-1.5 rounded-lg text-xs font-bold transition">Menu CMS</button>
             <button id="logout-btn" class="text-xs text-stone-400 hover:text-white transition">Wyloguj</button>
         </div>
     </div>
 
     <!-- NAWIGACJA -->
-    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm top-0 h-24 flex items-center transition-all duration-300" id="main-nav">
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm top-0 h-24 flex items-center" id="main-nav">
         <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
             <a href="#" id="logo-link" class="text-2xl font-bold text-wood-900 flex items-center gap-3">
                 <div class="bg-wood-600 p-2 rounded-lg text-white">
@@ -76,10 +76,10 @@
             </a>
             <div class="hidden lg:flex gap-10 items-center font-semibold text-stone-600">
                 <a href="#home" class="hover:text-wood-600 transition">Start</a>
-                <a href="#process" class="hover:text-wood-600 transition">Jak pracujemy</a>
-                <a href="#portfolio" class="hover:text-wood-600 transition text-wood-600">Nasze Realizacje</a>
-                <a href="#faq" class="hover:text-wood-600 transition">FAQ</a>
-                <a href="#contact" class="bg-wood-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-wood-800 transition">Wycena projektu</a>
+                <a href="#about" class="hover:text-wood-600 transition">Oferta</a>
+                <a href="#process" class="hover:text-wood-600 transition">Proces</a>
+                <a href="#portfolio" class="hover:text-wood-600 transition text-wood-600">Realizacje</a>
+                <a href="#contact" class="bg-wood-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-wood-800 transition">Wycena</a>
             </div>
         </div>
     </nav>
@@ -92,69 +92,79 @@
             <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="max-w-2xl text-center md:text-left">
-                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100 text-wood-800 text-xs font-bold mb-6 uppercase tracking-widest">Najwyższa jakość graweru</span>
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100 text-wood-800 text-xs font-bold mb-6 uppercase tracking-widest tracking-widest">Szybka wycena online</span>
                     <h1 class="text-5xl md:text-7xl font-bold text-white text-outline leading-tight mb-6">
-                        Twoje Pomysły<br>Wycięte w <span class="gradient-text">Drewnie</span>.
+                        Precyzja Lasera,<br>Ciepło <span class="gradient-text">Drewna</span>.
                     </h1>
-                    <p class="text-xl text-white text-outline mb-10 font-light opacity-90 leading-relaxed">Personalizowane pamiątki, gadżety reklamowe i dekoracje tworzone z pasją przy użyciu najnowszej technologii laserowej.</p>
+                    <p class="text-xl text-white text-outline mb-10 font-light opacity-90 leading-relaxed">Pracownia grawerska Xeomsc WoodArt. Tworzymy pamiątki, dekoracje i gadżety reklamowe, których nie znajdziesz w zwykłym sklepie.</p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="bg-wood-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl hover:bg-wood-800 transition transform hover:scale-105">Zobacz Portfolio</a>
+                        <a href="#portfolio" class="bg-wood-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl hover:bg-wood-800 transition transform hover:scale-105">Nasze Prace</a>
                         <a href="#contact" class="bg-white text-stone-900 px-10 py-4 rounded-full font-bold shadow-xl hover:bg-stone-100 transition">Kontakt</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Dlaczego My -->
-        <section class="py-24 bg-white">
+        <!-- Sekcja Oferta (Przywrócona) -->
+        <section id="about" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-microchip"></i></div>
-                        <h3 class="text-xl font-bold mb-4">Precyzja co do mm</h3>
-                        <p class="text-stone-500">Wykorzystujemy profesjonalne plotery laserowe, które pozwalają na odwzorowanie nawet najdrobniejszych detali Twojego projektu.</p>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Co oferuję?</h2>
+                    <div class="w-20 h-1.5 bg-wood-600 mx-auto rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl transition-all group">
+                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-wand-magic-sparkles text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-900">Grawerowanie</h3>
+                        <p class="text-stone-500 leading-relaxed">Precyzyjne nanoszenie grafiki, tekstu lub logotypów na drewno, szkło, korek czy niektóre tworzywa. Idealne do znakowania produktów.</p>
                     </div>
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-leaf"></i></div>
-                        <h3 class="text-xl font-bold mb-4">Ekologiczne Materiały</h3>
-                        <p class="text-stone-500">Pracujemy głównie na naturalnym drewnie, sklejce brzozowej i materiałach przyjaznych środowisku z certyfikowanych źródeł.</p>
+                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl transition-all group">
+                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-scissors text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-900">Precyzyjne Cięcie</h3>
+                        <p class="text-stone-500 leading-relaxed">Wycinanie dowolnych kształtów z drewna, sklejki i pleksi. Tworzymy napisy 3D, toppery na torty oraz skomplikowane puzzle.</p>
                     </div>
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                        <h3 class="text-xl font-bold mb-4">Szybka Realizacja</h3>
-                        <p class="text-stone-500">Większość zleceń realizujemy w ciągu 3-5 dni roboczych, dbając o to, by Twój prezent dotarł na czas.</p>
+                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl transition-all group">
+                        <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-gift text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-900">Unikalne Prezenty</h3>
+                        <p class="text-stone-500 leading-relaxed">Pamiątki na śluby, chrzciny i jubileusze. Każdy przedmiot możemy spersonalizować imieniem lub dedykacją.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Proces Zamówienia -->
-        <section id="process" class="py-24 bg-stone-50 overflow-hidden">
+        <section id="process" class="py-24 bg-stone-50">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold mb-4">Jak wygląda zamówienie?</h2>
-                    <p class="text-stone-500">Od pomysłu do gotowego produktu w 4 prostych krokach</p>
+                    <h2 class="text-4xl font-bold mb-4 text-stone-900">Zrealizuj swój projekt</h2>
+                    <p class="text-stone-500">Prosta droga od pomysłu do gotowego produktu</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
-                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">01</span>
-                        <h4 class="font-bold text-lg mb-4 pt-4">Projekt i wycena</h4>
-                        <p class="text-sm text-stone-500">Przesyłasz nam swój pomysł, a my przygotowujemy darmową wycenę i wstępny projekt.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">01</div>
+                        <h4 class="font-bold text-lg mb-2">Projekt</h4>
+                        <p class="text-xs text-stone-400">Przesyłasz nam swoją wizję lub gotowy plik graficzny.</p>
                     </div>
-                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
-                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">02</span>
-                        <h4 class="font-bold text-lg mb-4 pt-4">Akceptacja</h4>
-                        <p class="text-sm text-stone-500">Poprawiamy szczegóły projektu tak długo, aż będziesz w 100% zadowolony z efektu wizualnego.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">02</div>
+                        <h4 class="font-bold text-lg mb-2">Wycena</h4>
+                        <p class="text-xs text-stone-400">Używamy naszego kalkulatora, aby podać Ci uczciwą cenę.</p>
                     </div>
-                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
-                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">03</span>
-                        <h4 class="font-bold text-lg mb-4 pt-4">Grawerowanie</h4>
-                        <p class="text-sm text-stone-500">Nasze lasery ruszają do pracy. Dbamy o to, by każdy kawałek drewna był idealnie wykończony.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">03</div>
+                        <h4 class="font-bold text-lg mb-2">Realizacja</h4>
+                        <p class="text-xs text-stone-400">Wycinamy i grawerujemy, dbając o każdy detal wykończenia.</p>
                     </div>
-                    <div class="relative bg-white p-8 rounded-3xl border border-stone-100 shadow-sm">
-                        <span class="absolute -top-6 left-8 text-6xl font-black text-stone-100">04</span>
-                        <h4 class="font-bold text-lg mb-4 pt-4">Wysyłka</h4>
-                        <p class="text-sm text-stone-500">Starannie pakujemy Twoje zamówienie i wysyłamy kurierem prosto pod Twoje drzwi.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">04</div>
+                        <h4 class="font-bold text-lg mb-2">Odbiór</h4>
+                        <p class="text-xs text-stone-400">Gotowy produkt wysyłamy kurierem lub zapraszamy do odbioru.</p>
                     </div>
                 </div>
             </div>
@@ -163,7 +173,7 @@
         <!-- Portfolio Grid -->
         <section id="portfolio" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4">Nasze Ostatnie Prace</h2>
+                <h2 class="text-4xl font-bold mb-4 text-stone-900">Galeria Realizacji</h2>
                 <div class="w-20 h-1.5 bg-wood-600 mx-auto rounded-full mb-16"></div>
                 <div id="main-categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10 text-left"></div>
             </div>
@@ -172,19 +182,15 @@
         <!-- FAQ -->
         <section id="faq" class="py-24 bg-stone-50">
             <div class="max-w-3xl mx-auto px-6">
-                <h2 class="text-4xl font-bold mb-12 text-center">Częste pytania</h2>
-                <div class="space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h4 class="font-bold mb-2">Czy mogę przesłać własny projekt?</h4>
-                        <p class="text-stone-500 text-sm">Tak! Przyjmujemy pliki wektorowe (.cdr, .svg, .pdf, .ai) oraz wysokiej jakości grafiki rastrowe.</p>
+                <h2 class="text-3xl font-bold mb-10 text-center text-stone-900">Pytania i odpowiedzi</h2>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+                        <h4 class="font-bold mb-2">Jakie formaty plików akceptujecie?</h4>
+                        <p class="text-stone-500 text-sm">Najlepiej pliki wektorowe: PDF, SVG, CDR lub AI. Akceptujemy też zdjęcia wysokiej jakości (PNG/JPG).</p>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h4 class="font-bold mb-2">Jaki jest czas oczekiwania?</h4>
-                        <p class="text-stone-500 text-sm">Standardowy czas realizacji to 3-5 dni roboczych. Przy większych zamówieniach termin ustalamy indywidualnie.</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm">
-                        <h4 class="font-bold mb-2">Czy grawerujecie na powierzonym materiale?</h4>
-                        <p class="text-stone-500 text-sm">Tak, po wcześniejszej konsultacji i sprawdzeniu, czy materiał nadaje się do obróbki laserowej.</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+                        <h4 class="font-bold mb-2">Czy jest minimalna ilość zamówienia?</h4>
+                        <p class="text-stone-500 text-sm">Nie. Realizujemy zarówno zamówienia pojedyncze (np. personalizowany prezent), jak i serie po kilkaset sztuk.</p>
                     </div>
                 </div>
             </div>
@@ -193,58 +199,56 @@
         <!-- Kontakt -->
         <section id="contact" class="py-24 bg-white">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-12">Zapytaj o wycenę</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div class="bg-stone-50 p-10 rounded-3xl border border-stone-100 flex flex-col items-center">
-                        <div class="w-16 h-16 bg-wood-600 text-white rounded-full flex items-center justify-center mb-6 text-2xl shadow-lg"><i class="fa-solid fa-envelope"></i></div>
-                        <h4 class="text-xl font-bold mb-2">E-mail</h4>
-                        <p class="text-wood-600 font-bold text-lg">pkatlowski@gmail.com</p>
-                        <p class="text-stone-400 mt-4 text-sm">Odpowiadamy zazwyczaj w ciągu 24h</p>
+                <h2 class="text-4xl font-bold mb-12">Skontaktuj się z nami</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-stone-50 p-10 rounded-[2rem] border border-stone-100 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-wood-600 text-white rounded-full flex items-center justify-center mb-6 text-2xl"><i class="fa-solid fa-envelope"></i></div>
+                        <h4 class="text-xl font-bold mb-2">Napisz e-mail</h4>
+                        <p class="text-wood-600 font-bold">pkatlowski@gmail.com</p>
                     </div>
-                    <div class="bg-stone-50 p-10 rounded-3xl border border-stone-100 flex flex-col items-center">
-                        <div class="w-16 h-16 bg-stone-900 text-white rounded-full flex items-center justify-center mb-6 text-2xl shadow-lg"><i class="fa-solid fa-phone"></i></div>
-                        <h4 class="text-xl font-bold mb-2">Telefon</h4>
-                        <p class="text-stone-900 font-bold text-lg">+48 123 456 789</p>
-                        <p class="text-stone-400 mt-4 text-sm">Dostępni od pon. do pt. (8:00 - 16:00)</p>
+                    <div class="bg-stone-50 p-10 rounded-[2rem] border border-stone-100 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-stone-900 text-white rounded-full flex items-center justify-center mb-6 text-2xl"><i class="fa-solid fa-phone"></i></div>
+                        <h4 class="text-xl font-bold mb-2">Zadzwoń</h4>
+                        <p class="text-stone-900 font-bold">+48 123 456 789</p>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- WIDOKI DYNAMICZNE (PODSTRONY) -->
-    <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white">
+    <!-- PODSTRONY (MODALE DYNAMICZNE) -->
+    <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white fixed inset-0 z-[100] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
             <button id="back-to-main-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do galerii głównej</button>
-            <h2 id="subcategory-title" class="text-5xl font-bold mb-12"></h2>
+            <h2 id="subcategory-title" class="text-5xl font-bold mb-12 text-stone-900"></h2>
             <div id="subcategory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
         </div>
     </div>
 
-    <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white">
+    <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white fixed inset-0 z-[110] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <button id="back-to-sub-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do produktów</button>
-            <h2 id="gallery-title" class="text-4xl font-bold mb-12">Szczegóły realizacji</h2>
+            <h2 id="gallery-title" class="text-4xl font-bold mb-12 text-stone-900"></h2>
             <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
         </div>
     </div>
 
     <!-- LIGHTBOX -->
     <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden items-center justify-center p-4">
-        <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl animate-fade-in">
-        <button id="close-lightbox-btn" class="absolute top-8 right-8 text-white text-5xl hover:text-wood-500 transition"><i class="fa-solid fa-xmark"></i></button>
+        <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl">
+        <button id="close-lightbox-btn" class="absolute top-8 right-8 text-white text-5xl"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <!-- MODAL ADMINA -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-900/90 backdrop-blur-md hidden items-center justify-center p-6">
         <div class="bg-stone-900 text-white w-full max-w-6xl h-[85vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10">
             <div class="w-full md:w-72 bg-black/40 p-8 flex flex-col border-r border-white/5">
-                <h3 class="text-2xl font-bold mb-10 text-wood-500 flex items-center gap-3"><i class="fa-solid fa-gears"></i> CMS</h3>
+                <h3 class="text-2xl font-bold mb-10 text-wood-500">Zarządzanie</h3>
                 <nav class="space-y-3 flex-1">
                     <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Karuzela Hero</button>
                     <button id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Główne Galerie</button>
                     <button id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Produkty</button>
-                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Kalkulator Laser</button>
+                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5 text-xs">Ustawienia Stawek</button>
                 </nav>
                 <button id="close-admin-panel-btn" class="mt-8 text-sm text-stone-500 hover:text-white underline">Zamknij Panel</button>
             </div>
@@ -252,19 +256,11 @@
         </div>
     </div>
 
-    <footer class="bg-stone-950 text-stone-500 py-20 text-center text-sm border-t border-white/5">
+    <footer class="bg-stone-950 text-stone-500 py-20 text-center border-t border-white/5">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-left mb-12">
             <div>
                 <h4 class="text-white font-bold mb-6 text-lg">Xeomsc WoodArt</h4>
-                <p class="leading-relaxed">Grawerowanie i wycinanie laserowe to nasza pasja. Tworzymy rzeczy trwałe i piękne z najlepszych naturalnych materiałów.</p>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 text-lg">Szybkie linki</h4>
-                <div class="flex flex-col gap-3">
-                    <a href="#home" class="hover:text-white transition">Start</a>
-                    <a href="#portfolio" class="hover:text-white transition">Realizacje</a>
-                    <a href="#contact" class="hover:text-white transition">Wycena</a>
-                </div>
+                <p>Pracownia Grawerska Pawła Katłowskiego. Tworzymy z pasją od 2024 roku.</p>
             </div>
             <div>
                 <h4 class="text-white font-bold mb-6 text-lg">Social Media</h4>
@@ -273,9 +269,13 @@
                     <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
                 </div>
             </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">System</h4>
+                <button id="admin-footer-btn" class="hover:text-white underline">Zaloguj do Panelu Administracji</button>
+            </div>
         </div>
-        <div class="pt-12 border-t border-white/5 opacity-50">
-            &copy; 2024 Pracownia Xeomsc WoodArt. Wszystkie prawa zastrzeżone. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-4 text-xs">Administracja</button>
+        <div class="pt-12 border-t border-white/5 opacity-30 text-xs">
+            &copy; 2024 Xeomsc WoodArt. Wszystkie prawa zastrzeżone.
         </div>
     </footer>
 
@@ -285,7 +285,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfiguracja Firebase
         const firebaseConfig = JSON.parse(__firebase_config || '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
         
@@ -322,22 +321,17 @@
             const grid = document.getElementById('main-categories-grid');
             if (!grid) return;
             grid.innerHTML = Object.entries(siteData.categories).map(([id, c]) => `
-                <div class="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-stone-100 fade-in" onclick="window.openSub('${id}')">
-                    <div class="h-72 overflow-hidden relative">
-                        <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-full w-full object-cover group-hover:scale-110 transition duration-700">
-                        <div class="absolute inset-0 bg-wood-900/20 opacity-0 group-hover:opacity-100 transition duration-500 flex items-center justify-center">
-                            <span class="bg-white text-wood-900 px-6 py-2 rounded-full font-bold shadow-xl">Odkryj produkty</span>
-                        </div>
-                    </div>
+                <div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-stone-100 fade-in" onclick="window.openSub('${id}')">
+                    <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-64 w-full object-cover group-hover:scale-105 transition duration-500">
                     <div class="p-8">
-                        <h3 class="font-bold text-2xl mb-2">${c.title}</h3>
-                        <p class="text-stone-400 text-sm leading-relaxed">${c.desc || 'Wybierz, aby zobaczyć nasze realizacje w tej kategorii.'}</p>
+                        <h3 class="font-bold text-xl mb-2 text-stone-900">${c.title}</h3>
+                        <p class="text-stone-400 text-sm">${c.desc || 'Wybierz, aby zobaczyć realizacje.'}</p>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- GLOBALNE FUNKCJE OKIEN ---
+        // --- GLOBALNE FUNKCJE ---
         window.openSub = (id) => {
             const c = siteData.categories[id];
             if(!c) return;
@@ -346,15 +340,11 @@
                 <div class="bg-white rounded-[2rem] overflow-hidden border border-stone-100 cursor-pointer hover:shadow-2xl transition relative" onclick="window.openGal('${s.id}', '${s.title}', '${id}')">
                     <img src="${s.image}" class="h-64 w-full object-cover">
                     <div class="p-6 flex justify-between items-center">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-lg">${s.title}</span>
-                            <span class="text-xs text-stone-400 uppercase tracking-widest font-bold">Szczegóły</span>
-                        </div>
+                        <span class="font-bold text-stone-900">${s.title}</span>
                         <button onclick="event.stopPropagation(); window.delSub('${id}',${i})" class="admin-controls text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
-            document.getElementById('main-content').classList.add('hidden');
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
@@ -364,17 +354,15 @@
             document.getElementById('gallery-title').textContent = title;
             document.getElementById('back-to-sub-btn').onclick = () => window.openSub(cid);
             document.getElementById('gallery-grid').innerHTML = g.images.map((img, i) => `
-                <div class="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all hover:scale-105 group">
+                <div class="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-lg group">
                     <img src="${img.src}" class="w-full h-full object-cover" onclick="window.openLightbox('${img.src}')">
-                    <button onclick="window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-4 right-4 bg-red-500 text-white p-3 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-4 right-4 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
-            document.getElementById('subcategory-view').classList.add('hidden');
             document.getElementById('gallery-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
 
-        // --- ZAPIS ---
         async function saveData() {
             localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
             if (auth.currentUser) {
@@ -382,90 +370,75 @@
             }
         }
 
-        // --- CMS PANEL LOGIKA ---
-        function switchView(view) {
-            const cont = document.getElementById('admin-view-container');
-            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.toggle('active', b.id === `btn-${view}`));
-            
-            if (view === 'hero-gallery') {
-                cont.innerHTML = `
-                    <h4 class="text-2xl font-bold mb-6 text-wood-500">Materiały na stronie głównej</h4>
-                    <div class="bg-black/20 p-8 rounded-3xl border border-white/5 space-y-6 mb-10">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input id="h-url" class="calc-input" placeholder="Wklej link URL do zdjęcia/wideo">
-                            <select id="h-type" class="calc-input text-white"><option value="image">Zdjęcie</option><option value="video">Wideo (bezpośredni link)</option></select>
-                        </div>
-                        <button id="add-h-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold hover:bg-wood-500 transition">Dodaj do karuzeli</button>
+        // --- CMS PANEL ---
+        function renderAdminView(id) {
+            const container = document.getElementById('admin-view-container');
+            if (id === 'hero-gallery') {
+                container.innerHTML = `
+                    <h4 class="text-xl font-bold mb-6 text-wood-500">Banery Hero</h4>
+                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
+                        <input id="h-url" class="calc-input" placeholder="Link do zdjęcia/wideo">
+                        <select id="h-type" class="calc-input text-white"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
+                        <button id="add-h-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Dodaj</button>
                     </div>
-                    <div class="space-y-3">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex justify-between items-center"><span class="truncate max-w-[80%] opacity-60 text-sm">${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500 hover:text-white transition"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')}</div>
+                    <div class="space-y-2">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center text-xs opacity-60"><span>${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500 hover:text-white p-2">USUŃ</button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-h-btn').onclick = () => {
                     const url = document.getElementById('h-url').value;
-                    if(url) { siteData.heroItems.push({type: document.getElementById('h-type').value, url}); saveData(); switchView('hero-gallery'); }
+                    if(url) { siteData.heroItems.push({type: document.getElementById('h-type').value, url}); saveData(); renderAdminView('hero-gallery'); }
                 };
-            } else if (view === 'calculator') {
-                cont.innerHTML = `
-                    <h4 class="text-2xl font-bold mb-6 text-wood-500">Kalkulator Laserowy</h4>
-                    <p class="text-stone-400 mb-8 text-sm italic">Ustawienia stawek zgodne z Twoim arkuszem kalkulacyjnym.</p>
-                    <div class="grid grid-cols-2 gap-6">
+            } else if (id === 'calculator') {
+                container.innerHTML = `
+                    <h4 class="text-xl font-bold mb-6 text-wood-500">Stawki Kalkulatora</h4>
+                    <div class="space-y-6">
                         <div class="bg-black/20 p-6 rounded-2xl">
-                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Szerokość (mm)</label>
-                             <input id="cw" class="calc-input" value="100" type="number">
+                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase">Koszt pracy lasera (PLN/min)</label>
+                             <input id="rate-min" class="calc-input" value="${siteData.calcSettings.rateLaserMin}" type="number" step="0.01">
                         </div>
                         <div class="bg-black/20 p-6 rounded-2xl">
-                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Wysokość (mm)</label>
-                             <input id="ch" class="calc-input" value="100" type="number">
+                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase">Koszt materiału (PLN/cm2)</label>
+                             <input id="rate-cm" class="calc-input" value="${siteData.calcSettings.rateCm2}" type="number" step="0.0001">
                         </div>
-                    </div>
-                    <div class="bg-black/20 p-6 rounded-2xl mt-6">
-                         <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase tracking-tighter">Czas pracy maszyny (min)</label>
-                         <input id="ct" class="calc-input" value="10" type="number">
-                    </div>
-                    <div class="mt-10 p-10 bg-gradient-to-br from-wood-900 to-stone-900 rounded-[2rem] text-center border-2 border-wood-600/30">
-                        <p class="text-xs text-wood-500 uppercase font-black tracking-[0.2em] mb-4">Sugerowana cena klienta</p>
-                        <div id="c-res" class="text-6xl font-black text-white mt-2 drop-shadow-2xl">0.00 PLN</div>
+                        <button id="save-calc-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Zapisz nowe stawki</button>
                     </div>
                 `;
-                ['cw', 'ch', 'ct'].forEach(id => document.getElementById(id).oninput = () => {
-                    const w = parseFloat(document.getElementById('cw').value) || 0;
-                    const h = parseFloat(document.getElementById('ch').value) || 0;
-                    const t = parseFloat(document.getElementById('ct').value) || 0;
-                    const res = ((w * h / 100) * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.32;
-                    document.getElementById('c-res').textContent = res.toFixed(2) + " PLN";
-                });
-            } else if (view === 'categories') {
-                cont.innerHTML = `
-                    <h4 class="text-2xl font-bold mb-6 text-wood-500 text-white">Zarządzanie Kategoriami</h4>
-                    <div class="bg-black/20 p-8 rounded-3xl space-y-4 mb-10 border border-white/5">
-                        <input id="cat-t" class="calc-input" placeholder="Nazwa kategorii (np. Tabliczki Ślubne)">
-                        <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia okładki">
-                        <button id="add-cat-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white hover:bg-wood-500 transition">Stwórz nową kategorię</button>
+                document.getElementById('save-calc-btn').onclick = () => {
+                    siteData.calcSettings.rateLaserMin = parseFloat(document.getElementById('rate-min').value);
+                    siteData.calcSettings.rateCm2 = parseFloat(document.getElementById('rate-cm').value);
+                    saveData(); alert("Stawki zaktualizowane!");
+                };
+            } else if (id === 'categories') {
+                container.innerHTML = `
+                    <h4 class="text-xl font-bold mb-6 text-wood-500">Główne Kategorie</h4>
+                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
+                        <input id="cat-t" class="calc-input" placeholder="Nazwa galerii (np. Drewno)">
+                        <input id="cat-i" class="calc-input" placeholder="Okładka (link)">
+                        <button id="add-cat-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Zapisz</button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex justify-between items-center"><div class="flex flex-col"><span class="font-bold">${siteData.categories[k].title}</span><span class="text-[10px] opacity-40">${k}</span></div><button onclick="window.delCat('${k}')" class="text-red-500 hover:text-white transition p-3"><i class="fa-solid fa-trash-can"></i></button></div>`).join('')}</div>
+                    <div class="space-y-2 text-white">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-xl flex justify-between"><span>${siteData.categories[k].title}</span><button onclick="window.delCat('${k}')" class="text-red-500 p-2">USUŃ</button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-cat-btn').onclick = () => {
                     const t = document.getElementById('cat-t').value;
                     if(t) {
                         const id = 'c' + Date.now();
                         siteData.categories[id] = { title: t, image: document.getElementById('cat-i').value, subcategories: [] };
-                        saveData(); switchView('categories');
+                        saveData(); renderAdminView('categories');
                     }
                 };
-            } else if (view === 'products') {
-                cont.innerHTML = `
-                    <h4 class="text-2xl font-bold mb-6 text-wood-500 text-white">Dodaj Produkt do Kategorii</h4>
-                    <div class="bg-black/20 p-8 rounded-3xl space-y-4 border border-white/5 mb-10">
+            } else if (id === 'products') {
+                container.innerHTML = `
+                    <h4 class="text-xl font-bold mb-6 text-wood-500 text-white">Dodaj Produkt</h4>
+                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
                         <select id="p-cat" class="calc-input text-white">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select>
-                        <input id="p-t" class="calc-input" placeholder="Nazwa konkretnego produktu">
-                        <input id="p-i" class="calc-input" placeholder="Okładka produktu">
-                        <button id="p-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-xl">Zapisz Produkt</button>
+                        <input id="p-t" class="calc-input" placeholder="Nazwa (np. Topper)">
+                        <input id="p-i" class="calc-input" placeholder="Link do zdjęcia okładki">
+                        <button id="p-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Dodaj Produkt</button>
                     </div>
-                    <div class="bg-black/20 p-8 rounded-3xl text-white border border-white/5">
-                        <h4 class="font-bold mb-4">Dodaj Zdjęcie do Galerii Produktu</h4>
-                        <select id="p-gal-select" class="calc-input mb-4 text-white">${Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} -> ${s.title}</option>`)).join('')}</select>
-                        <input id="gal-img-url" class="calc-input mb-4" placeholder="Wklej link do zdjęcia">
-                        <button id="gal-btn" class="bg-stone-600 w-full p-4 rounded-xl font-bold">Dodaj zdjęcie do galerii</button>
-                    </div>
+                    <hr class="border-white/5 my-10">
+                    <h4 class="text-xl font-bold mb-4 text-white">Dodaj zdjęcie do galerii produktu</h4>
+                    <select id="p-gal-select" class="calc-input mb-4 text-white">${Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('')}</select>
+                    <input id="gal-img-url" class="calc-input mb-4" placeholder="Adres URL zdjęcia">
+                    <button id="gal-btn" class="bg-stone-600 w-full p-4 rounded-xl font-bold">Dodaj zdjęcie</button>
                 `;
                 document.getElementById('p-btn').onclick = () => {
                     const cid = document.getElementById('p-cat').value;
@@ -474,7 +447,7 @@
                         const sid = 's' + Date.now();
                         siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
                         siteData.galleries[sid] = { images: [] };
-                        saveData(); alert("Produkt dodany pomyślnie!"); switchView('products');
+                        saveData(); alert("Produkt dodany!"); renderAdminView('products');
                     }
                 };
                 document.getElementById('gal-btn').onclick = () => {
@@ -483,21 +456,20 @@
                     if(sid && url) {
                         if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
                         siteData.galleries[sid].images.push({ src: url });
-                        saveData(); alert("Zdjęcie dodane!"); document.getElementById('gal-img-url').value = "";
+                        saveData(); alert("Dodano zdjęcie!");
                     }
                 };
             }
         }
 
-        // --- HANDLERY ---
-        window.delHero = (i) => { siteData.heroItems.splice(i,1); saveData(); switchView('hero-gallery'); renderHero(); };
-        window.delCat = (k) => { if(confirm("Usunąć całą kategorię wraz z produktami?")) { delete siteData.categories[k]; saveData(); switchView('categories'); renderMain(); }};
-        window.delSub = (cid, i) => { if(confirm("Usunąć ten produkt?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); }};
-        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie z galerii?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); }};
+        // --- SYSTEM HANDLERS ---
+        window.delHero = (i) => { siteData.heroItems.splice(i,1); saveData(); renderAdminView('hero-gallery'); renderHero(); };
+        window.delCat = (k) => { if(confirm("Usunąć kategorię?")) { delete siteData.categories[k]; saveData(); renderAdminView('categories'); renderMain(); }};
+        window.delSub = (cid, i) => { if(confirm("Usunąć produkt?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); }};
+        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); }};
         window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.replace('hidden','flex'); };
         document.getElementById('close-lightbox-btn').onclick = () => document.getElementById('lightbox').classList.replace('flex','hidden');
 
-        // --- START SYSTEMU ---
         async function start() {
             try {
                 const appObj = initializeApp(firebaseConfig);
@@ -517,28 +489,27 @@
                             if (snap.exists()) {
                                 siteData = snap.data();
                                 localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                renderHero();
-                                renderMain();
+                                renderHero(); renderMain();
                             }
                         });
                         if (sessionStorage.getItem('xeomsc_admin') === 'true') {
                             document.body.classList.add('is-admin');
                             document.getElementById('admin-bar').classList.remove('hidden');
-                            document.getElementById('admin-footer-btn').classList.remove('hidden');
+                            document.getElementById('admin-footer-btn').classList.add('hidden');
                         }
                     }
                 });
             } catch (e) {
-                console.error("Tryb offline - załadowano z cache", e);
                 renderHero(); renderMain();
             }
         }
 
-        // --- GUI EVENTY ---
+        // GUI
         document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.location.hash = ''; window.location.reload(); };
-        document.getElementById('back-to-main-btn').onclick = () => { document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden'); };
-        document.getElementById('admin-footer-btn').onclick = () => document.getElementById('admin-panel').classList.remove('hidden');
-        document.getElementById('toggle-admin-panel-btn').onclick = () => { document.getElementById('admin-panel').classList.remove('hidden'); switchView('hero-gallery'); };
+        document.getElementById('back-to-main-btn').onclick = () => { document.getElementById('subcategory-view').classList.add('hidden'); };
+        document.getElementById('back-to-sub-btn').onclick = () => { document.getElementById('gallery-view').classList.add('hidden'); };
+        document.getElementById('admin-footer-btn').onclick = () => document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('toggle-admin-panel-btn').onclick = () => { document.getElementById('admin-panel').classList.remove('hidden'); renderAdminView('hero-gallery'); };
         document.getElementById('close-admin-panel-btn').onclick = () => document.getElementById('admin-panel').classList.add('hidden');
         document.getElementById('admin-login-form').onsubmit = (e) => {
             e.preventDefault();
@@ -551,10 +522,11 @@
 
         ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
             const btn = document.getElementById(`btn-${id}`);
-            if(btn) btn.onclick = () => switchView(id);
+            if(btn) btn.onclick = () => renderAdminView(id);
         });
 
-        // Start
+        window.addEventListener('hashchange', () => { if (window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
+
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero(); renderMain();
         start();
