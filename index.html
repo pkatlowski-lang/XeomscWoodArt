@@ -90,12 +90,6 @@
             display: flex !important;
         }
 
-        .hero-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
         .hero-slide {
             position: absolute;
             inset: 0;
@@ -128,9 +122,28 @@
         .calc-input:focus {
             border-color: #d97706;
         }
+
+        /* Loading Spinner */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: #fafaf9;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
+
+    <!-- EKRAN ŁADOWANIA DANYCH Z CHMURY -->
+    <div id="loading-overlay">
+        <div class="w-16 h-16 border-4 border-wood-100 border-t-wood-600 rounded-full animate-spin mb-4"></div>
+        <p class="font-bold text-stone-600 uppercase tracking-widest text-xs">Pobieranie danych z chmury...</p>
+    </div>
 
     <!-- EKRAN LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[300] bg-stone-900 hidden flex items-center justify-center p-4">
@@ -141,7 +154,7 @@
             <h2 class="text-2xl font-bold text-stone-900 mb-2">Panel Administratora</h2>
             <p class="text-gray-500 mb-6">Zaloguj się, aby zarządzać stroną</p>
             
-            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4 text-left">
+            <form id="admin-login-form" class="space-y-4 text-left">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Login</label>
                     <input type="text" id="login-user" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="Wpisz login">
@@ -153,19 +166,19 @@
                 <div id="login-error" class="text-red-500 text-sm hidden text-center font-bold">Błędny login lub hasło!</div>
                 <button type="submit" class="w-full bg-wood-600 text-white py-3 rounded-lg font-bold hover:bg-wood-700 transition shadow-lg">Zaloguj się</button>
             </form>
-            <button onclick="exitLogin()" class="mt-6 text-sm text-gray-400 hover:text-wood-600 underline">Wróć do strony głównej</button>
+            <button id="exit-login-btn" class="mt-6 text-sm text-gray-400 hover:text-wood-600 underline">Wróć do strony głównej</button>
         </div>
     </div>
 
     <!-- Pasek Admina -->
     <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-4 fixed top-0 w-full z-[150] flex justify-between items-center shadow-md">
         <div class="flex items-center gap-4">
-            <span class="hidden sm:inline font-semibold text-green-400"><i class="fa-solid fa-shield-halved mr-2"></i> Tryb Admina</span>
-            <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-1.5 rounded text-xs font-bold transition flex items-center">
+            <span class="hidden sm:inline font-semibold text-green-400"><i class="fa-solid fa-shield-halved mr-2"></i> Tryb Admina (Chmura)</span>
+            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-1.5 rounded text-xs font-bold transition flex items-center">
                 <i class="fa-solid fa-bars-staggered mr-2"></i> Menu Zarządzania
             </button>
         </div>
-        <button onclick="handleLogout()" class="hover:text-red-400 font-bold transition flex items-center"><i class="fa-solid fa-power-off mr-2"></i> Wyloguj</button>
+        <button id="logout-btn" class="hover:text-red-400 font-bold transition flex items-center"><i class="fa-solid fa-power-off mr-2"></i> Wyloguj</button>
     </div>
 
     <!-- Nawigacja Strony -->
@@ -173,30 +186,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-wood-600 tracking-tighter flex items-center">
+                    <a href="#" id="logo-link" class="text-2xl font-bold text-wood-600 tracking-tighter flex items-center">
                         <i class="fa-solid fa-bolt mr-2"></i> Xeomsc WoodArt
                     </a>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#home" onclick="goHome()" class="text-gray-600 hover:text-wood-600 transition font-medium">Start</a>
-                    <a href="#about" onclick="goHome()" class="text-gray-600 hover:text-wood-600 transition font-medium">O ofercie</a>
-                    <a href="#portfolio" onclick="goHome()" class="text-gray-600 hover:text-wood-600 transition font-medium">Realizacje</a>
-                    <a href="#contact" onclick="goHome()" class="px-5 py-2.5 bg-wood-600 text-white rounded-lg hover:bg-wood-800 transition shadow-lg font-medium">Wycena</a>
+                    <a href="#home" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">Start</a>
+                    <a href="#about" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">O ofercie</a>
+                    <a href="#portfolio" class="nav-link text-gray-600 hover:text-wood-600 transition font-medium">Realizacje</a>
+                    <a href="#contact" class="nav-link px-5 py-2.5 bg-wood-600 text-white rounded-lg hover:bg-wood-800 transition shadow-lg font-medium">Wycena</a>
                 </div>
-                <div class="md:hidden flex items-center">
-                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-wood-600">
-                        <i class="fa-solid fa-bars text-2xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobilne Menu -->
-        <div class="md:hidden hidden bg-white border-t border-stone-100" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="#home" onclick="goHome(); toggleMobileMenu();" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-stone-50">Start</a>
-                <a href="#about" onclick="goHome(); toggleMobileMenu();" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-stone-50">O ofercie</a>
-                <a href="#portfolio" onclick="goHome(); toggleMobileMenu();" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-stone-50">Realizacje</a>
-                <a href="#contact" onclick="goHome(); toggleMobileMenu();" class="block px-3 py-2 rounded-md font-bold text-wood-600">Wycena</a>
             </div>
         </div>
     </nav>
@@ -205,9 +204,7 @@
     <div id="main-content" class="pt-0 transition-all duration-300">
         <!-- Hero Section -->
         <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden">
-            <div class="absolute inset-0 z-0" id="hero-carousel-container">
-                <div class="w-full h-full bg-stone-200 animate-pulse"></div>
-            </div>
+            <div class="absolute inset-0 z-0" id="hero-carousel-container"></div>
             <div class="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
                 <div class="w-full md:w-1/2 text-center md:text-left bg-white/20 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none p-8 md:p-0 rounded-3xl">
@@ -227,7 +224,6 @@
                     </div>
                 </div>
             </div>
-            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-stone-50 to-transparent z-10 pointer-events-none"></div>
         </section>
 
         <!-- Oferta -->
@@ -274,7 +270,7 @@
         <section id="contact" class="py-24 bg-white border-t border-stone-100">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                  <h2 class="text-4xl font-bold mb-8">Kontakt i Wycena</h2>
-                 <p class="mb-12 text-gray-600 text-lg">Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę.</p>
+                 <p class="mb-12 text-gray-600 text-lg">Napisz do mnie, a przygotuję dla Ciebie indywidualną wycenę.</p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="flex flex-col items-center p-8 bg-stone-50 rounded-2xl border border-stone-100">
                         <i class="fa-solid fa-envelope text-wood-600 text-3xl mb-4"></i>
@@ -292,7 +288,7 @@
     <!-- WIDOKI DYNAMICZNE -->
     <div id="subcategory-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button onclick="goHome()" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót do głównych kategorii</button>
+            <button id="back-to-main-btn" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
             <h2 id="subcategory-title" class="text-4xl font-bold text-stone-900 mb-4">Wybierz produkt</h2>
             <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></div>
         </div>
@@ -300,9 +296,9 @@
 
     <div id="gallery-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button id="back-to-sub-btn" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót do listy produktów</button>
+            <button id="back-to-sub-btn" class="mb-8 flex items-center text-wood-600 font-bold hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left mr-2"></i> Powrót</button>
             <div class="mb-10">
-                <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-2">Galeria Zdjęć</h2>
+                <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-2">Galeria</h2>
                 <div id="gallery-product-info" class="text-stone-500 text-lg"></div>
             </div>
             <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -310,13 +306,12 @@
     </div>
 
     <!-- LIGHTBOX -->
-    <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer" onclick="closeLightbox()">
-        <div class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); changeLightboxImage(-1)"><i class="fa-solid fa-chevron-left"></i></div>
-        <div class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); changeLightboxImage(1)"><i class="fa-solid fa-chevron-right"></i></div>
-        <div class="relative max-w-5xl max-h-screen w-full flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+    <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer">
+        <div class="lightbox-nav lightbox-prev absolute left-4 text-white text-4xl p-4"><i class="fa-solid fa-chevron-left"></i></div>
+        <div class="lightbox-nav lightbox-next absolute right-4 text-white text-4xl p-4"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="relative max-w-5xl max-h-screen w-full flex flex-col items-center justify-center">
             <img id="lightbox-img" src="" alt="Powiększenie" class="lightbox-img rounded-lg">
-            <p id="lightbox-desc" class="text-white mt-4 text-xl font-medium text-center bg-black/50 px-6 py-2 rounded-full"></p>
-            <button class="absolute -top-12 right-0 text-white hover:text-wood-500" onclick="closeLightbox()"><i class="fa-solid fa-xmark text-4xl"></i></button>
+            <button class="absolute -top-12 right-0 text-white hover:text-wood-500" id="close-lightbox-btn"><i class="fa-solid fa-xmark text-4xl"></i></button>
         </div>
     </div>
 
@@ -329,165 +324,27 @@
                     <i class="fa-solid fa-gears"></i> Zarządzanie
                 </h2>
                 <nav class="space-y-2 flex-1">
-                    <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
+                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
                         <i class="fa-solid fa-images"></i> Galeria Tytułowa
                     </button>
-                    <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
+                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
                         <i class="fa-solid fa-folder-tree"></i> Kategorie
                     </button>
-                    <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
+                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
                         <i class="fa-solid fa-box-open"></i> Produkty i Zdjęcia
                     </button>
-                    <!-- Kalkulator Lasera Button -->
-                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
+                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition flex items-center gap-3">
                         <i class="fa-solid fa-calculator"></i> Kalkulator Lasera
                     </button>
                 </nav>
-                <button onclick="toggleAdminPanel()" class="mt-auto pt-4 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10">
+                <button id="close-admin-panel-btn" class="mt-auto pt-4 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10">
                     <i class="fa-solid fa-xmark"></i> Zamknij Panel
                 </button>
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 sm:p-10 bg-stone-900 text-white">
-                
-                <!-- Widok: Kalkulator Lasera -->
-                <div id="view-calculator" class="admin-view hidden space-y-8">
-                    <header>
-                        <h3 class="text-3xl font-bold mb-2">Kalkulator Lasera</h3>
-                        <p class="text-stone-400">Obliczenia na podstawie Szerokości, Wysokości i Czasu pracy.</p>
-                    </header>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Parametry Wejściowe -->
-                        <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 space-y-6">
-                            <h4 class="font-bold text-wood-500 uppercase text-xs border-b border-white/5 pb-2">Ustawienia i Koszty</h4>
-                            
-                            <!-- Sekcja Wymiarów -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Szerokość (mm)</label>
-                                    <input type="number" id="calc-width-mm" class="calc-input" value="100" oninput="runLaserCalculator()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Wysokość (mm)</label>
-                                    <input type="number" id="calc-height-mm" class="calc-input" value="100" oninput="runLaserCalculator()">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Czas Lasera (min)</label>
-                                    <input type="number" id="calc-time-laser" class="calc-input" value="10" oninput="runLaserCalculator()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Pole (cm²)</label>
-                                    <input type="text" id="calc-area-cm2" class="calc-input bg-stone-950 opacity-60" readonly value="100">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Koszt Lasera (PLN/min)</label>
-                                    <input type="number" step="0.01" id="calc-rate-laser-min" class="calc-input" value="0.50" oninput="runLaserCalculator()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Koszt Materiału (PLN/cm²)</label>
-                                    <input type="number" step="0.0001" id="calc-rate-cm2" class="calc-input" value="0.0038" oninput="runLaserCalculator()">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Marża (%)</label>
-                                    <input type="number" id="calc-margin" class="calc-input" value="20" oninput="runLaserCalculator()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Koszty Stałe (%)</label>
-                                    <input type="number" id="calc-overhead" class="calc-input" value="10" oninput="runLaserCalculator()">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Wyniki Kalkulacji -->
-                        <div class="bg-stone-950 p-8 rounded-2xl border-2 border-wood-600/30 flex flex-col justify-center items-center text-center space-y-6 text-white">
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <div>
-                                    <p class="text-stone-500 uppercase text-[9px] font-bold tracking-widest mb-1">Koszt Materiału</p>
-                                    <div id="calc-result-material" class="text-xl font-bold">0.00 PLN</div>
-                                </div>
-                                <div>
-                                    <p class="text-stone-500 uppercase text-[9px] font-bold tracking-widest mb-1">Koszt Lasera</p>
-                                    <div id="calc-result-laser" class="text-xl font-bold">0.00 PLN</div>
-                                </div>
-                            </div>
-
-                            <div class="w-full h-px bg-white/5"></div>
-
-                            <div>
-                                <p class="text-stone-500 uppercase text-xs font-bold tracking-widest mb-2">Całkowity Koszt Produkcji</p>
-                                <div id="calc-result-total-cost" class="text-3xl font-bold">0.00 PLN</div>
-                            </div>
-
-                            <div>
-                                <p class="text-wood-500 uppercase text-sm font-black tracking-widest mb-2">Sugerowana Cena Klienta</p>
-                                <div id="calc-result-final-price" class="text-6xl font-black drop-shadow-lg text-white">0.00 PLN</div>
-                            </div>
-                            
-                            <button onclick="saveCalcSettings()" class="bg-stone-800 hover:bg-stone-700 text-white px-6 py-2 rounded-lg text-xs font-bold transition">Zapisz ustawienia stawek</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="view-hero-gallery" class="admin-view hidden space-y-8">
-                    <header><h3 class="text-3xl font-bold mb-2">Galeria Tytułowa</h3></header>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <select id="admin-hero-type" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                            <input id="admin-hero-url" type="text" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Link URL">
-                        </div>
-                        <button onclick="adminAddHeroItem()" class="mt-6 bg-wood-600 hover:bg-wood-700 text-white font-bold py-3 px-8 rounded-xl transition w-full text-white">Dodaj</button>
-                    </div>
-                    <div id="hero-items-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                </div>
-
-                <div id="view-categories" class="admin-view hidden space-y-8 text-white">
-                    <header><h3 class="text-3xl font-bold mb-2">Kategorie</h3></header>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5" id="admin-cat-form-container">
-                        <form onsubmit="event.preventDefault(); adminSaveCategory();" class="space-y-4">
-                            <input type="hidden" id="admin-cat-edit-id">
-                            <input id="admin-main-cat-title" type="text" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Nazwa kategorii" required>
-                            <input id="admin-main-cat-desc" type="text" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Opis" required>
-                            <input id="admin-main-cat-image" type="text" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Zdjęcie okładki (link)">
-                            <div class="flex gap-2 text-white">
-                                <button type="submit" id="cat-save-btn" class="bg-wood-600 px-8 py-3 rounded-xl font-bold flex-1">Zapisz</button>
-                                <button type="button" id="cat-cancel-btn" onclick="resetCatForm()" class="hidden bg-stone-700 px-4 py-3 rounded-xl font-bold">Anuluj</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="admin-categories-list" class="grid grid-cols-1 gap-3"></div>
-                </div>
-
-                <div id="view-products" class="admin-view hidden space-y-10 text-white">
-                    <header><h3 class="text-3xl font-bold mb-2">Produkty</h3></header>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <select id="admin-main-cat-select" class="bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white"></select>
-                            <input id="admin-sub-title" type="text" class="bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Nazwa produktu">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input id="admin-sub-price" type="text" class="bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Cena">
-                            <input id="admin-sub-img" type="text" class="bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Link okładki">
-                        </div>
-                        <textarea id="admin-sub-desc" rows="3" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Opis..."></textarea>
-                        <button onclick="adminAddSubcategory()" class="bg-wood-600 px-8 py-3 rounded-xl font-bold w-full">Dodaj produkt</button>
-                    </div>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 space-y-6">
-                        <select id="admin-sub-cat-select" class="w-full bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white"></select>
-                        <input id="admin-img-url" type="text" class="bg-stone-950 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="Dodaj zdjęcie do galerii produktu (link)">
-                        <button onclick="adminAddImage()" class="bg-stone-600 px-8 py-3 rounded-xl font-bold w-full">Dodaj do galerii</button>
-                    </div>
-                </div>
-
+                <!-- Widoki będą renderowane dynamicznie przez JS -->
+                <div id="admin-view-container"></div>
             </div>
         </div>
     </div>
@@ -495,159 +352,156 @@
     <footer class="bg-stone-950 text-stone-500 py-16 text-center text-sm border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 space-y-6">
             <h2 class="text-xl font-bold text-wood-600 italic">Xeomsc WoodArt</h2>
-            <p>&copy; 2024 Wszystkie prawa zastrzeżone. <button id="admin-footer-btn" onclick="toggleAdminPanel()" class="hidden hover:text-white underline ml-2">Panel Zarządzania</button></p>
+            <p>&copy; 2024 Wszystkie prawa zastrzeżone. <button id="admin-footer-btn" class="hidden hover:text-white underline ml-2">Panel Zarządzania</button></p>
         </div>
     </footer>
 
-    <script>
-        // --- DANE ---
-        const defaultData = {
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfiguracja Firebase dostarczona przez środowisko
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DANE DOMYŚLNE ---
+        const initialData = {
             heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2070&auto=format&fit=crop' }],
             categories: {},
             galleries: {},
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        let siteData = JSON.parse(localStorage.getItem('xeomsc_data')) || defaultData;
-        
-        // --- KARUZELA HERO ---
-        let currentHeroIdx = 0, heroTimer = null;
+        let siteData = initialData;
+        let user = null;
+
+        // --- Ścieżka Firestore (Zasada 1) ---
+        const configDocPath = `artifacts/${appId}/public/data/siteConfig`;
+
+        // --- INICJALIZACJA AUTORYZACJI (Zasada 3) ---
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+
+        // --- LOGIKA BAZY DANYCH ---
+        function setupDataListener() {
+            if (!auth.currentUser) return;
+            
+            const docRef = doc(db, configDocPath, 'main');
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    siteData = snapshot.data();
+                    renderAll();
+                } else {
+                    // Jeśli baza jest pusta, zapisz dane startowe
+                    saveDataToCloud(initialData);
+                }
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+            }, (error) => {
+                console.error("Firestore Error:", error);
+            });
+        }
+
+        async function saveDataToCloud(data) {
+            if (!auth.currentUser) return;
+            try {
+                await setDoc(doc(db, configDocPath, 'main'), data);
+            } catch (e) {
+                console.error("Błąd zapisu:", e);
+            }
+        }
+
+        // --- GLOBALNE FUNKCJE (Dostępne dla UI) ---
+        window.saveData = () => saveDataToCloud(siteData);
+        window.goHome = () => {
+            document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('main-content').classList.remove('hidden');
+        };
+
+        // --- RENDEROWANIE UI ---
+        function renderAll() {
+            renderHeroCarousel();
+            renderMainCategories();
+            if (document.body.classList.contains('is-admin')) {
+                refreshAdminUI();
+            }
+        }
+
         function renderHeroCarousel() {
             const container = document.getElementById('hero-carousel-container');
-            if (!container || siteData.heroItems.length === 0) return;
+            if (!container || !siteData.heroItems.length) return;
             container.innerHTML = '';
             siteData.heroItems.forEach((item, idx) => {
                 const slide = document.createElement('div');
-                slide.className = `hero-slide ${idx === currentHeroIdx ? 'active' : ''}`;
-                slide.innerHTML = item.type === 'image' ? `<img src="${item.url}" class="w-full h-full object-cover">` : `<video src="${item.url}" class="w-full h-full object-cover" ${idx === currentHeroIdx ? 'autoplay' : ''} muted></video>`;
+                slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
+                slide.innerHTML = item.type === 'image' 
+                    ? `<img src="${item.url}" class="w-full h-full object-cover">` 
+                    : `<video src="${item.url}" class="w-full h-full object-cover" muted></video>`;
                 container.appendChild(slide);
             });
-            startHeroRotation();
-        }
-        function startHeroRotation() {
-            clearTimeout(heroTimer);
-            heroTimer = setTimeout(nextHeroSlide, 5000);
-        }
-        function nextHeroSlide() {
-            if (siteData.heroItems.length === 0) return;
-            currentHeroIdx = (currentHeroIdx + 1) % siteData.heroItems.length;
-            const slides = document.querySelectorAll('.hero-slide');
-            slides.forEach((s, idx) => s.classList.toggle('active', idx === currentHeroIdx));
-            startHeroRotation();
         }
 
-        // --- ADMIN I DANE ---
-        function saveData() { localStorage.setItem('xeomsc_data', JSON.stringify(siteData)); renderMainCategories(); }
-        
-        function switchAdminView(viewId) {
-            document.querySelectorAll('.admin-view').forEach(v => v.classList.add('hidden'));
-            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            document.getElementById(`btn-${viewId}`).classList.add('active');
-            if (viewId === 'calculator') initCalculator();
-            if (viewId === 'categories') renderCategoriesAdminList();
-            if (viewId === 'hero-gallery') renderHeroAdminList();
-        }
-
-        function initCalculator() {
-            const s = siteData.calcSettings;
-            document.getElementById('calc-rate-laser-min').value = s.rateLaserMin;
-            document.getElementById('calc-rate-cm2').value = s.rateCm2;
-            document.getElementById('calc-overhead').value = s.overhead;
-            document.getElementById('calc-margin').value = s.margin;
-            runLaserCalculator();
-        }
-
-        function runLaserCalculator() {
-            const w = parseFloat(document.getElementById('calc-width-mm').value) || 0;
-            const h = parseFloat(document.getElementById('calc-height-mm').value) || 0;
-            const t = parseFloat(document.getElementById('calc-time-laser').value) || 0;
-            const rl = parseFloat(document.getElementById('calc-rate-laser-min').value) || 0;
-            const rc = parseFloat(document.getElementById('calc-rate-cm2').value) || 0;
-            const oh = parseFloat(document.getElementById('calc-overhead').value) || 0;
-            const ma = parseFloat(document.getElementById('calc-margin').value) || 0;
-
-            const area = (w * h) / 100;
-            document.getElementById('calc-area-cm2').value = area.toFixed(2);
-            const costM = area * rc;
-            const costL = t * rl;
-            const baseCost = costM + costL;
-            const totalC = baseCost * (1 + oh / 100);
-            const finalP = totalC * (1 + ma / 100);
-
-            document.getElementById('calc-result-material').textContent = costM.toFixed(4) + " PLN";
-            document.getElementById('calc-result-laser').textContent = costL.toFixed(2) + " PLN";
-            document.getElementById('calc-result-total-cost').textContent = totalC.toFixed(2) + " PLN";
-            document.getElementById('calc-result-final-price').textContent = finalP.toFixed(2) + " PLN";
-        }
-
-        function saveCalcSettings() {
-            siteData.calcSettings = {
-                rateLaserMin: parseFloat(document.getElementById('calc-rate-laser-min').value),
-                rateCm2: parseFloat(document.getElementById('calc-rate-cm2').value),
-                overhead: parseFloat(document.getElementById('calc-overhead').value),
-                margin: parseFloat(document.getElementById('calc-margin').value)
-            };
-            saveData(); alert("Stawki zostały zapisane.");
-        }
-
-        // --- AUTH I START ---
-        function checkAuth() {
-            if (sessionStorage.getItem('xeomsc_admin') === 'true') {
-                document.body.classList.add('is-admin');
-                document.getElementById('admin-bar').classList.remove('hidden');
-                document.getElementById('admin-footer-btn').classList.remove('hidden');
-            } else if (location.hash === '#admin') {
-                document.getElementById('login-screen').classList.remove('hidden');
-            }
-        }
-        function handleLogin() {
-            if (document.getElementById('login-user').value === 'admin' && document.getElementById('login-pass').value === '12345') {
-                sessionStorage.setItem('xeomsc_admin', 'true');
-                location.reload();
-            } else { document.getElementById('login-error').classList.remove('hidden'); }
-        }
-        function handleLogout() { sessionStorage.removeItem('xeomsc_admin'); location.reload(); }
-        function toggleAdminPanel() { 
-            const p = document.getElementById('admin-panel');
-            p.classList.toggle('hidden');
-            p.style.display = p.classList.contains('hidden') ? 'none' : 'flex';
-            if(!p.classList.contains('hidden')) switchAdminView('hero-gallery');
-            refreshAdminUI();
-        }
-        function exitLogin() { location.hash = ''; location.reload(); }
-        function goHome() { 
-            document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden'));
-            document.getElementById('main-content').classList.remove('hidden');
-        }
-
-        // --- ZARZĄDZANIE TREŚCIĄ ---
         function renderMainCategories() {
             const grid = document.getElementById('main-categories-grid');
-            if(!grid) return; grid.innerHTML = '';
+            if (!grid) return;
+            grid.innerHTML = '';
             Object.keys(siteData.categories).forEach(k => {
                 const cat = siteData.categories[k];
                 const div = document.createElement('div');
-                div.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer border border-stone-100";
+                div.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer border border-stone-100 fade-in";
                 div.onclick = () => openSubcategories(k);
-                div.innerHTML = `<div class="h-64 overflow-hidden"><img src="${cat.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover"></div><div class="p-6"><h3 class="font-bold text-xl">${cat.title}</h3><p class="text-stone-500 text-sm">${cat.desc}</p></div>`;
+                div.innerHTML = `
+                    <div class="h-64 overflow-hidden"><img src="${cat.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover"></div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl">${cat.title}</h3>
+                        <p class="text-stone-500 text-sm">${cat.desc}</p>
+                    </div>
+                `;
                 grid.appendChild(div);
             });
         }
+
         function openSubcategories(id) {
             const cat = siteData.categories[id];
             document.getElementById('subcategory-title').textContent = cat.title;
             const g = document.getElementById('subcategory-grid'); g.innerHTML = '';
             cat.subcategories.forEach((s, idx) => {
                 const div = document.createElement('div');
-                div.className = "bg-white rounded-2xl overflow-hidden border border-stone-100 group cursor-pointer hover:shadow-lg transition";
+                div.className = "bg-white rounded-2xl overflow-hidden border border-stone-100 group cursor-pointer hover:shadow-lg transition relative";
                 div.onclick = () => openGallery(s.id, s.title, id, s.desc, s.price);
-                div.innerHTML = `<div class="h-48 overflow-hidden"><img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div><div class="p-4 flex justify-between items-center"><h4 class="font-bold">${s.title}</h4><button onclick="event.stopPropagation(); deleteSub('${id}',${idx})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button></div>`;
+                div.innerHTML = `
+                    <div class="h-48 overflow-hidden"><img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div>
+                    <div class="p-4 flex justify-between items-center">
+                        <h4 class="font-bold">${s.title}</h4>
+                        <button onclick="event.stopPropagation(); deleteSub('${id}',${idx})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
                 g.appendChild(div);
             });
             document.getElementById('main-content').classList.add('hidden');
             document.getElementById('subcategory-view').classList.remove('hidden');
+            window.scrollTo(0,0);
         }
+
+        window.deleteSub = (cid, idx) => {
+            if(confirm("Usunąć ten produkt?")) {
+                siteData.categories[cid].subcategories.splice(idx,1);
+                window.saveData();
+                openSubcategories(cid);
+            }
+        };
+
         function openGallery(subId, title, catId, desc, price) {
             const gal = siteData.galleries[subId] || { images: [] };
             document.getElementById('gallery-title').textContent = title;
@@ -658,73 +512,247 @@
                 const div = document.createElement('div');
                 div.className = "relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md group";
                 div.onclick = () => openLightbox(idx, gal.images);
-                div.innerHTML = `<img src="${img.src}" class="w-full h-full object-cover"><button onclick="event.stopPropagation(); deleteImg('${subId}',${idx},'${catId}','${title}','${desc}','${price}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>`;
+                div.innerHTML = `
+                    <img src="${img.src}" class="w-full h-full object-cover">
+                    <button onclick="event.stopPropagation(); deleteImg('${subId}',${idx},'${catId}','${title}','${desc}','${price}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
+                `;
                 g.appendChild(div);
             });
             document.getElementById('subcategory-view').classList.add('hidden');
             document.getElementById('gallery-view').classList.remove('hidden');
+            window.scrollTo(0,0);
         }
 
-        // --- FUNKCJE POMOCNICZE ADMINA ---
+        window.deleteImg = (sid, idx, cid, t, d, p) => {
+            if(confirm("Usunąć zdjęcie?")) {
+                siteData.galleries[sid].images.splice(idx,1);
+                window.saveData();
+                openGallery(sid, t, cid, d, p);
+            }
+        };
+
+        // --- KARUZELA LOGIKA ---
+        let currentSlide = 0;
+        setInterval(() => {
+            const slides = document.querySelectorAll('.hero-slide');
+            if (slides.length <= 1) return;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+
+        // --- AUTH OBSŁUGA ---
+        onAuthStateChanged(auth, (u) => {
+            user = u;
+            if (u) {
+                setupDataListener();
+                checkAdminSession();
+            }
+        });
+
+        function checkAdminSession() {
+            if (sessionStorage.getItem('xeomsc_admin') === 'true') {
+                document.body.classList.add('is-admin');
+                document.getElementById('admin-bar').classList.remove('hidden');
+                document.getElementById('admin-footer-btn').classList.remove('hidden');
+            } else if (window.location.hash === '#admin') {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        }
+
+        // --- ADMIN PANEL LOGIKA ---
+        const loginForm = document.getElementById('admin-login-form');
+        loginForm.onsubmit = (e) => {
+            e.preventDefault();
+            const userIn = document.getElementById('login-user').value;
+            const passIn = document.getElementById('login-pass').value;
+            if (userIn === 'admin' && passIn === '12345') {
+                sessionStorage.setItem('xeomsc_admin', 'true');
+                location.reload();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = () => {
+            sessionStorage.removeItem('xeomsc_admin');
+            location.reload();
+        };
+
+        document.getElementById('toggle-admin-panel-btn').onclick = () => toggleAdminPanel();
+        document.getElementById('admin-footer-btn').onclick = () => toggleAdminPanel();
+        document.getElementById('close-admin-panel-btn').onclick = () => toggleAdminPanel();
+
+        function toggleAdminPanel() {
+            const p = document.getElementById('admin-panel');
+            p.classList.toggle('hidden');
+            if (!p.classList.contains('hidden')) switchAdminView('hero-gallery');
+        }
+
+        function switchAdminView(viewId) {
+            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${viewId}`).classList.add('active');
+            renderAdminView(viewId);
+        }
+
+        // Podpięcie przycisków sidebar
+        ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
+            document.getElementById(`btn-${id}`).onclick = () => switchAdminView(id);
+        });
+
+        function renderAdminView(id) {
+            const container = document.getElementById('admin-view-container');
+            if (id === 'hero-gallery') {
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-6">Galeria Tytułowa</h3>
+                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
+                        <input id="new-hero-url" class="calc-input mb-4" placeholder="Link do zdjęcia/wideo">
+                        <select id="new-hero-type" class="calc-input mb-4"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
+                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj do karuzeli</button>
+                    </div>
+                    <div id="hero-admin-list" class="space-y-2"></div>
+                `;
+                renderHeroAdminList();
+                document.getElementById('add-hero-btn').onclick = () => {
+                    const url = document.getElementById('new-hero-url').value;
+                    const type = document.getElementById('new-hero-type').value;
+                    if(url) {
+                        siteData.heroItems.push({id: Date.now(), type, url});
+                        window.saveData();
+                        renderAdminView('hero-gallery');
+                    }
+                };
+            } else if (id === 'calculator') {
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-6">Kalkulator</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-stone-400">SZEROKOŚĆ (MM)</label>
+                            <input type="number" id="c-w" class="calc-input" value="100">
+                        </div>
+                        <div>
+                            <label class="text-xs text-stone-400">WYSOKOŚĆ (MM)</label>
+                            <input type="number" id="c-h" class="calc-input" value="100">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                         <label class="text-xs text-stone-400">CZAS PRACY (MIN)</label>
+                         <input type="number" id="c-t" class="calc-input" value="10">
+                    </div>
+                    <div class="mt-8 p-6 bg-stone-950 rounded-2xl text-center">
+                        <p class="text-stone-500 text-xs">SUGEROWANA CENA</p>
+                        <div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
+                    </div>
+                `;
+                const inputs = ['c-w', 'c-h', 'c-t'];
+                inputs.forEach(id => document.getElementById(id).oninput = runCalc);
+                runCalc();
+            } else if (id === 'categories') {
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-6">Kategorie</h3>
+                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
+                        <input id="cat-t" class="calc-input mb-2" placeholder="Nazwa kategorii">
+                        <input id="cat-i" class="calc-input mb-2" placeholder="Link okładki">
+                        <textarea id="cat-d" class="calc-input mb-2" placeholder="Opis"></textarea>
+                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Zapisz kategorię</button>
+                    </div>
+                    <div id="cat-admin-list" class="space-y-2"></div>
+                `;
+                renderCatAdminList();
+                document.getElementById('add-cat-btn').onclick = () => {
+                    const t = document.getElementById('cat-t').value;
+                    if(!t) return;
+                    const id = 'cat-' + Date.now();
+                    siteData.categories[id] = {
+                        title: t,
+                        image: document.getElementById('cat-i').value,
+                        desc: document.getElementById('cat-d').value,
+                        subcategories: []
+                    };
+                    window.saveData();
+                    renderAdminView('categories');
+                };
+            } else if (id === 'products') {
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-6">Produkty</h3>
+                    <div class="bg-stone-800 p-6 rounded-2xl mb-6">
+                        <select id="sel-cat" class="calc-input mb-2"></select>
+                        <input id="prod-t" class="calc-input mb-2" placeholder="Nazwa produktu">
+                        <input id="prod-i" class="calc-input mb-2" placeholder="Okładka produktu">
+                        <input id="prod-p" class="calc-input mb-2" placeholder="Cena (np. 50 PLN)">
+                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj produkt</button>
+                    </div>
+                    <div class="bg-stone-800 p-6 rounded-2xl">
+                        <p class="text-xs mb-2">DODAJ ZDJĘCIE DO GALERII PRODUKTU</p>
+                        <select id="sel-prod" class="calc-input mb-2"></select>
+                        <input id="gal-i" class="calc-input mb-2" placeholder="Link do zdjęcia">
+                        <button id="add-gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj do galerii</button>
+                    </div>
+                `;
+                refreshAdminUI();
+                document.getElementById('add-prod-btn').onclick = () => {
+                    const cid = document.getElementById('sel-cat').value;
+                    const t = document.getElementById('prod-t').value;
+                    if(!cid || !t) return;
+                    const sid = 'sub-' + Date.now();
+                    siteData.categories[cid].subcategories.push({
+                        id: sid,
+                        title: t,
+                        image: document.getElementById('prod-i').value,
+                        price: document.getElementById('prod-p').value
+                    });
+                    siteData.galleries[sid] = { images: [] };
+                    window.saveData();
+                    alert("Dodano produkt!");
+                };
+                document.getElementById('add-gal-btn').onclick = () => {
+                    const sid = document.getElementById('sel-prod').value;
+                    const url = document.getElementById('gal-i').value;
+                    if(!sid || !url) return;
+                    siteData.galleries[sid].images.push({ src: url });
+                    window.saveData();
+                    alert("Dodano zdjęcie!");
+                };
+            }
+        }
+
+        function runCalc() {
+            const w = parseFloat(document.getElementById('c-w').value) || 0;
+            const h = parseFloat(document.getElementById('c-h').value) || 0;
+            const t = parseFloat(document.getElementById('c-t').value) || 0;
+            const area = (w * h) / 100;
+            const cost = (area * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.1 * 1.2;
+            document.getElementById('c-res').textContent = cost.toFixed(2) + " PLN";
+        }
+
         function renderHeroAdminList() {
-            const list = document.getElementById('hero-items-list'); list.innerHTML = '';
-            siteData.heroItems.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-4 bg-stone-900 border border-white/10 p-4 rounded-xl";
-                div.innerHTML = `<div class="w-16 h-10 bg-black rounded-lg overflow-hidden flex-shrink-0 text-white">${item.type === 'image' ? `<img src="${item.url}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-video p-3"></i>`}</div><div class="flex-1 truncate text-xs text-stone-500">${item.url}</div><button onclick="adminRemoveHeroItem(${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`;
-                list.appendChild(div);
+            const l = document.getElementById('hero-admin-list'); if(!l) return;
+            l.innerHTML = '';
+            siteData.heroItems.forEach((it, idx) => {
+                const d = document.createElement('div');
+                d.className = "flex justify-between items-center bg-stone-950 p-3 rounded-lg text-xs";
+                d.innerHTML = `<span class="truncate mr-4">${it.url}</span> <button onclick="delHero(${idx})" class="text-red-500">USUŃ</button>`;
+                l.appendChild(d);
             });
         }
-        function adminAddHeroItem() { const u = document.getElementById('admin-hero-url').value, t = document.getElementById('admin-hero-type').value; if(u) siteData.heroItems.push({id: Date.now(), type: t, url: u}); saveData(); renderHeroAdminList(); renderHeroCarousel(); }
-        function adminRemoveHeroItem(i) { siteData.heroItems.splice(i,1); saveData(); renderHeroAdminList(); renderHeroCarousel(); }
+        window.delHero = (i) => { siteData.heroItems.splice(i,1); window.saveData(); renderAdminView('hero-gallery'); };
 
-        function renderCategoriesAdminList() {
-            const list = document.getElementById('admin-categories-list'); list.innerHTML = '';
-            Object.keys(siteData.categories).forEach(k => {
-                const c = siteData.categories[k];
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between bg-stone-950 p-4 rounded-xl border border-white/5";
-                div.innerHTML = `<div><h5 class="font-bold">${c.title}</h5><p class="text-xs text-stone-500">${k}</p></div><div class="flex gap-2"><button onclick="adminEditCategory('${k}')" class="text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="adminDeleteCategory('${k}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`;
-                list.appendChild(div);
+        function renderCatAdminList() {
+            const l = document.getElementById('cat-admin-list'); if(!l) return;
+            l.innerHTML = '';
+            Object.keys(siteData.categories).forEach(id => {
+                const c = siteData.categories[id];
+                const d = document.createElement('div');
+                d.className = "flex justify-between items-center bg-stone-950 p-3 rounded-lg text-xs";
+                d.innerHTML = `<span>${c.title}</span> <button onclick="delCat('${id}')" class="text-red-500">USUŃ</button>`;
+                l.appendChild(d);
             });
         }
-        function adminEditCategory(k) { const c = siteData.categories[k]; document.getElementById('admin-cat-edit-id').value = k; document.getElementById('admin-main-cat-title').value = c.title; document.getElementById('admin-main-cat-desc').value = c.desc; document.getElementById('admin-main-cat-image').value = c.image; document.getElementById('cat-save-btn').textContent = "Zaktualizuj"; document.getElementById('cat-cancel-btn').classList.remove('hidden'); }
-        function adminDeleteCategory(k) { if(confirm("Usunąć kategorię?")) { delete siteData.categories[k]; saveData(); renderCategoriesAdminList(); } }
+        window.delCat = (id) => { if(confirm("Usunąć całą kategorię?")) { delete siteData.categories[id]; window.saveData(); renderAdminView('categories'); }};
 
-        function adminSaveCategory() {
-            const id = document.getElementById('admin-cat-edit-id').value || 'cat-'+Date.now();
-            siteData.categories[id] = { 
-                title: document.getElementById('admin-main-cat-title').value,
-                desc: document.getElementById('admin-main-cat-desc').value,
-                image: document.getElementById('admin-main-cat-image').value,
-                subcategories: siteData.categories[id] ? siteData.categories[id].subcategories : []
-            };
-            saveData(); resetCatForm(); renderCategoriesAdminList();
-        }
-        function adminAddSubcategory() {
-            const cid = document.getElementById('admin-main-cat-select').value;
-            if(!cid) return;
-            const sid = 'sub-'+Date.now();
-            siteData.categories[cid].subcategories.push({
-                id: sid,
-                title: document.getElementById('admin-sub-title').value,
-                image: document.getElementById('admin-sub-img').value,
-                desc: document.getElementById('admin-sub-desc').value,
-                price: document.getElementById('admin-sub-price').value
-            });
-            siteData.galleries[sid] = { images: [] };
-            saveData(); refreshAdminUI();
-        }
-        function adminAddImage() {
-            const sid = document.getElementById('admin-sub-cat-select').value;
-            if(!sid) return;
-            siteData.galleries[sid].images.push({ src: document.getElementById('admin-img-url').value });
-            saveData();
-        }
-        function deleteSub(cid, idx) { if(confirm("Usunąć?")) { siteData.categories[cid].subcategories.splice(idx,1); saveData(); openSubcategories(cid); } }
-        function deleteImg(sid, idx, cid, t, d, p) { if(confirm("Usunąć?")) { siteData.galleries[sid].images.splice(idx,1); saveData(); openGallery(sid,t,cid,d,p); } }
         function refreshAdminUI() {
-            const m = document.getElementById('admin-main-cat-select'), s = document.getElementById('admin-sub-cat-select');
+            const m = document.getElementById('sel-cat'), s = document.getElementById('sel-prod');
+            if(!m || !s) return;
             m.innerHTML = '<option value="">Wybierz kategorię</option>';
             s.innerHTML = '<option value="">Wybierz produkt</option>';
             Object.keys(siteData.categories).forEach(k => {
@@ -732,15 +760,31 @@
                 siteData.categories[k].subcategories.forEach(sub => s.innerHTML += `<option value="${sub.id}">${siteData.categories[k].title} > ${sub.title}</option>`);
             });
         }
-        function resetCatForm() { document.getElementById('admin-cat-edit-id').value = ""; document.getElementById('cat-save-btn').textContent = "Zapisz"; document.getElementById('cat-cancel-btn').classList.add('hidden'); document.getElementById('admin-main-cat-title').value = ""; document.getElementById('admin-main-cat-desc').value = ""; document.getElementById('admin-main-cat-image').value = ""; }
 
         // LIGHTBOX
-        let cGal = [], cIdx = 0;
-        function openLightbox(i, g) { cGal = g; cIdx = i; const lb = document.getElementById('lightbox'); document.getElementById('lightbox-img').src = g[i].src; lb.classList.replace('hidden','flex'); setTimeout(()=>lb.classList.replace('opacity-0','opacity-100'),10); }
-        function closeLightbox() { const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100','opacity-0'); setTimeout(()=>lb.classList.replace('flex','hidden'),300); }
-        function changeLightboxImage(d) { cIdx = (cIdx + d + cGal.length) % cGal.length; document.getElementById('lightbox-img').src = cGal[cIdx].src; }
+        let currentGal = [];
+        let currentIdx = 0;
+        function openLightbox(idx, images) {
+            currentGal = images; currentIdx = idx;
+            document.getElementById('lightbox-img').src = images[idx].src;
+            const lb = document.getElementById('lightbox');
+            lb.classList.replace('hidden', 'flex');
+            setTimeout(() => lb.classList.replace('opacity-0', 'opacity-100'), 10);
+        }
+        document.getElementById('close-lightbox-btn').onclick = () => {
+            const lb = document.getElementById('lightbox');
+            lb.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => lb.classList.replace('flex', 'hidden'), 300);
+        };
+        document.querySelector('.lightbox-prev').onclick = (e) => { e.stopPropagation(); currentIdx = (currentIdx - 1 + currentGal.length) % currentGal.length; document.getElementById('lightbox-img').src = currentGal[currentIdx].src; };
+        document.querySelector('.lightbox-next').onclick = (e) => { e.stopPropagation(); currentIdx = (currentIdx + 1) % currentGal.length; document.getElementById('lightbox-img').src = currentGal[currentIdx].src; };
 
-        window.onload = () => { checkAuth(); renderMainCategories(); renderHeroCarousel(); };
+        // Start
+        initAuth();
+        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.goHome(); };
+        document.getElementById('back-to-main-btn').onclick = () => window.goHome();
+        document.getElementById('exit-login-btn').onclick = () => { window.location.hash = ''; location.reload(); };
+
     </script>
 </body>
 </html>
