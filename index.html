@@ -39,7 +39,7 @@
             font-family: 'Poppins', sans-serif;
             scroll-behavior: smooth;
             opacity: 0;
-            transition: opacity 0.5s ease-in;
+            transition: opacity 0.3s ease-in;
         }
         body.loaded {
             opacity: 1;
@@ -345,7 +345,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Konfiguracja Firebase
         const firebaseConfig = JSON.parse(__firebase_config);
@@ -363,16 +363,14 @@
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        // --- LOGIKA CACHE (NATYCHMIASTOWE ŁADOWANIE) ---
+        // --- LOGIKA CACHE (BŁYSKAWICZNA) ---
         let siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
-        let user = null;
         const configDocPath = `artifacts/${appId}/public/data/siteConfig`;
 
-        // Renderowanie wstępne z Cache
-        document.addEventListener('DOMContentLoaded', () => {
-            renderAll();
-            document.body.classList.add('loaded');
-        });
+        // --- RENDEROWANIE NATYCHMIASTOWE ---
+        // Renderujemy od razu to co mamy w localStorage, bez czekania na DOMContentLoaded
+        renderAll();
+        document.body.classList.add('loaded');
 
         // --- INICJALIZACJA ---
         async function initAuth() {
@@ -383,23 +381,23 @@
             }
         }
 
-        // --- NASŁUCHIWANIE ZMIAN (W TLE) ---
+        // --- NASŁUCHIWANIE W TLE (DANE) ---
         function setupDataListener() {
             const docRef = doc(db, configDocPath, 'main');
+            // Wykorzystujemy onSnapshot do cichej aktualizacji w tle
             onSnapshot(docRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const newData = snapshot.data();
-                    // Aktualizuj tylko jeśli dane się różnią
+                    // Tylko jeśli dane z chmury są inne niż te lokalne, przerysuj stronę
                     if (JSON.stringify(newData) !== JSON.stringify(siteData)) {
                         siteData = newData;
                         localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
                         renderAll();
                     }
-                } else if (!siteData || Object.keys(siteData.categories).length === 0) {
+                } else {
+                    // Jeśli baza pusta, inicjalizujemy ją
                     saveDataToCloud(initialData);
                 }
-            }, (error) => {
-                console.warn("Firestore listener error (normal during first boot):", error);
             });
         }
 
@@ -408,9 +406,7 @@
             try {
                 await setDoc(doc(db, configDocPath, 'main'), data);
                 localStorage.setItem('xeomsc_cached_data', JSON.stringify(data));
-            } catch (e) {
-                console.error("Błąd zapisu:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         window.saveData = () => saveDataToCloud(siteData);
@@ -419,7 +415,7 @@
             document.getElementById('main-content').classList.remove('hidden');
         };
 
-        // --- RENDEROWANIE ---
+        // --- RENDEROWANIE UI ---
         function renderAll() {
             renderHeroCarousel();
             renderMainCategories();
@@ -462,6 +458,7 @@
 
         function openSubcategories(id) {
             const cat = siteData.categories[id];
+            if (!cat) return;
             document.getElementById('subcategory-title').textContent = cat.title;
             const g = document.getElementById('subcategory-grid'); g.innerHTML = '';
             cat.subcategories.forEach((s, idx) => {
@@ -521,7 +518,6 @@
 
         // --- AUTH ---
         onAuthStateChanged(auth, (u) => {
-            user = u;
             if (u) {
                 setupDataListener();
                 checkAdminSession();
@@ -538,7 +534,7 @@
             }
         }
 
-        // --- ADMIN ACTIONS ---
+        // --- ADMIN PANEL UI ---
         const loginForm = document.getElementById('admin-login-form');
         loginForm.onsubmit = (e) => {
             e.preventDefault();
@@ -579,46 +575,46 @@
             const container = document.getElementById('admin-view-container');
             if (id === 'hero-gallery') {
                 container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6">Galeria Tytułowa</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Galeria Tytułowa</h3>
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
                         <input id="new-hero-url" class="calc-input mb-4" placeholder="Link do zdjęcia/wideo">
-                        <select id="new-hero-type" class="calc-input mb-4"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj</button>
+                        <select id="new-hero-type" class="calc-input mb-4 text-white"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
+                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Dodaj</button>
                     </div>
-                    <div id="hero-admin-list" class="space-y-2"></div>
+                    <div id="hero-admin-list" class="space-y-2 text-white"></div>
                 `;
                 renderHeroAdminList();
                 document.getElementById('add-hero-btn').onclick = () => {
                     const url = document.getElementById('new-hero-url').value;
                     if(url) {
                         siteData.heroItems.push({id: Date.now(), type: document.getElementById('new-hero-type').value, url});
-                        window.saveData();
-                        renderAdminView('hero-gallery');
+                        window.saveData(); renderAdminView('hero-gallery');
                     }
                 };
             } else if (id === 'calculator') {
                 container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6">Kalkulator</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Kalkulator</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="text-xs text-stone-400">SZEROKOŚĆ (MM)</label><input type="number" id="c-w" class="calc-input" value="100"></div>
                         <div><label class="text-xs text-stone-400">WYSOKOŚĆ (MM)</label><input type="number" id="c-h" class="calc-input" value="100"></div>
                     </div>
                     <div class="mt-4"><label class="text-xs text-stone-400">CZAS (MIN)</label><input type="number" id="c-t" class="calc-input" value="10"></div>
                     <div class="mt-8 p-6 bg-stone-950 rounded-2xl text-center">
-                        <p class="text-stone-500 text-xs">CENA</p><div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
+                        <p class="text-stone-500 text-xs uppercase font-bold tracking-widest">Sugerowana cena</p>
+                        <div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
                     </div>
                 `;
                 ['c-w', 'c-h', 'c-t'].forEach(id => document.getElementById(id).oninput = runCalc);
                 runCalc();
             } else if (id === 'categories') {
                 container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6">Kategorie</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Kategorie</h3>
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
                         <input id="cat-t" class="calc-input mb-2" placeholder="Nazwa">
                         <input id="cat-i" class="calc-input mb-2" placeholder="Okładka">
-                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Zapisz</button>
+                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Zapisz</button>
                     </div>
-                    <div id="cat-admin-list" class="space-y-2"></div>
+                    <div id="cat-admin-list" class="space-y-2 text-white"></div>
                 `;
                 renderCatAdminList();
                 document.getElementById('add-cat-btn').onclick = () => {
@@ -631,17 +627,17 @@
                 };
             } else if (id === 'products') {
                 container.innerHTML = `
-                    <h3 class="text-2xl font-bold mb-6">Produkty</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Produkty</h3>
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
-                        <select id="sel-cat" class="calc-input mb-2"></select>
+                        <select id="sel-cat" class="calc-input mb-2 text-white"></select>
                         <input id="prod-t" class="calc-input mb-2" placeholder="Nazwa produktu">
                         <input id="prod-i" class="calc-input mb-2" placeholder="Okładka">
-                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj</button>
+                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold text-white">Dodaj</button>
                     </div>
-                    <div class="bg-stone-800 p-6 rounded-2xl">
-                        <select id="sel-prod" class="calc-input mb-2"></select>
+                    <div class="bg-stone-800 p-6 rounded-2xl text-white">
+                        <select id="sel-prod" class="calc-input mb-2 text-white"></select>
                         <input id="gal-i" class="calc-input mb-2" placeholder="Link do zdjęcia">
-                        <button id="add-gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj do galerii</button>
+                        <button id="add-gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold text-white">Dodaj do galerii</button>
                     </div>
                 `;
                 refreshAdminUI();
