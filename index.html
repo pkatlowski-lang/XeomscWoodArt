@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xeomsc WoodArt - Grawerowanie Laserowe i Drewno</title>
+    <title>Xeomsc LaserHeat Art - Grawerowanie Laserowe i Drewno</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -39,29 +39,38 @@
 <body class="text-stone-800 bg-stone-50">
 
     <!-- PANEL LOGOWANIA -->
-    <div id="login-screen" class="fixed inset-0 z-[500] bg-stone-900/95 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in">
+    <div id="login-screen" class="fixed inset-0 z-[9999] bg-stone-900/95 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in border-4 border-wood-600">
             <i class="fa-solid fa-user-shield text-wood-600 text-5xl mb-6"></i>
-            <h2 class="text-2xl font-bold mb-6">Panel Administratora</h2>
+            <h2 class="text-2xl font-bold mb-2">Panel Administratora</h2>
+            <p class="text-stone-400 text-sm mb-6">Zaloguj się, aby zarządzać swoją stroną</p>
             <form id="admin-login-form" class="space-y-4 text-left">
-                <input type="text" id="login-user" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Login (admin)">
-                <input type="password" id="login-pass" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none" placeholder="Hasło (12345)">
-                <div id="login-error" class="text-red-500 text-sm hidden font-bold text-center">Błędne dane logowania</div>
-                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-wood-700 transition">Zaloguj się</button>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-stone-500 uppercase">Login</label>
+                    <input type="text" id="login-user" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="admin">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-stone-500 uppercase">Hasło</label>
+                    <input type="password" id="login-pass" class="w-full border p-4 rounded-xl focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="Wpisz hasło">
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden font-bold text-center p-2 bg-red-50 rounded-lg">Błędne dane logowania!</div>
+                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-wood-700 transition transform active:scale-95">Zaloguj się</button>
             </form>
-            <button id="exit-login-btn" class="mt-6 text-gray-400 underline text-sm">Wróć do strony głównej</button>
+            <button id="exit-login-btn" class="mt-8 text-stone-400 hover:text-wood-600 transition underline text-sm">Wróć do strony głównej</button>
         </div>
     </div>
 
     <!-- PASEK ADMINA -->
-    <div id="admin-bar" class="hidden bg-stone-900 text-white py-3 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-xl">
+    <div id="admin-bar" class="hidden bg-stone-900 text-white py-3 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-xl border-b border-wood-600">
         <div class="flex items-center gap-4">
-            <div class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-xs font-bold uppercase tracking-widest text-stone-400">Tryb Administratora</span>
+            <div class="h-3 w-3 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-xs font-bold uppercase tracking-widest text-wood-100">Jesteś zalogowany jako Admin</span>
         </div>
         <div class="flex gap-4">
-            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 px-4 py-1.5 rounded-lg text-xs font-bold transition">Menu CMS</button>
-            <button id="logout-btn" class="text-xs text-stone-400 hover:text-white transition">Wyloguj</button>
+            <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 px-5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-gears"></i> Menu Zarządzania
+            </button>
+            <button id="logout-btn" class="text-xs bg-stone-800 px-4 py-2 rounded-lg hover:bg-red-900 transition border border-white/10">Wyloguj</button>
         </div>
     </div>
 
@@ -72,7 +81,7 @@
                 <div class="bg-wood-600 p-2 rounded-lg text-white">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
-                <span>Xeomsc WoodArt</span>
+                <span>Xeomsc LaserHeat Art</span>
             </a>
             <div class="hidden lg:flex gap-10 items-center font-semibold text-stone-600">
                 <a href="#home" class="hover:text-wood-600 transition">Start</a>
@@ -92,20 +101,20 @@
             <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="max-w-2xl text-center md:text-left">
-                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100 text-wood-800 text-xs font-bold mb-6 uppercase tracking-widest tracking-widest">Szybka wycena online</span>
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-wood-100 text-wood-800 text-xs font-bold mb-6 uppercase tracking-widest">Twoja wyobraźnia, nasz laser</span>
                     <h1 class="text-5xl md:text-7xl font-bold text-white text-outline leading-tight mb-6">
                         Precyzja Lasera,<br>Ciepło <span class="gradient-text">Drewna</span>.
                     </h1>
-                    <p class="text-xl text-white text-outline mb-10 font-light opacity-90 leading-relaxed">Pracownia grawerska Xeomsc WoodArt. Tworzymy pamiątki, dekoracje i gadżety reklamowe, których nie znajdziesz w zwykłym sklepie.</p>
+                    <p class="text-xl text-white text-outline mb-10 font-light opacity-90 leading-relaxed">Pracownia Xeomsc LaserHeat Art. Tworzymy pamiątki, dekoracje i gadżety reklamowe, które zostają z Tobą na lata.</p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="bg-wood-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl hover:bg-wood-800 transition transform hover:scale-105">Nasze Prace</a>
-                        <a href="#contact" class="bg-white text-stone-900 px-10 py-4 rounded-full font-bold shadow-xl hover:bg-stone-100 transition">Kontakt</a>
+                        <a href="#portfolio" class="bg-wood-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl hover:bg-wood-800 transition transform hover:scale-105">Zobacz nasze prace</a>
+                        <a href="#contact" class="bg-white text-stone-900 px-10 py-4 rounded-full font-bold shadow-xl hover:bg-stone-100 transition">Wycena projektu</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Sekcja Oferta (Przywrócona) -->
+        <!-- Sekcja Oferta -->
         <section id="about" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center mb-16">
@@ -118,21 +127,21 @@
                             <i class="fa-solid fa-wand-magic-sparkles text-3xl"></i>
                         </div>
                         <h3 class="font-bold text-2xl mb-4 text-stone-900">Grawerowanie</h3>
-                        <p class="text-stone-500 leading-relaxed">Precyzyjne nanoszenie grafiki, tekstu lub logotypów na drewno, szkło, korek czy niektóre tworzywa. Idealne do znakowania produktów.</p>
+                        <p class="text-stone-500 leading-relaxed">Nanoszenie grafiki i tekstu na drewno, szkło i materiały organiczne. Personalizacja prezentów i znakowanie firmowe.</p>
                     </div>
                     <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl transition-all group">
                         <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors">
                             <i class="fa-solid fa-scissors text-3xl"></i>
                         </div>
                         <h3 class="font-bold text-2xl mb-4 text-stone-900">Precyzyjne Cięcie</h3>
-                        <p class="text-stone-500 leading-relaxed">Wycinanie dowolnych kształtów z drewna, sklejki i pleksi. Tworzymy napisy 3D, toppery na torty oraz skomplikowane puzzle.</p>
+                        <p class="text-stone-500 leading-relaxed">Wycinanie skomplikowanych kształtów ze sklejki, pleksi i innych materiałów do grubości 6-8mm. Toppery, napisy, puzzle.</p>
                     </div>
                     <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl transition-all group">
                         <div class="w-16 h-16 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors">
                             <i class="fa-solid fa-gift text-3xl"></i>
                         </div>
-                        <h3 class="font-bold text-2xl mb-4 text-stone-900">Unikalne Prezenty</h3>
-                        <p class="text-stone-500 leading-relaxed">Pamiątki na śluby, chrzciny i jubileusze. Każdy przedmiot możemy spersonalizować imieniem lub dedykacją.</p>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-900">Pamiątki i Prezenty</h3>
+                        <p class="text-stone-500 leading-relaxed">Personalizowane tabliczki ślubne, pamiątki chrztu, podziękowania dla rodziców i unikalne dekoracje domowe.</p>
                     </div>
                 </div>
             </div>
@@ -140,31 +149,28 @@
 
         <!-- Proces Zamówienia -->
         <section id="process" class="py-24 bg-stone-50">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold mb-4 text-stone-900">Zrealizuj swój projekt</h2>
-                    <p class="text-stone-500">Prosta droga od pomysłu do gotowego produktu</p>
-                </div>
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-16 text-stone-900">Twoje zamówienie krok po kroku</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
-                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">01</div>
-                        <h4 class="font-bold text-lg mb-2">Projekt</h4>
-                        <p class="text-xs text-stone-400">Przesyłasz nam swoją wizję lub gotowy plik graficzny.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-600 transition-colors">01</div>
+                        <h4 class="font-bold text-lg mb-2 text-stone-900">Pomysł</h4>
+                        <p class="text-xs text-stone-400">Prześlij nam swój pomysł lub gotowy plik.</p>
                     </div>
-                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
-                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">02</div>
-                        <h4 class="font-bold text-lg mb-2">Wycena</h4>
-                        <p class="text-xs text-stone-400">Używamy naszego kalkulatora, aby podać Ci uczciwą cenę.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-600 transition-colors">02</div>
+                        <h4 class="font-bold text-lg mb-2 text-stone-900">Wycena</h4>
+                        <p class="text-xs text-stone-400">Przygotujemy kalkulację na podstawie projektu.</p>
                     </div>
-                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
-                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">03</div>
-                        <h4 class="font-bold text-lg mb-2">Realizacja</h4>
-                        <p class="text-xs text-stone-400">Wycinamy i grawerujemy, dbając o każdy detal wykończenia.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-600 transition-colors">03</div>
+                        <h4 class="font-bold text-lg mb-2 text-stone-900">Laser</h4>
+                        <p class="text-xs text-stone-400">Wycinamy i grawerujemy Twoje zlecenie.</p>
                     </div>
-                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center text-center group">
-                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-100 transition-colors">04</div>
-                        <h4 class="font-bold text-lg mb-2">Odbiór</h4>
-                        <p class="text-xs text-stone-400">Gotowy produkt wysyłamy kurierem lub zapraszamy do odbioru.</p>
+                    <div class="relative bg-white p-10 rounded-3xl border border-stone-100 shadow-sm flex flex-col items-center group">
+                        <div class="text-4xl font-black text-stone-100 mb-4 group-hover:text-wood-600 transition-colors">04</div>
+                        <h4 class="font-bold text-lg mb-2 text-stone-900">Gotowe</h4>
+                        <p class="text-xs text-stone-400">Odbierasz produkt osobiście lub kurierem.</p>
                     </div>
                 </div>
             </div>
@@ -173,53 +179,36 @@
         <!-- Portfolio Grid -->
         <section id="portfolio" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Galeria Realizacji</h2>
+                <h2 class="text-4xl font-bold mb-4 text-stone-900">Wybrane Realizacje</h2>
                 <div class="w-20 h-1.5 bg-wood-600 mx-auto rounded-full mb-16"></div>
                 <div id="main-categories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10 text-left"></div>
             </div>
         </section>
 
-        <!-- FAQ -->
-        <section id="faq" class="py-24 bg-stone-50">
-            <div class="max-w-3xl mx-auto px-6">
-                <h2 class="text-3xl font-bold mb-10 text-center text-stone-900">Pytania i odpowiedzi</h2>
-                <div class="space-y-4">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                        <h4 class="font-bold mb-2">Jakie formaty plików akceptujecie?</h4>
-                        <p class="text-stone-500 text-sm">Najlepiej pliki wektorowe: PDF, SVG, CDR lub AI. Akceptujemy też zdjęcia wysokiej jakości (PNG/JPG).</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
-                        <h4 class="font-bold mb-2">Czy jest minimalna ilość zamówienia?</h4>
-                        <p class="text-stone-500 text-sm">Nie. Realizujemy zarówno zamówienia pojedyncze (np. personalizowany prezent), jak i serie po kilkaset sztuk.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Kontakt -->
-        <section id="contact" class="py-24 bg-white">
+        <section id="contact" class="py-24 bg-stone-900 text-white">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-12">Skontaktuj się z nami</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-stone-50 p-10 rounded-[2rem] border border-stone-100 flex flex-col items-center">
-                        <div class="w-16 h-16 bg-wood-600 text-white rounded-full flex items-center justify-center mb-6 text-2xl"><i class="fa-solid fa-envelope"></i></div>
-                        <h4 class="text-xl font-bold mb-2">Napisz e-mail</h4>
-                        <p class="text-wood-600 font-bold">pkatlowski@gmail.com</p>
+                <h2 class="text-4xl font-bold mb-12">Zrealizujmy Twój projekt</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="bg-stone-800 p-10 rounded-[2rem] border border-white/5 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-wood-600 text-white rounded-full flex items-center justify-center mb-6 text-2xl shadow-xl"><i class="fa-solid fa-envelope"></i></div>
+                        <h4 class="text-xl font-bold mb-2 uppercase tracking-widest text-stone-400">E-mail</h4>
+                        <p class="text-white font-bold text-lg">pkatlowski@gmail.com</p>
                     </div>
-                    <div class="bg-stone-50 p-10 rounded-[2rem] border border-stone-100 flex flex-col items-center">
-                        <div class="w-16 h-16 bg-stone-900 text-white rounded-full flex items-center justify-center mb-6 text-2xl"><i class="fa-solid fa-phone"></i></div>
-                        <h4 class="text-xl font-bold mb-2">Zadzwoń</h4>
-                        <p class="text-stone-900 font-bold">+48 123 456 789</p>
+                    <div class="bg-stone-800 p-10 rounded-[2rem] border border-white/5 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-white text-stone-900 rounded-full flex items-center justify-center mb-6 text-2xl shadow-xl"><i class="fa-solid fa-phone"></i></div>
+                        <h4 class="text-xl font-bold mb-2 uppercase tracking-widest text-stone-400">Telefon</h4>
+                        <p class="text-white font-bold text-lg">+48 123 456 789</p>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- PODSTRONY (MODALE DYNAMICZNE) -->
+    <!-- PODSTRONY (MODALE) -->
     <div id="subcategory-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white fixed inset-0 z-[100] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-main-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do galerii głównej</button>
+            <button onclick="window.goHome()" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform bg-stone-100 px-6 py-2 rounded-full"><i class="fa-solid fa-arrow-left"></i> Powrót do strony głównej</button>
             <h2 id="subcategory-title" class="text-5xl font-bold mb-12 text-stone-900"></h2>
             <div id="subcategory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
         </div>
@@ -227,7 +216,7 @@
 
     <div id="gallery-view" class="hidden min-h-screen pt-32 pb-20 fade-in bg-white fixed inset-0 z-[110] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6 text-center">
-            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform"><i class="fa-solid fa-arrow-left"></i> Wróć do produktów</button>
+            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-2 font-bold text-wood-600 hover:translate-x-[-5px] transition-transform bg-stone-100 px-6 py-2 rounded-full"><i class="fa-solid fa-arrow-left"></i> Powrót do listy produktów</button>
             <h2 id="gallery-title" class="text-4xl font-bold mb-12 text-stone-900"></h2>
             <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
         </div>
@@ -236,46 +225,43 @@
     <!-- LIGHTBOX -->
     <div id="lightbox" class="fixed inset-0 z-[1000] bg-black/95 hidden items-center justify-center p-4">
         <img id="lightbox-img" src="" class="max-h-full max-w-full rounded-lg shadow-2xl">
-        <button id="close-lightbox-btn" class="absolute top-8 right-8 text-white text-5xl"><i class="fa-solid fa-xmark"></i></button>
+        <button id="close-lightbox-btn" class="absolute top-8 right-8 text-white text-5xl hover:text-wood-500 transition"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- MODAL ADMINA -->
+    <!-- PANEL STEROWANIA CMS -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-900/90 backdrop-blur-md hidden items-center justify-center p-6">
         <div class="bg-stone-900 text-white w-full max-w-6xl h-[85vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10">
             <div class="w-full md:w-72 bg-black/40 p-8 flex flex-col border-r border-white/5">
-                <h3 class="text-2xl font-bold mb-10 text-wood-500">Zarządzanie</h3>
+                <h3 class="text-2xl font-bold mb-10 text-wood-500 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench"></i> CMS</h3>
                 <nav class="space-y-3 flex-1">
-                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Karuzela Hero</button>
-                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Główne Galerie</button>
-                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Produkty</button>
-                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5 text-xs">Ustawienia Stawek</button>
+                    <button id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Główny Baner</button>
+                    <button id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Kategorie Prac</button>
+                    <button id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Realizacje (Zdjęcia)</button>
+                    <button id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-3 rounded-xl transition font-semibold hover:bg-white/5">Cennik Kalkulatora</button>
                 </nav>
-                <button id="close-admin-panel-btn" class="mt-8 text-sm text-stone-500 hover:text-white underline">Zamknij Panel</button>
+                <button id="close-admin-panel-btn" class="mt-8 text-sm text-stone-500 hover:text-white transition underline">Zamknij panel</button>
             </div>
             <div class="flex-1 p-10 overflow-y-auto" id="admin-view-container"></div>
         </div>
     </div>
 
-    <footer class="bg-stone-950 text-stone-500 py-20 text-center border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-left mb-12">
+    <!-- STOPKA -->
+    <footer class="bg-stone-950 text-stone-500 py-16 text-center border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 text-left mb-12">
             <div>
-                <h4 class="text-white font-bold mb-6 text-lg">Xeomsc WoodArt</h4>
-                <p>Pracownia Grawerska Pawła Katłowskiego. Tworzymy z pasją od 2024 roku.</p>
+                <h4 class="text-white font-bold mb-6 text-lg">Xeomsc LaserHeat Art</h4>
+                <p class="text-sm opacity-60">Grawerujemy Twoje pomysły w najwyższej jakości. Odwiedź nas w pracowni lub zamów online z darmową wyceną.</p>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 text-lg">Social Media</h4>
-                <div class="flex gap-4 text-2xl">
-                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+            <div class="md:text-right">
+                <h4 class="text-white font-bold mb-6 text-lg">Pracownia Grawerska</h4>
+                <div class="flex flex-col gap-3 text-sm">
+                    <span>Poniedziałek - Piątek: 08:00 - 16:00</span>
+                    <span>Paweł Katłowski</span>
                 </div>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 text-lg">System</h4>
-                <button id="admin-footer-btn" class="hover:text-white underline">Zaloguj do Panelu Administracji</button>
-            </div>
         </div>
-        <div class="pt-12 border-t border-white/5 opacity-30 text-xs">
-            &copy; 2024 Xeomsc WoodArt. Wszystkie prawa zastrzeżone.
+        <div class="pt-8 border-t border-white/5 opacity-30 text-xs">
+            &copy; 2024 Xeomsc LaserHeat Art. Wszystkie prawa zastrzeżone.
         </div>
     </footer>
 
@@ -286,7 +272,7 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config || '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-laserheat-art';
         
         let db, auth, siteData = {};
 
@@ -297,7 +283,6 @@
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        // --- RENDEROWANIE GŁÓWNE ---
         function renderHero() {
             const container = document.getElementById('hero-carousel-container');
             if (!container || !siteData.heroItems) return;
@@ -308,13 +293,13 @@
             `).join('');
             
             let cur = 0;
-            setInterval(() => {
+            const carouselTimer = setInterval(() => {
                 const slides = document.querySelectorAll('.hero-slide');
                 if (slides.length < 2) return;
                 slides[cur].classList.remove('active');
                 cur = (cur + 1) % slides.length;
                 slides[cur].classList.add('active');
-            }, 5000);
+            }, 6000);
         }
 
         function renderMain() {
@@ -325,13 +310,12 @@
                     <img src="${c.image || 'https://via.placeholder.com/400'}" class="h-64 w-full object-cover group-hover:scale-105 transition duration-500">
                     <div class="p-8">
                         <h3 class="font-bold text-xl mb-2 text-stone-900">${c.title}</h3>
-                        <p class="text-stone-400 text-sm">${c.desc || 'Wybierz, aby zobaczyć realizacje.'}</p>
+                        <p class="text-stone-400 text-sm">Kliknij, aby zobaczyć realizacje.</p>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- GLOBALNE FUNKCJE ---
         window.openSub = (id) => {
             const c = siteData.categories[id];
             if(!c) return;
@@ -363,6 +347,12 @@
             window.scrollTo(0,0);
         };
 
+        window.goHome = () => {
+            document.getElementById('subcategory-view').classList.add('hidden');
+            document.getElementById('gallery-view').classList.add('hidden');
+            window.location.hash = '';
+        };
+
         async function saveData() {
             localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
             if (auth.currentUser) {
@@ -370,18 +360,17 @@
             }
         }
 
-        // --- CMS PANEL ---
         function renderAdminView(id) {
             const container = document.getElementById('admin-view-container');
             if (id === 'hero-gallery') {
                 container.innerHTML = `
                     <h4 class="text-xl font-bold mb-6 text-wood-500">Banery Hero</h4>
                     <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
-                        <input id="h-url" class="calc-input" placeholder="Link do zdjęcia/wideo">
+                        <input id="h-url" class="calc-input" placeholder="URL Zdjęcia/Wideo">
                         <select id="h-type" class="calc-input text-white"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                        <button id="add-h-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Dodaj</button>
+                        <button id="add-h-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-lg">Dodaj</button>
                     </div>
-                    <div class="space-y-2">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center text-xs opacity-60"><span>${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500 hover:text-white p-2">USUŃ</button></div>`).join('')}</div>
+                    <div class="space-y-2">${siteData.heroItems.map((h, i) => `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center text-xs opacity-60"><span>${h.url}</span><button onclick="window.delHero(${i})" class="text-red-500 p-2">USUŃ</button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-h-btn').onclick = () => {
                     const url = document.getElementById('h-url').value;
@@ -389,33 +378,23 @@
                 };
             } else if (id === 'calculator') {
                 container.innerHTML = `
-                    <h4 class="text-xl font-bold mb-6 text-wood-500">Stawki Kalkulatora</h4>
+                    <h4 class="text-xl font-bold mb-6 text-wood-500">Koszty</h4>
                     <div class="space-y-6">
-                        <div class="bg-black/20 p-6 rounded-2xl">
-                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase">Koszt pracy lasera (PLN/min)</label>
-                             <input id="rate-min" class="calc-input" value="${siteData.calcSettings.rateLaserMin}" type="number" step="0.01">
-                        </div>
-                        <div class="bg-black/20 p-6 rounded-2xl">
-                             <label class="text-[10px] text-stone-500 font-bold mb-2 block uppercase">Koszt materiału (PLN/cm2)</label>
-                             <input id="rate-cm" class="calc-input" value="${siteData.calcSettings.rateCm2}" type="number" step="0.0001">
-                        </div>
-                        <button id="save-calc-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Zapisz nowe stawki</button>
+                        <div class="bg-black/20 p-6 rounded-2xl"><label class="text-[10px] text-stone-500 font-bold mb-2 block">Minuta lasera (PLN)</label><input id="rate-min" class="calc-input" value="${siteData.calcSettings.rateLaserMin}" type="number" step="0.01"></div>
+                        <div class="bg-black/20 p-6 rounded-2xl"><label class="text-[10px] text-stone-500 font-bold mb-2 block">Materiał cm2 (PLN)</label><input id="rate-cm" class="calc-input" value="${siteData.calcSettings.rateCm2}" type="number" step="0.0001"></div>
+                        <button id="save-calc-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-xl">Zapisz</button>
                     </div>
                 `;
                 document.getElementById('save-calc-btn').onclick = () => {
                     siteData.calcSettings.rateLaserMin = parseFloat(document.getElementById('rate-min').value);
                     siteData.calcSettings.rateCm2 = parseFloat(document.getElementById('rate-cm').value);
-                    saveData(); alert("Stawki zaktualizowane!");
+                    saveData(); alert("Zapisano!");
                 };
             } else if (id === 'categories') {
                 container.innerHTML = `
-                    <h4 class="text-xl font-bold mb-6 text-wood-500">Główne Kategorie</h4>
-                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
-                        <input id="cat-t" class="calc-input" placeholder="Nazwa galerii (np. Drewno)">
-                        <input id="cat-i" class="calc-input" placeholder="Okładka (link)">
-                        <button id="add-cat-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Zapisz</button>
-                    </div>
-                    <div class="space-y-2 text-white">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-xl flex justify-between"><span>${siteData.categories[k].title}</span><button onclick="window.delCat('${k}')" class="text-red-500 p-2">USUŃ</button></div>`).join('')}</div>
+                    <h4 class="text-xl font-bold mb-6 text-wood-500">Kategorie</h4>
+                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6"><input id="cat-t" class="calc-input" placeholder="Nazwa"><input id="cat-i" class="calc-input" placeholder="Okładka link"><button id="add-cat-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-lg">Utwórz</button></div>
+                    <div class="space-y-2 text-white">${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-xl flex justify-between"><span>${siteData.categories[k].title}</span><button onclick="window.delCat('${k}')" class="text-red-500 font-bold">USUŃ</button></div>`).join('')}</div>
                 `;
                 document.getElementById('add-cat-btn').onclick = () => {
                     const t = document.getElementById('cat-t').value;
@@ -428,17 +407,8 @@
             } else if (id === 'products') {
                 container.innerHTML = `
                     <h4 class="text-xl font-bold mb-6 text-wood-500 text-white">Dodaj Produkt</h4>
-                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6">
-                        <select id="p-cat" class="calc-input text-white">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select>
-                        <input id="p-t" class="calc-input" placeholder="Nazwa (np. Topper)">
-                        <input id="p-i" class="calc-input" placeholder="Link do zdjęcia okładki">
-                        <button id="p-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold">Dodaj Produkt</button>
-                    </div>
-                    <hr class="border-white/5 my-10">
-                    <h4 class="text-xl font-bold mb-4 text-white">Dodaj zdjęcie do galerii produktu</h4>
-                    <select id="p-gal-select" class="calc-input mb-4 text-white">${Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('')}</select>
-                    <input id="gal-img-url" class="calc-input mb-4" placeholder="Adres URL zdjęcia">
-                    <button id="gal-btn" class="bg-stone-600 w-full p-4 rounded-xl font-bold">Dodaj zdjęcie</button>
+                    <div class="bg-black/20 p-6 rounded-2xl space-y-4 mb-6"><select id="p-cat" class="calc-input text-white">${Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('')}</select><input id="p-t" class="calc-input" placeholder="Nazwa"><input id="p-i" class="calc-input" placeholder="Okładka"><button id="p-btn" class="bg-wood-600 w-full p-4 rounded-xl font-bold text-white shadow-xl">Dodaj</button></div>
+                    <hr class="border-white/5 my-10"><h4 class="text-xl font-bold mb-4 text-white text-center">Dodaj zdjęcia do realizacji</h4><select id="p-gal-select" class="calc-input mb-4 text-white">${Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('')}</select><input id="gal-img-url" class="calc-input mb-4" placeholder="Link do zdjęcia"><button id="gal-btn" class="bg-stone-600 w-full p-4 rounded-xl font-bold text-white shadow-xl">Dodaj zdjęcie</button>
                 `;
                 document.getElementById('p-btn').onclick = () => {
                     const cid = document.getElementById('p-cat').value;
@@ -447,7 +417,7 @@
                         const sid = 's' + Date.now();
                         siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
                         siteData.galleries[sid] = { images: [] };
-                        saveData(); alert("Produkt dodany!"); renderAdminView('products');
+                        saveData(); alert("Dodano produkt!"); renderAdminView('products');
                     }
                 };
                 document.getElementById('gal-btn').onclick = () => {
@@ -456,17 +426,16 @@
                     if(sid && url) {
                         if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
                         siteData.galleries[sid].images.push({ src: url });
-                        saveData(); alert("Dodano zdjęcie!");
+                        saveData(); alert("Dodano zdjęcie!"); document.getElementById('gal-img-url').value = "";
                     }
                 };
             }
         }
 
-        // --- SYSTEM HANDLERS ---
         window.delHero = (i) => { siteData.heroItems.splice(i,1); saveData(); renderAdminView('hero-gallery'); renderHero(); };
         window.delCat = (k) => { if(confirm("Usunąć kategorię?")) { delete siteData.categories[k]; saveData(); renderAdminView('categories'); renderMain(); }};
-        window.delSub = (cid, i) => { if(confirm("Usunąć produkt?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); }};
-        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); }};
+        window.delSub = (cid, i) => { if(confirm("Usunąć?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSub(cid); }};
+        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGal(sid, t, cid); }};
         window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.replace('hidden','flex'); };
         document.getElementById('close-lightbox-btn').onclick = () => document.getElementById('lightbox').classList.replace('flex','hidden');
 
@@ -475,13 +444,8 @@
                 const appObj = initializeApp(firebaseConfig);
                 auth = getAuth(appObj);
                 db = getFirestore(appObj);
-                
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
                 onAuthStateChanged(auth, (u) => {
                     if (u) {
                         const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
@@ -495,20 +459,13 @@
                         if (sessionStorage.getItem('xeomsc_admin') === 'true') {
                             document.body.classList.add('is-admin');
                             document.getElementById('admin-bar').classList.remove('hidden');
-                            document.getElementById('admin-footer-btn').classList.add('hidden');
                         }
                     }
                 });
-            } catch (e) {
-                renderHero(); renderMain();
-            }
+            } catch (e) { renderHero(); renderMain(); }
         }
 
-        // GUI
-        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.location.hash = ''; window.location.reload(); };
-        document.getElementById('back-to-main-btn').onclick = () => { document.getElementById('subcategory-view').classList.add('hidden'); };
-        document.getElementById('back-to-sub-btn').onclick = () => { document.getElementById('gallery-view').classList.add('hidden'); };
-        document.getElementById('admin-footer-btn').onclick = () => document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('logo-link').onclick = (e) => { e.preventDefault(); window.goHome(); };
         document.getElementById('toggle-admin-panel-btn').onclick = () => { document.getElementById('admin-panel').classList.remove('hidden'); renderAdminView('hero-gallery'); };
         document.getElementById('close-admin-panel-btn').onclick = () => document.getElementById('admin-panel').classList.add('hidden');
         document.getElementById('admin-login-form').onsubmit = (e) => {
@@ -518,19 +475,15 @@
             } else document.getElementById('login-error').classList.remove('hidden');
         };
         document.getElementById('logout-btn').onclick = () => { sessionStorage.removeItem('xeomsc_admin'); location.reload(); };
-        document.getElementById('exit-login-btn').onclick = () => { window.location.hash = ''; location.reload(); };
-
+        document.getElementById('exit-login-btn').onclick = () => { document.getElementById('login-screen').classList.add('hidden'); window.location.hash = ''; };
         ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
             const btn = document.getElementById(`btn-${id}`);
             if(btn) btn.onclick = () => renderAdminView(id);
         });
-
         window.addEventListener('hashchange', () => { if (window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
-
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero(); renderMain();
         start();
-        
         if (window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden');
     </script>
 </body>
