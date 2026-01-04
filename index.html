@@ -38,6 +38,11 @@
         body {
             font-family: 'Poppins', sans-serif;
             scroll-behavior: smooth;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        body.loaded {
+            opacity: 1;
         }
         .gradient-text {
             background: linear-gradient(to right, #b45309, #d97706);
@@ -122,28 +127,9 @@
         .calc-input:focus {
             border-color: #d97706;
         }
-
-        /* Loading Spinner */
-        #loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: #fafaf9;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
-
-    <!-- EKRAN ŁADOWANIA DANYCH Z CHMURY -->
-    <div id="loading-overlay">
-        <div class="w-16 h-16 border-4 border-wood-100 border-t-wood-600 rounded-full animate-spin mb-4"></div>
-        <p class="font-bold text-stone-600 uppercase tracking-widest text-xs">Pobieranie danych z chmury...</p>
-    </div>
 
     <!-- EKRAN LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[300] bg-stone-900 hidden flex items-center justify-center p-4">
@@ -173,7 +159,7 @@
     <!-- Pasek Admina -->
     <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-4 fixed top-0 w-full z-[150] flex justify-between items-center shadow-md">
         <div class="flex items-center gap-4">
-            <span class="hidden sm:inline font-semibold text-green-400"><i class="fa-solid fa-shield-halved mr-2"></i> Tryb Admina (Chmura)</span>
+            <span class="hidden sm:inline font-semibold text-green-400"><i class="fa-solid fa-shield-halved mr-2"></i> Tryb Admina</span>
             <button id="toggle-admin-panel-btn" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-1.5 rounded text-xs font-bold transition flex items-center">
                 <i class="fa-solid fa-bars-staggered mr-2"></i> Menu Zarządzania
             </button>
@@ -216,7 +202,7 @@
                         Ciepło <span class="gradient-text white-outline-text">Drewna</span>.
                     </h1>
                     <p class="text-lg md:text-xl text-white mb-8 max-w-lg mx-auto md:mx-0 font-medium text-outline">
-                        Witaj w Xeomsc WoodArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą.
+                        Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         <a href="#portfolio" class="px-8 py-3.5 bg-wood-600 text-white rounded-xl hover:bg-wood-800 transition shadow-xl font-bold text-center">Zobacz nasze prace</a>
@@ -317,7 +303,7 @@
 
     <!-- PANEL ADMINISTRATORA -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-10">
-        <div class="bg-stone-900 text-white w-full max-w-6xl h-full max-h-[90vh] rounded-3xl overflow-hidden flex flex-col sm:flex-row shadow-2xl border border-white/10">
+        <div class="bg-stone-900 text-white w-full max-w-6xl h-full max-h-[90vh] rounded-3xl overflow-hidden flex flex-col sm:row shadow-2xl border border-white/10">
             <!-- Sidebar -->
             <div class="w-full sm:w-64 bg-stone-950 border-r border-white/5 p-6 flex flex-col">
                 <h2 class="text-xl font-bold mb-10 text-wood-500 flex items-center gap-2 uppercase tracking-widest">
@@ -343,7 +329,6 @@
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 sm:p-10 bg-stone-900 text-white">
-                <!-- Widoki będą renderowane dynamicznie przez JS -->
                 <div id="admin-view-container"></div>
             </div>
         </div>
@@ -362,7 +347,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfiguracja Firebase dostarczona przez środowisko
+        // Konfiguracja Firebase
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-woodart';
         
@@ -370,7 +355,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DANE DOMYŚLNE ---
+        // --- DANE DOMYŚLNE (BACKUP) ---
         const initialData = {
             heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2070&auto=format&fit=crop' }],
             categories: {},
@@ -378,13 +363,18 @@
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
         };
 
-        let siteData = initialData;
+        // --- LOGIKA CACHE (NATYCHMIASTOWE ŁADOWANIE) ---
+        let siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         let user = null;
-
-        // --- Ścieżka Firestore (Zasada 1) ---
         const configDocPath = `artifacts/${appId}/public/data/siteConfig`;
 
-        // --- INICJALIZACJA AUTORYZACJI (Zasada 3) ---
+        // Renderowanie wstępne z Cache
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+            document.body.classList.add('loaded');
+        });
+
+        // --- INICJALIZACJA ---
         async function initAuth() {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -393,23 +383,23 @@
             }
         }
 
-        // --- LOGIKA BAZY DANYCH ---
+        // --- NASŁUCHIWANIE ZMIAN (W TLE) ---
         function setupDataListener() {
-            if (!auth.currentUser) return;
-            
             const docRef = doc(db, configDocPath, 'main');
             onSnapshot(docRef, (snapshot) => {
                 if (snapshot.exists()) {
-                    siteData = snapshot.data();
-                    renderAll();
-                } else {
-                    // Jeśli baza jest pusta, zapisz dane startowe
+                    const newData = snapshot.data();
+                    // Aktualizuj tylko jeśli dane się różnią
+                    if (JSON.stringify(newData) !== JSON.stringify(siteData)) {
+                        siteData = newData;
+                        localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                        renderAll();
+                    }
+                } else if (!siteData || Object.keys(siteData.categories).length === 0) {
                     saveDataToCloud(initialData);
                 }
-                document.getElementById('loading-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
             }, (error) => {
-                console.error("Firestore Error:", error);
+                console.warn("Firestore listener error (normal during first boot):", error);
             });
         }
 
@@ -417,25 +407,23 @@
             if (!auth.currentUser) return;
             try {
                 await setDoc(doc(db, configDocPath, 'main'), data);
+                localStorage.setItem('xeomsc_cached_data', JSON.stringify(data));
             } catch (e) {
                 console.error("Błąd zapisu:", e);
             }
         }
 
-        // --- GLOBALNE FUNKCJE (Dostępne dla UI) ---
         window.saveData = () => saveDataToCloud(siteData);
         window.goHome = () => {
             document.querySelectorAll('#subcategory-view, #gallery-view').forEach(v => v.classList.add('hidden'));
             document.getElementById('main-content').classList.remove('hidden');
         };
 
-        // --- RENDEROWANIE UI ---
+        // --- RENDEROWANIE ---
         function renderAll() {
             renderHeroCarousel();
             renderMainCategories();
-            if (document.body.classList.contains('is-admin')) {
-                refreshAdminUI();
-            }
+            if (document.body.classList.contains('is-admin')) refreshAdminUI();
         }
 
         function renderHeroCarousel() {
@@ -447,7 +435,7 @@
                 slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
                 slide.innerHTML = item.type === 'image' 
                     ? `<img src="${item.url}" class="w-full h-full object-cover">` 
-                    : `<video src="${item.url}" class="w-full h-full object-cover" muted></video>`;
+                    : `<video src="${item.url}" class="w-full h-full object-cover" muted autoplay loop></video>`;
                 container.appendChild(slide);
             });
         }
@@ -484,7 +472,7 @@
                     <div class="h-48 overflow-hidden"><img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div>
                     <div class="p-4 flex justify-between items-center">
                         <h4 class="font-bold">${s.title}</h4>
-                        <button onclick="event.stopPropagation(); deleteSub('${id}',${idx})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="event.stopPropagation(); window.deleteSub('${id}',${idx})" class="admin-controls text-red-500"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `;
                 g.appendChild(div);
@@ -495,7 +483,7 @@
         }
 
         window.deleteSub = (cid, idx) => {
-            if(confirm("Usunąć ten produkt?")) {
+            if(confirm("Usunąć produkt?")) {
                 siteData.categories[cid].subcategories.splice(idx,1);
                 window.saveData();
                 openSubcategories(cid);
@@ -514,7 +502,7 @@
                 div.onclick = () => openLightbox(idx, gal.images);
                 div.innerHTML = `
                     <img src="${img.src}" class="w-full h-full object-cover">
-                    <button onclick="event.stopPropagation(); deleteImg('${subId}',${idx},'${catId}','${title}','${desc}','${price}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="event.stopPropagation(); window.deleteImg('${subId}',${idx},'${catId}','${title}','${desc}','${price}')" class="admin-controls absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
                 `;
                 g.appendChild(div);
             });
@@ -531,17 +519,7 @@
             }
         };
 
-        // --- KARUZELA LOGIKA ---
-        let currentSlide = 0;
-        setInterval(() => {
-            const slides = document.querySelectorAll('.hero-slide');
-            if (slides.length <= 1) return;
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 5000);
-
-        // --- AUTH OBSŁUGA ---
+        // --- AUTH ---
         onAuthStateChanged(auth, (u) => {
             user = u;
             if (u) {
@@ -560,13 +538,11 @@
             }
         }
 
-        // --- ADMIN PANEL LOGIKA ---
+        // --- ADMIN ACTIONS ---
         const loginForm = document.getElementById('admin-login-form');
         loginForm.onsubmit = (e) => {
             e.preventDefault();
-            const userIn = document.getElementById('login-user').value;
-            const passIn = document.getElementById('login-pass').value;
-            if (userIn === 'admin' && passIn === '12345') {
+            if (document.getElementById('login-user').value === 'admin' && document.getElementById('login-pass').value === '12345') {
                 sessionStorage.setItem('xeomsc_admin', 'true');
                 location.reload();
             } else {
@@ -595,7 +571,6 @@
             renderAdminView(viewId);
         }
 
-        // Podpięcie przycisków sidebar
         ['hero-gallery', 'categories', 'products', 'calculator'].forEach(id => {
             document.getElementById(`btn-${id}`).onclick = () => switchAdminView(id);
         });
@@ -608,16 +583,15 @@
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
                         <input id="new-hero-url" class="calc-input mb-4" placeholder="Link do zdjęcia/wideo">
                         <select id="new-hero-type" class="calc-input mb-4"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
-                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj do karuzeli</button>
+                        <button id="add-hero-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj</button>
                     </div>
                     <div id="hero-admin-list" class="space-y-2"></div>
                 `;
                 renderHeroAdminList();
                 document.getElementById('add-hero-btn').onclick = () => {
                     const url = document.getElementById('new-hero-url').value;
-                    const type = document.getElementById('new-hero-type').value;
                     if(url) {
-                        siteData.heroItems.push({id: Date.now(), type, url});
+                        siteData.heroItems.push({id: Date.now(), type: document.getElementById('new-hero-type').value, url});
                         window.saveData();
                         renderAdminView('hero-gallery');
                     }
@@ -626,51 +600,34 @@
                 container.innerHTML = `
                     <h3 class="text-2xl font-bold mb-6">Kalkulator</h3>
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs text-stone-400">SZEROKOŚĆ (MM)</label>
-                            <input type="number" id="c-w" class="calc-input" value="100">
-                        </div>
-                        <div>
-                            <label class="text-xs text-stone-400">WYSOKOŚĆ (MM)</label>
-                            <input type="number" id="c-h" class="calc-input" value="100">
-                        </div>
+                        <div><label class="text-xs text-stone-400">SZEROKOŚĆ (MM)</label><input type="number" id="c-w" class="calc-input" value="100"></div>
+                        <div><label class="text-xs text-stone-400">WYSOKOŚĆ (MM)</label><input type="number" id="c-h" class="calc-input" value="100"></div>
                     </div>
-                    <div class="mt-4">
-                         <label class="text-xs text-stone-400">CZAS PRACY (MIN)</label>
-                         <input type="number" id="c-t" class="calc-input" value="10">
-                    </div>
+                    <div class="mt-4"><label class="text-xs text-stone-400">CZAS (MIN)</label><input type="number" id="c-t" class="calc-input" value="10"></div>
                     <div class="mt-8 p-6 bg-stone-950 rounded-2xl text-center">
-                        <p class="text-stone-500 text-xs">SUGEROWANA CENA</p>
-                        <div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
+                        <p class="text-stone-500 text-xs">CENA</p><div id="c-res" class="text-5xl font-black text-wood-500 mt-2">0.00 PLN</div>
                     </div>
                 `;
-                const inputs = ['c-w', 'c-h', 'c-t'];
-                inputs.forEach(id => document.getElementById(id).oninput = runCalc);
+                ['c-w', 'c-h', 'c-t'].forEach(id => document.getElementById(id).oninput = runCalc);
                 runCalc();
             } else if (id === 'categories') {
                 container.innerHTML = `
                     <h3 class="text-2xl font-bold mb-6">Kategorie</h3>
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
-                        <input id="cat-t" class="calc-input mb-2" placeholder="Nazwa kategorii">
-                        <input id="cat-i" class="calc-input mb-2" placeholder="Link okładki">
-                        <textarea id="cat-d" class="calc-input mb-2" placeholder="Opis"></textarea>
-                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Zapisz kategorię</button>
+                        <input id="cat-t" class="calc-input mb-2" placeholder="Nazwa">
+                        <input id="cat-i" class="calc-input mb-2" placeholder="Okładka">
+                        <button id="add-cat-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Zapisz</button>
                     </div>
                     <div id="cat-admin-list" class="space-y-2"></div>
                 `;
                 renderCatAdminList();
                 document.getElementById('add-cat-btn').onclick = () => {
                     const t = document.getElementById('cat-t').value;
-                    if(!t) return;
-                    const id = 'cat-' + Date.now();
-                    siteData.categories[id] = {
-                        title: t,
-                        image: document.getElementById('cat-i').value,
-                        desc: document.getElementById('cat-d').value,
-                        subcategories: []
-                    };
-                    window.saveData();
-                    renderAdminView('categories');
+                    if(t) {
+                        const id = 'cat-' + Date.now();
+                        siteData.categories[id] = { title: t, image: document.getElementById('cat-i').value, subcategories: [] };
+                        window.saveData(); renderAdminView('categories');
+                    }
                 };
             } else if (id === 'products') {
                 container.innerHTML = `
@@ -678,12 +635,10 @@
                     <div class="bg-stone-800 p-6 rounded-2xl mb-6">
                         <select id="sel-cat" class="calc-input mb-2"></select>
                         <input id="prod-t" class="calc-input mb-2" placeholder="Nazwa produktu">
-                        <input id="prod-i" class="calc-input mb-2" placeholder="Okładka produktu">
-                        <input id="prod-p" class="calc-input mb-2" placeholder="Cena (np. 50 PLN)">
-                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj produkt</button>
+                        <input id="prod-i" class="calc-input mb-2" placeholder="Okładka">
+                        <button id="add-prod-btn" class="bg-wood-600 w-full py-3 rounded-xl font-bold">Dodaj</button>
                     </div>
                     <div class="bg-stone-800 p-6 rounded-2xl">
-                        <p class="text-xs mb-2">DODAJ ZDJĘCIE DO GALERII PRODUKTU</p>
                         <select id="sel-prod" class="calc-input mb-2"></select>
                         <input id="gal-i" class="calc-input mb-2" placeholder="Link do zdjęcia">
                         <button id="add-gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj do galerii</button>
@@ -692,26 +647,19 @@
                 refreshAdminUI();
                 document.getElementById('add-prod-btn').onclick = () => {
                     const cid = document.getElementById('sel-cat').value;
-                    const t = document.getElementById('prod-t').value;
-                    if(!cid || !t) return;
-                    const sid = 'sub-' + Date.now();
-                    siteData.categories[cid].subcategories.push({
-                        id: sid,
-                        title: t,
-                        image: document.getElementById('prod-i').value,
-                        price: document.getElementById('prod-p').value
-                    });
-                    siteData.galleries[sid] = { images: [] };
-                    window.saveData();
-                    alert("Dodano produkt!");
+                    if(cid && document.getElementById('prod-t').value) {
+                        const sid = 'sub-' + Date.now();
+                        siteData.categories[cid].subcategories.push({ id: sid, title: document.getElementById('prod-t').value, image: document.getElementById('prod-i').value });
+                        siteData.galleries[sid] = { images: [] };
+                        window.saveData(); alert("Dodano!");
+                    }
                 };
                 document.getElementById('add-gal-btn').onclick = () => {
                     const sid = document.getElementById('sel-prod').value;
-                    const url = document.getElementById('gal-i').value;
-                    if(!sid || !url) return;
-                    siteData.galleries[sid].images.push({ src: url });
-                    window.saveData();
-                    alert("Dodano zdjęcie!");
+                    if(sid && document.getElementById('gal-i').value) {
+                        siteData.galleries[sid].images.push({ src: document.getElementById('gal-i').value });
+                        window.saveData(); alert("Dodano!");
+                    }
                 };
             }
         }
@@ -720,60 +668,39 @@
             const w = parseFloat(document.getElementById('c-w').value) || 0;
             const h = parseFloat(document.getElementById('c-h').value) || 0;
             const t = parseFloat(document.getElementById('c-t').value) || 0;
-            const area = (w * h) / 100;
-            const cost = (area * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.1 * 1.2;
+            const cost = ((w * h / 100) * siteData.calcSettings.rateCm2 + t * siteData.calcSettings.rateLaserMin) * 1.32;
             document.getElementById('c-res').textContent = cost.toFixed(2) + " PLN";
         }
 
         function renderHeroAdminList() {
             const l = document.getElementById('hero-admin-list'); if(!l) return;
-            l.innerHTML = '';
-            siteData.heroItems.forEach((it, idx) => {
-                const d = document.createElement('div');
-                d.className = "flex justify-between items-center bg-stone-950 p-3 rounded-lg text-xs";
-                d.innerHTML = `<span class="truncate mr-4">${it.url}</span> <button onclick="delHero(${idx})" class="text-red-500">USUŃ</button>`;
-                l.appendChild(d);
-            });
+            l.innerHTML = siteData.heroItems.map((it, i) => `<div class="flex justify-between bg-stone-950 p-3 rounded-lg text-xs truncate"><span>${it.url}</span> <button onclick="window.delHero(${i})" class="text-red-500 ml-4">USUŃ</button></div>`).join('');
         }
         window.delHero = (i) => { siteData.heroItems.splice(i,1); window.saveData(); renderAdminView('hero-gallery'); };
 
         function renderCatAdminList() {
             const l = document.getElementById('cat-admin-list'); if(!l) return;
-            l.innerHTML = '';
-            Object.keys(siteData.categories).forEach(id => {
-                const c = siteData.categories[id];
-                const d = document.createElement('div');
-                d.className = "flex justify-between items-center bg-stone-950 p-3 rounded-lg text-xs";
-                d.innerHTML = `<span>${c.title}</span> <button onclick="delCat('${id}')" class="text-red-500">USUŃ</button>`;
-                l.appendChild(d);
-            });
+            l.innerHTML = Object.keys(siteData.categories).map(id => `<div class="flex justify-between bg-stone-950 p-3 rounded-lg text-xs"><span>${siteData.categories[id].title}</span> <button onclick="window.delCat('${id}')" class="text-red-500 ml-4">USUŃ</button></div>`).join('');
         }
-        window.delCat = (id) => { if(confirm("Usunąć całą kategorię?")) { delete siteData.categories[id]; window.saveData(); renderAdminView('categories'); }};
+        window.delCat = (id) => { if(confirm("Usunąć?")) { delete siteData.categories[id]; window.saveData(); renderAdminView('categories'); }};
 
         function refreshAdminUI() {
             const m = document.getElementById('sel-cat'), s = document.getElementById('sel-prod');
             if(!m || !s) return;
-            m.innerHTML = '<option value="">Wybierz kategorię</option>';
-            s.innerHTML = '<option value="">Wybierz produkt</option>';
-            Object.keys(siteData.categories).forEach(k => {
-                m.innerHTML += `<option value="${k}">${siteData.categories[k].title}</option>`;
-                siteData.categories[k].subcategories.forEach(sub => s.innerHTML += `<option value="${sub.id}">${siteData.categories[k].title} > ${sub.title}</option>`);
-            });
+            m.innerHTML = '<option value="">Wybierz kategorię</option>' + Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
+            s.innerHTML = '<option value="">Wybierz produkt</option>' + Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(sub => `<option value="${sub.id}">${siteData.categories[k].title} > ${sub.title}</option>`)).join('');
         }
 
-        // LIGHTBOX
-        let currentGal = [];
-        let currentIdx = 0;
+        // --- LIGHTBOX ---
+        let currentGal = [], currentIdx = 0;
         function openLightbox(idx, images) {
             currentGal = images; currentIdx = idx;
             document.getElementById('lightbox-img').src = images[idx].src;
-            const lb = document.getElementById('lightbox');
-            lb.classList.replace('hidden', 'flex');
+            const lb = document.getElementById('lightbox'); lb.classList.replace('hidden', 'flex');
             setTimeout(() => lb.classList.replace('opacity-0', 'opacity-100'), 10);
         }
         document.getElementById('close-lightbox-btn').onclick = () => {
-            const lb = document.getElementById('lightbox');
-            lb.classList.replace('opacity-100', 'opacity-0');
+            const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => lb.classList.replace('flex', 'hidden'), 300);
         };
         document.querySelector('.lightbox-prev').onclick = (e) => { e.stopPropagation(); currentIdx = (currentIdx - 1 + currentGal.length) % currentGal.length; document.getElementById('lightbox-img').src = currentGal[currentIdx].src; };
