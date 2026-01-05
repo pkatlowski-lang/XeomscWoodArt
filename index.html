@@ -134,6 +134,10 @@
             border-color: #d97706;
             background: #292524;
         }
+        .calc-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         .excel-row {
             display: flex;
@@ -422,7 +426,7 @@
                         <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
                         <span>CMS Panel</span>
                     </h2>
-                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.3 - Diagnostyka</p>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.4 - Edycja</p>
                 </div>
 
                 <nav class="space-y-3 flex-1 overflow-y-auto">
@@ -914,10 +918,14 @@
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Kategorie</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-500">Stwórz nową kategorię</h4>
+                    <h4 class="text-xs uppercase font-bold text-stone-500">Stwórz lub Edytuj kategorię</h4>
+                    <input type="hidden" id="edit-cat-id">
                     <input id="cat-t" class="calc-input" placeholder="Nazwa (np. Drewno)">
                     <input id="cat-i" class="calc-input" placeholder="Wklej link do zdjęcia okładki">
-                    <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
+                    <div class="flex gap-2">
+                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
+                        <button id="cancel-cat-btn" class="hidden bg-stone-600 hover:bg-stone-500 w-1/3 py-3 rounded-xl font-bold transition">Anuluj</button>
+                    </div>
                 </div>
                 <div class="space-y-3">
                     ${Object.keys(siteData.categories).map(k => `
@@ -926,43 +934,118 @@
                                 <img src="${siteData.categories[k].image}" class="w-12 h-12 rounded-lg object-cover">
                                 <span class="font-bold">${siteData.categories[k].title}</span>
                             </div>
-                            <button onclick="window.delCat('${k}')" class="text-red-500 hover:text-white font-bold text-sm px-3 py-1 bg-red-500/10 rounded-lg">USUŃ</button>
+                            <div class="flex gap-2">
+                                <button onclick="window.editCat('${k}')" class="text-blue-400 hover:text-white font-bold text-sm px-3 py-1 bg-blue-500/10 rounded-lg">EDYTUJ</button>
+                                <button onclick="window.delCat('${k}')" class="text-red-500 hover:text-white font-bold text-sm px-3 py-1 bg-red-500/10 rounded-lg">USUŃ</button>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
             `;
+            
+            // Logic for Add/Edit
             document.getElementById('add-cat-btn').onclick = () => {
                 const t = document.getElementById('cat-t').value;
+                const i = document.getElementById('cat-i').value;
+                const editId = document.getElementById('edit-cat-id').value;
+                
                 if(t) {
-                    const id = 'c' + Date.now();
-                    siteData.categories[id] = { title: t, image: document.getElementById('cat-i').value, subcategories: [] };
-                    saveData(); renderCategoriesAdmin(); renderMain();
+                    if (editId) {
+                        // Update existing
+                        siteData.categories[editId].title = t;
+                        siteData.categories[editId].image = i;
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano kategorię!";
+                    } else {
+                        // Create new
+                        const id = 'c' + Date.now();
+                        siteData.categories[id] = { title: t, image: i, subcategories: [] };
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Dodano kategorię!";
+                    }
+                    
+                    saveData(); 
+                    renderCategoriesAdmin(); 
+                    renderMain();
                     
                     const toast = document.getElementById('toast-notification');
-                    toast.querySelector('span').textContent = "Dodano kategorię!";
                     toast.classList.add('show');
                     setTimeout(() => toast.classList.remove('show'), 3000);
                 }
             };
+            
+            // Logic for Cancel
+            document.getElementById('cancel-cat-btn').onclick = () => {
+                renderCategoriesAdmin(); // Re-render to clear form
+            };
         }
+        
+        window.editCat = (id) => {
+            const cat = siteData.categories[id];
+            document.getElementById('cat-t').value = cat.title;
+            document.getElementById('cat-i').value = cat.image;
+            document.getElementById('edit-cat-id').value = id;
+            document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany";
+            document.getElementById('cancel-cat-btn').classList.remove('hidden');
+        };
 
         function renderProductsAdmin() {
             const container = document.getElementById('view-products');
             const categoryOptions = Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
             const productOptions = Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('');
 
+            // Generate list of existing products for management
+            let productsListHtml = '';
+            Object.keys(siteData.categories).forEach(catId => {
+                const cat = siteData.categories[catId];
+                if(cat.subcategories.length > 0) {
+                    productsListHtml += `<div class="mb-4"><h5 class="text-xs font-bold text-stone-500 uppercase mb-2 pl-2">${cat.title}</h5>`;
+                    productsListHtml += cat.subcategories.map((sub, index) => `
+                        <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2">
+                            <div class="flex items-center gap-3">
+                                <img src="${sub.image}" class="w-8 h-8 rounded-md object-cover">
+                                <span class="text-sm font-bold text-white">${sub.title}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.editProduct('${catId}', ${index})" class="text-blue-400 hover:text-white text-xs px-2 py-1 bg-blue-500/10 rounded">Edytuj</button>
+                                <button onclick="window.delSub('${catId}', ${index})" class="text-red-500 hover:text-white text-xs px-2 py-1 bg-red-500/10 rounded">Usuń</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    productsListHtml += `</div>`;
+                }
+            });
+
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Produkty i Galerie</h3>
+                
+                <!-- Sekcja Dodawania/Edycji Produktu -->
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-wood-500 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Krok 1: Stwórz Produkt w Kategorii</h4>
+                    <h4 class="text-xs uppercase font-bold text-wood-500 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Zarządzaj Produktem</h4>
+                    <input type="hidden" id="edit-prod-index">
+                    <input type="hidden" id="edit-prod-cat-id">
+                    
                     <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
                     <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
                     <input id="p-i" class="calc-input" placeholder="Wklej link do miniatury">
-                    <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
+                    
+                    <div class="flex gap-2">
+                        <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
+                        <button id="cancel-p-btn" class="hidden bg-stone-600 hover:bg-stone-500 w-1/3 py-3 rounded-xl font-bold transition">Anuluj</button>
+                    </div>
                 </div>
-                <hr class="border-white/10 my-8">
+
+                <!-- Lista Produktów do Edycji -->
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Krok 2: Dodaj Zdjęcia do Produktu</h4>
+                     <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-list"></i> Lista Istniejących Produktów</h4>
+                     <div class="max-h-60 overflow-y-auto pr-2">
+                        ${productsListHtml || '<p class="text-stone-500 text-sm">Brak produktów.</p>'}
+                     </div>
+                </div>
+
+                <hr class="border-white/10 my-8">
+                
+                <!-- Sekcja Galerii -->
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Dodaj Zdjęcia do Galerii Produktu</h4>
                     <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
                     <input id="gal-img-url" class="calc-input" placeholder="Wklej link do zdjęcia">
                     <button id="gal-btn" class="bg-stone-600 hover:bg-stone-500 w-full py-3 rounded-xl font-bold transition">Dodaj zdjęcie do galerii</button>
@@ -972,20 +1055,43 @@
             document.getElementById('p-btn').onclick = () => {
                 const cid = document.getElementById('p-cat').value;
                 const t = document.getElementById('p-t').value;
+                const img = document.getElementById('p-i').value;
+                
+                const editIndex = document.getElementById('edit-prod-index').value;
+                const editCatId = document.getElementById('edit-prod-cat-id').value;
+
                 if(cid && t) {
-                    const sid = 's' + Date.now();
-                    siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
-                    siteData.galleries[sid] = { images: [] };
+                    if (editIndex !== "") {
+                        // Edit Mode
+                        // Note: We use editCatId to ensure we update the correct list, 
+                        // even if the select box visually shows something else (though we disable it).
+                        const product = siteData.categories[editCatId].subcategories[editIndex];
+                        product.title = t;
+                        product.image = img;
+                        
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano produkt!";
+                    } else {
+                        // Add Mode
+                        const sid = 's' + Date.now();
+                        siteData.categories[cid].subcategories.push({ id: sid, title: t, image: img });
+                        siteData.galleries[sid] = { images: [] };
+                        
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Dodano produkt!";
+                    }
+
                     saveData(); 
+                    renderProductsAdmin(); // Refresh list and clear form
                     
                     const toast = document.getElementById('toast-notification');
-                    toast.querySelector('span').textContent = "Dodano produkt!";
                     toast.classList.add('show');
                     setTimeout(() => toast.classList.remove('show'), 3000);
-                    
-                    renderProductsAdmin();
                 }
             };
+
+            document.getElementById('cancel-p-btn').onclick = () => {
+                renderProductsAdmin();
+            };
+
             document.getElementById('gal-btn').onclick = () => {
                 const sid = document.getElementById('p-gal-select').value;
                 const url = document.getElementById('gal-img-url').value;
@@ -1003,6 +1109,24 @@
                 }
             };
         }
+
+        window.editProduct = (catId, index) => {
+            const product = siteData.categories[catId].subcategories[index];
+            
+            document.getElementById('p-t').value = product.title;
+            document.getElementById('p-i').value = product.image;
+            document.getElementById('p-cat').value = catId;
+            document.getElementById('p-cat').disabled = true; // Lock category change during edit to prevent complexity
+            
+            document.getElementById('edit-prod-index').value = index;
+            document.getElementById('edit-prod-cat-id').value = catId;
+            
+            document.getElementById('p-btn').textContent = "Zapisz Zmiany";
+            document.getElementById('cancel-p-btn').classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('view-products').scrollTop = 0;
+        };
 
         // --- NAWIGACJA FRONT-END ---
         window.openSubcategories = (id) => {
@@ -1075,7 +1199,22 @@
         // --- USUWANIE ---
         window.delHero = (i) => { if(confirm("Usunąć slajd?")) { siteData.heroItems.splice(i,1); saveData(); renderHeroAdmin(); renderHero(); } };
         window.delCat = (k) => { if(confirm("Usunąć całą kategorię i jej produkty?")) { delete siteData.categories[k]; saveData(); renderCategoriesAdmin(); renderMain(); } };
-        window.delSub = (cid, i) => { if(confirm("Usunąć produkt?")) { siteData.categories[cid].subcategories.splice(i,1); saveData(); window.openSubcategories(cid); } };
+        
+        // Updated delSub to refresh Admin view correctly if called from there
+        window.delSub = (cid, i) => { 
+            if(confirm("Usunąć produkt?")) { 
+                siteData.categories[cid].subcategories.splice(i,1); 
+                saveData(); 
+                
+                // If we are in admin panel, refresh admin view
+                if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                    renderProductsAdmin();
+                } else {
+                    window.openSubcategories(cid); 
+                }
+            } 
+        };
+        
         window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGallery(sid, t, cid); } };
 
         // --- UI ---
