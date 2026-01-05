@@ -48,7 +48,6 @@
             scroll-behavior: smooth;
         }
         
-        /* Efekty tekstowe */
         .gradient-text {
             background: linear-gradient(to right, #b45309, #d97706);
             -webkit-background-clip: text;
@@ -74,13 +73,11 @@
                  0px  2px 10px rgba(0,0,0,0.6);
         }
 
-        /* Tło Hero */
         .hero-bg {
             background-color: #fafaf9;
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
         
-        /* Animacje */
         .fade-in {
             animation: fadeIn 0.6s ease-out forwards;
             opacity: 0;
@@ -90,7 +87,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Karuzela */
         .hero-slide {
             position: absolute;
             inset: 0;
@@ -103,7 +99,6 @@
             z-index: 10;
         }
 
-        /* Admin UI */
         .admin-controls { display: none !important; }
         body.is-admin .admin-controls { display: flex !important; }
         
@@ -130,7 +125,6 @@
             background: #292524;
         }
 
-        /* Tabela Kalkulatora */
         .excel-row {
             display: flex;
             justify-content: space-between;
@@ -196,7 +190,6 @@
                 <span>Xeomsc <span class="text-wood-600">FusionArt</span></span>
             </a>
             
-            <!-- Desktop Menu -->
             <div class="hidden md:flex space-x-10 items-center font-medium text-stone-600">
                 <a href="#home" onclick="goHome()" class="hover:text-wood-600 transition">Start</a>
                 <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
@@ -204,7 +197,6 @@
                 <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Wycena</a>
             </div>
 
-            <!-- Mobile Menu Button -->
             <div class="md:hidden flex items-center">
                 <button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl">
                     <i class="fa-solid fa-bars"></i>
@@ -212,7 +204,6 @@
             </div>
         </div>
         
-        <!-- Mobile Menu Dropdown -->
         <div class="md:hidden hidden absolute top-24 left-0 w-full bg-white border-t border-stone-100 shadow-xl" id="mobile-menu">
             <div class="flex flex-col p-4 space-y-2">
                 <a href="#home" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Start</a>
@@ -228,7 +219,6 @@
         <!-- Hero Section -->
         <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden pt-20">
             <div class="absolute inset-0 z-0" id="hero-carousel-container">
-                <!-- Fallback gdy JS nie załaduje karuzeli -->
                 <div class="w-full h-full bg-stone-200 animate-pulse"></div>
             </div>
             <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
@@ -239,10 +229,11 @@
                         Pracownia Grawerska
                     </span>
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
-                        Precyzja Lasera,<br>
-                        Ciepło <span class="gradient-text white-outline-text">Drewna</span>.
+                        <!-- Dynamiczny Tytuł -->
+                        <span id="hero-title-main">Precyzja Lasera,<br>Ciepło</span> 
+                        <span id="hero-title-accent" class="gradient-text white-outline-text">Drewna</span>.
                     </h1>
-                    <p class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
+                    <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
                         Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą.
                     </p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
@@ -257,56 +248,32 @@
             </div>
         </section>
 
-        <!-- Oferta -->
+        <!-- Oferta (Dynamiczna) -->
         <section id="about" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6 text-center">
                 <h2 class="text-4xl font-bold mb-4 text-stone-900">Co oferujemy?</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <!-- Karta 1 -->
-                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm">
-                            <i class="fa-solid fa-wand-magic-sparkles text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4 text-stone-800">Grawerowanie</h3>
-                        <p class="text-stone-500 leading-relaxed">Niezwykle precyzyjne nanoszenie detali, logotypów i grafik na drewno, szkło, skórę i inne materiały.</p>
-                    </div>
-                    <!-- Karta 2 -->
-                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm">
-                            <i class="fa-solid fa-scissors text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4 text-stone-800">Precyzyjne Cięcie</h3>
-                        <p class="text-stone-500 leading-relaxed">Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki.</p>
-                    </div>
-                    <!-- Karta 3 -->
-                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm">
-                            <i class="fa-solid fa-gift text-3xl"></i>
-                        </div>
-                        <h3 class="font-bold text-2xl mb-4 text-stone-800">Unikalne Prezenty</h3>
-                        <p class="text-stone-500 leading-relaxed">Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie.</p>
-                    </div>
+                <div id="about-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Tu JS wstawi karty -->
                 </div>
             </div>
         </section>
 
-        <!-- Realizacje (Kategorie Główne) -->
+        <!-- Realizacje -->
         <section id="portfolio" class="py-24 bg-stone-50">
             <div class="max-w-7xl mx-auto px-6 text-center">
                 <h2 class="text-4xl font-bold mb-4 text-stone-900">Moje Realizacje</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
-                <!-- Siatka kategorii generowana przez JS -->
                 <div id="main-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-left"></div>
             </div>
         </section>
 
-        <!-- Kontakt -->
+        <!-- Kontakt (Dynamiczny) -->
         <section id="contact" class="py-24 bg-white">
             <div class="max-w-5xl mx-auto px-6 text-center">
                  <h2 class="text-4xl font-bold mb-6">Kontakt i Wycena</h2>
-                 <p class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe.</p>
+                 <p id="contact-desc" class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe.</p>
                  
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="flex flex-col items-center justify-center p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group">
@@ -314,56 +281,44 @@
                             <i class="fa-solid fa-envelope"></i>
                         </div>
                         <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Napisz do nas</span>
-                        <span class="font-bold text-2xl text-stone-900 break-all">pkatlowski@gmail.com</span>
+                        <span id="contact-email" class="font-bold text-2xl text-stone-900 break-all">pkatlowski@gmail.com</span>
                     </div>
                     <div class="flex flex-col items-center justify-center p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group">
                         <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
                             <i class="fa-solid fa-phone"></i>
                         </div>
                         <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Zadzwoń</span>
-                        <span class="font-bold text-2xl text-stone-900">+48 123 456 789</span>
+                        <span id="contact-phone" class="font-bold text-2xl text-stone-900">+48 123 456 789</span>
                     </div>
                  </div>
             </div>
         </section>
     </div>
 
-    <!-- 5. WIDOKI DYNAMICZNE (Podstrony) -->
-    
-    <!-- Widok Podkategorii/Produktów -->
+    <!-- WIDOKI DYNAMICZNE (Podstrony) -->
     <div id="subcategory-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[100] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
             <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do kategorii
             </button>
-            
             <h2 id="subcategory-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6">Wybierz produkt</h2>
-            
-            <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-                <!-- Generowane przez JS -->
-            </div>
+            <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
         </div>
     </div>
 
-    <!-- Widok Galerii Produktu -->
     <div id="gallery-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[110] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
             <button id="back-to-sub-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy produktów
             </button>
-            
             <div class="mb-12 border-b border-stone-100 pb-8">
                 <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-4">Galeria Zdjęć</h2>
                 <div id="gallery-product-info" class="text-stone-500 text-lg"></div>
             </div>
-            
-            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Generowane przez JS -->
-            </div>
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
     </div>
 
-    <!-- LIGHTBOX (Powiększanie zdjęć) -->
     <div id="lightbox" class="fixed inset-0 z-[5000] bg-stone-950/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer backdrop-blur-sm" onclick="closeLightbox()">
         <div class="relative max-w-7xl max-h-screen w-full flex flex-col items-center justify-center p-4" onclick="event.stopPropagation()">
             <img id="lightbox-img" src="" alt="Powiększenie" class="lightbox-img rounded-lg shadow-2xl">
@@ -385,10 +340,13 @@
                         <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
                         <span>CMS Panel</span>
                     </h2>
-                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.0</p>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.2</p>
                 </div>
 
                 <nav class="space-y-3 flex-1 overflow-y-auto">
+                    <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-pen-to-square w-6"></i> Edycja Treści
+                    </button>
                     <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
                         <i class="fa-solid fa-images w-6"></i> Karuzela Hero
                     </button>
@@ -412,98 +370,124 @@
             <!-- Content Area -->
             <div class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
                 
-                <!-- Widok: Kalkulator Lasera (Logic Arkusza) -->
-                <div id="view-calculator" class="admin-view hidden space-y-10">
+                <!-- Widok: Edycja Treści -->
+                <div id="view-content" class="admin-view hidden space-y-10">
                     <header>
-                        <h3 class="text-3xl font-bold mb-2">Kalkulator Wyceny</h3>
-                        <p class="text-stone-400">Symulacja arkusza kalkulacyjnego. Zmiany stawek zapisują się w chmurze.</p>
+                        <h3 class="text-3xl font-bold mb-2">Edycja Treści Strony</h3>
+                        <p class="text-stone-400">Dostosuj teksty powitalne, opisy i dane kontaktowe.</p>
                     </header>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                        <!-- Lewa: Inputy -->
-                        <div class="space-y-6">
-                            <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
-                                <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Dane Projektu</h4>
-                                
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Szerokość (mm)</label>
-                                        <input type="number" id="calc-width-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Wysokość (mm)</label>
-                                        <input type="number" id="calc-height-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Czas Pracy Lasera (minuty)</label>
-                                    <input type="number" id="calc-time-laser" class="calc-input text-xl font-mono" value="10" oninput="runLaserCalculator()">
-                                </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- Sekcja Hero -->
+                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja Powitalna (Hero)</h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek (Główna część)</label>
+                                <input id="edit-hero-main" class="calc-input" placeholder="np. Precyzja Lasera, Ciepło">
                             </div>
-
-                            <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
-                                <h4 class="font-bold text-stone-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Konfiguracja Stawek</h4>
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase mb-2">Koszt Lasera (PLN/min)</label>
-                                        <input type="number" step="0.01" id="calc-rate-laser-min" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase mb-2">Materiał (PLN/cm²)</label>
-                                        <input type="number" step="0.0001" id="calc-rate-cm2" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase mb-2">Koszty Stałe (Overhead %)</label>
-                                        <input type="number" id="calc-overhead" class="calc-input font-mono" oninput="runLaserCalculator()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-stone-400 uppercase mb-2">Marża Zysku (%)</label>
-                                        <input type="number" id="calc-margin" class="calc-input font-mono" oninput="runLaserCalculator()">
-                                    </div>
-                                </div>
-                                <button onclick="saveCalcSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition">
-                                    Zapisz stawki domyślne
-                                </button>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek (Wyróżniony kolor)</label>
+                                <input id="edit-hero-accent" class="calc-input" placeholder="np. Drewna">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Opis / Tekst witający</label>
+                                <textarea id="edit-hero-desc" class="calc-input h-24" placeholder="Opis pod nagłówkiem..."></textarea>
                             </div>
                         </div>
 
-                        <!-- Prawa: Wyniki -->
-                        <div class="bg-stone-950 p-10 rounded-[2.5rem] border-2 border-wood-600/20 flex flex-col justify-center text-white relative overflow-hidden">
-                            <div class="absolute top-0 right-0 p-10 opacity-5 text-9xl text-wood-600"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                            
-                            <h4 class="text-2xl font-bold mb-8 border-b border-white/10 pb-6 flex justify-between items-center">
-                                <span>Podsumowanie</span>
-                                <span class="text-xs bg-wood-600/20 text-wood-500 px-3 py-1 rounded-full uppercase tracking-wider">Netto</span>
-                            </h4>
-                            
-                            <div class="space-y-4 text-base">
-                                <div class="excel-row">
-                                    <span class="text-stone-400">Pole powierzchni:</span>
-                                    <span class="font-mono" id="res-area">0 cm²</span>
+                        <!-- Sekcja Kontakt -->
+                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Kontakt i Wycena</h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Email</label>
+                                <input id="edit-contact-email" class="calc-input">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Telefon</label>
+                                <input id="edit-contact-phone" class="calc-input">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Tekst zachęcający do wyceny</label>
+                                <textarea id="edit-contact-desc" class="calc-input h-24"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Sekcja Co Oferujemy (3 Karty) -->
+                        <div class="lg:col-span-2 bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja "Co Oferujemy" (3 Karty)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Karta 1 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 1</h5>
+                                    <input id="edit-card1-icon" class="calc-input text-xs" placeholder="Ikona (np. fa-solid fa-gift)">
+                                    <input id="edit-card1-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card1-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
                                 </div>
-                                <div class="excel-row">
-                                    <span class="text-stone-400">Koszt materiału:</span>
-                                    <span class="font-mono font-bold" id="res-material">0.00 PLN</span>
+                                <!-- Karta 2 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 2</h5>
+                                    <input id="edit-card2-icon" class="calc-input text-xs" placeholder="Ikona">
+                                    <input id="edit-card2-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card2-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
                                 </div>
-                                <div class="excel-row">
-                                    <span class="text-stone-400">Koszt pracy lasera:</span>
-                                    <span class="font-mono font-bold" id="res-laser">0.00 PLN</span>
-                                </div>
-                                <div class="excel-row text-wood-400/80">
-                                    <span>Baza kosztowa:</span>
-                                    <span class="font-mono" id="res-base">0.00 PLN</span>
-                                </div>
-                                <div class="excel-row">
-                                    <span class="text-stone-400">Narzut (Overhead):</span>
-                                    <span class="font-mono font-bold" id="res-overhead-val">0.00 PLN</span>
-                                </div>
-                                <div class="excel-row text-lg pt-4 border-t border-white/10 mt-2">
-                                    <span class="font-bold text-white">Całkowity Koszt Produkcji:</span>
-                                    <span class="font-mono font-bold text-wood-400" id="res-total-cost">0.00 PLN</span>
+                                <!-- Karta 3 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 3</h5>
+                                    <input id="edit-card3-icon" class="calc-input text-xs" placeholder="Ikona">
+                                    <input id="edit-card3-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card3-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
                                 </div>
                             </div>
-                            
+                        </div>
+
+                        <div class="lg:col-span-2">
+                             <button onclick="saveContentSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition text-lg">
+                                Zapisz wszystkie zmiany tekstowe
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widok: Kalkulator Lasera -->
+                <div id="view-calculator" class="admin-view hidden space-y-10">
+                    <header>
+                        <h3 class="text-3xl font-bold mb-2">Kalkulator Wyceny</h3>
+                        <p class="text-stone-400">Symulacja arkusza kalkulacyjnego.</p>
+                    </header>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                        <!-- Lewa -->
+                        <div class="space-y-6">
+                            <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
+                                <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Dane Projektu</h4>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Szerokość (mm)</label><input type="number" id="calc-width-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Wysokość (mm)</label><input type="number" id="calc-height-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div>
+                                </div>
+                                <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Czas Pracy Lasera (minuty)</label><input type="number" id="calc-time-laser" class="calc-input text-xl font-mono" value="10" oninput="runLaserCalculator()"></div>
+                            </div>
+                            <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
+                                <h4 class="font-bold text-stone-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Konfiguracja Stawek</h4>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Koszt Lasera (PLN/min)</label><input type="number" step="0.01" id="calc-rate-laser-min" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Materiał (PLN/cm²)</label><input type="number" step="0.0001" id="calc-rate-cm2" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Koszty Stałe (Overhead %)</label><input type="number" id="calc-overhead" class="calc-input font-mono" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Marża Zysku (%)</label><input type="number" id="calc-margin" class="calc-input font-mono" oninput="runLaserCalculator()"></div>
+                                </div>
+                                <button onclick="saveCalcSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition">Zapisz stawki domyślne</button>
+                            </div>
+                        </div>
+                        <!-- Prawa -->
+                        <div class="bg-stone-950 p-10 rounded-[2.5rem] border-2 border-wood-600/20 flex flex-col justify-center text-white relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-10 opacity-5 text-9xl text-wood-600"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                            <h4 class="text-2xl font-bold mb-8 border-b border-white/10 pb-6 flex justify-between items-center"><span>Podsumowanie</span><span class="text-xs bg-wood-600/20 text-wood-500 px-3 py-1 rounded-full uppercase tracking-wider">Netto</span></h4>
+                            <div class="space-y-4 text-base">
+                                <div class="excel-row"><span class="text-stone-400">Pole powierzchni:</span><span class="font-mono" id="res-area">0 cm²</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Koszt materiału:</span><span class="font-mono font-bold" id="res-material">0.00 PLN</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Koszt pracy lasera:</span><span class="font-mono font-bold" id="res-laser">0.00 PLN</span></div>
+                                <div class="excel-row text-wood-400/80"><span>Baza kosztowa:</span><span class="font-mono" id="res-base">0.00 PLN</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Narzut (Overhead):</span><span class="font-mono font-bold" id="res-overhead-val">0.00 PLN</span></div>
+                                <div class="excel-row text-lg pt-4 border-t border-white/10 mt-2"><span class="font-bold text-white">Całkowity Koszt Produkcji:</span><span class="font-mono font-bold text-wood-400" id="res-total-cost">0.00 PLN</span></div>
+                            </div>
                             <div class="mt-12 p-6 bg-wood-600 rounded-2xl text-center shadow-2xl transform scale-105">
                                 <p class="text-[10px] uppercase text-white/70 font-bold tracking-[0.2em] mb-2">Sugerowana Cena Końcowa</p>
                                 <div id="calc-result-final-price" class="text-5xl md:text-6xl font-black text-white drop-shadow-md">0.00 PLN</div>
@@ -512,11 +496,9 @@
                     </div>
                 </div>
 
-                <!-- Widok: Karuzela -->
+                <!-- Pozostałe Widoki -->
                 <div id="view-hero-gallery" class="admin-view hidden space-y-8"></div>
-                <!-- Widok: Kategorie -->
                 <div id="view-categories" class="admin-view hidden space-y-8"></div>
-                <!-- Widok: Produkty -->
                 <div id="view-products" class="admin-view hidden space-y-8"></div>
 
             </div>
@@ -540,22 +522,68 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // BEZPIECZNE POBIERANIE KONFIGURACJI
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
         
         let db, auth, siteData = {};
 
-        // Dane domyślne (gdy brak w bazie)
+        // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
             heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1622623363380-45c128919616?q=80&w=2070' }],
             categories: {},
             galleries: {},
-            calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 }
+            calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 },
+            textContent: {
+                hero: {
+                    main: "Precyzja Lasera,<br>Ciepło",
+                    accent: "Drewna",
+                    desc: "Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą."
+                },
+                aboutCards: [
+                    { icon: "fa-solid fa-wand-magic-sparkles", title: "Grawerowanie", desc: "Niezwykle precyzyjne nanoszenie detali, logotypów i grafik na drewno, szkło, skórę i inne materiały." },
+                    { icon: "fa-solid fa-scissors", title: "Precyzyjne Cięcie", desc: "Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki." },
+                    { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
+                ],
+                contact: {
+                    email: "pkatlowski@gmail.com",
+                    phone: "+48 123 456 789",
+                    desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe."
+                }
+            }
         };
 
-        // --- RENDEROWANIE STRONY ---
-        
+        // --- RENDEROWANIE TREŚCI ---
+        function renderTexts() {
+            if(!siteData.textContent) siteData.textContent = initialData.textContent; // Fallback
+            
+            const t = siteData.textContent;
+            
+            // Hero
+            if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
+            if(document.getElementById('hero-title-accent')) document.getElementById('hero-title-accent').textContent = t.hero.accent;
+            if(document.getElementById('hero-desc')) document.getElementById('hero-desc').textContent = t.hero.desc;
+
+            // Kontakt
+            if(document.getElementById('contact-email')) document.getElementById('contact-email').textContent = t.contact.email;
+            if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
+            if(document.getElementById('contact-desc')) document.getElementById('contact-desc').textContent = t.contact.desc;
+
+            // Karty "O ofercie"
+            const grid = document.getElementById('about-grid');
+            if(grid && t.aboutCards) {
+                grid.innerHTML = t.aboutCards.map(c => `
+                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
+                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm">
+                            <i class="${c.icon} text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-800">${c.title}</h3>
+                        <p class="text-stone-500 leading-relaxed">${c.desc}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // --- RENDEROWANIE HERO ---
         function renderHero() {
             const container = document.getElementById('hero-carousel-container');
             if (!container || !siteData.heroItems) return;
@@ -565,11 +593,9 @@
                 </div>
             `).join('');
             
-            // Automatyczna rotacja
             let cur = 0;
             const slides = document.querySelectorAll('.hero-slide');
             if(window.heroInterval) clearInterval(window.heroInterval);
-            
             window.heroInterval = setInterval(() => {
                 if (slides.length < 2) return;
                 slides[cur].classList.remove('active');
@@ -578,6 +604,7 @@
             }, 6000);
         }
 
+        // --- RENDEROWANIE KATEGORII ---
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (!grid) return; 
@@ -610,7 +637,7 @@
             });
         }
 
-        // --- KALKULATOR (Logika Arkusza) ---
+        // --- LOGIKA ARKUSZA KALKULACYJNEGO ---
         window.runLaserCalculator = () => {
             const w = parseFloat(document.getElementById('calc-width-mm').value) || 0;
             const h = parseFloat(document.getElementById('calc-height-mm').value) || 0;
@@ -621,25 +648,20 @@
             const oh = parseFloat(document.getElementById('calc-overhead').value) || 0;
             const ma = parseFloat(document.getElementById('calc-margin').value) || 0;
 
-            // Obliczenia
             const areaCm2 = (w * h) / 100;
             const costM = areaCm2 * rc;
             const costL = time * rl;
             const baseCost = costM + costL;
-            const totalWithOverhead = baseCost * (1 + (oh / 100)); // Baza + % kosztów stałych
+            const totalWithOverhead = baseCost * (1 + (oh / 100));
             const overheadValue = totalWithOverhead - baseCost;
-            
-            // Marża nakładana na koszt całkowity
             const finalPrice = totalWithOverhead * (1 + (ma / 100));
 
-            // Wyświetlanie
             document.getElementById('res-area').textContent = areaCm2.toFixed(2) + " cm²";
             document.getElementById('res-material').textContent = costM.toFixed(2) + " PLN";
             document.getElementById('res-laser').textContent = costL.toFixed(2) + " PLN";
             document.getElementById('res-base').textContent = baseCost.toFixed(2) + " PLN";
             document.getElementById('res-overhead-val').textContent = overheadValue.toFixed(2) + " PLN";
             document.getElementById('res-total-cost').textContent = totalWithOverhead.toFixed(2) + " PLN";
-            
             document.getElementById('calc-result-final-price').textContent = finalPrice.toFixed(2) + " PLN";
         };
 
@@ -654,21 +676,54 @@
             alert("Stawki zostały zapisane w chmurze!");
         };
 
+        // --- ZARZĄDZANIE TREŚCIĄ (Nowa Funkcja) ---
+        window.saveContentSettings = async () => {
+            const t = {
+                hero: {
+                    main: document.getElementById('edit-hero-main').value,
+                    accent: document.getElementById('edit-hero-accent').value,
+                    desc: document.getElementById('edit-hero-desc').value
+                },
+                contact: {
+                    email: document.getElementById('edit-contact-email').value,
+                    phone: document.getElementById('edit-contact-phone').value,
+                    desc: document.getElementById('edit-contact-desc').value
+                },
+                aboutCards: [
+                    {
+                        icon: document.getElementById('edit-card1-icon').value,
+                        title: document.getElementById('edit-card1-title').value,
+                        desc: document.getElementById('edit-card1-desc').value
+                    },
+                    {
+                        icon: document.getElementById('edit-card2-icon').value,
+                        title: document.getElementById('edit-card2-title').value,
+                        desc: document.getElementById('edit-card2-desc').value
+                    },
+                    {
+                        icon: document.getElementById('edit-card3-icon').value,
+                        title: document.getElementById('edit-card3-title').value,
+                        desc: document.getElementById('edit-card3-desc').value
+                    }
+                ]
+            };
+            siteData.textContent = t;
+            await saveData();
+            renderTexts(); // Odśwież na żywo
+            alert("Wszystkie treści zostały zaktualizowane!");
+        };
+
         // --- ZARZĄDZANIE WIDOKAMI ADMINA ---
         window.switchAdminView = (id) => {
-            // Ukryj wszystkie widoki
             document.querySelectorAll('.admin-view').forEach(v => v.classList.add('hidden'));
-            // Odznacz przyciski
             document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
             
-            // Pokaż wybrany
             const view = document.getElementById(`view-${id}`);
             if (view) view.classList.remove('hidden');
             
             const btn = document.getElementById(`btn-${id}`);
             if (btn) btn.classList.add('active');
             
-            // Renderowanie zawartości
             if (id === 'calculator') {
                 const s = siteData.calcSettings;
                 document.getElementById('calc-rate-laser-min').value = s.rateLaserMin;
@@ -682,6 +737,33 @@
                 renderCategoriesAdmin();
             } else if (id === 'products') {
                 renderProductsAdmin();
+            } else if (id === 'content') {
+                // Wypełnij formularz obecnymi danymi
+                if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                const t = siteData.textContent;
+
+                document.getElementById('edit-hero-main').value = t.hero.main;
+                document.getElementById('edit-hero-accent').value = t.hero.accent;
+                document.getElementById('edit-hero-desc').value = t.hero.desc;
+
+                document.getElementById('edit-contact-email').value = t.contact.email;
+                document.getElementById('edit-contact-phone').value = t.contact.phone;
+                document.getElementById('edit-contact-desc').value = t.contact.desc;
+
+                // Karty
+                if(t.aboutCards && t.aboutCards.length >= 3) {
+                    document.getElementById('edit-card1-icon').value = t.aboutCards[0].icon;
+                    document.getElementById('edit-card1-title').value = t.aboutCards[0].title;
+                    document.getElementById('edit-card1-desc').value = t.aboutCards[0].desc;
+
+                    document.getElementById('edit-card2-icon').value = t.aboutCards[1].icon;
+                    document.getElementById('edit-card2-title').value = t.aboutCards[1].title;
+                    document.getElementById('edit-card2-desc').value = t.aboutCards[1].desc;
+
+                    document.getElementById('edit-card3-icon').value = t.aboutCards[2].icon;
+                    document.getElementById('edit-card3-title').value = t.aboutCards[2].title;
+                    document.getElementById('edit-card3-desc').value = t.aboutCards[2].desc;
+                }
             }
         };
 
@@ -749,15 +831,11 @@
 
         function renderProductsAdmin() {
             const container = document.getElementById('view-products');
-            
-            // Helper do generowania opcji selecta
             const categoryOptions = Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
             const productOptions = Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('');
 
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Produkty i Galerie</h3>
-                
-                <!-- 1. Dodaj Produkt -->
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-wood-500 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Krok 1: Stwórz Produkt w Kategorii</h4>
                     <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
@@ -765,10 +843,7 @@
                     <input id="p-i" class="calc-input" placeholder="Miniatura (URL)">
                     <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
                 </div>
-                
                 <hr class="border-white/10 my-8">
-
-                <!-- 2. Dodaj Zdjęcie -->
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Krok 2: Dodaj Zdjęcia do Produktu</h4>
                     <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
@@ -917,7 +992,7 @@
         window.toggleAdminPanel = () => {
             const p = document.getElementById('admin-panel');
             p.classList.toggle('hidden');
-            if(!p.classList.contains('hidden')) window.switchAdminView('hero-gallery');
+            if(!p.classList.contains('hidden')) window.switchAdminView('content');
         };
         
         window.exitLogin = () => {
@@ -944,7 +1019,6 @@
                 document.getElementById('login-screen').classList.remove('hidden');
             }
 
-            // Obsługa nasłuchiwania zmian hash'a dla lepszego UX
             window.addEventListener('hashchange', () => {
                 if(window.location.hash === '#admin') {
                      document.getElementById('login-screen').classList.remove('hidden');
@@ -952,7 +1026,6 @@
             });
 
             try {
-                // Bezpieczne ładowanie Firebase
                 if (Object.keys(firebaseConfig).length > 0) {
                     const appObj = initializeApp(firebaseConfig);
                     auth = getAuth(appObj);
@@ -970,9 +1043,12 @@
                             onSnapshot(docRef, (snap) => {
                                 if (snap.exists()) {
                                     siteData = snap.data();
+                                    // Upewnij się, że nowe pola istnieją po załadowaniu ze starej bazy
+                                    if(!siteData.textContent) siteData.textContent = initialData.textContent;
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
                                     renderHero();
                                     renderMain();
+                                    renderTexts(); // Aktualizuj teksty
                                 } else {
                                     saveData();
                                 }
@@ -987,15 +1063,14 @@
                 console.log("Uruchomiono w trybie offline / bez bazy danych");
                 renderHero();
                 renderMain();
+                renderTexts();
             }
         }
 
-        // Init
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
-        // Ważne: Renderujemy od razu, żeby strona nie była pusta
         renderHero();
         renderMain();
-        // Startujemy logikę (z try-catch na błędy)
+        renderTexts();
         start();
     </script>
 </body>
