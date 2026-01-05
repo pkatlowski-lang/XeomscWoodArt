@@ -530,11 +530,7 @@
                 <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
                 <p class="text-xs">Pasja. Precyzja. Drewno.</p>
             </div>
-            <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone. 
-                <button id="admin-footer-btn" onclick="document.getElementById('login-screen').classList.remove('hidden')" class="hover:text-wood-500 underline ml-4 transition">
-                    <i class="fa-solid fa-lock text-xs"></i> Admin
-                </button>
-            </p>
+            <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
         </div>
     </footer>
 
@@ -544,7 +540,8 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config || '{}');
+        // BEZPIECZNE POBIERANIE KONFIGURACJI
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
         
         let db, auth, siteData = {};
@@ -947,35 +944,47 @@
                 document.getElementById('login-screen').classList.remove('hidden');
             }
 
-            try {
-                const appObj = initializeApp(firebaseConfig);
-                auth = getAuth(appObj);
-                db = getFirestore(appObj);
-                
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+            // Obsługa nasłuchiwania zmian hash'a dla lepszego UX
+            window.addEventListener('hashchange', () => {
+                if(window.location.hash === '#admin') {
+                     document.getElementById('login-screen').classList.remove('hidden');
                 }
+            });
 
-                onAuthStateChanged(auth, (u) => {
-                    if(u) {
-                        const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
-                        onSnapshot(docRef, (snap) => {
-                            if (snap.exists()) {
-                                siteData = snap.data();
-                                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                renderHero();
-                                renderMain();
-                            } else {
-                                // Pierwsze uruchomienie
-                                saveData();
-                            }
-                        });
+            try {
+                // Bezpieczne ładowanie Firebase
+                if (Object.keys(firebaseConfig).length > 0) {
+                    const appObj = initializeApp(firebaseConfig);
+                    auth = getAuth(appObj);
+                    db = getFirestore(appObj);
+                    
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
                     }
-                });
+
+                    onAuthStateChanged(auth, (u) => {
+                        if(u) {
+                            const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
+                            onSnapshot(docRef, (snap) => {
+                                if (snap.exists()) {
+                                    siteData = snap.data();
+                                    localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                    renderHero();
+                                    renderMain();
+                                } else {
+                                    saveData();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    console.warn("Tryb offline: Brak konfiguracji Firebase");
+                    throw new Error("No config");
+                }
             } catch (e) {
-                console.log("Offline mode");
+                console.log("Uruchomiono w trybie offline / bez bazy danych");
                 renderHero();
                 renderMain();
             }
@@ -983,8 +992,10 @@
 
         // Init
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        // Ważne: Renderujemy od razu, żeby strona nie była pusta
         renderHero();
         renderMain();
+        // Startujemy logikę (z try-catch na błędy)
         start();
     </script>
 </body>
