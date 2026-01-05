@@ -133,6 +133,17 @@
             font-size: 0.9rem;
         }
         .excel-row:last-child { border-bottom: none; }
+        
+        /* Status Indicator */
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .status-offline { background-color: #ef4444; }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -167,9 +178,9 @@
     <!-- 2. PASEK ADMINA (Widoczny po zalogowaniu) -->
     <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-lg border-b border-wood-600">
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full border border-green-500/50">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-xs font-bold text-green-400 uppercase tracking-wider">Tryb Admina</span>
+            <div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10" id="db-status-indicator">
+                <div id="status-dot" class="status-dot status-offline"></div>
+                <span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Offline (Lokalnie)</span>
             </div>
             <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
                 <i class="fa-solid fa-gears"></i> Otwórz Panel CMS
@@ -340,7 +351,7 @@
                         <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
                         <span>CMS Panel</span>
                     </h2>
-                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.2</p>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.3 - Cloud</p>
                 </div>
 
                 <nav class="space-y-3 flex-1 overflow-y-auto">
@@ -374,7 +385,7 @@
                 <div id="view-content" class="admin-view hidden space-y-10">
                     <header>
                         <h3 class="text-3xl font-bold mb-2">Edycja Treści Strony</h3>
-                        <p class="text-stone-400">Dostosuj teksty powitalne, opisy i dane kontaktowe.</p>
+                        <p class="text-stone-400">Zmiany tutaj są natychmiast widoczne na wszystkich urządzeniach.</p>
                     </header>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         
@@ -442,7 +453,7 @@
 
                         <div class="lg:col-span-2">
                              <button onclick="saveContentSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition text-lg">
-                                Zapisz wszystkie zmiany tekstowe
+                                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Zapisz wszystkie zmiany w chmurze
                             </button>
                         </div>
                     </div>
@@ -522,10 +533,34 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
+        // ==========================================
+        // KONFIGURACJA FIREBASE
+        // ==========================================
         
+        // 1. DLA GITHUB PAGES:
+        // Aby strona działała globalnie po wrzuceniu na GitHub, MUSISZ tu wkleić swoją konfigurację.
+        // Skopiuj obiekt 'firebaseConfig' z konsoli Firebase (Project Settings > General > Your apps)
+        
+        let manualConfig = {
+            // TU WKLEJ SWOJĄ KONFIGURACJĘ FIREBASE (odkomentuj i wypełnij)
+            // apiKey: "TWOJE-API-KEY",
+            // authDomain: "twoj-projekt.firebaseapp.com",
+            // projectId: "twoj-projekt",
+            // storageBucket: "twoj-projekt.firebasestorage.app",
+            // messagingSenderId: "123456789",
+            // appId: "1:123456:web:abcdef"
+        };
+
+        // 2. DLA TEGO ŚRODOWISKA (CANVAS/AI):
+        // Automatyczne pobieranie konfiguracji środowiska
+        const envConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        
+        // Wybór konfiguracji: Ręczna (dla GitHub) ma priorytet nad środowiskową
+        const firebaseConfig = Object.keys(manualConfig).length > 0 ? manualConfig : envConfig;
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
         let db, auth, siteData = {};
+        let isOnline = false;
 
         // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
@@ -710,7 +745,7 @@
             siteData.textContent = t;
             await saveData();
             renderTexts(); // Odśwież na żywo
-            alert("Wszystkie treści zostały zaktualizowane!");
+            alert("Wszystkie treści zostały zaktualizowane w chmurze!");
         };
 
         // --- ZARZĄDZANIE WIDOKAMI ADMINA ---
@@ -1000,13 +1035,39 @@
             window.location.hash = '';
         };
 
+        // --- FIREBASE STATUS UI ---
+        function updateStatusUI(online) {
+            isOnline = online;
+            const dot = document.getElementById('status-dot');
+            const txt = document.getElementById('status-text');
+            if(online) {
+                dot.className = "status-dot status-online";
+                txt.textContent = "ONLINE (CHMURA)";
+                txt.classList.add('text-green-400');
+                txt.classList.remove('text-stone-400');
+            } else {
+                dot.className = "status-dot status-offline";
+                txt.textContent = "OFFLINE (LOKALNIE)";
+                txt.classList.add('text-stone-400');
+                txt.classList.remove('text-green-400');
+            }
+        }
+
         // --- FIREBASE SYNC ---
         async function saveData() {
+            // Zawsze zapisuj lokalnie jako backup
             localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-            if(auth && auth.currentUser) {
+            
+            if(isOnline && auth && auth.currentUser) {
                 try {
                     await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
-                } catch(e) { console.error("Sync error", e); }
+                    console.log("Zapisano w chmurze");
+                } catch(e) { 
+                    console.error("Błąd zapisu w chmurze", e); 
+                    alert("Uwaga: Błąd zapisu w chmurze! Sprawdź połączenie.");
+                }
+            } else {
+                console.log("Zapisano tylko lokalnie (Offline)");
             }
         }
 
@@ -1039,17 +1100,30 @@
 
                     onAuthStateChanged(auth, (u) => {
                         if(u) {
+                            updateStatusUI(true);
+                            // Nasłuchuj zmian w czasie rzeczywistym
                             const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
                             onSnapshot(docRef, (snap) => {
                                 if (snap.exists()) {
+                                    console.log("Otrzymano aktualizację z chmury");
                                     siteData = snap.data();
-                                    // Upewnij się, że nowe pola istnieją po załadowaniu ze starej bazy
+                                    
+                                    // Upewnij się, że nowe pola istnieją
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                                    
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                    
+                                    // Odśwież widok
                                     renderHero();
                                     renderMain();
-                                    renderTexts(); // Aktualizuj teksty
+                                    renderTexts(); 
+                                    
+                                    // Jeśli panel admina jest otwarty, odśwież formularze
+                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                                       // Opcjonalnie można tu dodać logikę odświeżania inputów
+                                    }
                                 } else {
+                                    // Pierwsze uruchomienie w chmurze - wyślij dane lokalne
                                     saveData();
                                 }
                             });
@@ -1057,10 +1131,11 @@
                     });
                 } else {
                     console.warn("Tryb offline: Brak konfiguracji Firebase");
-                    throw new Error("No config");
+                    updateStatusUI(false);
                 }
             } catch (e) {
-                console.log("Uruchomiono w trybie offline / bez bazy danych");
+                console.log("Uruchomiono w trybie offline / bez bazy danych", e);
+                updateStatusUI(false);
                 renderHero();
                 renderMain();
                 renderTexts();
