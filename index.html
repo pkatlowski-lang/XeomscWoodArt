@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ANTI-CACHE META TAGS (Wymuszanie świeżej wersji u klienta) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>Xeomsc FusionArt - Grawerowanie Laserowe i Drewno</title>
     
     <!-- Tailwind CSS -->
@@ -102,7 +108,6 @@
         .admin-controls { display: none !important; }
         body.is-admin .admin-controls { display: flex !important; }
         
-        /* POPRAWKA: Przesunięcie menu głównego w dół, gdy pasek admina jest widoczny */
         body.is-admin #navbar {
             top: 58px; 
         }
@@ -190,6 +195,18 @@
             width: 100%;
             z-index: 10000;
         }
+        
+        /* Stopka diagnostyczna */
+        .diag-footer {
+            font-size: 10px;
+            color: #555;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            cursor: pointer;
+        }
+        .source-live { color: #22c55e; font-weight: bold; }
+        .source-default { color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -405,7 +422,7 @@
                         <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
                         <span>CMS Panel</span>
                     </h2>
-                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.6 - DIAGNOSTYKA</p>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.3 - Diagnostyka</p>
                 </div>
 
                 <nav class="space-y-3 flex-1 overflow-y-auto">
@@ -576,6 +593,10 @@
             <div class="text-left">
                 <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
                 <p class="text-xs">Pasja. Precyzja. Drewno.</p>
+                <!-- DIAGNOSTYKA WIDOCZNA DLA WSZYSTKICH -->
+                <div class="diag-footer" onclick="showDetailedError()">
+                    <p id="data-source-indicator">Inicjowanie...</p>
+                </div>
             </div>
             <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
         </div>
@@ -591,12 +612,6 @@
         // KONFIGURACJA FIREBASE
         // ==========================================
         
-        // 1. DLA GITHUB PAGES (To jest najważniejsza część dla Ciebie!):
-        // Aby strona działała globalnie po wrzuceniu na GitHub, MUSISZ tu wkleić swoją konfigurację.
-        // Skopiuj obiekt 'firebaseConfig' z konsoli Firebase (Project Settings > General > Your apps)
-        
-        // --- MIEJSCE NA TWOJĄ KONFIGURACJĘ DLA GITHUB ---
-        // Wklej tutaj swoje dane z Firebase Console (usuń znak komentarza //)
         let manualConfig = {
           apiKey: "AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
           authDomain: "xeomsc-a8edd.firebaseapp.com",
@@ -605,18 +620,14 @@
           messagingSenderId: "43822805612",
           appId: "1:43822805612:web:d343653e47777d8ebf5e49"
         };
-        // ---------------------------------------------------
 
-        // 2. DLA TEGO ŚRODOWISKA (CANVAS/AI):
-        // Automatyczne pobieranie konfiguracji środowiska
         const envConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        
-        // Wybór konfiguracji: Ręczna (dla GitHub) ma priorytet nad środowiskową
         const firebaseConfig = Object.keys(manualConfig).length > 0 ? manualConfig : envConfig;
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
         let db, auth, siteData = {};
         let isOnline = false;
+        let lastError = "";
 
         // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
@@ -766,7 +777,7 @@
             await saveData();
         };
 
-        // --- ZARZĄDZANIE TREŚCIĄ (Nowa Funkcja) ---
+        // --- ZARZĄDZANIE TREŚCIĄ ---
         window.saveContentSettings = async () => {
             const t = {
                 hero: {
@@ -799,9 +810,8 @@
             };
             siteData.textContent = t;
             await saveData();
-            renderTexts(); // Odśwież na żywo
+            renderTexts(); 
             
-            // Pokaż Toast
             const toast = document.getElementById('toast-notification');
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
@@ -832,7 +842,6 @@
             } else if (id === 'products') {
                 renderProductsAdmin();
             } else if (id === 'content') {
-                // Wypełnij formularz obecnymi danymi
                 if(!siteData.textContent) siteData.textContent = initialData.textContent;
                 const t = siteData.textContent;
 
@@ -844,7 +853,6 @@
                 document.getElementById('edit-contact-phone').value = t.contact.phone;
                 document.getElementById('edit-contact-desc').value = t.contact.desc;
 
-                // Karty
                 if(t.aboutCards && t.aboutCards.length >= 3) {
                     document.getElementById('edit-card1-icon').value = t.aboutCards[0].icon;
                     document.getElementById('edit-card1-title').value = t.aboutCards[0].title;
@@ -1143,9 +1151,38 @@
                 txt.classList.remove('text-green-400');
                 
                 if(message) {
-                    banner.textContent = "BŁĄD POŁĄCZENIA: " + message;
+                    lastError = message; // Zapamiętaj błąd dla diagnostyki
+                    // Tłumaczenie błędów
+                    let friendlyMsg = message;
+                    if(message.includes('auth/configuration-not-found')) {
+                        friendlyMsg = "Uwierzytelnianie nie jest włączone w konsoli Firebase! (Wejdź w Authentication -> Sign-in method -> Włącz Anonymous)";
+                    } else if (message.includes('auth/api-key-not-valid')) {
+                        friendlyMsg = "Nieprawidłowy klucz API (API Key). Sprawdź konfigurację.";
+                    } else if (message.includes('network-request-failed')) {
+                        friendlyMsg = "Błąd sieci. Sprawdź połączenie z internetem.";
+                    } else if (message.includes('permission-denied')) {
+                        friendlyMsg = "Brak uprawnień. Sprawdź Reguły (Rules) w Firestore.";
+                    }
+
+                    banner.textContent = "BŁĄD: " + friendlyMsg;
                     banner.style.display = 'block';
                 }
+            }
+        }
+        
+        window.showDetailedError = () => {
+            if(lastError) alert("Ostatni błąd techniczny:\n" + lastError);
+            else if(!isOnline) alert("Nie połączono z chmurą. Sprawdź konsolę Firebase.");
+            else alert("Połączenie z chmurą jest aktywne i poprawne.");
+        };
+        
+        // --- DIAGNOSTYKA ŹRÓDŁA DANYCH ---
+        function updateDataSourceIndicator(source, isError=false) {
+            const el = document.getElementById('data-source-indicator');
+            if(source === 'cloud') {
+                el.innerHTML = 'Źródło danych: <span class="source-live">CHMURA (LIVE)</span>';
+            } else {
+                el.innerHTML = 'Źródło danych: <span class="source-default">DOMYŚLNE (OFFLINE)</span>' + (isError ? ' - Sprawdź połączenie (Kliknij tutaj)' : '');
             }
         }
 
@@ -1205,6 +1242,7 @@
                     } catch (authError) {
                         console.error("Critical Auth Error:", authError);
                         updateStatusUI(false, authError.code || authError.message);
+                        updateDataSourceIndicator('local', true);
                         return;
                     }
 
@@ -1217,6 +1255,7 @@
                                 if (snap.exists()) {
                                     console.log("Otrzymano aktualizację z chmury");
                                     siteData = snap.data();
+                                    updateDataSourceIndicator('cloud');
                                     
                                     // Upewnij się, że nowe pola istnieją
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
@@ -1233,19 +1272,29 @@
                                        // Opcjonalnie można tu dodać logikę odświeżania inputów
                                     }
                                 } else {
-                                    // Pierwsze uruchomienie w chmurze - wyślij dane lokalne
-                                    saveData();
+                                    // Pierwsze uruchomienie w chmurze - wyślij dane lokalne jeśli to admin, lub użyj default jeśli klient
+                                    if(sessionStorage.getItem('xeomsc_admin') === 'true') {
+                                        saveData();
+                                    } else {
+                                        updateDataSourceIndicator('local');
+                                    }
                                 }
+                            }, (error) => {
+                                console.error("Snapshot error:", error);
+                                updateStatusUI(false, error.message);
+                                updateDataSourceIndicator('local', true);
                             });
                         }
                     });
                 } else {
                     console.warn("Tryb offline: Brak konfiguracji Firebase");
                     updateStatusUI(false, "Brak konfiguracji Firebase");
+                    updateDataSourceIndicator('local');
                 }
             } catch (e) {
                 console.log("Uruchomiono w trybie offline / bez bazy danych", e);
                 updateStatusUI(false, e.message);
+                updateDataSourceIndicator('local', true);
                 renderHero();
                 renderMain();
                 renderTexts();
