@@ -102,6 +102,11 @@
         .admin-controls { display: none !important; }
         body.is-admin .admin-controls { display: flex !important; }
         
+        /* POPRAWKA: Przesunięcie menu głównego w dół, gdy pasek admina jest widoczny */
+        body.is-admin #navbar {
+            top: 58px; 
+        }
+
         .admin-sidebar-item.active {
             background-color: #b45309;
             color: white;
@@ -144,9 +149,39 @@
         }
         .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
         .status-offline { background-color: #ef4444; }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #22c55e;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        #toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
+
+    <!-- Toast Notification -->
+    <div id="toast-notification">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Zapisano zmiany w chmurze!</span>
+    </div>
 
     <!-- 1. EKRAN LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[9999] bg-stone-900/98 hidden flex items-center justify-center p-4 backdrop-blur-sm">
@@ -183,7 +218,7 @@
                 <span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Offline (Lokalnie)</span>
             </div>
             <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
-                <i class="fa-solid fa-gears"></i> Otwórz Panel CMS
+                <i class="fa-solid fa-gears"></i> Panel CMS
             </button>
         </div>
         <button onclick="handleLogout()" class="text-stone-400 hover:text-white font-medium transition flex items-center gap-2 text-xs">
@@ -240,7 +275,6 @@
                         Pracownia Grawerska
                     </span>
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
-                        <!-- Dynamiczny Tytuł -->
                         <span id="hero-title-main">Precyzja Lasera,<br>Ciepło</span> 
                         <span id="hero-title-accent" class="gradient-text white-outline-text">Drewna</span>.
                     </h1>
@@ -351,7 +385,7 @@
                         <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
                         <span>CMS Panel</span>
                     </h2>
-                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.3 - Cloud</p>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v1.4 - Cloud</p>
                 </div>
 
                 <nav class="space-y-3 flex-1 overflow-y-auto">
@@ -365,7 +399,7 @@
                         <i class="fa-solid fa-layer-group w-6"></i> Kategorie
                     </button>
                     <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
-                        <i class="fa-solid fa-box-open w-6"></i> Produkty
+                        <i class="fa-solid fa-box-open w-6"></i> Produkty i Galerie
                     </button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-wood-500 hover:text-wood-400 bg-wood-500/10">
@@ -537,19 +571,21 @@
         // KONFIGURACJA FIREBASE
         // ==========================================
         
-        // 1. DLA GITHUB PAGES:
+        // 1. DLA GITHUB PAGES (To jest najważniejsza część dla Ciebie!):
         // Aby strona działała globalnie po wrzuceniu na GitHub, MUSISZ tu wkleić swoją konfigurację.
         // Skopiuj obiekt 'firebaseConfig' z konsoli Firebase (Project Settings > General > Your apps)
         
+        // --- MIEJSCE NA TWOJĄ KONFIGURACJĘ DLA GITHUB ---
+        // Wklej tutaj swoje dane z Firebase Console (usuń znak komentarza //)
         let manualConfig = {
-            // TU WKLEJ SWOJĄ KONFIGURACJĘ FIREBASE (odkomentuj i wypełnij)
-            // apiKey: "TWOJE-API-KEY",
-            // authDomain: "twoj-projekt.firebaseapp.com",
-            // projectId: "twoj-projekt",
-            // storageBucket: "twoj-projekt.firebasestorage.app",
-            // messagingSenderId: "123456789",
-            // appId: "1:123456:web:abcdef"
+          apiKey: "AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
+          authDomain: "xeomsc-a8edd.firebaseapp.com",
+          projectId: "xeomsc-a8edd",
+          storageBucket: "xeomsc-a8edd.firebasestorage.app",
+          messagingSenderId: "43822805612",
+          appId: "1:43822805612:web:d343653e47777d8ebf5e49"
         };
+        // ---------------------------------------------------
 
         // 2. DLA TEGO ŚRODOWISKA (CANVAS/AI):
         // Automatyczne pobieranie konfiguracji środowiska
@@ -708,7 +744,6 @@
                 margin: parseFloat(document.getElementById('calc-margin').value)
             };
             await saveData();
-            alert("Stawki zostały zapisane w chmurze!");
         };
 
         // --- ZARZĄDZANIE TREŚCIĄ (Nowa Funkcja) ---
@@ -745,7 +780,11 @@
             siteData.textContent = t;
             await saveData();
             renderTexts(); // Odśwież na żywo
-            alert("Wszystkie treści zostały zaktualizowane w chmurze!");
+            
+            // Pokaż Toast
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
         // --- ZARZĄDZANIE WIDOKAMI ADMINA ---
@@ -808,7 +847,7 @@
                 <h3 class="text-3xl font-bold mb-6">Karuzela Startowa</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-500">Dodaj nowy slajd</h4>
-                    <input id="h-url" class="calc-input" placeholder="Adres URL zdjęcia lub wideo">
+                    <input id="h-url" class="calc-input" placeholder="Wklej link do zdjęcia lub wideo (np. z Imgur)">
                     <select id="h-type" class="calc-input"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
                     <button id="add-h-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj do karuzeli</button>
                 </div>
@@ -828,7 +867,17 @@
             `;
             document.getElementById('add-h-btn').onclick = () => {
                 const u = document.getElementById('h-url').value;
-                if(u) { siteData.heroItems.push({type: document.getElementById('h-type').value, url: u}); saveData(); renderHeroAdmin(); renderHero(); }
+                if(u) { 
+                    siteData.heroItems.push({type: document.getElementById('h-type').value, url: u}); 
+                    saveData(); 
+                    renderHeroAdmin(); 
+                    renderHero(); 
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano slajd!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
             };
         }
 
@@ -839,7 +888,7 @@
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-500">Stwórz nową kategorię</h4>
                     <input id="cat-t" class="calc-input" placeholder="Nazwa (np. Drewno)">
-                    <input id="cat-i" class="calc-input" placeholder="URL Okładki">
+                    <input id="cat-i" class="calc-input" placeholder="Wklej link do zdjęcia okładki">
                     <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
                 </div>
                 <div class="space-y-3">
@@ -860,6 +909,11 @@
                     const id = 'c' + Date.now();
                     siteData.categories[id] = { title: t, image: document.getElementById('cat-i').value, subcategories: [] };
                     saveData(); renderCategoriesAdmin(); renderMain();
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano kategorię!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
                 }
             };
         }
@@ -875,14 +929,14 @@
                     <h4 class="text-xs uppercase font-bold text-wood-500 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Krok 1: Stwórz Produkt w Kategorii</h4>
                     <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
                     <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
-                    <input id="p-i" class="calc-input" placeholder="Miniatura (URL)">
+                    <input id="p-i" class="calc-input" placeholder="Wklej link do miniatury">
                     <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
                 </div>
                 <hr class="border-white/10 my-8">
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Krok 2: Dodaj Zdjęcia do Produktu</h4>
                     <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
-                    <input id="gal-img-url" class="calc-input" placeholder="URL Zdjęcia">
+                    <input id="gal-img-url" class="calc-input" placeholder="Wklej link do zdjęcia">
                     <button id="gal-btn" class="bg-stone-600 hover:bg-stone-500 w-full py-3 rounded-xl font-bold transition">Dodaj zdjęcie do galerii</button>
                 </div>
             `;
@@ -894,7 +948,14 @@
                     const sid = 's' + Date.now();
                     siteData.categories[cid].subcategories.push({ id: sid, title: t, image: document.getElementById('p-i').value });
                     siteData.galleries[sid] = { images: [] };
-                    saveData(); alert("Produkt dodany! Teraz możesz dodać do niego zdjęcia."); renderProductsAdmin();
+                    saveData(); 
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano produkt!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                    
+                    renderProductsAdmin();
                 }
             };
             document.getElementById('gal-btn').onclick = () => {
@@ -903,7 +964,14 @@
                 if(sid && url) {
                     if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
                     siteData.galleries[sid].images.push({ src: url });
-                    saveData(); alert("Zdjęcie dodane do galerii!"); document.getElementById('gal-img-url').value = "";
+                    saveData(); 
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano zdjęcie!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                    
+                    document.getElementById('gal-img-url').value = "";
                 }
             };
         }
@@ -1062,6 +1130,13 @@
                 try {
                     await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
                     console.log("Zapisano w chmurze");
+                    
+                    // Pokazuj Toast
+                    const toast = document.getElementById('toast-notification');
+                    if (toast) {
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 3000);
+                    }
                 } catch(e) { 
                     console.error("Błąd zapisu w chmurze", e); 
                     alert("Uwaga: Błąd zapisu w chmurze! Sprawdź połączenie.");
