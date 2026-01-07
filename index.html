@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ANTI-CACHE META TAGS (Z Twojego pliku) -->
+    <!-- ANTI-CACHE META TAGS (Wymuszanie świeżej wersji u klienta) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -49,18 +49,34 @@
     </script>
 
     <style>
-        /* --- STYLE BAZOWE (Zgodne z Twoim kodem) --- */
-        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
         
         .gradient-text {
             background: linear-gradient(to right, #b45309, #d97706);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         
+        .white-outline-text {
+            text-shadow: 
+                -1px -1px 0 #fff,  
+                 1px -1px 0 #fff,
+                -1px  1px 0 #fff,
+                 1px  1px 0 #fff,
+                 0px  0px 8px rgba(255,255,255,0.8);
+        }
+
         .text-outline {
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.6), 0px 0px 20px rgba(0,0,0,0.4);
+            text-shadow: 
+                -1px -1px 2px rgba(0,0,0,0.4),  
+                 1px -1px 2px rgba(0,0,0,0.4),
+                -1px  1px 2px rgba(0,0,0,0.4),
+                 1px  1px 2px rgba(0,0,0,0.4),
+                 0px  2px 10px rgba(0,0,0,0.6);
         }
 
         .hero-bg {
@@ -68,106 +84,213 @@
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
         
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease-in-out; z-index: 1; }
-        .hero-slide.active { opacity: 1; z-index: 10; }
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 1;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            z-index: 10;
+        }
 
-        /* --- ADMIN STYLE --- */
         .admin-controls { display: none !important; }
         body.is-admin .admin-controls { display: flex !important; }
-        body.is-admin #navbar { top: 58px; }
-        .admin-sidebar-item.active { background-color: #b45309; color: white; border-right: 4px solid #fff; }
+        
+        body.is-admin #navbar {
+            top: 58px; 
+        }
+
+        .admin-sidebar-item.active {
+            background-color: #b45309;
+            color: white;
+            border-right: 4px solid #fff;
+        }
+
         #admin-panel.hidden { display: none !important; }
 
-        .calc-input { background: #1c1917; border: 1px solid #444; color: white; padding: 0.75rem; border-radius: 0.5rem; width: 100%; outline: none; transition: border-color 0.2s; font-size: 0.9rem; }
-        .calc-input:focus { border-color: #d97706; background: #292524; }
-        .calc-input:disabled { opacity: 0.5; cursor: not-allowed; background: #0f0f0f; }
+        .calc-input {
+            background: #1c1917;
+            border: 1px solid #444;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .calc-input:focus {
+            border-color: #d97706;
+            background: #292524;
+        }
+        .calc-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-        .excel-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .excel-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
         .excel-row:last-child { border-bottom: none; }
         
-        /* --- STATUS I ERROR --- */
-        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        /* Status Indicator */
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
         .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
         .status-offline { background-color: #ef4444; }
         .status-connecting { background-color: #eab308; animation: pulse 1s infinite; }
 
+        /* Toast Notification */
         #toast-notification {
-            position: fixed; bottom: 20px; right: 20px; background-color: #22c55e; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); transform: translateY(100px); opacity: 0; transition: all 0.5s; z-index: 9999; display: flex; align-items: center; gap: 10px; font-weight: bold;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #22c55e;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
         }
-        #toast-notification.show { transform: translateY(0); opacity: 1; }
+        #toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
+        /* Error Banner */
         #error-banner {
-            display: none; background-color: #ef4444; color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: bold; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 10000; cursor: pointer; box-shadow: 0 -4px 15px rgba(239, 68, 68, 0.4); animation: pulse-red 2s infinite;
+            display: none;
+            background-color: #ef4444;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10000;
         }
-        @keyframes pulse-red { 0% { background-color: #ef4444; } 50% { background-color: #dc2626; } 100% { background-color: #ef4444; } }
         
-        /* --- KARUZELA (Nowa Funkcja) --- */
-        .carousel-track { display: flex; transition: transform 0.5s ease-in-out; gap: 20px; }
-        .carousel-item { min-width: 100%; flex: 0 0 100%; }
-        @media (min-width: 640px) { .carousel-item { min-width: calc(50% - 10px); flex: 0 0 calc(50% - 10px); } }
-        @media (min-width: 1024px) { .carousel-item { min-width: calc(33.333% - 14px); flex: 0 0 calc(33.333% - 14px); } }
-
+        /* Stopka diagnostyczna */
+        .diag-footer {
+            font-size: 10px;
+            color: #555;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            cursor: pointer;
+        }
         .source-live { color: #22c55e; font-weight: bold; }
         .source-default { color: #ef4444; font-weight: bold; }
-        
-        /* Modal do naprawy bazy */
-        .fix-modal { position: fixed; inset: 0; z-index: 11000; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
 
-    <div id="toast-notification"><i class="fa-solid fa-check-circle"></i><span>Zapisano zmiany!</span></div>
-
-    <!-- BANER BŁĘDU (Zgodny z Twoim kodem, jeśli wystąpi permission-denied) -->
-    <div id="error-banner" onclick="showRulesHelp()">
-        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
-        BŁĄD DOSTĘPU: Baza danych jest zablokowana. Kliknij, aby naprawić.
+    <!-- Toast Notification -->
+    <div id="toast-notification">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Zapisano zmiany w chmurze!</span>
     </div>
 
-    <!-- 1. LOGIN SCREEN -->
+    <!-- Error Banner for Diagnostics -->
+    <div id="error-banner"></div>
+
+    <!-- 1. EKRAN LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[9999] bg-stone-900/98 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in border-4 border-wood-600">
-            <div class="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-wood-100 text-wood-600 text-4xl shadow-inner"><i class="fa-solid fa-user-lock"></i></div>
+            <div class="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-wood-100 text-wood-600 text-4xl shadow-inner">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
             <h2 class="text-3xl font-bold text-stone-900 mb-2">Panel Administratora</h2>
-            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5 text-left mt-6">
-                <div><label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Login</label><input type="text" id="login-user" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:border-wood-500 transition"></div>
-                <div><label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Hasło</label><input type="password" id="login-pass" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:border-wood-500 transition"></div>
-                <div id="login-error" class="text-red-500 text-sm hidden text-center font-bold bg-red-50 p-2 rounded-lg">Błędny login lub hasło!</div>
-                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg">Zaloguj się</button>
+            <p class="text-stone-500 mb-8 text-sm">Zaloguj się, aby zarządzać treścią strony</p>
+            
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Login</label>
+                    <input type="text" id="login-user" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition font-medium" placeholder="Login">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Hasło</label>
+                    <input type="password" id="login-pass" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition font-medium" placeholder="Hasło">
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden text-center font-bold bg-red-50 p-2 rounded-lg">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Błędny login lub hasło!
+                </div>
+                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95">Zaloguj się</button>
             </form>
-            <button onclick="exitLogin()" class="mt-8 text-sm text-stone-400 hover:text-wood-600 underline">Wróć do strony głównej</button>
+            <button onclick="exitLogin()" class="mt-8 text-sm text-stone-400 hover:text-wood-600 underline transition">Wróć do strony głównej</button>
         </div>
     </div>
 
-    <!-- 2. PASEK ADMINA -->
+    <!-- 2. PASEK ADMINA (Widoczny po zalogowaniu) -->
     <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-lg border-b border-wood-600">
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10" id="db-status-indicator">
-                <div id="status-dot" class="status-dot status-connecting"></div><span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Łączenie...</span>
+                <div id="status-dot" class="status-dot status-connecting"></div>
+                <span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Łączenie...</span>
             </div>
-            <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md"><i class="fa-solid fa-gears"></i> Panel CMS</button>
+            <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-gears"></i> Panel CMS
+            </button>
         </div>
-        <button onclick="handleLogout()" class="text-stone-400 hover:text-white font-medium transition flex items-center gap-2 text-xs"><i class="fa-solid fa-power-off"></i> Wyloguj</button>
+        <button onclick="handleLogout()" class="text-stone-400 hover:text-white font-medium transition flex items-center gap-2 text-xs">
+            <i class="fa-solid fa-power-off"></i> Wyloguj
+        </button>
     </div>
 
-    <!-- 3. NAWIGACJA -->
+    <!-- 3. NAWIGACJA STRONY -->
     <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300 top-0 h-24 flex items-center" id="navbar">
         <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group">
-                <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-bolt"></i></div>
+                <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg group-hover:bg-wood-700 transition">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
                 <span>Xeomsc <span class="text-wood-600">FusionArt</span></span>
             </a>
+            
             <div class="hidden md:flex space-x-10 items-center font-medium text-stone-600">
                 <a href="#home" onclick="goHome()" class="hover:text-wood-600 transition">Start</a>
                 <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
                 <a href="#portfolio" onclick="goHome()" class="hover:text-wood-600 transition">Realizacje</a>
                 <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Wycena</a>
             </div>
-            <div class="md:hidden flex items-center"><button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl"><i class="fa-solid fa-bars"></i></button></div>
+
+            <div class="md:hidden flex items-center">
+                <button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
         </div>
+        
         <div class="md:hidden hidden absolute top-24 left-0 w-full bg-white border-t border-stone-100 shadow-xl" id="mobile-menu">
             <div class="flex flex-col p-4 space-y-2">
                 <a href="#home" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Start</a>
@@ -178,450 +301,1149 @@
         </div>
     </nav>
 
-    <!-- 4. GŁÓWNA TREŚĆ STRONY -->
+    <!-- 4. KONTENER GŁÓWNY -->
     <div id="main-content" class="pt-0 transition-all duration-300">
         <!-- Hero Section -->
         <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden pt-20">
-            <div class="absolute inset-0 z-0" id="hero-carousel-container"><div class="w-full h-full bg-stone-200 animate-pulse"></div></div>
+            <div class="absolute inset-0 z-0" id="hero-carousel-container">
+                <div class="w-full h-full bg-stone-200 animate-pulse"></div>
+            </div>
             <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
+            
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
-                    <span class="inline-block py-2 px-5 rounded-full bg-wood-100/90 backdrop-blur text-wood-800 text-xs font-bold mb-6 border border-wood-200 uppercase tracking-widest shadow-lg">Pracownia Grawerska</span>
-                    <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline"><span id="hero-title-main"></span> <span id="hero-title-accent" class="gradient-text white-outline-text"></span>.</h1>
-                    <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed"></p>
+                    <span class="inline-block py-2 px-5 rounded-full bg-wood-100/90 backdrop-blur text-wood-800 text-xs font-bold mb-6 border border-wood-200 uppercase tracking-widest shadow-lg">
+                        Pracownia Grawerska
+                    </span>
+                    <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
+                        <span id="hero-title-main">Precyzja Lasera,<br>Ciepło</span> 
+                        <span id="hero-title-accent" class="gradient-text white-outline-text">Drewna</span>.
+                    </h1>
+                    <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
+                        Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą.
+                    </p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="px-10 py-4 bg-wood-600 text-white rounded-full hover:bg-wood-700 hover:scale-105 transform transition shadow-xl font-bold text-center">Zobacz nasze prace</a>
-                        <a href="#contact" class="px-10 py-4 bg-white/90 backdrop-blur text-stone-900 rounded-full hover:bg-white transition shadow-xl font-bold text-center">Wycena projektu</a>
+                        <a href="#portfolio" class="px-10 py-4 bg-wood-600 text-white rounded-full hover:bg-wood-700 hover:scale-105 transform transition shadow-xl font-bold text-center">
+                            Zobacz nasze prace
+                        </a>
+                        <a href="#contact" class="px-10 py-4 bg-white/90 backdrop-blur text-stone-900 rounded-full hover:bg-white transition shadow-xl font-bold text-center">
+                            Wycena projektu
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Sekcja O Ofercie -->
+        <!-- Oferta (Dynamiczna) -->
         <section id="about" class="py-24 bg-white">
             <div class="max-w-7xl mx-auto px-6 text-center">
                 <h2 class="text-4xl font-bold mb-4 text-stone-900">Co oferujemy?</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
-                <div id="about-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
-            </div>
-        </section>
-
-        <!-- Sekcja Realizacje (KARUZELA KATEGORII - TO CO CHCIAŁEŚ) -->
-        <section id="portfolio" class="py-24 bg-stone-50 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-6 text-center relative">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Nasze Kategorie</h2>
-                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 
-                <!-- Strzałki -->
-                <button onclick="prevSlide()" class="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-wood-600 hover:text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition md:-left-4 text-stone-800"><i class="fa-solid fa-chevron-left"></i></button>
-                <button onclick="nextSlide()" class="absolute right-0 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-wood-600 hover:text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition md:-right-4 text-stone-800"><i class="fa-solid fa-chevron-right"></i></button>
-                
-                <!-- Kontener -->
-                <div class="overflow-hidden w-full px-2 py-4">
-                    <div id="carousel-track" class="carousel-track"></div>
+                <div id="about-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Tu JS wstawi karty -->
                 </div>
             </div>
         </section>
 
-        <!-- Sekcja Kontakt -->
+        <!-- Realizacje -->
+        <section id="portfolio" class="py-24 bg-stone-50">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-4 text-stone-900">Moje Realizacje</h2>
+                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
+                <div id="main-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-left"></div>
+            </div>
+        </section>
+
+        <!-- Kontakt (Dynamiczny) -->
         <section id="contact" class="py-24 bg-white">
             <div class="max-w-5xl mx-auto px-6 text-center">
                  <h2 class="text-4xl font-bold mb-6">Kontakt i Wycena</h2>
-                 <p id="contact-desc" class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto"></p>
+                 <p id="contact-desc" class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe.</p>
+                 
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="flex flex-col items-center justify-center p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group">
-                        <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
                         <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Napisz do nas</span>
-                        <span id="contact-email" class="font-bold text-2xl text-stone-900 break-all"></span>
+                        <span id="contact-email" class="font-bold text-2xl text-stone-900 break-all">pkatlowski@gmail.com</span>
                     </div>
                     <div class="flex flex-col items-center justify-center p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group">
-                        <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition"><i class="fa-solid fa-phone"></i></div>
+                        <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
                         <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Zadzwoń</span>
-                        <span id="contact-phone" class="font-bold text-2xl text-stone-900"></span>
+                        <span id="contact-phone" class="font-bold text-2xl text-stone-900">+48 123 456 789</span>
                     </div>
                  </div>
             </div>
         </section>
     </div>
 
-    <!-- 5. PODSTRONY - SYSTEM 3-POZIOMOWY (DRZEWO) -->
-    
-    <!-- Widok Podkategorii -->
+    <!-- WIDOKI DYNAMICZNE (Podstrony) -->
     <div id="subcategory-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[100] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit"><i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do Strony Głównej</button>
-            <h2 id="sub-view-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6"></h2>
-            <div id="sub-view-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
+            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do kategorii
+            </button>
+            <h2 id="subcategory-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6">Wybierz produkt</h2>
+            <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
         </div>
     </div>
 
-    <!-- Widok Produktów -->
-    <div id="products-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[105] overflow-y-auto">
-        <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit"><i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do Podkategorii</button>
-            <h2 id="products-view-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6"></h2>
-            <div id="products-view-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
-        </div>
-    </div>
-
-    <!-- Widok Galerii -->
     <div id="gallery-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[110] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-prod-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit"><i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do Produktów</button>
-            <div class="mb-12 border-b border-stone-100 pb-8"><h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-4"></h2><div class="text-stone-500 text-lg">Galeria zdjęć produktu</div></div>
+            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy produktów
+            </button>
+            <div class="mb-12 border-b border-stone-100 pb-8">
+                <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-4">Galeria Zdjęć</h2>
+                <div id="gallery-product-info" class="text-stone-500 text-lg"></div>
+            </div>
             <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
     </div>
 
-    <!-- Lightbox -->
     <div id="lightbox" class="fixed inset-0 z-[5000] bg-stone-950/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer backdrop-blur-sm" onclick="closeLightbox()">
         <div class="relative max-w-7xl max-h-screen w-full flex flex-col items-center justify-center p-4" onclick="event.stopPropagation()">
-            <img id="lightbox-img" src="" alt="Powiększenie" class="rounded-lg shadow-2xl max-h-[85vh] object-contain">
-            <button class="absolute top-4 right-4 text-white/70 hover:text-white transition" onclick="closeLightbox()"><i class="fa-solid fa-xmark text-5xl"></i></button>
+            <img id="lightbox-img" src="" alt="Powiększenie" class="lightbox-img rounded-lg shadow-2xl">
+            <button class="absolute top-4 right-4 text-white/50 hover:text-white transition" onclick="closeLightbox()">
+                <i class="fa-solid fa-xmark text-4xl"></i>
+            </button>
+            <p class="text-white/60 mt-4 text-sm font-medium">Kliknij poza zdjęcie, aby zamknąć</p>
         </div>
     </div>
 
-    <!-- 6. PANEL ADMINISTRATORA (PEŁNY, WERSJA 3.5) -->
+    <!-- 6. PANEL ADMINISTRATORA (CMS) -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-950/60 backdrop-blur-md hidden items-center justify-center p-4 sm:p-8">
         <div class="bg-stone-900 text-white w-full max-w-7xl h-full max-h-[90vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10 ring-1 ring-white/5">
-            <div class="w-full md:w-72 bg-black/40 border-r border-white/5 p-8 flex flex-col shrink-0 overflow-y-auto">
-                <div class="mb-10"><h2 class="text-xl font-bold text-white flex items-center gap-3"><i class="fa-solid fa-screwdriver-wrench text-wood-500"></i><span>CMS v3.5</span></h2><p class="text-stone-500 text-xs mt-2">Pełna Wersja Drzewiasta</p></div>
-                <nav class="space-y-3 flex-1">
-                    <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-pen-to-square w-6"></i> Treść & Opcje</button>
-                    <button onclick="switchAdminView('hero')" id="btn-hero" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-6"></i> Karuzela Hero</button>
+            
+            <!-- Sidebar -->
+            <div class="w-full md:w-72 bg-black/40 border-r border-white/5 p-8 flex flex-col shrink-0">
+                <div class="mb-10">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i>
+                        <span>CMS Panel</span>
+                    </h2>
+                    <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.4 - Edycja</p>
+                </div>
+
+                <nav class="space-y-3 flex-1 overflow-y-auto">
+                    <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-pen-to-square w-6"></i> Edycja Treści
+                    </button>
+                    <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-images w-6"></i> Karuzela Hero
+                    </button>
+                    <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-layer-group w-6"></i> Kategorie
+                    </button>
+                    <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-box-open w-6"></i> Produkty i Galerie
+                    </button>
                     <div class="h-px bg-white/10 my-2"></div>
-                    <button onclick="switchAdminView('cats')" id="btn-cats" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder w-6"></i> 1. Kategorie</button>
-                    <button onclick="switchAdminView('subcats')" id="btn-subcats" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-open w-6"></i> 2. Podkategorie</button>
-                    <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-box-open w-6"></i> 3. Produkty</button>
-                    <div class="h-px bg-white/10 my-2"></div>
-                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl bg-wood-600/10 text-wood-500 font-bold hover:bg-wood-600/20 transition flex items-center gap-3"><i class="fa-solid fa-calculator w-6"></i> Kalkulator</button>
+                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-wood-500 hover:text-wood-400 bg-wood-500/10">
+                        <i class="fa-solid fa-calculator w-6"></i> Kalkulator
+                    </button>
                 </nav>
-                <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
+                
+                <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center">
+                    <i class="fa-solid fa-xmark"></i> Zamknij Panel
+                </button>
             </div>
             
+            <!-- Content Area -->
             <div class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
-                <!-- Widok 1: Treść -->
+                
+                <!-- Widok: Edycja Treści -->
                 <div id="view-content" class="admin-view hidden space-y-10">
-                    <header><h3 class="text-3xl font-bold mb-2">Edycja Treści</h3></header>
+                    <header>
+                        <h3 class="text-3xl font-bold mb-2">Edycja Treści Strony</h3>
+                        <p class="text-stone-400">Zmiany tutaj są natychmiast widoczne na wszystkich urządzeniach.</p>
+                    </header>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- Sekcja Hero -->
                         <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
-                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja Hero</h4>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek 1</label><input id="edit-hero-main" class="calc-input"></div>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek 2 (Kolor)</label><input id="edit-hero-accent" class="calc-input"></div>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Opis</label><textarea id="edit-hero-desc" class="calc-input h-24"></textarea></div>
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja Powitalna (Hero)</h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek (Główna część)</label>
+                                <input id="edit-hero-main" class="calc-input" placeholder="np. Precyzja Lasera, Ciepło">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek (Wyróżniony kolor)</label>
+                                <input id="edit-hero-accent" class="calc-input" placeholder="np. Drewna">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Opis / Tekst witający</label>
+                                <textarea id="edit-hero-desc" class="calc-input h-24" placeholder="Opis pod nagłówkiem..."></textarea>
+                            </div>
                         </div>
+
+                        <!-- Sekcja Kontakt -->
                         <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
-                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Kontakt</h4>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Email</label><input id="edit-contact-email" class="calc-input"></div>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Telefon</label><input id="edit-contact-phone" class="calc-input"></div>
-                            <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Tekst zachęty</label><textarea id="edit-contact-desc" class="calc-input h-24"></textarea></div>
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Kontakt i Wycena</h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Email</label>
+                                <input id="edit-contact-email" class="calc-input">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Telefon</label>
+                                <input id="edit-contact-phone" class="calc-input">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Tekst zachęcający do wyceny</label>
+                                <textarea id="edit-contact-desc" class="calc-input h-24"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Sekcja Co Oferujemy (3 Karty) -->
+                        <div class="lg:col-span-2 bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja "Co Oferujemy" (3 Karty)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Karta 1 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 1</h5>
+                                    <input id="edit-card1-icon" class="calc-input text-xs" placeholder="Ikona (np. fa-solid fa-gift)">
+                                    <input id="edit-card1-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card1-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
+                                </div>
+                                <!-- Karta 2 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 2</h5>
+                                    <input id="edit-card2-icon" class="calc-input text-xs" placeholder="Ikona">
+                                    <input id="edit-card2-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card2-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
+                                </div>
+                                <!-- Karta 3 -->
+                                <div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5">
+                                    <h5 class="text-xs font-bold text-white text-center">Karta 3</h5>
+                                    <input id="edit-card3-icon" class="calc-input text-xs" placeholder="Ikona">
+                                    <input id="edit-card3-title" class="calc-input text-xs font-bold" placeholder="Tytuł">
+                                    <textarea id="edit-card3-desc" class="calc-input text-xs h-20" placeholder="Opis"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2">
+                             <button onclick="saveContentSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition text-lg">
+                                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Zapisz wszystkie zmiany w chmurze
+                            </button>
                         </div>
                     </div>
-                    <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
-                        <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Karty Ofertowe</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="edit-cards-container"></div>
-                    </div>
-                    <button onclick="saveContentSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition text-lg">Zapisz wszystkie treści</button>
                 </div>
 
-                <!-- Widok 2: Hero -->
-                <div id="view-hero" class="admin-view hidden space-y-8">
-                    <h3 class="text-3xl font-bold mb-6">Karuzela Hero</h3>
-                    <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                        <div class="flex gap-2"><input id="h-url" class="calc-input" placeholder="Wklej URL Obrazu"><button onclick="addHeroSlide()" class="bg-wood-600 px-6 py-2 rounded-xl font-bold hover:bg-wood-500 transition">Dodaj</button></div>
-                    </div>
-                    <div id="hero-list" class="space-y-2"></div>
-                </div>
-
-                <!-- Widok 3: Kategorie -->
-                <div id="view-cats" class="admin-view hidden space-y-8">
-                    <h3 class="text-3xl font-bold mb-6 text-wood-500">1. Kategorie Główne</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 mb-8">
-                        <input type="hidden" id="edit-cat-id"><input id="cat-title" class="calc-input mb-3" placeholder="Nazwa Kategorii (np. Święta)"><input id="cat-img" class="calc-input mb-3" placeholder="URL Zdjęcia okładki">
-                        <div class="flex gap-2"><button onclick="saveCategory()" class="bg-wood-600 w-full py-3 rounded-xl font-bold hover:bg-wood-500 transition">Zapisz</button><button onclick="resetCatForm()" class="bg-stone-700 px-4 rounded-xl hover:bg-stone-600 transition">Anuluj</button></div>
-                    </div>
-                    <div id="cats-list" class="space-y-2"></div>
-                </div>
-
-                <!-- Widok 4: Podkategorie -->
-                <div id="view-subcats" class="admin-view hidden space-y-8">
-                    <h3 class="text-3xl font-bold mb-6 text-wood-500">2. Podkategorie</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 mb-8">
-                        <label class="text-xs font-bold text-stone-400 mb-1 block">Wybierz Kategorię:</label><select id="sub-parent-select" class="calc-input mb-4 text-white cursor-pointer hover:bg-stone-800"></select>
-                        <input type="hidden" id="edit-sub-id"><input id="sub-title" class="calc-input mb-3" placeholder="Nazwa Podkategorii (np. Boże Narodzenie)"><input id="sub-img" class="calc-input mb-3" placeholder="URL Zdjęcia">
-                        <div class="flex gap-2"><button onclick="saveSubcategory()" class="bg-wood-600 w-full py-3 rounded-xl font-bold hover:bg-wood-500 transition">Zapisz</button><button onclick="resetSubForm()" class="bg-stone-700 px-4 rounded-xl hover:bg-stone-600 transition">Anuluj</button></div>
-                    </div>
-                    <div id="subcats-list" class="space-y-2 max-h-96 overflow-y-auto pr-2 custom-scrollbar"></div>
-                </div>
-
-                <!-- Widok 5: Produkty -->
-                <div id="view-products" class="admin-view hidden space-y-8">
-                    <h3 class="text-3xl font-bold mb-6 text-wood-500">3. Produkty</h3>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 mb-8">
-                        <div class="grid grid-cols-2 gap-4 mb-3"><div><label class="text-xs font-bold text-stone-400 mb-1 block">Kategoria:</label><select id="prod-parent-cat" class="calc-input text-white cursor-pointer" onchange="updateProdSubSelect()"></select></div><div><label class="text-xs font-bold text-stone-400 mb-1 block">Podkategoria:</label><select id="prod-parent-sub" class="calc-input text-white cursor-pointer"></select></div></div>
-                        <input type="hidden" id="edit-prod-id"><input id="prod-title" class="calc-input mb-3" placeholder="Nazwa Produktu"><input id="prod-img" class="calc-input mb-3" placeholder="URL Miniatury">
-                        <div class="flex gap-2"><button onclick="saveProduct()" class="bg-wood-600 w-full py-3 rounded-xl font-bold hover:bg-wood-500 transition">Zapisz</button><button onclick="resetProdForm()" class="bg-stone-700 px-4 rounded-xl hover:bg-stone-600 transition">Anuluj</button></div>
-                    </div>
-                    <div class="bg-stone-800 p-6 rounded-2xl border border-white/5 mb-8">
-                        <h4 class="text-lg font-bold mb-4 text-stone-300 flex items-center gap-2"><i class="fa-solid fa-images"></i> Galeria</h4>
-                        <div class="flex gap-2 mb-4"><select id="gal-prod-select" class="calc-input text-white w-1/3 cursor-pointer"><option>Wybierz produkt...</option></select><input id="gal-url" class="calc-input w-2/3" placeholder="URL Zdjęcia"><button onclick="addGalleryImage()" class="bg-blue-600 px-6 rounded-xl font-bold hover:bg-blue-500 transition">Dodaj</button></div>
-                    </div>
-                    <div id="products-list" class="space-y-2 max-h-96 overflow-y-auto pr-2 custom-scrollbar"></div>
-                </div>
-
-                <!-- Widok 6: Kalkulator -->
+                <!-- Widok: Kalkulator Lasera -->
                 <div id="view-calculator" class="admin-view hidden space-y-10">
-                    <header><h3 class="text-3xl font-bold mb-2">Kalkulator Wyceny</h3></header>
+                    <header>
+                        <h3 class="text-3xl font-bold mb-2">Kalkulator Wyceny</h3>
+                        <p class="text-stone-400">Symulacja arkusza kalkulacyjnego.</p>
+                    </header>
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                        <!-- Lewa -->
                         <div class="space-y-6">
                             <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
-                                <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Dane</h4>
-                                <div class="grid grid-cols-2 gap-6"><div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Szerokość (mm)</label><input type="number" id="calc-width-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div><div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Wysokość (mm)</label><input type="number" id="calc-height-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div></div>
-                                <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Czas Lasera (min)</label><input type="number" id="calc-time-laser" class="calc-input text-xl font-mono" value="10" oninput="runLaserCalculator()"></div>
+                                <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Dane Projektu</h4>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Szerokość (mm)</label><input type="number" id="calc-width-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Wysokość (mm)</label><input type="number" id="calc-height-mm" class="calc-input text-xl font-mono" value="100" oninput="runLaserCalculator()"></div>
+                                </div>
+                                <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Czas Pracy Lasera (minuty)</label><input type="number" id="calc-time-laser" class="calc-input text-xl font-mono" value="10" oninput="runLaserCalculator()"></div>
                             </div>
                             <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-6">
-                                <h4 class="font-bold text-stone-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Stawki</h4>
-                                <div class="grid grid-cols-2 gap-6"><div><label class="block text-[10px] text-stone-400 uppercase mb-2">Laser (PLN/min)</label><input type="number" step="0.01" id="calc-rate-laser-min" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div><div><label class="block text-[10px] text-stone-400 uppercase mb-2">Materiał (PLN/cm²)</label><input type="number" step="0.0001" id="calc-rate-cm2" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div><div><label class="block text-[10px] text-stone-400 uppercase mb-2">Koszty Stałe (%)</label><input type="number" id="calc-overhead" class="calc-input font-mono" oninput="runLaserCalculator()"></div><div><label class="block text-[10px] text-stone-400 uppercase mb-2">Marża (%)</label><input type="number" id="calc-margin" class="calc-input font-mono" oninput="runLaserCalculator()"></div></div>
-                                <button onclick="saveCalcSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition">Zapisz stawki</button>
+                                <h4 class="font-bold text-stone-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Konfiguracja Stawek</h4>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Koszt Lasera (PLN/min)</label><input type="number" step="0.01" id="calc-rate-laser-min" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Materiał (PLN/cm²)</label><input type="number" step="0.0001" id="calc-rate-cm2" class="calc-input font-mono text-wood-400" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Koszty Stałe (Overhead %)</label><input type="number" id="calc-overhead" class="calc-input font-mono" oninput="runLaserCalculator()"></div>
+                                    <div><label class="block text-[10px] text-stone-400 uppercase mb-2">Marża Zysku (%)</label><input type="number" id="calc-margin" class="calc-input font-mono" oninput="runLaserCalculator()"></div>
+                                </div>
+                                <button onclick="saveCalcSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition">Zapisz stawki domyślne</button>
                             </div>
                         </div>
+                        <!-- Prawa -->
                         <div class="bg-stone-950 p-10 rounded-[2.5rem] border-2 border-wood-600/20 flex flex-col justify-center text-white relative overflow-hidden">
                             <div class="absolute top-0 right-0 p-10 opacity-5 text-9xl text-wood-600"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                             <h4 class="text-2xl font-bold mb-8 border-b border-white/10 pb-6 flex justify-between items-center"><span>Podsumowanie</span><span class="text-xs bg-wood-600/20 text-wood-500 px-3 py-1 rounded-full uppercase tracking-wider">Netto</span></h4>
                             <div class="space-y-4 text-base">
-                                <div class="excel-row"><span class="text-stone-400">Pole:</span><span class="font-mono" id="res-area">0 cm²</span></div>
-                                <div class="excel-row"><span class="text-stone-400">Materiał:</span><span class="font-mono font-bold" id="res-material">0.00 PLN</span></div>
-                                <div class="excel-row"><span class="text-stone-400">Laser:</span><span class="font-mono font-bold" id="res-laser">0.00 PLN</span></div>
-                                <div class="excel-row text-wood-400/80"><span>Baza:</span><span class="font-mono" id="res-base">0.00 PLN</span></div>
-                                <div class="excel-row"><span class="text-stone-400">Narzut:</span><span class="font-mono font-bold" id="res-overhead-val">0.00 PLN</span></div>
-                                <div class="excel-row text-lg pt-4 border-t border-white/10 mt-2"><span class="font-bold text-white">Koszt Całkowity:</span><span class="font-mono font-bold text-wood-400" id="res-total-cost">0.00 PLN</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Pole powierzchni:</span><span class="font-mono" id="res-area">0 cm²</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Koszt materiału:</span><span class="font-mono font-bold" id="res-material">0.00 PLN</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Koszt pracy lasera:</span><span class="font-mono font-bold" id="res-laser">0.00 PLN</span></div>
+                                <div class="excel-row text-wood-400/80"><span>Baza kosztowa:</span><span class="font-mono" id="res-base">0.00 PLN</span></div>
+                                <div class="excel-row"><span class="text-stone-400">Narzut (Overhead):</span><span class="font-mono font-bold" id="res-overhead-val">0.00 PLN</span></div>
+                                <div class="excel-row text-lg pt-4 border-t border-white/10 mt-2"><span class="font-bold text-white">Całkowity Koszt Produkcji:</span><span class="font-mono font-bold text-wood-400" id="res-total-cost">0.00 PLN</span></div>
                             </div>
                             <div class="mt-12 p-6 bg-wood-600 rounded-2xl text-center shadow-2xl transform scale-105">
-                                <p class="text-[10px] uppercase text-white/70 font-bold tracking-[0.2em] mb-2">Cena Sugerowana</p>
+                                <p class="text-[10px] uppercase text-white/70 font-bold tracking-[0.2em] mb-2">Sugerowana Cena Końcowa</p>
                                 <div id="calc-result-final-price" class="text-5xl md:text-6xl font-black text-white drop-shadow-md">0.00 PLN</div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Pozostałe Widoki -->
+                <div id="view-hero-gallery" class="admin-view hidden space-y-8"></div>
+                <div id="view-categories" class="admin-view hidden space-y-8"></div>
+                <div id="view-products" class="admin-view hidden space-y-8"></div>
+
             </div>
         </div>
     </div>
 
-    <!-- LOGIKA (W STYLU TWOJEGO ORYGINALNEGO PLIKU) -->
+    <!-- Stopka -->
+    <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-left">
+                <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
+                <p class="text-xs">Pasja. Precyzja. Drewno.</p>
+                <!-- DIAGNOSTYKA WIDOCZNA DLA WSZYSTKICH -->
+                <div class="diag-footer" onclick="showDetailedError()">
+                    <p id="data-source-indicator">Inicjowanie...</p>
+                </div>
+            </div>
+            <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+    <!-- LOGIKA SYSTEMU -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const manualConfig = { apiKey: "AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw", authDomain: "xeomsc-a8edd.firebaseapp.com", projectId: "xeomsc-a8edd", storageBucket: "xeomsc-a8edd.firebasestorage.app", messagingSenderId: "43822805612", appId: "1:43822805612:web:d343653e47777d8ebf5e49" };
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : manualConfig;
+        // ==========================================
+        // KONFIGURACJA FIREBASE
+        // ==========================================
+        
+        let manualConfig = {
+          apiKey: "AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
+          authDomain: "xeomsc-a8edd.firebaseapp.com",
+          projectId: "xeomsc-a8edd",
+          storageBucket: "xeomsc-a8edd.firebasestorage.app",
+          messagingSenderId: "43822805612",
+          appId: "1:43822805612:web:d343653e47777d8ebf5e49"
+        };
+
+        const envConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const firebaseConfig = Object.keys(manualConfig).length > 0 ? manualConfig : envConfig;
+        
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'xeomsc-fusionart';
         let db, auth, siteData = {};
-        let isOnline = false, lastError = "";
+        let isOnline = false;
+        let lastError = "";
 
-        // Oryginalna struktura danych, którą rozszerzyłem o nowe funkcje
+        // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
-            heroItems: [{ type: 'image', url: 'https://images.unsplash.com/photo-1622623363380-45c128919616?q=80&w=2070' }],
-            categories: {}, galleries: {},
+            heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1622623363380-45c128919616?q=80&w=2070' }],
+            categories: {},
+            galleries: {},
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 },
             textContent: {
-                hero: { main: "Precyzja Lasera,<br>Ciepło", accent: "Drewna", desc: "Tworzymy z pasją." },
-                contact: { email: "kontakt@xeomsc.pl", phone: "123-456-789", desc: "Napisz do nas." },
+                hero: {
+                    main: "Precyzja Lasera,<br>Ciepło",
+                    accent: "Drewna",
+                    desc: "Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą."
+                },
                 aboutCards: [
-                    { icon: "fa-solid fa-wand-magic-sparkles", title: "Grawerowanie", desc: "Precyzyjne detale." },
-                    { icon: "fa-solid fa-scissors", title: "Cięcie", desc: "Skomplikowane kształty." },
-                    { icon: "fa-solid fa-gift", title: "Prezenty", desc: "Na każdą okazję." }
-                ]
+                    { icon: "fa-solid fa-wand-magic-sparkles", title: "Grawerowanie", desc: "Niezwykle precyzyjne nanoszenie detali, logotypów i grafik na drewno, szkło, skórę i inne materiały." },
+                    { icon: "fa-solid fa-scissors", title: "Precyzyjne Cięcie", desc: "Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki." },
+                    { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
+                ],
+                contact: {
+                    email: "pkatlowski@gmail.com",
+                    phone: "+48 123 456 789",
+                    desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe."
+                }
             }
         };
 
+        // --- RENDEROWANIE TREŚCI ---
         function renderTexts() {
-            if(!siteData.textContent) siteData.textContent = initialData.textContent;
+            if(!siteData.textContent) siteData.textContent = initialData.textContent; // Fallback
+            
             const t = siteData.textContent;
+            
+            // Hero
             if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
             if(document.getElementById('hero-title-accent')) document.getElementById('hero-title-accent').textContent = t.hero.accent;
             if(document.getElementById('hero-desc')) document.getElementById('hero-desc').textContent = t.hero.desc;
+
+            // Kontakt
             if(document.getElementById('contact-email')) document.getElementById('contact-email').textContent = t.contact.email;
             if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
             if(document.getElementById('contact-desc')) document.getElementById('contact-desc').textContent = t.contact.desc;
+
+            // Karty "O ofercie"
             const grid = document.getElementById('about-grid');
             if(grid && t.aboutCards) {
-                grid.innerHTML = t.aboutCards.map(c => `<div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group"><div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm"><i class="${c.icon} text-3xl"></i></div><h3 class="font-bold text-2xl mb-4 text-stone-800">${c.title}</h3><p class="text-stone-500 leading-relaxed">${c.desc}</p></div>`).join('');
+                grid.innerHTML = t.aboutCards.map(c => `
+                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
+                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm">
+                            <i class="${c.icon} text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-4 text-stone-800">${c.title}</h3>
+                        <p class="text-stone-500 leading-relaxed">${c.desc}</p>
+                    </div>
+                `).join('');
             }
         }
 
-        let currentSlide = 0;
-        function updateCarousel() { const t=document.getElementById('carousel-track'); if(!t)return; const w=window.innerWidth>=1024?33.333:(window.innerWidth>=640?50:100); t.style.transform=`translateX(-${currentSlide*w}%)`; }
-        window.nextSlide = () => { const t=Object.keys(siteData.categories).length; let v=window.innerWidth>=1024?3:(window.innerWidth>=640?2:1); if(currentSlide<t-v) { currentSlide++; updateCarousel(); } else { currentSlide=0; updateCarousel(); }};
-        window.prevSlide = () => { if(currentSlide>0) { currentSlide--; updateCarousel(); }};
+        // --- RENDEROWANIE HERO ---
+        function renderHero() {
+            const container = document.getElementById('hero-carousel-container');
+            if (!container || !siteData.heroItems) return;
+            container.innerHTML = siteData.heroItems.map((it, idx) => `
+                <div class="hero-slide ${idx === 0 ? 'active' : ''}">
+                    ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover">` : `<video src="${it.url}" class="w-full h-full object-cover" muted autoplay loop></video>`}
+                </div>
+            `).join('');
+            
+            let cur = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            if(window.heroInterval) clearInterval(window.heroInterval);
+            window.heroInterval = setInterval(() => {
+                if (slides.length < 2) return;
+                slides[cur].classList.remove('active');
+                cur = (cur + 1) % slides.length;
+                slides[cur].classList.add('active');
+            }, 6000);
+        }
 
+        // --- RENDEROWANIE KATEGORII ---
         function renderMain() {
-            const track = document.getElementById('carousel-track');
-            track.innerHTML = '';
-            const cats = Object.entries(siteData.categories);
-            if (cats.length === 0) { track.innerHTML = '<div class="w-full text-center text-stone-500 font-bold py-10">Brak kategorii. Dodaj je w panelu admina.</div>'; return; }
-            cats.forEach(([id, c]) => {
+            const grid = document.getElementById('main-categories-grid');
+            if (!grid) return; 
+            grid.innerHTML = '';
+            
+            if (Object.keys(siteData.categories).length === 0) {
+                grid.innerHTML = '<p class="text-stone-400 col-span-3 text-center py-10">Brak kategorii. Dodaj je w panelu admina.</p>';
+                return;
+            }
+
+            Object.entries(siteData.categories).forEach(([id, c]) => {
                 const div = document.createElement('div');
-                div.className = "carousel-item group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100";
+                div.className = "group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in";
                 div.onclick = () => window.openSubcategories(id);
-                div.innerHTML = `<div class="h-80 overflow-hidden relative"><img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"><div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-80"></div><div class="absolute bottom-6 left-8 text-white"><h3 class="font-bold text-3xl mb-1">${c.title}</h3><span class="text-xs uppercase tracking-widest opacity-80">Zobacz kolekcję <i class="fa-solid fa-arrow-right ml-2"></i></span></div></div>`;
-                track.appendChild(div);
-            });
-            updateCarousel();
-        }
-
-        window.openSubcategories = (catId) => {
-            const c = siteData.categories[catId]; if(!c) return;
-            document.getElementById('sub-view-title').textContent = c.title;
-            const grid = document.getElementById('sub-view-grid'); grid.innerHTML = '';
-            if(!c.subcategories || c.subcategories.length === 0) { grid.innerHTML = '<p class="col-span-3 text-center text-stone-500 font-medium">Brak podkategorii.</p>'; } 
-            else { c.subcategories.forEach((sub, idx) => { const div = document.createElement('div'); div.className = "group bg-white rounded-3xl overflow-hidden border border-stone-100 cursor-pointer hover:shadow-xl transition relative"; div.onclick = () => window.openProducts(catId, idx); div.innerHTML = `<div class="h-64 overflow-hidden"><img src="${sub.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div><div class="p-6"><h4 class="font-bold text-xl text-stone-800">${sub.title}</h4><p class="text-sm text-stone-400 mt-1">${sub.products ? sub.products.length : 0} produktów</p></div>`; grid.appendChild(div); }); }
-            document.getElementById('main-content').classList.add('hidden'); document.getElementById('subcategory-view').classList.remove('hidden'); window.scrollTo(0,0);
-        };
-        window.openProducts = (catId, subIdx) => {
-            const cat = siteData.categories[catId]; const sub = cat.subcategories[subIdx];
-            document.getElementById('products-view-title').textContent = sub.title; document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategories(catId);
-            const grid = document.getElementById('products-view-grid'); grid.innerHTML = '';
-            if(!sub.products || sub.products.length === 0) { grid.innerHTML = '<p class="col-span-3 text-center text-stone-500 font-medium">Brak produktów.</p>'; } 
-            else { sub.products.forEach((prod) => { const div = document.createElement('div'); div.className = "group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg cursor-pointer border border-stone-100 transition"; div.onclick = () => window.openGallery(prod.id, prod.title, catId, subIdx); div.innerHTML = `<div class="aspect-square overflow-hidden"><img src="${prod.image}" class="w-full h-full object-cover group-hover:scale-105 transition"></div><div class="p-4"><h5 class="font-bold text-lg text-stone-800">${prod.title}</h5></div>`; grid.appendChild(div); }); }
-            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('products-view').classList.remove('hidden'); window.scrollTo(0,0);
-        };
-        window.openGallery = (prodId, prodTitle, catId, subIdx) => {
-            const g = siteData.galleries[prodId] || { images: [] };
-            document.getElementById('gallery-title').textContent = prodTitle; document.getElementById('back-to-prod-btn').onclick = () => window.openProducts(catId, subIdx);
-            const grid = document.getElementById('gallery-grid'); grid.innerHTML = '';
-            if(g.images.length === 0) { grid.innerHTML = '<p class="col-span-4 text-center text-stone-500 font-medium">Brak zdjęć.</p>'; } 
-            else { g.images.forEach(img => { const div = document.createElement('div'); div.className = "aspect-square rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition shadow-sm border border-stone-100"; div.onclick = () => window.openLightbox(img.src); div.innerHTML = `<img src="${img.src}" class="w-full h-full object-cover">`; grid.appendChild(div); }); }
-            document.getElementById('products-view').classList.add('hidden'); document.getElementById('gallery-view').classList.remove('hidden'); window.scrollTo(0,0);
-        };
-
-        window.saveContentSettings = async () => {
-            const t = { hero: { main: document.getElementById('edit-hero-main').value, accent: document.getElementById('edit-hero-accent').value, desc: document.getElementById('edit-hero-desc').value }, contact: { email: document.getElementById('edit-contact-email').value, phone: document.getElementById('edit-contact-phone').value, desc: document.getElementById('edit-contact-desc').value }, aboutCards: [] };
-            for(let i=0; i<3; i++) { t.aboutCards.push({ icon: document.getElementById(`edit-card${i}-icon`).value, title: document.getElementById(`edit-card${i}-title`).value, desc: document.getElementById(`edit-card${i}-desc`).value }); }
-            siteData.textContent = t; await saveData(); renderTexts(); showToast();
-        };
-        function renderContentAdmin() {
-            if(!siteData.textContent) siteData.textContent = initialData.textContent; const t = siteData.textContent;
-            document.getElementById('edit-hero-main').value = t.hero.main; document.getElementById('edit-hero-accent').value = t.hero.accent; document.getElementById('edit-hero-desc').value = t.hero.desc; document.getElementById('edit-contact-email').value = t.contact.email; document.getElementById('edit-contact-phone').value = t.contact.phone; document.getElementById('edit-contact-desc').value = t.contact.desc;
-            const c = document.getElementById('edit-cards-container'); c.innerHTML = '';
-            for(let i=0; i<3; i++) { const ca = t.aboutCards[i] || {icon:'', title:'', desc:''}; c.innerHTML += `<div class="bg-stone-900/50 p-4 rounded-xl space-y-2 border border-white/5"><h5 class="text-xs font-bold text-white text-center">Karta ${i+1}</h5><input id="edit-card${i}-icon" class="calc-input text-xs" placeholder="Ikona" value="${ca.icon}"><input id="edit-card${i}-title" class="calc-input text-xs font-bold" placeholder="Tytuł" value="${ca.title}"><textarea id="edit-card${i}-desc" class="calc-input text-xs h-16" placeholder="Opis">${ca.desc}</textarea></div>`; }
-        }
-        window.saveCategory = () => { const t = document.getElementById('cat-title').value, i = document.getElementById('cat-img').value, id = document.getElementById('edit-cat-id').value || 'c' + Date.now(); if(t) { if(!siteData.categories[id]) siteData.categories[id] = { subcategories: [] }; siteData.categories[id].title = t; siteData.categories[id].image = i; saveData(); renderCatsAdmin(); renderMain(); showToast(); resetCatForm(); } };
-        window.saveSubcategory = () => { const pid = document.getElementById('sub-parent-select').value, t = document.getElementById('sub-title').value, i = document.getElementById('sub-img').value, eid = document.getElementById('edit-sub-id').value; if(pid && t) { const p = siteData.categories[pid]; if(eid !== "") { p.subcategories[eid].title = t; p.subcategories[eid].image = i; } else { p.subcategories.push({ id: 's'+Date.now(), title: t, image: i, products: [] }); } saveData(); renderSubcatsAdmin(); showToast(); resetSubForm(); } };
-        window.saveProduct = () => { const pc = document.getElementById('prod-parent-cat').value, ps = document.getElementById('prod-parent-sub').value, t = document.getElementById('prod-title').value, i = document.getElementById('prod-img').value, eid = document.getElementById('edit-prod-id').value; if(pc && ps !== "" && t) { const s = siteData.categories[pc].subcategories[ps]; if(!s.products) s.products = []; if(eid) { const p = s.products.find(p => p.id === eid); if(p) { p.title = t; p.image = i; } } else { const nid = 'p' + Date.now(); s.products.push({ id: nid, title: t, image: i }); siteData.galleries[nid] = { images: [] }; } saveData(); renderProductsAdmin(); showToast(); resetProdForm(); } };
-        window.addGalleryImage = () => { const pid = document.getElementById('gal-prod-select').value, u = document.getElementById('gal-url').value; if(pid && u) { if(!siteData.galleries[pid]) siteData.galleries[pid] = { images: [] }; siteData.galleries[pid].images.push({ src: u }); saveData(); showToast(); document.getElementById('gal-url').value = ""; } };
-
-        function renderCatsAdmin() { document.getElementById('cats-list').innerHTML = Object.entries(siteData.categories).map(([id, c]) => `<div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5"><div class="flex items-center gap-3"><img src="${c.image}" class="w-8 h-8 rounded object-cover"><b>${c.title}</b></div><div><button onclick="editCat('${id}')" class="text-blue-400 text-xs mr-2 font-bold hover:text-white">EDYTUJ</button><button onclick="deleteCat('${id}')" class="text-red-400 text-xs font-bold hover:text-white">USUŃ</button></div></div>`).join(''); const o = '<option value="">Wybierz...</option>' + Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join(''); document.getElementById('sub-parent-select').innerHTML = o; document.getElementById('prod-parent-cat').innerHTML = o; }
-        function renderSubcatsAdmin() { let h = ''; Object.entries(siteData.categories).forEach(([catId, cat]) => { if(cat.subcategories && cat.subcategories.length > 0) { h += `<div class="mb-2"><small class="text-stone-500 uppercase font-bold pl-1 tracking-wider">${cat.title}</small>`; cat.subcategories.forEach((sub, idx) => { h += `<div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-1 ml-2"><div class="flex items-center gap-3"><img src="${sub.image}" class="w-8 h-8 rounded object-cover"><span>${sub.title}</span></div><div><button onclick="editSub('${catId}', ${idx})" class="text-blue-400 text-xs mr-2 font-bold hover:text-white">EDYTUJ</button><button onclick="deleteSub('${catId}', ${idx})" class="text-red-400 text-xs font-bold hover:text-white">USUŃ</button></div></div>`; }); h += `</div>`; } }); document.getElementById('subcats-list').innerHTML = h; }
-        window.updateProdSubSelect = () => { const cid = document.getElementById('prod-parent-cat').value, s = document.getElementById('prod-parent-sub'); s.innerHTML = '<option value="">Wybierz...</option>'; if(cid && siteData.categories[cid]) { siteData.categories[cid].subcategories.forEach((sub, idx) => { s.innerHTML += `<option value="${idx}">${sub.title}</option>`; }); } renderProductsList(); };
-        function renderProductsList() { let h = ''; Object.entries(siteData.categories).forEach(([catId, cat]) => { if(cat.subcategories) { cat.subcategories.forEach((sub, subIdx) => { if(sub.products && sub.products.length > 0) { h += `<div class="mb-2 ml-2"><small class="text-stone-500 font-bold">${cat.title} > ${sub.title}</small>`; sub.products.forEach((p) => { h += `<div class="bg-black/40 p-2 rounded-lg flex justify-between items-center border border-white/5 mb-1 ml-2"><div class="flex items-center gap-2"><img src="${p.image}" class="w-6 h-6 rounded object-cover"><span class="text-sm">${p.title}</span></div><button onclick="deleteProd('${catId}', ${subIdx}, '${p.id}')" class="text-red-400 text-xs font-bold hover:text-white">USUŃ</button></div>`; }); h += `</div>`; } }); } }); document.getElementById('products-list').innerHTML = h || '<div class="text-stone-500 text-sm">Brak produktów. Wybierz kategorie powyżej i dodaj pierwszy produkt.</div>'; renderProductsAdminHelpers(); }
-        function renderProductsAdminHelpers() { const g = document.getElementById('gal-prod-select'); g.innerHTML = '<option value="">Wybierz produkt...</option>'; Object.values(siteData.categories).forEach(c => { if(c.subcategories) { c.subcategories.forEach(s => { if(s.products) { s.products.forEach(p => { g.innerHTML += `<option value="${p.id}">${c.title} > ${s.title} > ${p.title}</option>`; }); } }); } }); }
-        
-        window.editCat = (id) => { const c = siteData.categories[id]; document.getElementById('cat-title').value = c.title; document.getElementById('cat-img').value = c.image; document.getElementById('edit-cat-id').value = id; };
-        window.deleteCat = (id) => { if(confirm('Usunąć kategorię i wszystko w niej?')) { delete siteData.categories[id]; saveData(); renderCatsAdmin(); renderMain(); }};
-        window.resetCatForm = () => { document.getElementById('cat-title').value=""; document.getElementById('cat-img').value=""; document.getElementById('edit-cat-id').value=""; };
-        window.editSub = (catId, idx) => { const s = siteData.categories[catId].subcategories[idx]; document.getElementById('sub-parent-select').value = catId; document.getElementById('sub-parent-select').disabled = true; document.getElementById('sub-title').value = s.title; document.getElementById('sub-img').value = s.image; document.getElementById('edit-sub-id').value = idx; };
-        window.deleteSub = (catId, idx) => { if(confirm('Usunąć podkategorię?')) { siteData.categories[catId].subcategories.splice(idx,1); saveData(); renderSubcatsAdmin(); }};
-        window.resetSubForm = () => { document.getElementById('sub-parent-select').disabled=false; document.getElementById('sub-title').value=""; document.getElementById('sub-img').value=""; document.getElementById('edit-sub-id').value=""; };
-        window.deleteProd = (catId, subIdx, pId) => { if(confirm('Usunąć produkt?')) { const sub = siteData.categories[catId].subcategories[subIdx]; sub.products = sub.products.filter(p => p.id !== pId); saveData(); renderProductsList(); }};
-        window.resetProdForm = () => { document.getElementById('prod-title').value=""; document.getElementById('prod-img').value=""; document.getElementById('edit-prod-id').value=""; };
-
-        window.runLaserCalculator = () => { const w = parseFloat(document.getElementById('calc-width-mm').value)||0, h = parseFloat(document.getElementById('calc-height-mm').value)||0, t = parseFloat(document.getElementById('calc-time-laser').value)||0, rl = parseFloat(document.getElementById('calc-rate-laser-min').value)||0, rc = parseFloat(document.getElementById('calc-rate-cm2').value)||0, oh = parseFloat(document.getElementById('calc-overhead').value)||0, ma = parseFloat(document.getElementById('calc-margin').value)||0; const ac = (w*h)/100, cm = ac*rc, cl = t*rl, bc = cm+cl, to = bc*(1+(oh/100)), ov = to-bc, fp = to*(1+(ma/100)); document.getElementById('res-area').textContent = ac.toFixed(2)+" cm²"; document.getElementById('res-material').textContent = cm.toFixed(2)+" PLN"; document.getElementById('res-laser').textContent = cl.toFixed(2)+" PLN"; document.getElementById('res-base').textContent = bc.toFixed(2)+" PLN"; document.getElementById('res-overhead-val').textContent = ov.toFixed(2)+" PLN"; document.getElementById('res-total-cost').textContent = to.toFixed(2)+" PLN"; document.getElementById('calc-result-final-price').textContent = fp.toFixed(2)+" PLN"; };
-        window.saveCalcSettings = async () => { siteData.calcSettings = { rateLaserMin: parseFloat(document.getElementById('calc-rate-laser-min').value), rateCm2: parseFloat(document.getElementById('calc-rate-cm2').value), overhead: parseFloat(document.getElementById('calc-overhead').value), margin: parseFloat(document.getElementById('calc-margin').value) }; await saveData(); showToast(); };
-
-        window.switchAdminView = (id) => { document.querySelectorAll('.admin-view').forEach(v => v.classList.add('hidden')); document.getElementById('view-'+id).classList.remove('hidden'); document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+id).classList.add('active'); if(id === 'cats') renderCatsAdmin(); if(id === 'subcats') renderSubcatsAdmin(); if(id === 'products') renderProductsAdmin(); if(id === 'content') renderContentAdmin(); if(id === 'calculator') { const s = siteData.calcSettings; document.getElementById('calc-rate-laser-min').value = s.rateLaserMin; document.getElementById('calc-rate-cm2').value = s.rateCm2; document.getElementById('calc-overhead').value = s.overhead; document.getElementById('calc-margin').value = s.margin; window.runLaserCalculator(); } };
-        async function saveData() { localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData)); if(isOnline && auth.currentUser) { try { await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData); } catch(e){ console.error(e); } } }
-        function showToast() { const t = document.getElementById('toast-notification'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-
-        window.goHome = () => { ['subcategory-view','products-view','gallery-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById('main-content').classList.remove('hidden'); window.scrollTo(0,0); };
-        window.openLightbox = (src) => { document.getElementById('lightbox-img').src=src; document.getElementById('lightbox').classList.remove('hidden'); setTimeout(()=>document.getElementById('lightbox').classList.replace('opacity-0','opacity-100'),10); };
-        window.closeLightbox = () => { const lb=document.getElementById('lightbox'); lb.classList.replace('opacity-100','opacity-0'); setTimeout(()=>lb.classList.add('hidden'),300); };
-        window.toggleMobileMenu = () => document.getElementById('mobile-menu').classList.toggle('hidden');
-        window.toggleAdminPanel = () => document.getElementById('admin-panel').classList.toggle('hidden');
-        window.handleLogin = () => { if(document.getElementById('login-user').value==='admin' && document.getElementById('login-pass').value==='12345') { sessionStorage.setItem('xeomsc_admin','true'); location.reload(); } else { document.getElementById('login-error').classList.remove('hidden'); }};
-        window.handleLogout = () => { sessionStorage.removeItem('xeomsc_admin'); location.reload(); };
-        window.exitLogin = () => { document.getElementById('login-screen').classList.add('hidden'); };
-        window.addHeroSlide = () => { const u = document.getElementById('h-url').value; if(u) { siteData.heroItems.push({type:'image', url:u}); saveData(); renderHero(); document.getElementById('h-url').value=''; } };
-        function renderHero() { const c = document.getElementById('hero-carousel-container'); if(!c) return; c.innerHTML = siteData.heroItems.map((h,i) => `<div class="hero-slide ${i===0?'active':''}"><img src="${h.url}" class="w-full h-full object-cover"></div>`).join(''); let cur = 0; const slides = document.querySelectorAll('.hero-slide'); if(window.heroInterval) clearInterval(window.heroInterval); window.heroInterval = setInterval(() => { if (slides.length < 2) return; slides[cur].classList.remove('active'); cur = (cur + 1) % slides.length; slides[cur].classList.add('active'); }, 6000); }
-
-        // --- POMOC PRZY BŁĘDZIE PERMISSION-DENIED (Zgodne z Twoim kodem) ---
-        window.showRulesHelp = () => {
-            if(document.getElementById('rules-modal')) return;
-            const modal = document.createElement('div');
-            modal.className = "fix-modal";
-            modal.id = "rules-modal";
-            modal.innerHTML = `
-                <div class="bg-stone-900 text-white p-8 rounded-3xl max-w-2xl w-full border border-red-500 shadow-2xl relative">
-                    <button onclick="document.getElementById('rules-modal').remove()" class="absolute top-4 right-4 text-stone-500 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
-                    <h2 class="text-2xl font-bold text-red-500 mb-4"><i class="fa-solid fa-lock mr-2"></i> Baza Danych Zablokowana</h2>
-                    <p class="text-stone-300 mb-4 text-sm">Aby strona działała online, musisz odblokować bazę w Firebase.</p>
-                    <ol class="list-decimal list-inside text-stone-400 text-xs mb-4 space-y-1">
-                        <li>Wejdź na <a href="https://console.firebase.google.com" target="_blank" class="text-blue-400 underline">console.firebase.google.com</a></li>
-                        <li>Wybierz projekt -> <b>Firestore Database</b> -> zakładka <b>Rules</b>.</li>
-                        <li>Wklej poniższy kod i kliknij <b>Publish</b>.</li>
-                    </ol>
-                    <div class="bg-black p-4 rounded-xl border border-stone-700 font-mono text-xs text-green-400 mb-6 relative group">
-                        <pre id="rules-code">rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}</pre>
-                        <button onclick="navigator.clipboard.writeText(document.getElementById('rules-code').innerText); this.innerText='Skopiowano!'" class="absolute top-2 right-2 bg-stone-800 hover:bg-stone-700 text-white px-3 py-1 rounded-lg text-xs transition">Kopiuj Kod</button>
+                div.innerHTML = `
+                    <div class="h-72 overflow-hidden relative">
+                        <img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                        <div class="absolute bottom-6 left-8 text-white">
+                            <h3 class="font-bold text-2xl">${c.title}</h3>
+                        </div>
                     </div>
-                    <button onclick="document.getElementById('rules-modal').remove()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition">Zamknij</button>
+                    <div class="p-8 flex justify-between items-center">
+                        <span class="text-stone-500 font-medium text-sm">Zobacz kolekcję</span>
+                        <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </div>`;
+                grid.appendChild(div);
+            });
+        }
+
+        // --- LOGIKA ARKUSZA KALKULACYJNEGO ---
+        window.runLaserCalculator = () => {
+            const w = parseFloat(document.getElementById('calc-width-mm').value) || 0;
+            const h = parseFloat(document.getElementById('calc-height-mm').value) || 0;
+            const time = parseFloat(document.getElementById('calc-time-laser').value) || 0;
+            
+            const rl = parseFloat(document.getElementById('calc-rate-laser-min').value) || 0;
+            const rc = parseFloat(document.getElementById('calc-rate-cm2').value) || 0;
+            const oh = parseFloat(document.getElementById('calc-overhead').value) || 0;
+            const ma = parseFloat(document.getElementById('calc-margin').value) || 0;
+
+            const areaCm2 = (w * h) / 100;
+            const costM = areaCm2 * rc;
+            const costL = time * rl;
+            const baseCost = costM + costL;
+            const totalWithOverhead = baseCost * (1 + (oh / 100));
+            const overheadValue = totalWithOverhead - baseCost;
+            const finalPrice = totalWithOverhead * (1 + (ma / 100));
+
+            document.getElementById('res-area').textContent = areaCm2.toFixed(2) + " cm²";
+            document.getElementById('res-material').textContent = costM.toFixed(2) + " PLN";
+            document.getElementById('res-laser').textContent = costL.toFixed(2) + " PLN";
+            document.getElementById('res-base').textContent = baseCost.toFixed(2) + " PLN";
+            document.getElementById('res-overhead-val').textContent = overheadValue.toFixed(2) + " PLN";
+            document.getElementById('res-total-cost').textContent = totalWithOverhead.toFixed(2) + " PLN";
+            document.getElementById('calc-result-final-price').textContent = finalPrice.toFixed(2) + " PLN";
+        };
+
+        window.saveCalcSettings = async () => {
+            siteData.calcSettings = {
+                rateLaserMin: parseFloat(document.getElementById('calc-rate-laser-min').value),
+                rateCm2: parseFloat(document.getElementById('calc-rate-cm2').value),
+                overhead: parseFloat(document.getElementById('calc-overhead').value),
+                margin: parseFloat(document.getElementById('calc-margin').value)
+            };
+            await saveData();
+        };
+
+        // --- ZARZĄDZANIE TREŚCIĄ ---
+        window.saveContentSettings = async () => {
+            const t = {
+                hero: {
+                    main: document.getElementById('edit-hero-main').value,
+                    accent: document.getElementById('edit-hero-accent').value,
+                    desc: document.getElementById('edit-hero-desc').value
+                },
+                contact: {
+                    email: document.getElementById('edit-contact-email').value,
+                    phone: document.getElementById('edit-contact-phone').value,
+                    desc: document.getElementById('edit-contact-desc').value
+                },
+                aboutCards: [
+                    {
+                        icon: document.getElementById('edit-card1-icon').value,
+                        title: document.getElementById('edit-card1-title').value,
+                        desc: document.getElementById('edit-card1-desc').value
+                    },
+                    {
+                        icon: document.getElementById('edit-card2-icon').value,
+                        title: document.getElementById('edit-card2-title').value,
+                        desc: document.getElementById('edit-card2-desc').value
+                    },
+                    {
+                        icon: document.getElementById('edit-card3-icon').value,
+                        title: document.getElementById('edit-card3-title').value,
+                        desc: document.getElementById('edit-card3-desc').value
+                    }
+                ]
+            };
+            siteData.textContent = t;
+            await saveData();
+            renderTexts(); 
+            
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        };
+
+        // --- ZARZĄDZANIE WIDOKAMI ADMINA ---
+        window.switchAdminView = (id) => {
+            document.querySelectorAll('.admin-view').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
+            
+            const view = document.getElementById(`view-${id}`);
+            if (view) view.classList.remove('hidden');
+            
+            const btn = document.getElementById(`btn-${id}`);
+            if (btn) btn.classList.add('active');
+            
+            if (id === 'calculator') {
+                const s = siteData.calcSettings;
+                document.getElementById('calc-rate-laser-min').value = s.rateLaserMin;
+                document.getElementById('calc-rate-cm2').value = s.rateCm2;
+                document.getElementById('calc-overhead').value = s.overhead;
+                document.getElementById('calc-margin').value = s.margin;
+                window.runLaserCalculator();
+            } else if (id === 'hero-gallery') {
+                renderHeroAdmin();
+            } else if (id === 'categories') {
+                renderCategoriesAdmin();
+            } else if (id === 'products') {
+                renderProductsAdmin();
+            } else if (id === 'content') {
+                if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                const t = siteData.textContent;
+
+                document.getElementById('edit-hero-main').value = t.hero.main;
+                document.getElementById('edit-hero-accent').value = t.hero.accent;
+                document.getElementById('edit-hero-desc').value = t.hero.desc;
+
+                document.getElementById('edit-contact-email').value = t.contact.email;
+                document.getElementById('edit-contact-phone').value = t.contact.phone;
+                document.getElementById('edit-contact-desc').value = t.contact.desc;
+
+                if(t.aboutCards && t.aboutCards.length >= 3) {
+                    document.getElementById('edit-card1-icon').value = t.aboutCards[0].icon;
+                    document.getElementById('edit-card1-title').value = t.aboutCards[0].title;
+                    document.getElementById('edit-card1-desc').value = t.aboutCards[0].desc;
+
+                    document.getElementById('edit-card2-icon').value = t.aboutCards[1].icon;
+                    document.getElementById('edit-card2-title').value = t.aboutCards[1].title;
+                    document.getElementById('edit-card2-desc').value = t.aboutCards[1].desc;
+
+                    document.getElementById('edit-card3-icon').value = t.aboutCards[2].icon;
+                    document.getElementById('edit-card3-title').value = t.aboutCards[2].title;
+                    document.getElementById('edit-card3-desc').value = t.aboutCards[2].desc;
+                }
+            }
+        };
+
+        function renderHeroAdmin() {
+            const container = document.getElementById('view-hero-gallery');
+            container.innerHTML = `
+                <h3 class="text-3xl font-bold mb-6">Karuzela Startowa</h3>
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-500">Dodaj nowy slajd</h4>
+                    <input id="h-url" class="calc-input" placeholder="Wklej link do zdjęcia lub wideo (np. z Imgur)">
+                    <select id="h-type" class="calc-input"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
+                    <button id="add-h-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj do karuzeli</button>
+                </div>
+                <div class="space-y-3">
+                    ${siteData.heroItems.map((h, i) => `
+                        <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                            <div class="flex items-center gap-4 overflow-hidden">
+                                <div class="w-16 h-10 bg-black rounded overflow-hidden shrink-0">
+                                    ${h.type === 'image' ? `<img src="${h.url}" class="w-full h-full object-cover">` : `<video src="${h.url}" class="w-full h-full object-cover"></video>`}
+                                </div>
+                                <span class="text-xs text-stone-400 truncate max-w-[200px]">${h.url}</span>
+                            </div>
+                            <button onclick="window.delHero(${i})" class="text-red-500 hover:text-white p-2 transition"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-            document.body.appendChild(modal);
+            document.getElementById('add-h-btn').onclick = () => {
+                const u = document.getElementById('h-url').value;
+                if(u) { 
+                    siteData.heroItems.push({type: document.getElementById('h-type').value, url: u}); 
+                    saveData(); 
+                    renderHeroAdmin(); 
+                    renderHero(); 
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano slajd!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+            };
+        }
+
+        function renderCategoriesAdmin() {
+            const container = document.getElementById('view-categories');
+            container.innerHTML = `
+                <h3 class="text-3xl font-bold mb-6">Kategorie</h3>
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-500">Stwórz lub Edytuj kategorię</h4>
+                    <input type="hidden" id="edit-cat-id">
+                    <input id="cat-t" class="calc-input" placeholder="Nazwa (np. Drewno)">
+                    <input id="cat-i" class="calc-input" placeholder="Wklej link do zdjęcia okładki">
+                    <div class="flex gap-2">
+                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
+                        <button id="cancel-cat-btn" class="hidden bg-stone-600 hover:bg-stone-500 w-1/3 py-3 rounded-xl font-bold transition">Anuluj</button>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    ${Object.keys(siteData.categories).map(k => `
+                        <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                            <div class="flex items-center gap-4">
+                                <img src="${siteData.categories[k].image}" class="w-12 h-12 rounded-lg object-cover">
+                                <span class="font-bold">${siteData.categories[k].title}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.editCat('${k}')" class="text-blue-400 hover:text-white font-bold text-sm px-3 py-1 bg-blue-500/10 rounded-lg">EDYTUJ</button>
+                                <button onclick="window.delCat('${k}')" class="text-red-500 hover:text-white font-bold text-sm px-3 py-1 bg-red-500/10 rounded-lg">USUŃ</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Logic for Add/Edit
+            document.getElementById('add-cat-btn').onclick = () => {
+                const t = document.getElementById('cat-t').value;
+                const i = document.getElementById('cat-i').value;
+                const editId = document.getElementById('edit-cat-id').value;
+                
+                if(t) {
+                    if (editId) {
+                        // Update existing
+                        siteData.categories[editId].title = t;
+                        siteData.categories[editId].image = i;
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano kategorię!";
+                    } else {
+                        // Create new
+                        const id = 'c' + Date.now();
+                        siteData.categories[id] = { title: t, image: i, subcategories: [] };
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Dodano kategorię!";
+                    }
+                    
+                    saveData(); 
+                    renderCategoriesAdmin(); 
+                    renderMain();
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+            };
+            
+            // Logic for Cancel
+            document.getElementById('cancel-cat-btn').onclick = () => {
+                renderCategoriesAdmin(); // Re-render to clear form
+            };
+        }
+        
+        window.editCat = (id) => {
+            const cat = siteData.categories[id];
+            document.getElementById('cat-t').value = cat.title;
+            document.getElementById('cat-i').value = cat.image;
+            document.getElementById('edit-cat-id').value = id;
+            document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany";
+            document.getElementById('cancel-cat-btn').classList.remove('hidden');
         };
 
-        // --- FUNKCJE STATUSU I STARTU (Zgodne z Twoim plikiem) ---
-        function updateStatusUI(online, msg="") {
+        function renderProductsAdmin() {
+            const container = document.getElementById('view-products');
+            const categoryOptions = Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
+            const productOptions = Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('');
+
+            // Generate list of existing products for management
+            let productsListHtml = '';
+            Object.keys(siteData.categories).forEach(catId => {
+                const cat = siteData.categories[catId];
+                if(cat.subcategories.length > 0) {
+                    productsListHtml += `<div class="mb-4"><h5 class="text-xs font-bold text-stone-500 uppercase mb-2 pl-2">${cat.title}</h5>`;
+                    productsListHtml += cat.subcategories.map((sub, index) => `
+                        <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2">
+                            <div class="flex items-center gap-3">
+                                <img src="${sub.image}" class="w-8 h-8 rounded-md object-cover">
+                                <span class="text-sm font-bold text-white">${sub.title}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.editProduct('${catId}', ${index})" class="text-blue-400 hover:text-white text-xs px-2 py-1 bg-blue-500/10 rounded">Edytuj</button>
+                                <button onclick="window.delSub('${catId}', ${index})" class="text-red-500 hover:text-white text-xs px-2 py-1 bg-red-500/10 rounded">Usuń</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    productsListHtml += `</div>`;
+                }
+            });
+
+            container.innerHTML = `
+                <h3 class="text-3xl font-bold mb-6">Produkty i Galerie</h3>
+                
+                <!-- Sekcja Dodawania/Edycji Produktu -->
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-wood-500 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Zarządzaj Produktem</h4>
+                    <input type="hidden" id="edit-prod-index">
+                    <input type="hidden" id="edit-prod-cat-id">
+                    
+                    <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
+                    <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
+                    <input id="p-i" class="calc-input" placeholder="Wklej link do miniatury">
+                    
+                    <div class="flex gap-2">
+                        <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
+                        <button id="cancel-p-btn" class="hidden bg-stone-600 hover:bg-stone-500 w-1/3 py-3 rounded-xl font-bold transition">Anuluj</button>
+                    </div>
+                </div>
+
+                <!-- Lista Produktów do Edycji -->
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                     <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-list"></i> Lista Istniejących Produktów</h4>
+                     <div class="max-h-60 overflow-y-auto pr-2">
+                        ${productsListHtml || '<p class="text-stone-500 text-sm">Brak produktów.</p>'}
+                     </div>
+                </div>
+
+                <hr class="border-white/10 my-8">
+                
+                <!-- Sekcja Galerii -->
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-400 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Dodaj Zdjęcia do Galerii Produktu</h4>
+                    <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
+                    <input id="gal-img-url" class="calc-input" placeholder="Wklej link do zdjęcia">
+                    <button id="gal-btn" class="bg-stone-600 hover:bg-stone-500 w-full py-3 rounded-xl font-bold transition">Dodaj zdjęcie do galerii</button>
+                </div>
+            `;
+            
+            document.getElementById('p-btn').onclick = () => {
+                const cid = document.getElementById('p-cat').value;
+                const t = document.getElementById('p-t').value;
+                const img = document.getElementById('p-i').value;
+                
+                const editIndex = document.getElementById('edit-prod-index').value;
+                const editCatId = document.getElementById('edit-prod-cat-id').value;
+
+                if(cid && t) {
+                    if (editIndex !== "") {
+                        // Edit Mode
+                        // Note: We use editCatId to ensure we update the correct list, 
+                        // even if the select box visually shows something else (though we disable it).
+                        const product = siteData.categories[editCatId].subcategories[editIndex];
+                        product.title = t;
+                        product.image = img;
+                        
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano produkt!";
+                    } else {
+                        // Add Mode
+                        const sid = 's' + Date.now();
+                        siteData.categories[cid].subcategories.push({ id: sid, title: t, image: img });
+                        siteData.galleries[sid] = { images: [] };
+                        
+                        document.getElementById('toast-notification').querySelector('span').textContent = "Dodano produkt!";
+                    }
+
+                    saveData(); 
+                    renderProductsAdmin(); // Refresh list and clear form
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+            };
+
+            document.getElementById('cancel-p-btn').onclick = () => {
+                renderProductsAdmin();
+            };
+
+            document.getElementById('gal-btn').onclick = () => {
+                const sid = document.getElementById('p-gal-select').value;
+                const url = document.getElementById('gal-img-url').value;
+                if(sid && url) {
+                    if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
+                    siteData.galleries[sid].images.push({ src: url });
+                    saveData(); 
+                    
+                    const toast = document.getElementById('toast-notification');
+                    toast.querySelector('span').textContent = "Dodano zdjęcie!";
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                    
+                    document.getElementById('gal-img-url').value = "";
+                }
+            };
+        }
+
+        window.editProduct = (catId, index) => {
+            const product = siteData.categories[catId].subcategories[index];
+            
+            document.getElementById('p-t').value = product.title;
+            document.getElementById('p-i').value = product.image;
+            document.getElementById('p-cat').value = catId;
+            document.getElementById('p-cat').disabled = true; // Lock category change during edit to prevent complexity
+            
+            document.getElementById('edit-prod-index').value = index;
+            document.getElementById('edit-prod-cat-id').value = catId;
+            
+            document.getElementById('p-btn').textContent = "Zapisz Zmiany";
+            document.getElementById('cancel-p-btn').classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('view-products').scrollTop = 0;
+        };
+
+        // --- NAWIGACJA FRONT-END ---
+        window.openSubcategories = (id) => {
+            const c = siteData.categories[id];
+            if(!c) return;
+            document.getElementById('subcategory-title').textContent = c.title;
+            const grid = document.getElementById('subcategory-grid'); 
+            grid.innerHTML = '';
+            
+            if(c.subcategories.length === 0) {
+                grid.innerHTML = '<p class="text-stone-500 col-span-3 text-center">Brak produktów w tej kategorii.</p>';
+            }
+
+            c.subcategories.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = "group bg-white rounded-3xl overflow-hidden border border-stone-100 cursor-pointer hover:shadow-2xl transition-all duration-300 relative";
+                div.onclick = () => window.openGallery(s.id, s.title, id);
+                div.innerHTML = `
+                    <div class="h-64 overflow-hidden">
+                        <img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-6 flex justify-between items-center">
+                        <span class="font-bold text-xl text-stone-800">${s.title}</span>
+                        <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); window.delSub('${id}',${i})" class="admin-controls absolute top-4 right-4 bg-red-500 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+            
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.remove('hidden'); 
+            window.scrollTo(0,0);
+        };
+
+        window.openGallery = (sid, title, cid) => {
+            const g = siteData.galleries[sid] || { images: [] };
+            document.getElementById('gallery-title').textContent = title;
+            document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategories(cid);
+            
+            const grid = document.getElementById('gallery-grid'); 
+            grid.innerHTML = '';
+
+            if(g.images.length === 0) {
+                grid.innerHTML = '<p class="text-stone-500 col-span-4 text-center">Galeria jest pusta.</p>';
+            }
+
+            g.images.forEach((img, i) => {
+                const div = document.createElement('div');
+                div.className = "relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition group";
+                div.onclick = () => window.openLightbox(img.src);
+                div.innerHTML = `
+                    <img src="${img.src}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                    <button onclick="event.stopPropagation(); window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-3 right-3 bg-red-500 text-white w-8 h-8 rounded-lg items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 flex transition">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+            
+            document.getElementById('subcategory-view').classList.add('hidden');
+            document.getElementById('gallery-view').classList.remove('hidden'); 
+            window.scrollTo(0,0);
+        };
+
+        // --- USUWANIE ---
+        window.delHero = (i) => { if(confirm("Usunąć slajd?")) { siteData.heroItems.splice(i,1); saveData(); renderHeroAdmin(); renderHero(); } };
+        window.delCat = (k) => { if(confirm("Usunąć całą kategorię i jej produkty?")) { delete siteData.categories[k]; saveData(); renderCategoriesAdmin(); renderMain(); } };
+        
+        // Updated delSub to refresh Admin view correctly if called from there
+        window.delSub = (cid, i) => { 
+            if(confirm("Usunąć produkt?")) { 
+                siteData.categories[cid].subcategories.splice(i,1); 
+                saveData(); 
+                
+                // If we are in admin panel, refresh admin view
+                if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                    renderProductsAdmin();
+                } else {
+                    window.openSubcategories(cid); 
+                }
+            } 
+        };
+        
+        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGallery(sid, t, cid); } };
+
+        // --- UI ---
+        window.openLightbox = (src) => { 
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lightbox-img').src = src; 
+            lb.classList.remove('hidden'); 
+            setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+        };
+        window.closeLightbox = () => { 
+            const lb = document.getElementById('lightbox');
+            lb.classList.replace('opacity-100','opacity-0'); 
+            setTimeout(() => { lb.classList.add('hidden'); }, 300);
+        };
+        
+        window.goHome = () => { 
+            document.getElementById('subcategory-view').classList.add('hidden'); 
+            document.getElementById('gallery-view').classList.add('hidden'); 
+            document.getElementById('main-content').classList.remove('hidden');
+            window.scrollTo(0,0);
+        };
+        
+        window.toggleMobileMenu = () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        };
+
+        // --- AUTH ---
+        window.handleLogin = () => {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            if(u === 'admin' && p === '12345') {
+                sessionStorage.setItem('xeomsc_admin', 'true');
+                location.reload();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        };
+        
+        window.handleLogout = () => {
+            sessionStorage.removeItem('xeomsc_admin');
+            location.reload();
+        };
+
+        window.toggleAdminPanel = () => {
+            const p = document.getElementById('admin-panel');
+            p.classList.toggle('hidden');
+            if(!p.classList.contains('hidden')) window.switchAdminView('content');
+        };
+        
+        window.exitLogin = () => {
+            document.getElementById('login-screen').classList.add('hidden');
+            window.location.hash = '';
+        };
+
+        // --- FIREBASE STATUS UI ---
+        function updateStatusUI(online, message = "") {
             isOnline = online;
             const dot = document.getElementById('status-dot');
             const txt = document.getElementById('status-text');
             const banner = document.getElementById('error-banner');
-            if(online) { 
-                dot.className="status-dot status-online"; txt.innerText="ONLINE"; txt.className="text-xs font-bold text-green-400"; 
-                banner.style.display = 'none'; 
-            } else { 
-                dot.className="status-dot status-offline"; txt.innerText="OFFLINE"; txt.className="text-xs font-bold text-red-400";
-                if(lastError && lastError.includes("permission-denied")) {
+
+            if(online) {
+                dot.className = "status-dot status-online";
+                txt.textContent = "ONLINE (CHMURA)";
+                txt.classList.add('text-green-400');
+                txt.classList.remove('text-stone-400');
+                banner.style.display = 'none';
+            } else {
+                dot.className = "status-dot status-offline";
+                txt.textContent = "OFFLINE (BŁĄD)";
+                txt.classList.add('text-red-400');
+                txt.classList.remove('text-green-400');
+                
+                if(message) {
+                    lastError = message; // Zapamiętaj błąd dla diagnostyki
+                    // Tłumaczenie błędów
+                    let friendlyMsg = message;
+                    if(message.includes('auth/configuration-not-found')) {
+                        friendlyMsg = "Uwierzytelnianie nie jest włączone w konsoli Firebase! (Wejdź w Authentication -> Sign-in method -> Włącz Anonymous)";
+                    } else if (message.includes('auth/api-key-not-valid')) {
+                        friendlyMsg = "Nieprawidłowy klucz API (API Key). Sprawdź konfigurację.";
+                    } else if (message.includes('network-request-failed')) {
+                        friendlyMsg = "Błąd sieci. Sprawdź połączenie z internetem.";
+                    } else if (message.includes('permission-denied')) {
+                        friendlyMsg = "Brak uprawnień. Sprawdź Reguły (Rules) w Firestore.";
+                    }
+
+                    banner.textContent = "BŁĄD: " + friendlyMsg;
                     banner.style.display = 'block';
-                    if(!sessionStorage.getItem('rules_shown')) { showRulesHelp(); sessionStorage.setItem('rules_shown', 'true'); }
                 }
             }
-            updateDataSourceIndicator(online ? 'cloud' : 'local');
         }
-        function updateDataSourceIndicator(s) { document.getElementById('data-source-indicator').innerHTML = s==='cloud' ? '<span class="source-live">LIVE (CHMURA)</span>' : '<span class="source-default">OFFLINE</span>'; }
+        
+        window.showDetailedError = () => {
+            if(lastError) alert("Ostatni błąd techniczny:\n" + lastError);
+            else if(!isOnline) alert("Nie połączono z chmurą. Sprawdź konsolę Firebase.");
+            else alert("Połączenie z chmurą jest aktywne i poprawne.");
+        };
+        
+        // --- DIAGNOSTYKA ŹRÓDŁA DANYCH ---
+        function updateDataSourceIndicator(source, isError=false) {
+            const el = document.getElementById('data-source-indicator');
+            if(source === 'cloud') {
+                el.innerHTML = 'Źródło danych: <span class="source-live">CHMURA (LIVE)</span>';
+            } else {
+                el.innerHTML = 'Źródło danych: <span class="source-default">DOMYŚLNE (OFFLINE)</span>' + (isError ? ' - Sprawdź połączenie (Kliknij tutaj)' : '');
+            }
+        }
+
+        // --- FIREBASE SYNC ---
+        async function saveData() {
+            // Zawsze zapisuj lokalnie jako backup
+            localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+            
+            if(isOnline && auth && auth.currentUser) {
+                try {
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
+                    console.log("Zapisano w chmurze");
+                    
+                    // Pokazuj Toast
+                    const toast = document.getElementById('toast-notification');
+                    if (toast) {
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 3000);
+                    }
+                } catch(e) { 
+                    console.error("Błąd zapisu w chmurze", e); 
+                    alert("Uwaga: Błąd zapisu w chmurze! Sprawdź połączenie.");
+                }
+            } else {
+                console.log("Zapisano tylko lokalnie (Offline)");
+            }
+        }
 
         async function start() {
-            if(sessionStorage.getItem('xeomsc_admin') === 'true') { document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); }
-            
-            const local = localStorage.getItem('xeomsc_cached_data');
-            if(local) siteData = JSON.parse(local); else siteData = initialData;
-            renderMain(); renderHero(); renderTexts();
+            // Sprawdź admina
+            if(sessionStorage.getItem('xeomsc_admin') === 'true') {
+                document.body.classList.add('is-admin');
+                document.getElementById('admin-bar').classList.remove('hidden');
+            } else if(window.location.hash === '#admin') {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+
+            window.addEventListener('hashchange', () => {
+                if(window.location.hash === '#admin') {
+                     document.getElementById('login-screen').classList.remove('hidden');
+                }
+            });
 
             try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                await signInAnonymously(auth);
-                
-                onAuthStateChanged(auth, u => {
-                    if(u) {
-                        updateStatusUI(true);
-                        onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), snap => {
-                            if(snap.exists()) {
-                                siteData = snap.data();
-                                if(!siteData.categories) siteData.categories = {};
-                                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                renderMain(); renderHero(); renderTexts();
-                            }
-                        }, error => { 
-                            console.error("Snapshot error detected:", error); 
-                            lastError = error.message; 
-                            updateStatusUI(false); 
-                        });
+                if (Object.keys(firebaseConfig).length > 0) {
+                    const appObj = initializeApp(firebaseConfig);
+                    auth = getAuth(appObj);
+                    db = getFirestore(appObj);
+                    
+                    // Próba autoryzacji z obsługą błędów
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (authError) {
+                        console.error("Critical Auth Error:", authError);
+                        updateStatusUI(false, authError.code || authError.message);
+                        updateDataSourceIndicator('local', true);
+                        return;
                     }
-                });
-            } catch(e) { console.log("Offline mode", e); updateStatusUI(false); }
+
+                    onAuthStateChanged(auth, (u) => {
+                        if(u) {
+                            updateStatusUI(true);
+                            // Nasłuchuj zmian w czasie rzeczywistym
+                            const docRef = doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main');
+                            onSnapshot(docRef, (snap) => {
+                                if (snap.exists()) {
+                                    console.log("Otrzymano aktualizację z chmury");
+                                    siteData = snap.data();
+                                    updateDataSourceIndicator('cloud');
+                                    
+                                    // Upewnij się, że nowe pola istnieją
+                                    if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                                    
+                                    localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                    
+                                    // Odśwież widok
+                                    renderHero();
+                                    renderMain();
+                                    renderTexts(); 
+                                    
+                                    // Jeśli panel admina jest otwarty, odśwież formularze
+                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) {
+                                       // Opcjonalnie można tu dodać logikę odświeżania inputów
+                                    }
+                                } else {
+                                    // Pierwsze uruchomienie w chmurze - wyślij dane lokalne jeśli to admin, lub użyj default jeśli klient
+                                    if(sessionStorage.getItem('xeomsc_admin') === 'true') {
+                                        saveData();
+                                    } else {
+                                        updateDataSourceIndicator('local');
+                                    }
+                                }
+                            }, (error) => {
+                                console.error("Snapshot error:", error);
+                                updateStatusUI(false, error.message);
+                                updateDataSourceIndicator('local', true);
+                            });
+                        }
+                    });
+                } else {
+                    console.warn("Tryb offline: Brak konfiguracji Firebase");
+                    updateStatusUI(false, "Brak konfiguracji Firebase");
+                    updateDataSourceIndicator('local');
+                }
+            } catch (e) {
+                console.log("Uruchomiono w trybie offline / bez bazy danych", e);
+                updateStatusUI(false, e.message);
+                updateDataSourceIndicator('local', true);
+                renderHero();
+                renderMain();
+                renderTexts();
+            }
         }
+
+        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        renderHero();
+        renderMain();
+        renderTexts();
         start();
     </script>
 </body>
