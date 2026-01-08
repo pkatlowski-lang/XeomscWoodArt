@@ -276,25 +276,25 @@
         </button>
     </div>
 
-    <!-- 3. NAWIGACJA STRONY (ZMIANA: Domyślnie przezroczysta) -->
-    <nav class="fixed w-full z-50 bg-transparent transition-all duration-300 top-0 h-24 flex items-center" id="navbar">
+    <!-- 3. NAWIGACJA STRONY (ZMIANA: Biała, stała) -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300 top-0 h-24 flex items-center border-b border-stone-100" id="navbar">
         <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
-            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 group transition-colors" id="nav-logo">
+            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors" id="nav-logo">
                 <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg group-hover:bg-wood-700 transition">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
-                <span>Xeomsc <span class="text-wood-500" id="nav-logo-accent">FusionArt</span></span>
+                <span>Xeomsc <span class="text-wood-600" id="nav-logo-accent">FusionArt</span></span>
             </a>
             
-            <div class="hidden md:flex space-x-10 items-center font-medium text-white/90" id="nav-links">
-                <a href="#home" onclick="goHome()" class="hover:text-wood-400 transition">Start</a>
-                <a href="#about" onclick="goHome()" class="hover:text-wood-400 transition">O ofercie</a>
-                <a href="#portfolio" onclick="goHome()" class="hover:text-wood-400 transition">Realizacje</a>
+            <div class="hidden md:flex space-x-10 items-center font-medium text-stone-600" id="nav-links">
+                <a href="#home" onclick="goHome()" class="hover:text-wood-600 transition">Start</a>
+                <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
+                <a href="#portfolio" onclick="goHome()" class="hover:text-wood-600 transition">Realizacje</a>
                 <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Wycena</a>
             </div>
 
             <div class="md:hidden flex items-center">
-                <button onclick="toggleMobileMenu()" class="text-white p-2 text-2xl transition-colors" id="mobile-menu-btn">
+                <button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl transition-colors" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
@@ -310,10 +310,11 @@
         </div>
     </nav>
 
-    <!-- 4. KONTENER GŁÓWNY -->
-    <div id="main-content" class="pt-0 transition-all duration-300">
+    <!-- 4. KONTENER GŁÓWNY (ZMIANA: Padding-top 24 = 6rem, bo navbar ma h-24) -->
+    <div id="main-content" class="pt-24 transition-all duration-300">
         <!-- Hero Section -->
-        <section id="home" class="relative h-screen flex items-center hero-bg overflow-hidden pt-20">
+        <!-- ZMIANA: Wysokość h-[calc(100vh-6rem)] aby wypełnić ekran pod paskiem -->
+        <section id="home" class="relative h-[calc(100vh-6rem)] flex items-center hero-bg overflow-hidden pt-10">
             <div class="absolute inset-0 z-0" id="hero-carousel-container">
                 <div class="w-full h-full bg-stone-200 animate-pulse"></div>
             </div>
@@ -684,52 +685,17 @@
         // --- OBSŁUGA PASEK NAWIGACJI (SCROLL) ---
         window.updateNavbar = () => {
             const navbar = document.getElementById('navbar');
-            const logo = document.getElementById('nav-logo');
-            const logoAccent = document.getElementById('nav-logo-accent');
-            const linksContainer = document.getElementById('nav-links');
-            const mobileBtn = document.getElementById('mobile-menu-btn');
             
             if(!navbar) return;
 
             if (window.scrollY > 50) {
-                // SCROLLED: Białe tło, ciemny tekst
-                navbar.classList.remove('bg-transparent', 'h-24');
-                navbar.classList.add('bg-white/95', 'backdrop-blur-md', 'shadow-sm', 'h-20');
-                
-                logo.classList.remove('text-white');
-                logo.classList.add('text-stone-900');
-                
-                logoAccent.classList.remove('text-wood-500'); // Jasny pomarańcz
-                logoAccent.classList.add('text-wood-600'); // Ciemniejszy
-                
-                if(linksContainer) {
-                    Array.from(linksContainer.children).forEach(link => {
-                        link.classList.remove('hover:text-wood-400');
-                        link.classList.add('text-stone-600', 'hover:text-wood-600');
-                    });
-                }
-                
-                if(mobileBtn) mobileBtn.classList.replace('text-white', 'text-stone-800');
-
+                // SCROLLED: Zmniejsz wysokość
+                navbar.classList.remove('h-24');
+                navbar.classList.add('h-20');
             } else {
-                // TOP: Przezroczyste tło, biały tekst
-                navbar.classList.add('bg-transparent', 'h-24');
-                navbar.classList.remove('bg-white/95', 'backdrop-blur-md', 'shadow-sm', 'h-20');
-                
-                logo.classList.add('text-white');
-                logo.classList.remove('text-stone-900');
-
-                logoAccent.classList.add('text-wood-500'); 
-                logoAccent.classList.remove('text-wood-600');
-
-                if(linksContainer) {
-                    Array.from(linksContainer.children).forEach(link => {
-                        link.classList.add('hover:text-wood-400');
-                        link.classList.remove('text-stone-600', 'hover:text-wood-600');
-                    });
-                }
-                
-                if(mobileBtn) mobileBtn.classList.replace('text-stone-800', 'text-white');
+                // TOP: Pełna wysokość
+                navbar.classList.add('h-24');
+                navbar.classList.remove('h-20');
             }
         };
         window.addEventListener('scroll', window.updateNavbar);
