@@ -475,7 +475,7 @@
             </div>
             
             <!-- Content Area -->
-            <div class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
+            <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
                 
                 <!-- Widok: Edycja Treści -->
                 <div id="view-content" class="admin-view hidden space-y-10">
@@ -1093,6 +1093,9 @@
             document.getElementById('edit-cat-id').value = id;
             document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany";
             document.getElementById('cancel-cat-btn').classList.remove('hidden');
+            
+            // Scroll to top
+            document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.toggleCatVisibility = (id) => {
@@ -1249,7 +1252,7 @@
             document.getElementById('cancel-p-btn').classList.remove('hidden');
             
             // Scroll to form
-            document.getElementById('view-products').scrollTop = 0;
+            document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.toggleProductVisibility = (catId, index) => {
