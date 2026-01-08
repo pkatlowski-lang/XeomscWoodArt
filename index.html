@@ -89,16 +89,20 @@
         video::-webkit-media-controls-enclosure { display: none !important; }
         video::-webkit-media-controls-panel { display: none !important; }
         
-        /* Ukrywanie elementów specyficznych dla Opera GX / Lucid Mode i innych wtyczek */
-        .button-container, 
-        .custom-button-wrapper, 
-        .custom-button, 
-        .rgx-button-wrapper, 
+        /* OPERA GX / LUCID MODE BLOCKER 
+           Te reguły celują w specyficzne klasy wstrzykiwane przez Operę GX.
+           Używamy !important, aby nadpisać style przeglądarki.
+        */
+        .rgx-button-wrapper,
         .rgx-button-overlay,
+        .custom-button-wrapper,
+        .button-container, /* Opera często wrzuca to w kontener o tej nazwie */
         #video-detach-button,
         #send-by-qrcode-button,
         #lucid-mode-button,
-        #skip-button {
+        #skip-button,
+        div[class*="rgx"],   /* Blokuje wszystko co ma 'rgx' w nazwie klasy */
+        div[class*="custom-button"] {
             display: none !important;
             opacity: 0 !important;
             visibility: hidden !important;
@@ -106,7 +110,13 @@
             width: 0 !important;
             height: 0 !important;
             position: absolute !important;
-            z-index: -9999 !important;
+            z-index: -99999 !important;
+            transform: scale(0) !important;
+        }
+
+        /* Dodatkowe zabezpieczenie dla cienia (Shadow DOM) jeśli jest dostępne */
+        ::part(rgx-button), ::part(lucid-mode) {
+            display: none !important;
         }
 
         .fade-in {
@@ -1819,6 +1829,50 @@
                 renderTexts();
             }
         }
+        
+        // --- OPERA GX CLEANER (STRAŻNIK DOM) ---
+        // Monitoruje DOM i usuwa elementy wstrzykiwane przez przeglądarkę
+        const cleanOperaOverlays = () => {
+            const selectors = [
+                '.rgx-button-wrapper',
+                '.custom-button-wrapper',
+                '#video-detach-button',
+                '#send-by-qrcode-button',
+                '#lucid-mode-button',
+                'div[class*="rgx"]',
+                '.button-container' // Uwaga: usuwa tylko jeśli zawiera elementy Opery
+            ];
+            
+            selectors.forEach(s => {
+                document.querySelectorAll(s).forEach(el => {
+                    // Dla ogólnych klas sprawdzamy czy to na pewno Opera (żeby nie usunąć własnego kodu)
+                    if (s === '.button-container') {
+                        if(el.querySelector('.custom-button-wrapper') || el.querySelector('#video-detach-button')) {
+                            el.remove();
+                        }
+                    } else {
+                        el.remove();
+                    }
+                });
+            });
+        };
+
+        // Uruchom od razu
+        cleanOperaOverlays();
+
+        // Uruchom obserwatora, który usunie elementy, gdy Opera spróbuje je dodać
+        const observer = new MutationObserver((mutations) => {
+            let shouldClean = false;
+            for(const mutation of mutations) {
+                if (mutation.addedNodes.length) {
+                    shouldClean = true; 
+                    break;
+                }
+            }
+            if(shouldClean) cleanOperaOverlays();
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
 
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero();
