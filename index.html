@@ -276,32 +276,32 @@
         </button>
     </div>
 
-    <!-- 3. NAWIGACJA STRONY -->
-    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300 top-0 h-24 flex items-center" id="navbar">
+    <!-- 3. NAWIGACJA STRONY (ZMIANA: Domyślnie przezroczysta) -->
+    <nav class="fixed w-full z-50 bg-transparent transition-all duration-300 top-0 h-24 flex items-center" id="navbar">
         <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
-            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group">
+            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 group transition-colors" id="nav-logo">
                 <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg group-hover:bg-wood-700 transition">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
-                <span>Xeomsc <span class="text-wood-600">FusionArt</span></span>
+                <span>Xeomsc <span class="text-wood-500" id="nav-logo-accent">FusionArt</span></span>
             </a>
             
-            <div class="hidden md:flex space-x-10 items-center font-medium text-stone-600">
-                <a href="#home" onclick="goHome()" class="hover:text-wood-600 transition">Start</a>
-                <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
-                <a href="#portfolio" onclick="goHome()" class="hover:text-wood-600 transition">Realizacje</a>
+            <div class="hidden md:flex space-x-10 items-center font-medium text-white/90" id="nav-links">
+                <a href="#home" onclick="goHome()" class="hover:text-wood-400 transition">Start</a>
+                <a href="#about" onclick="goHome()" class="hover:text-wood-400 transition">O ofercie</a>
+                <a href="#portfolio" onclick="goHome()" class="hover:text-wood-400 transition">Realizacje</a>
                 <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Wycena</a>
             </div>
 
             <div class="md:hidden flex items-center">
-                <button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl">
+                <button onclick="toggleMobileMenu()" class="text-white p-2 text-2xl transition-colors" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
         
         <div class="md:hidden hidden absolute top-24 left-0 w-full bg-white border-t border-stone-100 shadow-xl" id="mobile-menu">
-            <div class="flex flex-col p-4 space-y-2">
+            <div class="flex flex-col p-4 space-y-2 text-stone-800">
                 <a href="#home" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Start</a>
                 <a href="#about" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">O ofercie</a>
                 <a href="#portfolio" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Realizacje</a>
@@ -476,17 +476,15 @@
             
             <!-- Content Area -->
             <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
-                
-                <!-- Widok: Edycja Treści -->
+                <!-- (Zawartość CMS bez zmian) -->
                 <div id="view-content" class="admin-view hidden space-y-10">
-                    <header>
+                    <!-- ... -->
+                     <header>
                         <h3 class="text-3xl font-bold mb-2">Edycja Treści Strony</h3>
                         <p class="text-stone-400">Zmiany tutaj są natychmiast widoczne na wszystkich urządzeniach.</p>
                     </header>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        
-                        <!-- Sekcja Hero -->
-                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
+                         <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4">
                             <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Sekcja Powitalna (Hero)</h4>
                             <div>
                                 <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Nagłówek (Główna część)</label>
@@ -555,8 +553,8 @@
                     </div>
                 </div>
 
-                <!-- Widok: Kalkulator Lasera -->
                 <div id="view-calculator" class="admin-view hidden space-y-10">
+                    <!-- ... (Kalkulator bez zmian) ... -->
                     <header>
                         <h3 class="text-3xl font-bold mb-2">Kalkulator Wyceny</h3>
                         <p class="text-stone-400">Symulacja arkusza kalkulacyjnego.</p>
@@ -682,6 +680,61 @@
                 }
             }
         };
+
+        // --- OBSŁUGA PASEK NAWIGACJI (SCROLL) ---
+        window.updateNavbar = () => {
+            const navbar = document.getElementById('navbar');
+            const logo = document.getElementById('nav-logo');
+            const logoAccent = document.getElementById('nav-logo-accent');
+            const linksContainer = document.getElementById('nav-links');
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            
+            if(!navbar) return;
+
+            if (window.scrollY > 50) {
+                // SCROLLED: Białe tło, ciemny tekst
+                navbar.classList.remove('bg-transparent', 'h-24');
+                navbar.classList.add('bg-white/95', 'backdrop-blur-md', 'shadow-sm', 'h-20');
+                
+                logo.classList.remove('text-white');
+                logo.classList.add('text-stone-900');
+                
+                logoAccent.classList.remove('text-wood-500'); // Jasny pomarańcz
+                logoAccent.classList.add('text-wood-600'); // Ciemniejszy
+                
+                if(linksContainer) {
+                    Array.from(linksContainer.children).forEach(link => {
+                        link.classList.remove('hover:text-wood-400');
+                        link.classList.add('text-stone-600', 'hover:text-wood-600');
+                    });
+                }
+                
+                if(mobileBtn) mobileBtn.classList.replace('text-white', 'text-stone-800');
+
+            } else {
+                // TOP: Przezroczyste tło, biały tekst
+                navbar.classList.add('bg-transparent', 'h-24');
+                navbar.classList.remove('bg-white/95', 'backdrop-blur-md', 'shadow-sm', 'h-20');
+                
+                logo.classList.add('text-white');
+                logo.classList.remove('text-stone-900');
+
+                logoAccent.classList.add('text-wood-500'); 
+                logoAccent.classList.remove('text-wood-600');
+
+                if(linksContainer) {
+                    Array.from(linksContainer.children).forEach(link => {
+                        link.classList.add('hover:text-wood-400');
+                        link.classList.remove('text-stone-600', 'hover:text-wood-600');
+                    });
+                }
+                
+                if(mobileBtn) mobileBtn.classList.replace('text-stone-800', 'text-white');
+            }
+        };
+        window.addEventListener('scroll', window.updateNavbar);
+
+        // ... (reszta funkcji: scrollCategories, renderHero itp. bez zmian)
         
         // Funkcja przewijania kategorii (Zaktualizowana: Infinite Loop - 360 stopni)
         window.scrollCategories = (direction, isAuto = false) => {
@@ -1588,6 +1641,9 @@
         renderMain();
         renderTexts();
         start();
+        
+        // Initial call to set navbar state
+        updateNavbar();
     </script>
 </body>
 </html>
