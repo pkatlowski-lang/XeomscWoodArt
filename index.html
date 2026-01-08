@@ -494,7 +494,7 @@
         </button>
     </div>
 
-    <!-- NOWY: MODAL FORMULARZA KONTAKTOWEGO -->
+    <!-- MODAL FORMULARZA KONTAKTOWEGO -->
     <div id="contact-modal" class="fixed inset-0 z-[3000] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh]">
             
@@ -550,7 +550,6 @@
 
     <!-- 6. PANEL ADMINISTRATORA (CMS) -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-950/60 backdrop-blur-md hidden items-center justify-center p-4 sm:p-8">
-        <!-- ... (Zawartość panelu admina bez zmian) ... -->
         <div class="bg-stone-900 text-white w-full max-w-7xl h-full max-h-[90vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10 ring-1 ring-white/5">
             <div class="w-full md:w-72 bg-black/40 border-r border-white/5 p-8 flex flex-col shrink-0">
                 <div class="mb-10">
@@ -1018,10 +1017,8 @@
             document.getElementById('gallery-view').classList.remove('hidden'); 
             window.scrollTo(0,0);
         };
-        // (Reszta funkcji bez zmian - updateMainImage, delHero, delCat...)
 
         // --- ZARZĄDZANIE TREŚCIĄ (SAVE CONTENT SETTINGS) ---
-        // (Musimy dodać to ponownie, bo plik był skrócony w poprzednich wersjach)
         window.saveContentSettings = async () => {
              const t = {
                 hero: {
@@ -1048,7 +1045,7 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         };
         
-        // --- POZOSTAŁE FUNKCJE (delSub, delImg, UI Lightbox, Auth, Firebase) ---
+        // --- POZOSTAŁE FUNKCJE ---
         window.updateMainImage = (index) => {
             window.currentImgIndex = index;
             const mainImg = document.getElementById('main-product-img');
@@ -1146,9 +1143,7 @@
             window.location.hash = '';
         };
 
-        // ... (Tu przywracamy funkcje Admina: switchAdminView, renderHeroAdmin, renderCategoriesAdmin, renderProductsAdmin, editProduct, toggleProductVisibility - są identyczne jak w poprzednim pliku, ale kluczowe dla działania panelu. Skracam dla czytelności bloku, ale w pełnym kodzie muszą być.) ...
-        
-        // RE-IMPLEMENTACJA BRAKUJĄCYCH FUNKCJI ADMINA (Dla kompletności):
+        // --- FUNKCJE ADMINA (ZARZĄDZANIE) ---
         window.switchAdminView = (id) => {
             document.querySelectorAll('.admin-view').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
@@ -1223,10 +1218,21 @@
                     <input type="hidden" id="edit-cat-id">
                     <input id="cat-t" class="calc-input" placeholder="Nazwa">
                     <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia">
-                    <div class="flex gap-2"><button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button><button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button></div>
+                    <div class="flex gap-2">
+                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
+                        <button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
+                    </div>
                 </div>
                 <div class="space-y-3">
-                    ${Object.keys(siteData.categories).map(k => `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5"><span class="font-bold">${siteData.categories[k].title}</span><div class="flex gap-2"><button onclick="window.editCat('${k}')" class="text-blue-400 text-sm">EDYTUJ</button><button onclick="window.delCat('${k}')" class="text-red-500 text-sm">USUŃ</button></div></div>`).join('')}
+                    ${Object.keys(siteData.categories).map(k => `
+                        <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                            <span class="font-bold">${siteData.categories[k].title}</span>
+                            <div class="flex gap-2">
+                                <button onclick="window.editCat('${k}')" class="text-blue-400 text-sm">EDYTUJ</button>
+                                <button onclick="window.delCat('${k}')" class="text-red-500 text-sm">USUŃ</button>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>`;
             document.getElementById('add-cat-btn').onclick = () => {
                 const t = document.getElementById('cat-t').value;
@@ -1259,7 +1265,15 @@
                 const cat = siteData.categories[catId];
                 if(cat.subcategories.length > 0) {
                     productsListHtml += `<div class="mb-4"><h5 class="text-xs font-bold text-stone-500 uppercase mb-2 pl-2">${cat.title}</h5>`;
-                    productsListHtml += cat.subcategories.map((sub, index) => `<div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2"><span class="text-sm font-bold text-white">${sub.title}</span><div class="flex gap-2"><button onclick="window.editProduct('${catId}', ${index})" class="text-blue-400 text-xs">Edytuj</button><button onclick="window.delSub('${catId}', ${index})" class="text-red-500 text-xs">Usuń</button></div></div>`).join('');
+                    productsListHtml += cat.subcategories.map((sub, index) => `
+                        <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2">
+                            <span class="text-sm font-bold text-white">${sub.title}</span>
+                            <div class="flex gap-2">
+                                <button onclick="window.editProduct('${catId}', ${index})" class="text-blue-400 text-xs">Edytuj</button>
+                                <button onclick="window.delSub('${catId}', ${index})" class="text-red-500 text-xs">Usuń</button>
+                            </div>
+                        </div>
+                    `).join('');
                     productsListHtml += `</div>`;
                 }
             });
@@ -1270,13 +1284,27 @@
                     <input type="hidden" id="edit-prod-index"><input type="hidden" id="edit-prod-cat-id">
                     <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
                     <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
-                    <div class="grid grid-cols-2 gap-4"><input id="p-code" class="calc-input" placeholder="Kod produktu"><input id="p-price" class="calc-input" placeholder="Cena"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="p-code" class="calc-input" placeholder="Kod produktu">
+                        <input id="p-price" class="calc-input" placeholder="Cena">
+                    </div>
                     <textarea id="p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
                     <input id="p-i" class="calc-input" placeholder="Miniatura">
-                    <div class="flex gap-2"><button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button><button id="cancel-p-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button></div>
+                    <div class="flex gap-2">
+                        <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
+                        <button id="cancel-p-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
+                    </div>
                 </div>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8"><h4 class="text-xs uppercase font-bold text-stone-400">Lista Produktów</h4><div class="max-h-60 overflow-y-auto pr-2">${productsListHtml}</div></div>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8"><h4 class="text-xs uppercase font-bold text-stone-400">Dodaj Zdjęcia do Galerii</h4><select id="p-gal-select" class="calc-input text-white">${productOptions}</select><input id="gal-img-url" class="calc-input" placeholder="Link do zdjęcia"><button id="gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj zdjęcie</button></div>`;
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-400">Lista Produktów</h4>
+                    <div class="max-h-60 overflow-y-auto pr-2">${productsListHtml}</div>
+                </div>
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                    <h4 class="text-xs uppercase font-bold text-stone-400">Dodaj Zdjęcia do Galerii</h4>
+                    <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
+                    <input id="gal-img-url" class="calc-input" placeholder="Link do zdjęcia">
+                    <button id="gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj zdjęcie</button>
+                </div>`;
             
             document.getElementById('p-btn').onclick = () => {
                 const cid = document.getElementById('p-cat').value;
