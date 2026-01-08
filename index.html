@@ -84,17 +84,31 @@
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
         
-        /* AGRESYWNE UKRYWANIE KONTROLEK WIDEO */
-        video::-webkit-media-controls {
-            display: none !important;
-        }
-        video::-webkit-media-controls-enclosure {
-            display: none !important;
-        }
-        video::-webkit-media-controls-panel {
-            display: none !important;
-        }
+        /* AGRESYWNE UKRYWANIE KONTROLEK WIDEO ORAZ NAKŁADEK PRZEGLĄDARKOWYCH (Opera GX, rozszerzenia) */
+        video::-webkit-media-controls { display: none !important; }
+        video::-webkit-media-controls-enclosure { display: none !important; }
+        video::-webkit-media-controls-panel { display: none !important; }
         
+        /* Ukrywanie elementów specyficznych dla Opera GX / Lucid Mode i innych wtyczek */
+        .button-container, 
+        .custom-button-wrapper, 
+        .custom-button, 
+        .rgx-button-wrapper, 
+        .rgx-button-overlay,
+        #video-detach-button,
+        #send-by-qrcode-button,
+        #lucid-mode-button,
+        #skip-button {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            z-index: -9999 !important;
+        }
+
         .fade-in {
             animation: fadeIn 0.6s ease-out forwards;
             opacity: 0;
@@ -230,6 +244,13 @@
         .hide-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        /* Styl wybranego zdjęcia w karuzeli produktu */
+        .thumb-active {
+            border: 2px solid #b45309;
+            opacity: 1;
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -428,27 +449,78 @@
         </div>
     </div>
 
+    <!-- ZMODYFIKOWANY WIDOK PRODUKTU (Zamiast Gallery View) -->
     <div id="gallery-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[110] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-sub-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy produktów
+            <button id="back-to-sub-btn" class="mb-8 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy
             </button>
-            <div class="mb-12 border-b border-stone-100 pb-8">
-                <h2 id="gallery-title" class="text-4xl font-bold text-stone-900 mb-4">Galeria Zdjęć</h2>
-                <div id="gallery-product-info" class="text-stone-500 text-lg"></div>
+            
+            <div id="product-layout" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- LEWA KOLUMNA: ZDJĘCIA -->
+                <div class="space-y-6">
+                    <!-- Główne Zdjęcie -->
+                    <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden shadow-2xl border border-stone-100 group cursor-zoom-in" onclick="openLightbox(window.currentImgIndex)">
+                         <img id="main-product-img" src="" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                             <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-50 group-hover:scale-100"></i>
+                         </div>
+                    </div>
+                    
+                    <!-- Karuzela Miniatur -->
+                    <div id="product-thumbnails" class="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                        <!-- Tu JS wstawi miniaturki -->
+                    </div>
+                </div>
+
+                <!-- PRAWA KOLUMNA: OPIS -->
+                <div class="flex flex-col justify-center space-y-8">
+                    <div>
+                        <span id="prod-code" class="inline-block py-1 px-3 bg-stone-100 text-stone-500 text-xs font-mono rounded-lg mb-4">Kod: ---</span>
+                        <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-stone-900 mb-4 leading-tight">Nazwa Produktu</h2>
+                        <p id="prod-price" class="text-3xl font-bold text-wood-600">0.00 PLN</p>
+                    </div>
+
+                    <div class="w-full h-px bg-stone-100"></div>
+
+                    <div>
+                        <h4 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-3">Opis Produktu</h4>
+                        <p id="prod-desc" class="text-stone-600 text-lg leading-relaxed whitespace-pre-line">Brak opisu.</p>
+                    </div>
+
+                    <div class="pt-6">
+                        <a href="#contact" onclick="goHome()" class="inline-flex items-center gap-3 px-8 py-4 bg-wood-600 text-white rounded-full font-bold hover:bg-wood-700 transition shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                            <i class="fa-regular fa-envelope"></i> Zapytaj o ten produkt
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
     </div>
 
-    <div id="lightbox" class="fixed inset-0 z-[5000] bg-stone-950/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer backdrop-blur-sm" onclick="closeLightbox()">
-        <div class="relative max-w-7xl max-h-screen w-full flex flex-col items-center justify-center p-4" onclick="event.stopPropagation()">
-            <img id="lightbox-img" src="" alt="Powiększenie" class="lightbox-img rounded-lg shadow-2xl">
-            <button class="absolute top-4 right-4 text-white/50 hover:text-white transition" onclick="closeLightbox()">
-                <i class="fa-solid fa-xmark text-4xl"></i>
-            </button>
-            <p class="text-white/60 mt-4 text-sm font-medium">Kliknij poza zdjęcie, aby zamknąć</p>
+    <!-- ULEPSZONY LIGHTBOX (Pełny ekran ze strzałkami) -->
+    <div id="lightbox" class="fixed inset-0 z-[5000] bg-stone-950/95 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 cursor-pointer backdrop-blur-md" onclick="closeLightbox()">
+        
+        <!-- Przycisk Zamknij -->
+        <button class="absolute top-6 right-6 text-white/50 hover:text-white transition z-[5010] p-4" onclick="closeLightbox()">
+            <i class="fa-solid fa-xmark text-4xl"></i>
+        </button>
+
+        <!-- Strzałka LEWO -->
+        <button onclick="event.stopPropagation(); changeLightboxImage(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white p-6 transition z-[5010] hidden md:block hover:bg-white/5 rounded-full">
+            <i class="fa-solid fa-chevron-left text-4xl"></i>
+        </button>
+
+        <!-- Kontener Zdjęcia -->
+        <div class="relative max-w-7xl max-h-screen w-full flex flex-col items-center justify-center p-2" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Powiększenie" class="rounded-lg shadow-2xl max-h-[85vh] object-contain transition-all duration-300">
+            <p id="lightbox-counter" class="text-white/40 mt-4 text-sm font-mono">1 / 5</p>
         </div>
+
+        <!-- Strzałka PRAWO -->
+        <button onclick="event.stopPropagation(); changeLightboxImage(1)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white p-6 transition z-[5010] hidden md:block hover:bg-white/5 rounded-full">
+            <i class="fa-solid fa-chevron-right text-4xl"></i>
+        </button>
     </div>
 
     <!-- 6. PANEL ADMINISTRATORA (CMS) -->
@@ -670,6 +742,10 @@
         // Zmienne do auto-scrolla
         let categoryAutoScroll = null;
         let isLoopJump = false; // Flaga do kontrolowania skoków pętli
+
+        // Zmienne do galerii / lightboxa
+        window.currentLightboxImages = [];
+        window.currentImgIndex = 0;
 
         // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
@@ -1194,6 +1270,8 @@
                         <input id="p-price" class="calc-input" placeholder="Szacowana cena (np. 50 PLN)">
                     </div>
 
+                    <textarea id="p-desc" class="calc-input h-24" placeholder="Opis produktu (opcjonalnie)..."></textarea>
+
                     <input id="p-i" class="calc-input" placeholder="Wklej link do miniatury">
                     
                     <div class="flex gap-2">
@@ -1227,6 +1305,7 @@
                 const img = document.getElementById('p-i').value;
                 const code = document.getElementById('p-code').value;
                 const price = document.getElementById('p-price').value;
+                const desc = document.getElementById('p-desc').value;
                 
                 const editIndex = document.getElementById('edit-prod-index').value;
                 const editCatId = document.getElementById('edit-prod-cat-id').value;
@@ -1239,6 +1318,7 @@
                         product.image = img;
                         product.code = code;
                         product.price = price;
+                        product.desc = desc;
                         
                         document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano produkt!";
                     } else {
@@ -1250,6 +1330,7 @@
                             image: img, 
                             code: code,
                             price: price,
+                            desc: desc,
                             isHidden: false 
                         });
                         siteData.galleries[sid] = { images: [] };
@@ -1295,6 +1376,7 @@
             document.getElementById('p-i').value = product.image;
             document.getElementById('p-code').value = product.code || '';
             document.getElementById('p-price').value = product.price || '';
+            document.getElementById('p-desc').value = product.desc || '';
             
             document.getElementById('p-cat').value = catId;
             document.getElementById('p-cat').disabled = true; // Lock category change during edit to prevent complexity
@@ -1351,6 +1433,7 @@
                             ${s.price ? `<span class="bg-wood-100 text-wood-700 text-xs font-bold px-2 py-1 rounded-lg shadow-sm whitespace-nowrap">${s.price}</span>` : ''}
                         </div>
                         ${s.code ? `<span class="text-xs text-stone-400 font-mono">Kod: ${s.code}</span>` : ''}
+                        ${s.desc ? `<p class="text-sm text-stone-500 line-clamp-2 mt-2 leading-snug">${s.desc}</p>` : ''}
                         
                         <div class="mt-4 flex justify-end">
                             <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition">
@@ -1370,34 +1453,92 @@
             window.scrollTo(0,0);
         };
 
+        // --- ZMODYFIKOWANA LOGIKA: WIDOK PRODUKTU (Zastępuje starą Galerię) ---
         window.openGallery = (sid, title, cid) => {
-            const g = siteData.galleries[sid] || { images: [] };
-            document.getElementById('gallery-title').textContent = title;
+            // 1. Znajdź pełny obiekt produktu, żeby pobrać opis, kod, cenę
+            const category = siteData.categories[cid];
+            const product = category ? category.subcategories.find(s => s.id === sid) : null;
+            
+            if (!product) return;
+
+            // Ustaw dane tekstowe
+            document.getElementById('prod-title').textContent = product.title;
+            document.getElementById('prod-code').textContent = product.code ? `Kod: ${product.code}` : 'Kod: ---';
+            document.getElementById('prod-price').textContent = product.price || '--- PLN';
+            document.getElementById('prod-desc').textContent = product.desc || 'Brak opisu.';
+            
             document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategories(cid);
             
-            const grid = document.getElementById('gallery-grid'); 
-            grid.innerHTML = '';
+            // 2. Przygotuj listę zdjęć (Okładka + Galeria)
+            const galleryData = siteData.galleries[sid] || { images: [] };
+            
+            // Scalamy: [Obrazek Główny Produktu] + [Zdjęcia z Galerii]
+            // Dodajemy 'isCover: true' dla pierwszego, żeby łatwiej zarządzać
+            const allImages = [
+                { src: product.image, isCover: true }, 
+                ...galleryData.images
+            ];
 
-            if(g.images.length === 0) {
-                grid.innerHTML = '<p class="text-stone-500 col-span-4 text-center">Galeria jest pusta.</p>';
+            // Zapisz globalnie, by lightbox miał dostęp
+            window.currentLightboxImages = allImages;
+            window.currentImgIndex = 0; // Reset index
+
+            // 3. Renderuj Główne Zdjęcie
+            const mainImgEl = document.getElementById('main-product-img');
+            mainImgEl.src = allImages[0].src;
+
+            // 4. Renderuj Miniaturki (Karuzela)
+            const thumbsContainer = document.getElementById('product-thumbnails');
+            thumbsContainer.innerHTML = '';
+            
+            if(allImages.length > 1) {
+                allImages.forEach((img, i) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = img.src;
+                    thumb.className = `w-20 h-20 rounded-xl object-cover cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`;
+                    
+                    // Kliknięcie w miniaturkę zmienia główne zdjęcie
+                    thumb.onclick = () => {
+                        window.updateMainImage(i);
+                    };
+                    
+                    thumbsContainer.appendChild(thumb);
+                });
+            } else {
+                thumbsContainer.innerHTML = '<span class="text-xs text-stone-400">Brak dodatkowych zdjęć.</span>';
             }
 
-            g.images.forEach((img, i) => {
-                const div = document.createElement('div');
-                div.className = "relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition group";
-                div.onclick = () => window.openLightbox(img.src);
-                div.innerHTML = `
-                    <img src="${img.src}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
-                    <button onclick="event.stopPropagation(); window.delImg('${sid}',${i},'${cid}','${title}')" class="admin-controls absolute top-3 right-3 bg-red-500 text-white w-8 h-8 rounded-lg items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 flex transition">
-                        <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                `;
-                grid.appendChild(div);
-            });
-            
+            // Pokaż widok
             document.getElementById('subcategory-view').classList.add('hidden');
             document.getElementById('gallery-view').classList.remove('hidden'); 
             window.scrollTo(0,0);
+        };
+
+        window.updateMainImage = (index) => {
+            window.currentImgIndex = index;
+            const mainImg = document.getElementById('main-product-img');
+            const images = window.currentLightboxImages;
+            
+            if(images[index]) {
+                // Efekt fade
+                mainImg.style.opacity = '0.5';
+                setTimeout(() => {
+                    mainImg.src = images[index].src;
+                    mainImg.style.opacity = '1';
+                }, 150);
+                
+                // Aktualizuj style miniaturek
+                const thumbs = document.getElementById('product-thumbnails').children;
+                for(let i=0; i<thumbs.length; i++) {
+                    if(i === index) {
+                        thumbs[i].classList.add('thumb-active');
+                        thumbs[i].classList.remove('opacity-60');
+                    } else {
+                        thumbs[i].classList.remove('thumb-active');
+                        thumbs[i].classList.add('opacity-60');
+                    }
+                }
+            }
         };
 
         // --- USUWANIE ---
@@ -1421,13 +1562,48 @@
         
         window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGallery(sid, t, cid); } };
 
-        // --- UI ---
-        window.openLightbox = (src) => { 
+        // --- UI LIGHTBOX (Poprawione) ---
+        window.openLightbox = (index = 0) => { 
             const lb = document.getElementById('lightbox');
-            document.getElementById('lightbox-img').src = src; 
-            lb.classList.remove('hidden'); 
-            setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+            const imgEl = document.getElementById('lightbox-img');
+            const counterEl = document.getElementById('lightbox-counter');
+            
+            window.currentImgIndex = index;
+            const images = window.currentLightboxImages;
+
+            if(images.length > 0 && images[index]) {
+                imgEl.src = images[index].src;
+                counterEl.textContent = `${index + 1} / ${images.length}`;
+                
+                lb.classList.remove('hidden'); 
+                setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+            }
         };
+
+        window.changeLightboxImage = (direction) => {
+            const images = window.currentLightboxImages;
+            if(!images || images.length === 0) return;
+
+            let newIndex = window.currentImgIndex + direction;
+            
+            // Loop navigation
+            if(newIndex >= images.length) newIndex = 0;
+            if(newIndex < 0) newIndex = images.length - 1;
+
+            window.currentImgIndex = newIndex;
+            
+            const imgEl = document.getElementById('lightbox-img');
+            const counterEl = document.getElementById('lightbox-counter');
+            
+            // Simple fade effect
+            imgEl.style.opacity = 0.5;
+            setTimeout(() => {
+                imgEl.src = images[newIndex].src;
+                counterEl.textContent = `${newIndex + 1} / ${images.length}`;
+                imgEl.style.opacity = 1;
+            }, 150);
+        };
+
         window.closeLightbox = () => { 
             const lb = document.getElementById('lightbox');
             lb.classList.replace('opacity-100','opacity-0'); 
