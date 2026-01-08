@@ -754,7 +754,10 @@
             if (!container || !siteData.heroItems) return;
             container.innerHTML = siteData.heroItems.map((it, idx) => `
                 <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-                    ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover">` : `<video src="${it.url}" class="w-full h-full object-cover" muted autoplay loop></video>`}
+                    <!-- ZMIANA: Dodano object-center, aby grafika była zawsze wyśrodkowana -->
+                    ${it.type === 'image' 
+                        ? `<img src="${it.url}" class="w-full h-full object-cover object-center">` 
+                        : `<video src="${it.url}" class="w-full h-full object-cover object-center" muted autoplay loop></video>`}
                 </div>
             `).join('');
             
