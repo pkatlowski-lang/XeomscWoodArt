@@ -84,6 +84,17 @@
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
         
+        /* AGRESYWNE UKRYWANIE KONTROLEK WIDEO */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        video::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        
         .fade-in {
             animation: fadeIn 0.6s ease-out forwards;
             opacity: 0;
@@ -318,7 +329,10 @@
             <div class="absolute inset-0 z-0" id="hero-carousel-container">
                 <div class="w-full h-full bg-stone-200 animate-pulse"></div>
             </div>
-            <div class="absolute inset-0 bg-stone-900/40 z-10 pointer-events-none"></div>
+            
+            <!-- ZMIANA: Usunięto 'pointer-events-none' z warstwy overlay. -->
+            <!-- Teraz ta warstwa blokuje myszkę, więc wideo pod spodem jest nieklikalne -->
+            <div class="absolute inset-0 bg-stone-900/40 z-10"></div>
             
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
@@ -763,7 +777,7 @@
                     <!-- ZMIANA: Dodano object-center, aby grafika była zawsze wyśrodkowana -->
                     ${it.type === 'image' 
                         ? `<img src="${it.url}" class="w-full h-full object-cover object-center">` 
-                        : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture></video>`}
+                        : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
                 </div>
             `).join('');
             
