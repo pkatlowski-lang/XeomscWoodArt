@@ -361,8 +361,8 @@
                 <h2 class="text-4xl font-bold mb-4 text-stone-900">Moje Realizacje</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 
-                <!-- Wrapper dla karuzeli z przyciskami -->
-                <div class="relative group">
+                <!-- Wrapper dla karuzeli z przyciskami i Auto-Scroll Events -->
+                <div class="relative group" onmouseenter="window.stopAutoScroll()" onmouseleave="window.startAutoScroll()">
                     <button onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
@@ -653,6 +653,9 @@
         let db, auth, siteData = {};
         let isOnline = false;
         let lastError = "";
+        
+        // Zmienne do auto-scrolla
+        let categoryAutoScroll = null;
 
         // Dane domyślne (w tym nowe pola tekstowe)
         const initialData = {
@@ -679,14 +682,39 @@
             }
         };
         
-        // Funkcja przewijania kategorii (Dodana)
-        window.scrollCategories = (direction) => {
+        // Funkcja przewijania kategorii (Zaktualizowana: Pętla + Auto)
+        window.scrollCategories = (direction, isAuto = false) => {
             const container = document.getElementById('main-categories-grid');
-            if(container) {
-                // Przewija o jedną "kartę" (400px + gap)
-                const scrollAmount = window.innerWidth < 768 ? 320 : 420; 
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            if(!container) return;
+
+            const scrollAmount = window.innerWidth < 768 ? 320 : 420;
+            const currentScroll = container.scrollLeft;
+            const maxScroll = container.scrollWidth - container.clientWidth;
+
+            // Logika zapętlania
+            if (direction === 1 && currentScroll >= maxScroll - 10) {
+                // Jeśli jesteśmy na końcu i klikamy prawo -> skocz na początek
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+                return;
+            } else if (direction === -1 && currentScroll <= 10) {
+                 // Jeśli jesteśmy na początku i klikamy lewo -> skocz na koniec
+                container.scrollTo({ left: maxScroll, behavior: 'smooth' });
+                return;
             }
+
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        };
+        
+        // Funkcje sterujące auto-scrollem
+        window.startAutoScroll = () => {
+            window.stopAutoScroll();
+            categoryAutoScroll = setInterval(() => {
+                window.scrollCategories(1, true);
+            }, 3000); // Co 3 sekundy
+        };
+
+        window.stopAutoScroll = () => {
+            if(categoryAutoScroll) clearInterval(categoryAutoScroll);
         };
 
         // --- RENDEROWANIE TREŚCI ---
@@ -741,7 +769,7 @@
             }, 6000);
         }
 
-        // --- RENDEROWANIE KATEGORII (Zmienione style dla karuzeli) ---
+        // --- RENDEROWANIE KATEGORII (Zmienione: Sortowanie + Start AutoScroll) ---
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (!grid) return; 
@@ -751,10 +779,13 @@
                 grid.innerHTML = '<p class="text-stone-400 w-full text-center py-10">Brak kategorii. Dodaj je w panelu admina.</p>';
                 return;
             }
+            
+            // SORTOWANIE ALFABETYCZNE
+            const sortedCategories = Object.entries(siteData.categories)
+                .sort(([, a], [, b]) => a.title.localeCompare(b.title, 'pl'));
 
-            Object.entries(siteData.categories).forEach(([id, c]) => {
+            sortedCategories.forEach(([id, c]) => {
                 const div = document.createElement('div');
-                // Zmiana klas: dodano min-w-... i snap-center
                 div.className = "group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in min-w-[320px] md:min-w-[400px] snap-center shrink-0";
                 div.onclick = () => window.openSubcategories(id);
                 div.innerHTML = `
@@ -773,6 +804,9 @@
                     </div>`;
                 grid.appendChild(div);
             });
+            
+            // Uruchom auto-scroll po wyrenderowaniu
+            window.startAutoScroll();
         }
 
         // --- LOGIKA ARKUSZA KALKULACYJNEGO ---
@@ -1278,7 +1312,7 @@
         window.handleLogin = () => {
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
-            if(u === 'admin' && p === '12345') {
+            if(u === 'AdminXeons1308' && p === 'Ktymnyy5') {
                 sessionStorage.setItem('xeomsc_admin', 'true');
                 location.reload();
             } else {
