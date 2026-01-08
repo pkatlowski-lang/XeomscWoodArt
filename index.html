@@ -763,7 +763,7 @@
                     <!-- ZMIANA: Dodano object-center, aby grafika była zawsze wyśrodkowana -->
                     ${it.type === 'image' 
                         ? `<img src="${it.url}" class="w-full h-full object-cover object-center">` 
-                        : `<video src="${it.url}" class="w-full h-full object-cover object-center" muted autoplay loop></video>`}
+                        : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture></video>`}
                 </div>
             `).join('');
             
