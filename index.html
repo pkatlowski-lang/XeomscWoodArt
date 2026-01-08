@@ -973,6 +973,55 @@
         };
 
         // --- ZMODYFIKOWANA LOGIKA: WIDOK PRODUKTU ---
+        
+        // NOWE: Funkcja otwierająca widok podkategorii (Lista produktów) - BRAKUJĄCY ELEMENT PRZYWRÓCONY!
+        window.openSubcategories = (id) => {
+            const cat = siteData.categories[id];
+            if (!cat) return;
+
+            // Ustaw tytuł
+            const titleEl = document.getElementById('subcategory-title');
+            if(titleEl) titleEl.textContent = cat.title;
+
+            // Renderuj grid produktów
+            const grid = document.getElementById('subcategory-grid');
+            if(grid) {
+                grid.innerHTML = '';
+                if (cat.subcategories && cat.subcategories.length > 0) {
+                    grid.innerHTML = cat.subcategories.map((sub, index) => {
+                        if (sub.isHidden) return ''; 
+                        
+                        return `
+                        <div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${sub.id}', '${sub.title}', '${id}')" style="animation-delay: ${index * 50}ms">
+                            <div class="h-64 overflow-hidden relative">
+                                <img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                                    <span class="bg-white/90 text-stone-900 px-6 py-2 rounded-full font-bold text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition duration-300 shadow-lg">Zobacz szczegóły</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <p class="text-wood-600 font-bold text-lg">${sub.price || 'Wycena'} PLN</p>
+                                    <span class="text-xs text-stone-400 uppercase tracking-wider font-medium">Kliknij</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów w tej kategorii.</p></div>';
+                }
+            }
+
+            // Przełącz widok
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('gallery-view').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.remove('hidden');
+            window.scrollTo(0,0);
+        };
+
         window.openGallery = (sid, title, cid) => {
             const category = siteData.categories[cid];
             const product = category ? category.subcategories.find(s => s.id === sid) : null;
