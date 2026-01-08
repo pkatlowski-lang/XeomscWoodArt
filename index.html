@@ -1160,6 +1160,7 @@
                             <div class="flex items-center gap-3">
                                 <img src="${sub.image}" class="w-8 h-8 rounded-md object-cover">
                                 <span class="text-sm font-bold text-white">${sub.title}</span>
+                                ${sub.code ? `<span class="text-[9px] bg-stone-700 text-stone-300 px-1.5 py-0.5 rounded font-mono ml-2">${sub.code}</span>` : ''}
                                 ${sub.isHidden ? '<span class="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded uppercase font-bold">UKRYTY</span>' : ''}
                             </div>
                             <div class="flex gap-2">
@@ -1187,6 +1188,12 @@
                     
                     <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
                     <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="p-code" class="calc-input" placeholder="Kod produktu (np. G-001)">
+                        <input id="p-price" class="calc-input" placeholder="Szacowana cena (np. 50 PLN)">
+                    </div>
+
                     <input id="p-i" class="calc-input" placeholder="Wklej link do miniatury">
                     
                     <div class="flex gap-2">
@@ -1218,6 +1225,8 @@
                 const cid = document.getElementById('p-cat').value;
                 const t = document.getElementById('p-t').value;
                 const img = document.getElementById('p-i').value;
+                const code = document.getElementById('p-code').value;
+                const price = document.getElementById('p-price').value;
                 
                 const editIndex = document.getElementById('edit-prod-index').value;
                 const editCatId = document.getElementById('edit-prod-cat-id').value;
@@ -1228,12 +1237,21 @@
                         const product = siteData.categories[editCatId].subcategories[editIndex];
                         product.title = t;
                         product.image = img;
+                        product.code = code;
+                        product.price = price;
                         
                         document.getElementById('toast-notification').querySelector('span').textContent = "Zaktualizowano produkt!";
                     } else {
                         // Add Mode
                         const sid = 's' + Date.now();
-                        siteData.categories[cid].subcategories.push({ id: sid, title: t, image: img, isHidden: false });
+                        siteData.categories[cid].subcategories.push({ 
+                            id: sid, 
+                            title: t, 
+                            image: img, 
+                            code: code,
+                            price: price,
+                            isHidden: false 
+                        });
                         siteData.galleries[sid] = { images: [] };
                         
                         document.getElementById('toast-notification').querySelector('span').textContent = "Dodano produkt!";
@@ -1275,6 +1293,9 @@
             
             document.getElementById('p-t').value = product.title;
             document.getElementById('p-i').value = product.image;
+            document.getElementById('p-code').value = product.code || '';
+            document.getElementById('p-price').value = product.price || '';
+            
             document.getElementById('p-cat').value = catId;
             document.getElementById('p-cat').disabled = true; // Lock category change during edit to prevent complexity
             
@@ -1324,10 +1345,17 @@
                     <div class="h-64 overflow-hidden">
                         <img src="${s.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="p-6 flex justify-between items-center">
-                        <span class="font-bold text-xl text-stone-800">${s.title}</span>
-                        <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
-                            <i class="fa-solid fa-chevron-right"></i>
+                    <div class="p-6 flex flex-col gap-2">
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-xl text-stone-800">${s.title}</span>
+                            ${s.price ? `<span class="bg-wood-100 text-wood-700 text-xs font-bold px-2 py-1 rounded-lg shadow-sm whitespace-nowrap">${s.price}</span>` : ''}
+                        </div>
+                        ${s.code ? `<span class="text-xs text-stone-400 font-mono">Kod: ${s.code}</span>` : ''}
+                        
+                        <div class="mt-4 flex justify-end">
+                            <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
                         </div>
                     </div>
                     <button onclick="event.stopPropagation(); window.delSub('${id}',${originalIndex})" class="admin-controls absolute top-4 right-4 bg-red-500 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:scale-110 transition">
