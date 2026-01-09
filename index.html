@@ -369,7 +369,7 @@
                 <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
                 <a href="#portfolio" onclick="goHome()" class="hover:text-wood-600 transition">Nasze Produkty</a>
                 <a href="#custom-orders" onclick="goHome()" class="hover:text-wood-600 transition">Zrealizowane Zlecenia</a>
-                <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Wycena</a>
+                <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Kontakt</a>
             </div>
 
             <div class="md:hidden flex items-center">
@@ -385,7 +385,7 @@
                 <a href="#about" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">O ofercie</a>
                 <a href="#portfolio" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Nasze Produkty</a>
                 <a href="#custom-orders" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Zrealizowane Zlecenia</a>
-                <a href="#contact" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl bg-wood-50 text-wood-700 font-bold">Wycena</a>
+                <a href="#contact" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl bg-wood-50 text-wood-700 font-bold">Kontakt</a>
             </div>
         </div>
     </nav>
@@ -417,7 +417,7 @@
                             Zobacz nasze prace
                         </a>
                         <a href="#contact" class="px-10 py-4 bg-white/90 backdrop-blur text-stone-900 rounded-full hover:bg-white transition shadow-xl font-bold text-center">
-                            Wycena projektu
+                            Napisz do nas
                         </a>
                     </div>
                 </div>
@@ -485,13 +485,15 @@
                  <h2 class="text-4xl font-bold mb-6">Kontakt i Wycena</h2>
                  <p id="contact-desc" class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe.</p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="flex flex-col items-center justify-center p-10 bg-white rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group shadow-sm">
-                        <div class="w-16 h-16 bg-stone-50 rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
+                    <!-- PRZEBUDOWANY PRZYCISK KONTAKTU -->
+                    <div onclick="openGeneralContactModal()" class="flex flex-col items-center justify-center p-10 bg-white rounded-[2.5rem] border border-stone-100 hover:border-wood-600 hover:bg-wood-50 cursor-pointer transition group shadow-sm transform hover:-translate-y-1">
+                        <span class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4 group-hover:text-wood-600 transition">Kliknij</span>
+                        <div class="w-20 h-20 bg-stone-50 rounded-full shadow-md flex items-center justify-center text-wood-600 text-3xl mb-6 group-hover:scale-110 group-hover:bg-wood-600 group-hover:text-white transition duration-300">
                             <i class="fa-solid fa-envelope"></i>
                         </div>
-                        <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Napisz do nas</span>
-                        <span id="contact-email" class="font-bold text-2xl text-stone-900 break-all">pkatlowski@gmail.com</span>
+                        <span class="font-bold text-2xl text-stone-900 group-hover:text-wood-700 transition">Wyślij Wiadomość</span>
                     </div>
+
                     <div class="flex flex-col items-center justify-center p-10 bg-white rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group shadow-sm">
                         <div class="w-16 h-16 bg-stone-50 rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
                             <i class="fa-solid fa-phone"></i>
@@ -614,7 +616,11 @@
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twój Email</label>
                     <input type="email" id="contact-email-input" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="np. jan@example.com">
                 </div>
-                <div class="border-t border-b border-stone-100 py-4 my-2">
+                
+                <!-- SEKCJONOWANIE TREŚCI -->
+                
+                <!-- Opcja 1: Kody Produktów (Tylko przy zapytaniu o produkt) -->
+                <div id="product-codes-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
                     <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Kody Produktów</label>
                     <div id="product-codes-container" class="space-y-3">
                         <div class="flex gap-2">
@@ -625,13 +631,23 @@
                         <i class="fa-solid fa-plus-circle"></i> Dodaj kolejny kod produktu
                     </button>
                 </div>
+
+                <!-- Opcja 2: Upload Zdjęć (Tylko przy ogólnym kontakcie) -->
+                <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
+                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie)</label>
+                    <div class="relative">
+                        <input type="file" id="contact-file-input" accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
+                    </div>
+                    <p class="text-[10px] text-stone-400 mt-1">Zdjęcie zostanie wysłane do administratora.</p>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Treść Wiadomości / Zapytanie</label>
-                    <textarea id="contact-message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition h-32 resize-none" placeholder="Dzień dobry, interesuje mnie ten produkt..."></textarea>
+                    <textarea id="contact-message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition h-32 resize-none" placeholder="Dzień dobry, chciałbym zapytać o..."></textarea>
                 </div>
             </div>
             <div class="p-6 border-t border-stone-100 bg-stone-50 shrink-0">
-                <button onclick="submitContactForm()" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2">
+                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Wyślij zapytanie
                 </button>
             </div>
@@ -714,6 +730,17 @@
                             <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Telefon</label><input id="edit-contact-phone" class="calc-input"></div>
                             <div><label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Tekst zachęcający do wyceny</label><textarea id="edit-contact-desc" class="calc-input h-24"></textarea></div>
                         </div>
+                        
+                         <!-- NOWE POLE DLA API IMGBB -->
+                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 space-y-4 lg:col-span-2">
+                            <h4 class="font-bold text-wood-500 uppercase text-xs tracking-widest border-b border-white/5 pb-4">Konfiguracja API (Upload Zdjęć)</h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-2">Klucz API ImgBB (Wymagany do uploadu)</label>
+                                <input id="edit-imgbb-key" class="calc-input" placeholder="Wklej klucz API z imgbb.com">
+                                <p class="text-[10px] text-stone-500 mt-1">Darmowy klucz zdobędziesz na <a href="https://api.imgbb.com/" target="_blank" class="text-wood-500 underline">api.imgbb.com</a>.</p>
+                            </div>
+                        </div>
+
                         <div class="lg:col-span-2"><button onclick="saveContentSettings()" class="w-full py-4 bg-wood-600 hover:bg-wood-500 rounded-xl font-bold shadow-lg transition text-lg"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Zapisz wszystkie zmiany w chmurze</button></div>
                     </div>
                 </div>
@@ -854,6 +881,7 @@
             galleries: {},
             customOrders: [], // Tablica linków do zdjęć
             calcSettings: { rateLaserMin: 0.50, rateCm2: 0.0038, overhead: 10, margin: 20 },
+            imgbbKey: "", // Klucz do uploadu zdjęć
             textContent: {
                 hero: {
                     main: "Precyzja Lasera,<br>Ciepło",
@@ -1132,20 +1160,45 @@
             await saveData();
         };
 
-        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO ---
+        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO (ZMODYFIKOWANA) ---
+        
+        // Funkcja do otwierania modalu z kodem produktu (Zapytanie ofertowe)
         window.openContactModal = (defaultCode = '') => {
             const modal = document.getElementById('contact-modal');
-            const container = document.getElementById('product-codes-container');
-            container.innerHTML = `
+            const codeContainer = document.getElementById('product-codes-container');
+            
+            // Konfiguracja widoku
+            document.getElementById('product-codes-section').classList.remove('hidden');
+            document.getElementById('contact-upload-section').classList.add('hidden');
+            
+            codeContainer.innerHTML = `
                 <div class="flex gap-2">
                     <input type="text" name="product-code" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" placeholder="Kod produktu" value="${defaultCode}">
                 </div>
             `;
+            
+            resetFormFields();
+            modal.classList.remove('hidden');
+        };
+
+        // Funkcja do otwierania modalu ogólnego (Napisz do nas)
+        window.openGeneralContactModal = () => {
+            const modal = document.getElementById('contact-modal');
+            
+            // Konfiguracja widoku
+            document.getElementById('product-codes-section').classList.add('hidden');
+            document.getElementById('contact-upload-section').classList.remove('hidden');
+            
+            resetFormFields();
+            modal.classList.remove('hidden');
+        };
+
+        function resetFormFields() {
             document.getElementById('contact-name').value = '';
             document.getElementById('contact-email-input').value = '';
             document.getElementById('contact-message').value = '';
-            modal.classList.remove('hidden');
-        };
+            document.getElementById('contact-file-input').value = ''; // Reset pliku
+        }
 
         window.closeContactModal = () => {
             document.getElementById('contact-modal').classList.add('hidden');
@@ -1161,11 +1214,48 @@
             `;
             container.appendChild(div);
         };
+        
+        // Funkcja pomocnicza: Upload do ImgBB
+        async function uploadImageToImgBB(file) {
+            const apiKey = siteData.imgbbKey;
+            if(!apiKey) {
+                alert("Błąd konfiguracji: Administrator nie ustawił klucza API ImgBB w panelu CMS.");
+                return null;
+            }
+            
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                if(data.success) {
+                    return data.data.url;
+                } else {
+                    console.error("ImgBB Error:", data);
+                    alert("Błąd przesyłania zdjęcia. Spróbuj ponownie.");
+                    return null;
+                }
+            } catch(e) {
+                console.error("Upload error:", e);
+                alert("Wystąpił błąd podczas połączenia z serwerem zdjęć.");
+                return null;
+            }
+        }
 
         window.submitContactForm = async () => {
+            const btn = document.getElementById('submit-contact-btn');
+            const originalBtnText = btn.innerHTML;
+            
             const name = document.getElementById('contact-name').value;
             const email = document.getElementById('contact-email-input').value;
             const message = document.getElementById('contact-message').value;
+            
+            // Sprawdzenie czy to formularz produktowy czy ogólny
+            const isProductMode = !document.getElementById('product-codes-section').classList.contains('hidden');
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if(!emailRegex.test(email)) {
@@ -1173,16 +1263,48 @@
                 return;
             }
             
-            const codes = Array.from(document.querySelectorAll('input[name="product-code"]'))
-                .map(input => input.value)
-                .filter(val => val.trim() !== '');
-            
             if(!name) { alert("Proszę podać imię."); return; }
 
+            // Logika kodów produktów
+            let codes = [];
+            if(isProductMode) {
+                codes = Array.from(document.querySelectorAll('input[name="product-code"]'))
+                    .map(input => input.value)
+                    .filter(val => val.trim() !== '');
+            }
+
+            // Logika uploadu zdjęcia
+            let imageUrl = null;
+            const fileInput = document.getElementById('contact-file-input');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Wysyłanie...';
+            btn.disabled = true;
+
+            if(!isProductMode && fileInput.files.length > 0) {
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Przesyłanie zdjęcia...';
+                imageUrl = await uploadImageToImgBB(fileInput.files[0]);
+                if(!imageUrl) {
+                    // Upload fail - revert button
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                    return; // Stop submission
+                }
+            }
+
             try {
-                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
-                    name: name, email: email, message: message, codes: codes, date: new Date().toISOString(), read: false
-                });
+                const msgData = {
+                    name: name, 
+                    email: email, 
+                    message: message, 
+                    date: new Date().toISOString(), 
+                    read: false
+                };
+
+                if(isProductMode) msgData.codes = codes;
+                if(imageUrl) msgData.imageUrl = imageUrl;
+
+                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), msgData);
+                
                 document.getElementById('toast-text').textContent = "Wysłano wiadomość!";
                 const toast = document.getElementById('toast-notification');
                 toast.classList.add('show');
@@ -1191,6 +1313,9 @@
             } catch (e) {
                 console.error("Błąd wysyłania:", e);
                 alert("Wystąpił błąd podczas wysyłania wiadomości.");
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
             }
         };
 
@@ -1419,7 +1544,27 @@
                 document.getElementById('edit-contact-email').value = t.contact.email;
                 document.getElementById('edit-contact-phone').value = t.contact.phone;
                 document.getElementById('edit-contact-desc').value = t.contact.desc;
+                // Wczytaj klucz API jeśli istnieje
+                if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
+        };
+
+        window.saveContentSettings = async () => {
+            if(!siteData.textContent) siteData.textContent = initialData.textContent;
+            
+            siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
+            siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
+            siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
+            siteData.textContent.contact.email = document.getElementById('edit-contact-email').value;
+            siteData.textContent.contact.phone = document.getElementById('edit-contact-phone').value;
+            siteData.textContent.contact.desc = document.getElementById('edit-contact-desc').value;
+            
+            // Zapisz klucz API
+            siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
+
+            await saveData();
+            renderTexts();
+            alert("Zapisano zmiany treści i konfiguracji!");
         };
 
         // --- NASŁUCHIWANIE WIADOMOŚCI ---
@@ -1477,6 +1622,7 @@
                                 <div class="col-span-1 text-center text-xs text-stone-500 font-mono">${index + 1}</div>
                                 <div class="col-span-6 md:col-span-7 truncate text-sm ${emailClass}">
                                     ${isUnread ? '<i class="fa-solid fa-circle text-[8px] mr-2 align-middle"></i>' : ''} ${msg.email}
+                                    ${msg.imageUrl ? '<i class="fa-solid fa-paperclip ml-2 text-wood-500" title="Zawiera załącznik"></i>' : ''}
                                 </div>
                                 <div class="col-span-3 text-right text-xs text-stone-500"><span class="block text-stone-300">${dateStr}</span><span class="text-[10px]">${timeStr}</span></div>
                                 <div class="col-span-2 md:col-span-1 text-center">
@@ -1492,6 +1638,17 @@
                                         </div>
                                     </div>
                                     ${msg.codes && msg.codes.length > 0 ? `<div><p class="text-xs text-stone-500 uppercase font-bold mb-2">Dotyczy produktów:</p><div class="flex flex-wrap gap-2">${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono select-all">${c}</span>`).join('')}</div></div>` : ''}
+                                    
+                                    ${msg.imageUrl ? `
+                                    <div class="bg-wood-500/10 p-4 rounded-lg border border-wood-500/20">
+                                        <p class="text-xs text-wood-500 uppercase font-bold mb-2"><i class="fa-solid fa-paperclip"></i> Załącznik</p>
+                                        <a href="${msg.imageUrl}" target="_blank" class="flex items-center gap-3 text-white hover:text-wood-400 transition group">
+                                            <div class="w-16 h-16 rounded overflow-hidden bg-black"><img src="${msg.imageUrl}" class="w-full h-full object-cover"></div>
+                                            <span class="font-bold underline">📷 Zobacz załączone zdjęcie</span>
+                                        </a>
+                                    </div>
+                                    ` : ''}
+
                                     <div><p class="text-xs text-stone-500 uppercase font-bold mb-2">Treść wiadomości</p><div class="text-stone-300 text-sm whitespace-pre-wrap bg-stone-900/50 p-4 rounded-lg border border-white/5">${msg.message}</div></div>
                                     <div class="pt-2"><a href="mailto:${msg.email}?subject=Odp: Zapytanie Xeomsc FusionArt" class="inline-flex items-center gap-2 text-xs font-bold text-wood-500 hover:text-white transition"><i class="fa-solid fa-reply"></i> Odpowiedz Klientowi</a></div>
                                 </div>
@@ -1904,7 +2061,12 @@
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
                                     renderHero(); renderMain(); renderTexts();
-                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) { /* refresh admin inputs if needed */ }
+                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
+                                         // Refresh admin inputs if needed
+                                         if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) {
+                                             document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
+                                         }
+                                    }
                                 } else {
                                     if(sessionStorage.getItem('xeomsc_admin') === 'true') saveData();
                                     else updateDataSourceIndicator('local');
