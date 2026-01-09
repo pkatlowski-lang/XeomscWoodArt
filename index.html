@@ -248,19 +248,48 @@
 
         /* Styl dla skrzynki wiadomości */
         .message-row {
-            transition: all 0.2s;
-            cursor: pointer;
+            transition: background-color 0.2s;
         }
         .message-row:hover {
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255,255,255,0.03);
         }
-        .message-unread {
-            background-color: rgba(180, 83, 9, 0.15); /* wood-600 */
-            border-left: 4px solid #b45309;
+        
+        .msg-unread-indicator {
+            color: #ef4444; /* Czerwony dla nieprzeczytanych */
+            font-weight: bold;
         }
-        .message-read {
-            border-left: 4px solid transparent;
-            opacity: 0.7;
+        .msg-read-indicator {
+            color: #d6d3d1; /* Szary/Biały dla przeczytanych */
+            font-weight: normal;
+        }
+        
+        .msg-content-accordion {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease;
+            opacity: 0;
+        }
+        .msg-content-accordion.open {
+            opacity: 1;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            height: 18px;
+            min-width: 18px;
+            padding: 0 4px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
         }
     </style>
 </head>
@@ -309,8 +338,10 @@
                 <div id="status-dot" class="status-dot status-connecting"></div>
                 <span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Łączenie...</span>
             </div>
-            <button onclick="toggleAdminPanel()" class="bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
+            <button onclick="toggleAdminPanel()" class="relative bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
                 <i class="fa-solid fa-gears"></i> Panel CMS
+                <!-- Badge w pasku -->
+                <span id="msg-count-bar" class="notification-badge hidden">0</span>
             </button>
         </div>
         <button onclick="handleLogout()" class="text-stone-400 hover:text-white font-medium transition flex items-center gap-2 text-xs">
@@ -576,9 +607,11 @@
                     <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.4 - Edycja</p>
                 </div>
                 <nav class="space-y-3 flex-1 overflow-y-auto">
-                    <!-- Dodany przycisk Wiadomości -->
-                    <button onclick="switchAdminView('messages')" id="btn-messages" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
-                        <i class="fa-solid fa-inbox w-6"></i> Wiadomości
+                    <!-- Dodany przycisk Wiadomości z LICZNIKIEM -->
+                    <button onclick="switchAdminView('messages')" id="btn-messages" class="relative admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-inbox w-6"></i> 
+                        <span class="flex-1">Wiadomości</span>
+                        <span id="msg-count-sidebar" class="bg-wood-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
                     </button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
@@ -611,11 +644,19 @@
                     <header class="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
                         <div>
                             <h3 class="text-3xl font-bold mb-2">Skrzynka Odbiorcza</h3>
-                            <p class="text-stone-400">Wiadomości od klientów z formularza kontaktowego.</p>
+                            <p class="text-stone-400">Poniżej znajdziesz wszystkie wiadomości od klientów.</p>
                         </div>
-                        <button onclick="renderMessagesAdmin()" class="bg-stone-800 hover:bg-stone-700 px-4 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-rotate-right"></i> Odśwież</button>
                     </header>
-                    <div id="messages-list" class="space-y-4">
+                    
+                    <!-- NAGŁÓWKI TABELI WIADOMOŚCI -->
+                    <div class="grid grid-cols-12 gap-4 text-xs font-bold text-stone-500 uppercase pb-2 border-b border-white/5 px-2">
+                         <div class="col-span-1 text-center">#</div>
+                         <div class="col-span-6 md:col-span-7">Adres Email</div>
+                         <div class="col-span-3 text-right">Data</div>
+                         <div class="col-span-2 md:col-span-1 text-center">Usuń</div>
+                    </div>
+
+                    <div id="messages-list" class="space-y-1">
                         <p class="text-stone-500 text-center py-10">Ładowanie wiadomości...</p>
                     </div>
                 </div>
@@ -726,7 +767,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, addDoc, collection, deleteDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, addDoc, collection, deleteDoc, updateDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
         // KONFIGURACJA FIREBASE
@@ -748,6 +789,7 @@
         let db, auth, siteData = {};
         let isOnline = false;
         let lastError = "";
+        let messageUnsubscribe = null; // Przechowuje subskrypcję do wiadomości
         
         let categoryAutoScroll = null;
         let isLoopJump = false; 
@@ -975,19 +1017,26 @@
             container.appendChild(div);
         };
 
-        // ZMODYFIKOWANE: Zapis do Firestore zamiast mailto
+        // ZMODYFIKOWANE: Walidacja emaila + Zapis
         window.submitContactForm = async () => {
             const name = document.getElementById('contact-name').value;
             const email = document.getElementById('contact-email-input').value;
             const message = document.getElementById('contact-message').value;
+            
+            // WALIDACJA EMAILA
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!emailRegex.test(email)) {
+                alert("Proszę podać poprawny adres e-mail (np. nazwa@domena.pl).");
+                return;
+            }
             
             // Pobierz wszystkie kody
             const codes = Array.from(document.querySelectorAll('input[name="product-code"]'))
                 .map(input => input.value)
                 .filter(val => val.trim() !== ''); // Usuń puste
             
-            if(!name || !email) {
-                alert("Proszę podać imię i email.");
+            if(!name) {
+                alert("Proszę podać imię.");
                 return;
             }
 
@@ -1223,12 +1272,16 @@
             } else { document.getElementById('login-error').classList.remove('hidden'); }
         };
         
-        window.handleLogout = () => { sessionStorage.removeItem('xeomsc_admin'); location.reload(); };
+        window.handleLogout = () => { 
+            sessionStorage.removeItem('xeomsc_admin'); 
+            if(messageUnsubscribe) messageUnsubscribe(); // Zatrzymaj nasłuchiwanie
+            location.reload(); 
+        };
 
         window.toggleAdminPanel = () => {
             const p = document.getElementById('admin-panel');
             p.classList.toggle('hidden');
-            if(!p.classList.contains('hidden')) window.switchAdminView('messages'); // Domyślnie otwórz wiadomości
+            if(!p.classList.contains('hidden')) window.switchAdminView('messages'); 
         };
         
         window.exitLogin = () => {
@@ -1280,11 +1333,47 @@
             }
         };
 
-        // --- OBSŁUGA SKRZYNKI WIADOMOŚCI ADMINA ---
+        // --- NASŁUCHIWANIE WIADOMOŚCI (REAL-TIME COUNTER) ---
+        function startMessageListener() {
+            // Nasłuchuj na zmiany w kolekcji wiadomości (tylko jeśli admin zalogowany)
+            if (messageUnsubscribe) return; // Już działa
+
+            const q = query(collection(db, `artifacts/${appId}/public/data/messages`));
+            messageUnsubscribe = onSnapshot(q, (snapshot) => {
+                let unreadCount = 0;
+                snapshot.forEach((doc) => {
+                    if (doc.data().read === false) unreadCount++;
+                });
+
+                // Aktualizuj plakietki
+                const badgeBar = document.getElementById('msg-count-bar');
+                const badgeSidebar = document.getElementById('msg-count-sidebar');
+                
+                [badgeBar, badgeSidebar].forEach(el => {
+                    if(unreadCount > 0) {
+                        el.textContent = unreadCount;
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                });
+                
+                // Jeśli jesteśmy w widoku wiadomości, odśwież go dynamicznie
+                const msgView = document.getElementById('view-messages');
+                if(!msgView.classList.contains('hidden')) {
+                    renderMessagesAdmin(); 
+                }
+            }, (error) => {
+                console.error("Błąd nasłuchiwania wiadomości:", error);
+            });
+        }
+
+        // --- OBSŁUGA SKRZYNKI WIADOMOŚCI ADMINA (ZMODYFIKOWANA) ---
         window.renderMessagesAdmin = async () => {
             const container = document.getElementById('messages-list');
-            container.innerHTML = '<p class="text-stone-500 text-center py-10">Ładowanie wiadomości...</p>';
-
+            
+            // Pobieramy dane bezpośrednio, ale użyjemy istniejącego nasłuchu w przyszłości dla optymalizacji
+            // Tutaj pobieramy "snapshot" jednorazowo aby wyrenderować listę
             try {
                 const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/messages`));
                 const messages = [];
@@ -1305,49 +1394,70 @@
                     return;
                 }
 
-                container.innerHTML = messages.map(msg => {
-                    const date = new Date(msg.date).toLocaleString('pl-PL');
+                container.innerHTML = messages.map((msg, index) => {
+                    const dateObj = new Date(msg.date);
+                    const dateStr = dateObj.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+                    const timeStr = dateObj.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                    
                     const isUnread = !msg.read;
-                    const codesBadge = msg.codes && msg.codes.length > 0 
-                        ? `<span class="bg-wood-600/20 text-wood-500 px-2 py-1 rounded text-xs font-bold ml-2">Produkty: ${msg.codes.length}</span>` 
-                        : '';
-
+                    const rowBgClass = isUnread ? 'bg-red-900/10 border-l-4 border-red-500' : 'bg-stone-800 border-l-4 border-transparent opacity-80';
+                    const emailClass = isUnread ? 'text-red-500 font-bold' : 'text-stone-300';
+                    
                     return `
-                        <div class="bg-stone-800 p-6 rounded-xl border border-white/5 message-row ${isUnread ? 'message-unread' : 'message-read'}" id="msg-${msg.id}">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <h4 class="font-bold text-lg text-white">${msg.name || 'Nieznany'}</h4>
-                                        ${isUnread ? '<span class="bg-wood-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Nowa</span>' : ''}
-                                    </div>
-                                    <a href="mailto:${msg.email}" class="text-wood-400 hover:text-wood-300 text-sm flex items-center gap-2 transition">
-                                        <i class="fa-regular fa-envelope"></i> ${msg.email}
-                                    </a>
+                        <div class="rounded-lg overflow-hidden mb-1 transition-all ${rowBgClass}">
+                            <!-- NAGŁÓWEK WIERSZA -->
+                            <div class="grid grid-cols-12 gap-4 items-center p-4 cursor-pointer hover:bg-white/5 transition" onclick="window.toggleMessageDetails('${msg.id}', ${msg.read})">
+                                <div class="col-span-1 text-center text-xs text-stone-500 font-mono">${index + 1}</div>
+                                <div class="col-span-6 md:col-span-7 truncate text-sm ${emailClass}">
+                                    ${isUnread ? '<i class="fa-solid fa-circle text-[8px] mr-2 align-middle"></i>' : ''}
+                                    ${msg.email}
                                 </div>
-                                <div class="text-right">
-                                    <span class="text-stone-500 text-xs block mb-2">${date}</span>
-                                    <div class="flex gap-2 justify-end">
-                                        <button onclick="window.toggleRead('${msg.id}', ${msg.read})" class="p-2 rounded hover:bg-white/10 text-stone-400 hover:text-white transition" title="${msg.read ? 'Oznacz jako nieprzeczytane' : 'Oznacz jako przeczytane'}">
-                                            <i class="fa-regular ${msg.read ? 'fa-envelope' : 'fa-envelope-open'}"></i>
-                                        </button>
-                                        <button onclick="window.delMessage('${msg.id}')" class="p-2 rounded hover:bg-red-500/20 text-red-400 hover:text-red-500 transition" title="Usuń">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
+                                <div class="col-span-3 text-right text-xs text-stone-500">
+                                    <span class="block text-stone-300">${dateStr}</span>
+                                    <span class="text-[10px]">${timeStr}</span>
+                                </div>
+                                <div class="col-span-2 md:col-span-1 text-center">
+                                    <button onclick="event.stopPropagation(); window.delMessage('${msg.id}')" class="text-stone-600 hover:text-red-500 transition p-2">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                             
-                            ${msg.codes && msg.codes.length > 0 ? `
-                                <div class="mb-4 bg-black/20 p-3 rounded-lg border border-white/5">
-                                    <p class="text-xs text-stone-500 uppercase font-bold mb-2">Zapytanie dotyczy produktów (Kody):</p>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono">${c}</span>`).join('')}
+                            <!-- ROZWIJANA TREŚĆ -->
+                            <div id="msg-details-${msg.id}" class="msg-content-accordion bg-black/20 border-t border-white/5">
+                                <div class="p-6 space-y-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-xs text-stone-500 uppercase font-bold">Nadawca</p>
+                                            <p class="text-white text-lg font-bold">${msg.name || 'Brak imienia'}</p>
+                                        </div>
+                                        <div class="text-right">
+                                             <button onclick="window.toggleRead('${msg.id}', ${msg.read})" class="text-xs border border-stone-600 rounded px-3 py-1 hover:bg-white/10 transition ${isUnread ? 'text-stone-300' : 'text-stone-500'}">
+                                                ${isUnread ? 'Oznacz jako przeczytane' : 'Oznacz jako nieprzeczytane'}
+                                             </button>
+                                        </div>
+                                    </div>
+
+                                    ${msg.codes && msg.codes.length > 0 ? `
+                                        <div>
+                                            <p class="text-xs text-stone-500 uppercase font-bold mb-2">Dotyczy produktów:</p>
+                                            <div class="flex flex-wrap gap-2">
+                                                ${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono select-all">${c}</span>`).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+
+                                    <div>
+                                        <p class="text-xs text-stone-500 uppercase font-bold mb-2">Treść wiadomości</p>
+                                        <div class="text-stone-300 text-sm whitespace-pre-wrap bg-stone-900/50 p-4 rounded-lg border border-white/5">${msg.message}</div>
+                                    </div>
+                                    
+                                    <div class="pt-2">
+                                        <a href="mailto:${msg.email}?subject=Odp: Zapytanie Xeomsc FusionArt" class="inline-flex items-center gap-2 text-xs font-bold text-wood-500 hover:text-white transition">
+                                            <i class="fa-solid fa-reply"></i> Odpowiedz Klientowi
+                                        </a>
                                     </div>
                                 </div>
-                            ` : ''}
-                            
-                            <div class="bg-stone-900/50 p-4 rounded-lg text-stone-300 text-sm whitespace-pre-wrap border border-white/5">
-                                ${msg.message || 'Brak treści wiadomości.'}
                             </div>
                         </div>
                     `;
@@ -1359,11 +1469,37 @@
             }
         };
 
+        window.toggleMessageDetails = async (id, isRead) => {
+            const details = document.getElementById(`msg-details-${id}`);
+            const isOpen = details.classList.contains('open');
+            
+            // Zwiń wszystkie inne
+            document.querySelectorAll('.msg-content-accordion').forEach(el => {
+                if(el.id !== `msg-details-${id}`) {
+                    el.style.maxHeight = null;
+                    el.classList.remove('open');
+                }
+            });
+
+            if (isOpen) {
+                details.style.maxHeight = null;
+                details.classList.remove('open');
+            } else {
+                details.classList.add('open');
+                details.style.maxHeight = details.scrollHeight + "px";
+                
+                // Jeśli nieprzeczytana, oznacz jako przeczytana przy otwarciu
+                if (!isRead) {
+                    await window.toggleRead(id, false); // false bo currentStatus to false (nieprzeczytana)
+                }
+            }
+        };
+
         window.delMessage = async (id) => {
             if(confirm("Czy na pewno chcesz usunąć tę wiadomość?")) {
                 try {
                     await deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, id));
-                    document.getElementById(`msg-${id}`).remove();
+                    // Lista odświeży się sama dzięki onSnapshot w startMessageListener -> renderMessagesAdmin
                 } catch(e) { alert("Błąd usuwania: " + e.message); }
             }
         };
@@ -1373,8 +1509,8 @@
                 await updateDoc(doc(db, `artifacts/${appId}/public/data/messages`, id), {
                     read: !currentStatus
                 });
-                renderMessagesAdmin(); // Odśwież listę
-            } catch(e) { alert("Błąd aktualizacji statusu: " + e.message); }
+                // Lista odświeży się sama
+            } catch(e) { console.error("Błąd aktualizacji statusu", e); }
         };
 
         function renderHeroAdmin() {
@@ -1605,7 +1741,12 @@
         observer.observe(document.body, { childList: true, subtree: true });
 
         async function start() {
-            if(sessionStorage.getItem('xeomsc_admin') === 'true') { document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); }
+            if(sessionStorage.getItem('xeomsc_admin') === 'true') { 
+                document.body.classList.add('is-admin'); 
+                document.getElementById('admin-bar').classList.remove('hidden');
+                // Jeśli jesteśmy adminem, uruchom nasłuchiwanie wiadomości od razu
+                setTimeout(() => { if(isOnline) startMessageListener(); }, 1000);
+            }
             else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
             window.addEventListener('hashchange', () => { if(window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
 
@@ -1622,6 +1763,11 @@
                     onAuthStateChanged(auth, (u) => {
                         if(u) {
                             updateStatusUI(true);
+                            // Sprawdź czy jesteśmy adminem po zalogowaniu do firebase
+                            if(sessionStorage.getItem('xeomsc_admin') === 'true') {
+                                startMessageListener();
+                            }
+
                             onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
                                 if (snap.exists()) {
                                     siteData = snap.data();
