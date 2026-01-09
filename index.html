@@ -245,6 +245,23 @@
             opacity: 1;
             transform: scale(1.05);
         }
+
+        /* Styl dla skrzynki wiadomości */
+        .message-row {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .message-row:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+        .message-unread {
+            background-color: rgba(180, 83, 9, 0.15); /* wood-600 */
+            border-left: 4px solid #b45309;
+        }
+        .message-read {
+            border-left: 4px solid transparent;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -252,7 +269,7 @@
     <!-- Toast Notification -->
     <div id="toast-notification">
         <i class="fa-solid fa-check-circle"></i>
-        <span>Zapisano zmiany w chmurze!</span>
+        <span id="toast-text">Zapisano zmiany w chmurze!</span>
     </div>
 
     <!-- Error Banner for Diagnostics -->
@@ -543,7 +560,6 @@
                 <button onclick="submitContactForm()" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Wyślij zapytanie
                 </button>
-                <p class="text-[10px] text-center text-stone-400 mt-2">Kliknięcie otworzy Twój program pocztowy z gotową wiadomością.</p>
             </div>
         </div>
     </div>
@@ -560,6 +576,11 @@
                     <p class="text-stone-500 text-xs mt-2">Zarządzanie treścią v2.4 - Edycja</p>
                 </div>
                 <nav class="space-y-3 flex-1 overflow-y-auto">
+                    <!-- Dodany przycisk Wiadomości -->
+                    <button onclick="switchAdminView('messages')" id="btn-messages" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-inbox w-6"></i> Wiadomości
+                    </button>
+                    <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
                         <i class="fa-solid fa-pen-to-square w-6"></i> Edycja Treści
                     </button>
@@ -584,6 +605,21 @@
             
             <!-- Content Area -->
             <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
+                
+                <!-- NOWY WIDOK: WIADOMOŚCI -->
+                <div id="view-messages" class="admin-view hidden space-y-6">
+                    <header class="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-2">Skrzynka Odbiorcza</h3>
+                            <p class="text-stone-400">Wiadomości od klientów z formularza kontaktowego.</p>
+                        </div>
+                        <button onclick="renderMessagesAdmin()" class="bg-stone-800 hover:bg-stone-700 px-4 py-2 rounded-lg text-sm transition"><i class="fa-solid fa-rotate-right"></i> Odśwież</button>
+                    </header>
+                    <div id="messages-list" class="space-y-4">
+                        <p class="text-stone-500 text-center py-10">Ładowanie wiadomości...</p>
+                    </div>
+                </div>
+
                 <div id="view-content" class="admin-view hidden space-y-10">
                      <header>
                         <h3 class="text-3xl font-bold mb-2">Edycja Treści Strony</h3>
@@ -690,7 +726,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, addDoc, collection, deleteDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
         // KONFIGURACJA FIREBASE
@@ -904,7 +940,7 @@
             await saveData();
         };
 
-        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO (MAILTO) ---
+        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO (ZAPIS DO BAZY) ---
         window.openContactModal = (defaultCode = '') => {
             const modal = document.getElementById('contact-modal');
             const container = document.getElementById('product-codes-container');
@@ -939,7 +975,8 @@
             container.appendChild(div);
         };
 
-        window.submitContactForm = () => {
+        // ZMODYFIKOWANE: Zapis do Firestore zamiast mailto
+        window.submitContactForm = async () => {
             const name = document.getElementById('contact-name').value;
             const email = document.getElementById('contact-email-input').value;
             const message = document.getElementById('contact-message').value;
@@ -954,27 +991,33 @@
                 return;
             }
 
-            // Konstrukcja treści maila
-            const subject = encodeURIComponent(`Zapytanie ofertowe od: ${name}`);
-            const bodyText = `Nowe zapytanie ze strony Xeomsc FusionArt\n\n` +
-                             `Imię: ${name}\n` +
-                             `Email klienta: ${email}\n\n` +
-                             `Interesujące produkty (Kody):\n` +
-                             (codes.length > 0 ? codes.map(c => `- ${c}`).join('\n') : '- Brak kodów / Zapytanie ogólne') + 
-                             `\n\nTreść wiadomości:\n${message}`;
-            
-            const body = encodeURIComponent(bodyText);
-            
-            // Otwórz klienta poczty
-            window.location.href = `mailto:pkatlowski@gmail.com?subject=${subject}&body=${body}`;
-            
-            // Opcjonalnie zamknij modal po chwili
-            setTimeout(() => window.closeContactModal(), 1000);
+            try {
+                // Zapisz do Firestore w kolekcji 'messages'
+                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+                    name: name,
+                    email: email,
+                    message: message,
+                    codes: codes,
+                    date: new Date().toISOString(),
+                    read: false
+                });
+
+                // Pokaż potwierdzenie
+                document.getElementById('toast-text').textContent = "Wysłano wiadomość!";
+                const toast = document.getElementById('toast-notification');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+
+                setTimeout(() => window.closeContactModal(), 1000);
+            } catch (e) {
+                console.error("Błąd wysyłania:", e);
+                alert("Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie.");
+            }
         };
 
         // --- ZMODYFIKOWANA LOGIKA: WIDOK PRODUKTU ---
         
-        // NOWE: Funkcja otwierająca widok podkategorii (Lista produktów) - BRAKUJĄCY ELEMENT PRZYWRÓCONY!
+        // NOWE: Funkcja otwierająca widok podkategorii (Lista produktów)
         window.openSubcategories = (id) => {
             const cat = siteData.categories[id];
             if (!cat) return;
@@ -1089,6 +1132,7 @@
             siteData.textContent = t;
             await saveData();
             renderTexts(); 
+            document.getElementById('toast-text').textContent = "Zapisano zmiany w chmurze!";
             const toast = document.getElementById('toast-notification');
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
@@ -1184,7 +1228,7 @@
         window.toggleAdminPanel = () => {
             const p = document.getElementById('admin-panel');
             p.classList.toggle('hidden');
-            if(!p.classList.contains('hidden')) window.switchAdminView('content');
+            if(!p.classList.contains('hidden')) window.switchAdminView('messages'); // Domyślnie otwórz wiadomości
         };
         
         window.exitLogin = () => {
@@ -1201,7 +1245,9 @@
             const btn = document.getElementById(`btn-${id}`);
             if (btn) btn.classList.add('active');
             
-            if (id === 'calculator') {
+            if (id === 'messages') {
+                renderMessagesAdmin();
+            } else if (id === 'calculator') {
                 const s = siteData.calcSettings;
                 document.getElementById('calc-rate-laser-min').value = s.rateLaserMin;
                 document.getElementById('calc-rate-cm2').value = s.rateCm2;
@@ -1232,6 +1278,103 @@
                     document.getElementById('edit-card3-desc').value = t.aboutCards[2].desc;
                 }
             }
+        };
+
+        // --- OBSŁUGA SKRZYNKI WIADOMOŚCI ADMINA ---
+        window.renderMessagesAdmin = async () => {
+            const container = document.getElementById('messages-list');
+            container.innerHTML = '<p class="text-stone-500 text-center py-10">Ładowanie wiadomości...</p>';
+
+            try {
+                const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/messages`));
+                const messages = [];
+                snapshot.forEach((doc) => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sortowanie po dacie (od najnowszych)
+                messages.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                if (messages.length === 0) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-20 text-stone-500 opacity-50">
+                            <i class="fa-regular fa-envelope-open text-6xl mb-4"></i>
+                            <p>Brak wiadomości.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = messages.map(msg => {
+                    const date = new Date(msg.date).toLocaleString('pl-PL');
+                    const isUnread = !msg.read;
+                    const codesBadge = msg.codes && msg.codes.length > 0 
+                        ? `<span class="bg-wood-600/20 text-wood-500 px-2 py-1 rounded text-xs font-bold ml-2">Produkty: ${msg.codes.length}</span>` 
+                        : '';
+
+                    return `
+                        <div class="bg-stone-800 p-6 rounded-xl border border-white/5 message-row ${isUnread ? 'message-unread' : 'message-read'}" id="msg-${msg.id}">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="font-bold text-lg text-white">${msg.name || 'Nieznany'}</h4>
+                                        ${isUnread ? '<span class="bg-wood-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Nowa</span>' : ''}
+                                    </div>
+                                    <a href="mailto:${msg.email}" class="text-wood-400 hover:text-wood-300 text-sm flex items-center gap-2 transition">
+                                        <i class="fa-regular fa-envelope"></i> ${msg.email}
+                                    </a>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-stone-500 text-xs block mb-2">${date}</span>
+                                    <div class="flex gap-2 justify-end">
+                                        <button onclick="window.toggleRead('${msg.id}', ${msg.read})" class="p-2 rounded hover:bg-white/10 text-stone-400 hover:text-white transition" title="${msg.read ? 'Oznacz jako nieprzeczytane' : 'Oznacz jako przeczytane'}">
+                                            <i class="fa-regular ${msg.read ? 'fa-envelope' : 'fa-envelope-open'}"></i>
+                                        </button>
+                                        <button onclick="window.delMessage('${msg.id}')" class="p-2 rounded hover:bg-red-500/20 text-red-400 hover:text-red-500 transition" title="Usuń">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${msg.codes && msg.codes.length > 0 ? `
+                                <div class="mb-4 bg-black/20 p-3 rounded-lg border border-white/5">
+                                    <p class="text-xs text-stone-500 uppercase font-bold mb-2">Zapytanie dotyczy produktów (Kody):</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono">${c}</span>`).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="bg-stone-900/50 p-4 rounded-lg text-stone-300 text-sm whitespace-pre-wrap border border-white/5">
+                                ${msg.message || 'Brak treści wiadomości.'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error("Błąd pobierania wiadomości:", e);
+                container.innerHTML = '<p class="text-red-400 text-center py-5">Wystąpił błąd podczas pobierania wiadomości.</p>';
+            }
+        };
+
+        window.delMessage = async (id) => {
+            if(confirm("Czy na pewno chcesz usunąć tę wiadomość?")) {
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, id));
+                    document.getElementById(`msg-${id}`).remove();
+                } catch(e) { alert("Błąd usuwania: " + e.message); }
+            }
+        };
+
+        window.toggleRead = async (id, currentStatus) => {
+            try {
+                await updateDoc(doc(db, `artifacts/${appId}/public/data/messages`, id), {
+                    read: !currentStatus
+                });
+                renderMessagesAdmin(); // Odśwież listę
+            } catch(e) { alert("Błąd aktualizacji statusu: " + e.message); }
         };
 
         function renderHeroAdmin() {
