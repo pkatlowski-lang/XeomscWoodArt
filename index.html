@@ -624,7 +624,10 @@
                         <i class="fa-solid fa-layer-group w-6"></i> Kategorie
                     </button>
                     <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
-                        <i class="fa-solid fa-box-open w-6"></i> Produkty i Galerie
+                        <i class="fa-solid fa-plus-circle w-6"></i> Dodaj Produkty
+                    </button>
+                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white">
+                        <i class="fa-solid fa-list-ul w-6"></i> Lista Produktów
                     </button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-wood-500 hover:text-wood-400 bg-wood-500/10">
@@ -744,7 +747,71 @@
                 </div>
                 <div id="view-hero-gallery" class="admin-view hidden space-y-8"></div>
                 <div id="view-categories" class="admin-view hidden space-y-8"></div>
+                
+                <!-- ZMODYFIKOWANY WIDOK: DODAJ PRODUKTY -->
                 <div id="view-products" class="admin-view hidden space-y-8"></div>
+                
+                <!-- NOWY WIDOK: LISTA PRODUKTÓW -->
+                <div id="view-product-list" class="admin-view hidden space-y-8">
+                     <header><h3 class="text-3xl font-bold mb-2">Lista Produktów</h3><p class="text-stone-400">Edytuj, ukrywaj lub usuwaj istniejące produkty.</p></header>
+                     <div class="space-y-6">
+                        <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
+                            <!-- KROK 1: Wybierz Kategorię -->
+                            <div>
+                                <label class="block text-xs font-bold text-stone-500 uppercase mb-2">1. Wybierz Kategorię</label>
+                                <select id="list-cat-select" class="calc-input text-white font-bold" onchange="onSelectListCategory()">
+                                    <option value="">-- Wybierz kategorię --</option>
+                                </select>
+                            </div>
+
+                            <!-- KROK 2: Wybierz Produkt -->
+                            <div id="list-prod-container" class="hidden animate-fade-in">
+                                <label class="block text-xs font-bold text-stone-500 uppercase mb-2 mt-4">2. Wybierz Produkt</label>
+                                <select id="list-prod-select" class="calc-input text-white font-bold" onchange="onSelectListProduct()">
+                                    <option value="">-- Wybierz produkt --</option>
+                                </select>
+                            </div>
+
+                            <!-- KROK 3: Akcje -->
+                            <div id="list-actions" class="hidden animate-fade-in flex gap-3 mt-6 pt-6 border-t border-white/10">
+                                <button onclick="editProductFromList()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-pen"></i> Edytuj
+                                </button>
+                                <button id="btn-toggle-hide" onclick="toggleHideProduct()" class="bg-stone-600 hover:bg-stone-500 text-white px-6 py-3 rounded-xl font-bold transition flex items-center gap-2">
+                                    <i class="fa-regular fa-eye-slash"></i> Ukryj
+                                </button>
+                                <button onclick="deleteProductFromList()" class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 ml-auto">
+                                    <i class="fa-solid fa-trash"></i> Usuń
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KROK 4: Formularz Edycji (Ukryty domyślnie) -->
+                        <div id="list-edit-form" class="hidden bg-stone-800 p-8 rounded-3xl border border-wood-600/30 ring-1 ring-wood-600/20 space-y-4 animate-fade-in">
+                            <h4 class="text-xl font-bold text-wood-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> Edycja Produktu</h4>
+                            
+                            <input id="edit-p-t" class="calc-input" placeholder="Nazwa produktu">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input id="edit-p-code" class="calc-input" placeholder="Kod produktu">
+                                <input id="edit-p-price" class="calc-input" placeholder="Cena">
+                            </div>
+                            <textarea id="edit-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
+                            <input id="edit-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
+                            
+                            <!-- Galeria w edycji -->
+                            <div class="pt-4 border-t border-white/5">
+                                <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia w galerii</label>
+                                <div id="edit-gallery-container" class="space-y-2"></div>
+                            </div>
+
+                            <div class="flex gap-2 pt-4">
+                                <button onclick="saveEditedProduct()" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition text-white">Zapisz Zmiany</button>
+                                <button onclick="document.getElementById('list-edit-form').classList.add('hidden')" class="bg-stone-600 hover:bg-stone-500 w-1/3 py-3 rounded-xl font-bold transition text-white">Anuluj</button>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -789,13 +856,17 @@
         let db, auth, siteData = {};
         let isOnline = false;
         let lastError = "";
-        let messageUnsubscribe = null; // Przechowuje subskrypcję do wiadomości
+        let messageUnsubscribe = null; 
         
         let categoryAutoScroll = null;
         let isLoopJump = false; 
 
         window.currentLightboxImages = [];
         window.currentImgIndex = 0;
+
+        // Stan dla listy produktów
+        window.selectedListCatId = null;
+        window.selectedListProdIndex = null;
 
         const initialData = {
             heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1622623363380-45c128919616?q=80&w=2070' }],
@@ -833,7 +904,6 @@
         };
         window.addEventListener('scroll', window.updateNavbar);
         
-        // Funkcja przewijania kategorii 
         window.scrollCategories = (direction, isAuto = false) => {
             const container = document.getElementById('main-categories-grid');
             if(!container) return;
@@ -982,23 +1052,18 @@
             await saveData();
         };
 
-        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO (ZAPIS DO BAZY) ---
+        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO ---
         window.openContactModal = (defaultCode = '') => {
             const modal = document.getElementById('contact-modal');
             const container = document.getElementById('product-codes-container');
-            
-            // Wyczyść kontener i dodaj pierwszy kod (z produktu lub pusty)
             container.innerHTML = `
                 <div class="flex gap-2">
                     <input type="text" name="product-code" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" placeholder="Kod produktu" value="${defaultCode}">
                 </div>
             `;
-            
-            // Wyczyść pozostałe pola
             document.getElementById('contact-name').value = '';
             document.getElementById('contact-email-input').value = '';
             document.getElementById('contact-message').value = '';
-            
             modal.classList.remove('hidden');
         };
 
@@ -1017,65 +1082,45 @@
             container.appendChild(div);
         };
 
-        // ZMODYFIKOWANE: Walidacja emaila + Zapis
         window.submitContactForm = async () => {
             const name = document.getElementById('contact-name').value;
             const email = document.getElementById('contact-email-input').value;
             const message = document.getElementById('contact-message').value;
             
-            // WALIDACJA EMAILA
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if(!emailRegex.test(email)) {
                 alert("Proszę podać poprawny adres e-mail (np. nazwa@domena.pl).");
                 return;
             }
             
-            // Pobierz wszystkie kody
             const codes = Array.from(document.querySelectorAll('input[name="product-code"]'))
                 .map(input => input.value)
-                .filter(val => val.trim() !== ''); // Usuń puste
+                .filter(val => val.trim() !== '');
             
-            if(!name) {
-                alert("Proszę podać imię.");
-                return;
-            }
+            if(!name) { alert("Proszę podać imię."); return; }
 
             try {
-                // Zapisz do Firestore w kolekcji 'messages'
                 await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
-                    name: name,
-                    email: email,
-                    message: message,
-                    codes: codes,
-                    date: new Date().toISOString(),
-                    read: false
+                    name: name, email: email, message: message, codes: codes, date: new Date().toISOString(), read: false
                 });
-
-                // Pokaż potwierdzenie
                 document.getElementById('toast-text').textContent = "Wysłano wiadomość!";
                 const toast = document.getElementById('toast-notification');
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 3000);
-
                 setTimeout(() => window.closeContactModal(), 1000);
             } catch (e) {
                 console.error("Błąd wysyłania:", e);
-                alert("Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie.");
+                alert("Wystąpił błąd podczas wysyłania wiadomości.");
             }
         };
 
         // --- ZMODYFIKOWANA LOGIKA: WIDOK PRODUKTU ---
-        
-        // NOWE: Funkcja otwierająca widok podkategorii (Lista produktów)
         window.openSubcategories = (id) => {
             const cat = siteData.categories[id];
             if (!cat) return;
-
-            // Ustaw tytuł
             const titleEl = document.getElementById('subcategory-title');
             if(titleEl) titleEl.textContent = cat.title;
 
-            // Renderuj grid produktów
             const grid = document.getElementById('subcategory-grid');
             if(grid) {
                 grid.innerHTML = '';
@@ -1106,8 +1151,6 @@
                     grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów w tej kategorii.</p></div>';
                 }
             }
-
-            // Przełącz widok
             document.getElementById('main-content').classList.add('hidden');
             document.getElementById('gallery-view').classList.add('hidden');
             document.getElementById('subcategory-view').classList.remove('hidden');
@@ -1124,7 +1167,6 @@
             document.getElementById('prod-price').textContent = product.price || '--- PLN';
             document.getElementById('prod-desc').textContent = product.desc || 'Brak opisu.';
             
-            // ZAKTUALIZOWANY PRZYCISK: Przekazuje kod produktu do modala
             const askBtn = document.getElementById('ask-btn');
             const codeToPass = product.code || '';
             askBtn.onclick = () => window.openContactModal(codeToPass);
@@ -1159,35 +1201,6 @@
             window.scrollTo(0,0);
         };
 
-        // --- ZARZĄDZANIE TREŚCIĄ (SAVE CONTENT SETTINGS) ---
-        window.saveContentSettings = async () => {
-             const t = {
-                hero: {
-                    main: document.getElementById('edit-hero-main').value,
-                    accent: document.getElementById('edit-hero-accent').value,
-                    desc: document.getElementById('edit-hero-desc').value
-                },
-                contact: {
-                    email: document.getElementById('edit-contact-email').value,
-                    phone: document.getElementById('edit-contact-phone').value,
-                    desc: document.getElementById('edit-contact-desc').value
-                },
-                aboutCards: [
-                    { icon: document.getElementById('edit-card1-icon').value, title: document.getElementById('edit-card1-title').value, desc: document.getElementById('edit-card1-desc').value },
-                    { icon: document.getElementById('edit-card2-icon').value, title: document.getElementById('edit-card2-title').value, desc: document.getElementById('edit-card2-desc').value },
-                    { icon: document.getElementById('edit-card3-icon').value, title: document.getElementById('edit-card3-title').value, desc: document.getElementById('edit-card3-desc').value }
-                ]
-            };
-            siteData.textContent = t;
-            await saveData();
-            renderTexts(); 
-            document.getElementById('toast-text').textContent = "Zapisano zmiany w chmurze!";
-            const toast = document.getElementById('toast-notification');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        };
-        
-        // --- POZOSTAŁE FUNKCJE ---
         window.updateMainImage = (index) => {
             window.currentImgIndex = index;
             const mainImg = document.getElementById('main-product-img');
@@ -1208,14 +1221,20 @@
 
         window.delHero = (i) => { if(confirm("Usunąć slajd?")) { siteData.heroItems.splice(i,1); saveData(); renderHeroAdmin(); renderHero(); } };
         window.delCat = (k) => { if(confirm("Usunąć całą kategorię i jej produkty?")) { delete siteData.categories[k]; saveData(); renderCategoriesAdmin(); renderMain(); } };
+        
+        // Zaktualizowany delSub dla listy produktów
         window.delSub = (cid, i) => { 
             if(confirm("Usunąć produkt?")) { 
                 siteData.categories[cid].subcategories.splice(i,1); 
                 saveData(); 
-                if(!document.getElementById('admin-panel').classList.contains('hidden')) { renderProductsAdmin(); } else { window.openSubcategories(cid); }
+                if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
+                   // Jeśli jesteśmy w liście produktów, odśwież widok
+                   onSelectListCategory(); 
+                } else { 
+                   window.openSubcategories(cid); 
+                }
             } 
         };
-        window.delImg = (sid, i, cid, t) => { if(confirm("Usunąć zdjęcie?")) { siteData.galleries[sid].images.splice(i,1); saveData(); window.openGallery(sid, t, cid); } };
 
         window.openLightbox = (index = 0) => { 
             const lb = document.getElementById('lightbox');
@@ -1274,7 +1293,7 @@
         
         window.handleLogout = () => { 
             sessionStorage.removeItem('xeomsc_admin'); 
-            if(messageUnsubscribe) messageUnsubscribe(); // Zatrzymaj nasłuchiwanie
+            if(messageUnsubscribe) messageUnsubscribe(); 
             location.reload(); 
         };
 
@@ -1298,9 +1317,8 @@
             const btn = document.getElementById(`btn-${id}`);
             if (btn) btn.classList.add('active');
             
-            if (id === 'messages') {
-                renderMessagesAdmin();
-            } else if (id === 'calculator') {
+            if (id === 'messages') { renderMessagesAdmin(); } 
+            else if (id === 'calculator') {
                 const s = siteData.calcSettings;
                 document.getElementById('calc-rate-laser-min').value = s.rateLaserMin;
                 document.getElementById('calc-rate-cm2').value = s.rateCm2;
@@ -1309,7 +1327,8 @@
                 window.runLaserCalculator();
             } else if (id === 'hero-gallery') { renderHeroAdmin(); } 
             else if (id === 'categories') { renderCategoriesAdmin(); } 
-            else if (id === 'products') { renderProductsAdmin(); } 
+            else if (id === 'products') { renderAddProductView(); } 
+            else if (id === 'product-list') { renderProductListView(); }
             else if (id === 'content') {
                 if(!siteData.textContent) siteData.textContent = initialData.textContent;
                 const t = siteData.textContent;
@@ -1333,10 +1352,9 @@
             }
         };
 
-        // --- NASŁUCHIWANIE WIADOMOŚCI (REAL-TIME COUNTER) ---
+        // --- NASŁUCHIWANIE WIADOMOŚCI ---
         function startMessageListener() {
-            // Nasłuchuj na zmiany w kolekcji wiadomości (tylko jeśli admin zalogowany)
-            if (messageUnsubscribe) return; // Już działa
+            if (messageUnsubscribe) return; 
 
             const q = query(collection(db, `artifacts/${appId}/public/data/messages`));
             messageUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -1345,7 +1363,6 @@
                     if (doc.data().read === false) unreadCount++;
                 });
 
-                // Aktualizuj plakietki
                 const badgeBar = document.getElementById('msg-count-bar');
                 const badgeSidebar = document.getElementById('msg-count-sidebar');
                 
@@ -1358,39 +1375,21 @@
                     }
                 });
                 
-                // Jeśli jesteśmy w widoku wiadomości, odśwież go dynamicznie
                 const msgView = document.getElementById('view-messages');
-                if(!msgView.classList.contains('hidden')) {
-                    renderMessagesAdmin(); 
-                }
-            }, (error) => {
-                console.error("Błąd nasłuchiwania wiadomości:", error);
-            });
+                if(!msgView.classList.contains('hidden')) { renderMessagesAdmin(); }
+            }, (error) => { console.error("Błąd wiadomości:", error); });
         }
 
-        // --- OBSŁUGA SKRZYNKI WIADOMOŚCI ADMINA (ZMODYFIKOWANA) ---
         window.renderMessagesAdmin = async () => {
             const container = document.getElementById('messages-list');
-            
-            // Pobieramy dane bezpośrednio, ale użyjemy istniejącego nasłuchu w przyszłości dla optymalizacji
-            // Tutaj pobieramy "snapshot" jednorazowo aby wyrenderować listę
             try {
                 const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/messages`));
                 const messages = [];
-                snapshot.forEach((doc) => {
-                    messages.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Sortowanie po dacie (od najnowszych)
+                snapshot.forEach((doc) => { messages.push({ id: doc.id, ...doc.data() }); });
                 messages.sort((a, b) => new Date(b.date) - new Date(a.date));
 
                 if (messages.length === 0) {
-                    container.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-20 text-stone-500 opacity-50">
-                            <i class="fa-regular fa-envelope-open text-6xl mb-4"></i>
-                            <p>Brak wiadomości.</p>
-                        </div>
-                    `;
+                    container.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-stone-500 opacity-50"><i class="fa-regular fa-envelope-open text-6xl mb-4"></i><p>Brak wiadomości.</p></div>`;
                     return;
                 }
 
@@ -1398,119 +1397,58 @@
                     const dateObj = new Date(msg.date);
                     const dateStr = dateObj.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
                     const timeStr = dateObj.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-                    
                     const isUnread = !msg.read;
                     const rowBgClass = isUnread ? 'bg-red-900/10 border-l-4 border-red-500' : 'bg-stone-800 border-l-4 border-transparent opacity-80';
                     const emailClass = isUnread ? 'text-red-500 font-bold' : 'text-stone-300';
                     
                     return `
                         <div class="rounded-lg overflow-hidden mb-1 transition-all ${rowBgClass}">
-                            <!-- NAGŁÓWEK WIERSZA -->
                             <div class="grid grid-cols-12 gap-4 items-center p-4 cursor-pointer hover:bg-white/5 transition" onclick="window.toggleMessageDetails('${msg.id}', ${msg.read})">
                                 <div class="col-span-1 text-center text-xs text-stone-500 font-mono">${index + 1}</div>
                                 <div class="col-span-6 md:col-span-7 truncate text-sm ${emailClass}">
-                                    ${isUnread ? '<i class="fa-solid fa-circle text-[8px] mr-2 align-middle"></i>' : ''}
-                                    ${msg.email}
+                                    ${isUnread ? '<i class="fa-solid fa-circle text-[8px] mr-2 align-middle"></i>' : ''} ${msg.email}
                                 </div>
-                                <div class="col-span-3 text-right text-xs text-stone-500">
-                                    <span class="block text-stone-300">${dateStr}</span>
-                                    <span class="text-[10px]">${timeStr}</span>
-                                </div>
+                                <div class="col-span-3 text-right text-xs text-stone-500"><span class="block text-stone-300">${dateStr}</span><span class="text-[10px]">${timeStr}</span></div>
                                 <div class="col-span-2 md:col-span-1 text-center">
-                                    <button onclick="event.stopPropagation(); window.delMessage('${msg.id}')" class="text-stone-600 hover:text-red-500 transition p-2">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                    <button onclick="event.stopPropagation(); window.delMessage('${msg.id}')" class="text-stone-600 hover:text-red-500 transition p-2"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            
-                            <!-- ROZWIJANA TREŚĆ -->
                             <div id="msg-details-${msg.id}" class="msg-content-accordion bg-black/20 border-t border-white/5">
                                 <div class="p-6 space-y-4">
                                     <div class="flex justify-between items-start">
-                                        <div>
-                                            <p class="text-xs text-stone-500 uppercase font-bold">Nadawca</p>
-                                            <p class="text-white text-lg font-bold">${msg.name || 'Brak imienia'}</p>
-                                        </div>
+                                        <div><p class="text-xs text-stone-500 uppercase font-bold">Nadawca</p><p class="text-white text-lg font-bold">${msg.name || 'Brak imienia'}</p></div>
                                         <div class="text-right">
-                                             <button onclick="window.toggleRead('${msg.id}', ${msg.read})" class="text-xs border border-stone-600 rounded px-3 py-1 hover:bg-white/10 transition ${isUnread ? 'text-stone-300' : 'text-stone-500'}">
-                                                ${isUnread ? 'Oznacz jako przeczytane' : 'Oznacz jako nieprzeczytane'}
-                                             </button>
+                                             <button onclick="window.toggleRead('${msg.id}', ${msg.read})" class="text-xs border border-stone-600 rounded px-3 py-1 hover:bg-white/10 transition ${isUnread ? 'text-stone-300' : 'text-stone-500'}">${isUnread ? 'Oznacz jako przeczytane' : 'Oznacz jako nieprzeczytane'}</button>
                                         </div>
                                     </div>
-
-                                    ${msg.codes && msg.codes.length > 0 ? `
-                                        <div>
-                                            <p class="text-xs text-stone-500 uppercase font-bold mb-2">Dotyczy produktów:</p>
-                                            <div class="flex flex-wrap gap-2">
-                                                ${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono select-all">${c}</span>`).join('')}
-                                            </div>
-                                        </div>
-                                    ` : ''}
-
-                                    <div>
-                                        <p class="text-xs text-stone-500 uppercase font-bold mb-2">Treść wiadomości</p>
-                                        <div class="text-stone-300 text-sm whitespace-pre-wrap bg-stone-900/50 p-4 rounded-lg border border-white/5">${msg.message}</div>
-                                    </div>
-                                    
-                                    <div class="pt-2">
-                                        <a href="mailto:${msg.email}?subject=Odp: Zapytanie Xeomsc FusionArt" class="inline-flex items-center gap-2 text-xs font-bold text-wood-500 hover:text-white transition">
-                                            <i class="fa-solid fa-reply"></i> Odpowiedz Klientowi
-                                        </a>
-                                    </div>
+                                    ${msg.codes && msg.codes.length > 0 ? `<div><p class="text-xs text-stone-500 uppercase font-bold mb-2">Dotyczy produktów:</p><div class="flex flex-wrap gap-2">${msg.codes.map(c => `<span class="bg-wood-600 text-white px-2 py-1 rounded text-xs font-mono select-all">${c}</span>`).join('')}</div></div>` : ''}
+                                    <div><p class="text-xs text-stone-500 uppercase font-bold mb-2">Treść wiadomości</p><div class="text-stone-300 text-sm whitespace-pre-wrap bg-stone-900/50 p-4 rounded-lg border border-white/5">${msg.message}</div></div>
+                                    <div class="pt-2"><a href="mailto:${msg.email}?subject=Odp: Zapytanie Xeomsc FusionArt" class="inline-flex items-center gap-2 text-xs font-bold text-wood-500 hover:text-white transition"><i class="fa-solid fa-reply"></i> Odpowiedz Klientowi</a></div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }).join('');
-
-            } catch (e) {
-                console.error("Błąd pobierania wiadomości:", e);
-                container.innerHTML = '<p class="text-red-400 text-center py-5">Wystąpił błąd podczas pobierania wiadomości.</p>';
-            }
+            } catch (e) { container.innerHTML = '<p class="text-red-400 text-center py-5">Wystąpił błąd podczas pobierania wiadomości.</p>'; }
         };
 
         window.toggleMessageDetails = async (id, isRead) => {
             const details = document.getElementById(`msg-details-${id}`);
             const isOpen = details.classList.contains('open');
-            
-            // Zwiń wszystkie inne
             document.querySelectorAll('.msg-content-accordion').forEach(el => {
-                if(el.id !== `msg-details-${id}`) {
-                    el.style.maxHeight = null;
-                    el.classList.remove('open');
-                }
+                if(el.id !== `msg-details-${id}`) { el.style.maxHeight = null; el.classList.remove('open'); }
             });
-
-            if (isOpen) {
-                details.style.maxHeight = null;
-                details.classList.remove('open');
-            } else {
-                details.classList.add('open');
-                details.style.maxHeight = details.scrollHeight + "px";
-                
-                // Jeśli nieprzeczytana, oznacz jako przeczytana przy otwarciu
-                if (!isRead) {
-                    await window.toggleRead(id, false); // false bo currentStatus to false (nieprzeczytana)
-                }
-            }
+            if (isOpen) { details.style.maxHeight = null; details.classList.remove('open'); } 
+            else { details.classList.add('open'); details.style.maxHeight = details.scrollHeight + "px"; if (!isRead) { await window.toggleRead(id, false); } }
         };
 
         window.delMessage = async (id) => {
             if(confirm("Czy na pewno chcesz usunąć tę wiadomość?")) {
-                try {
-                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, id));
-                    // Lista odświeży się sama dzięki onSnapshot w startMessageListener -> renderMessagesAdmin
-                } catch(e) { alert("Błąd usuwania: " + e.message); }
+                try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, id)); } catch(e) { alert("Błąd usuwania: " + e.message); }
             }
         };
 
         window.toggleRead = async (id, currentStatus) => {
-            try {
-                await updateDoc(doc(db, `artifacts/${appId}/public/data/messages`, id), {
-                    read: !currentStatus
-                });
-                // Lista odświeży się sama
-            } catch(e) { console.error("Błąd aktualizacji statusu", e); }
+            try { await updateDoc(doc(db, `artifacts/${appId}/public/data/messages`, id), { read: !currentStatus }); } catch(e) { console.error("Błąd aktualizacji statusu", e); }
         };
 
         function renderHeroAdmin() {
@@ -1584,104 +1522,238 @@
             document.getElementById('cancel-cat-btn').classList.remove('hidden');
         };
 
-        function renderProductsAdmin() {
+        // --- ZMODYFIKOWANA FUNKCJA: DODAJ PRODUKTY ---
+        function renderAddProductView() {
             const container = document.getElementById('view-products');
             const categoryOptions = Object.keys(siteData.categories).map(k => `<option value="${k}">${siteData.categories[k].title}</option>`).join('');
-            const productOptions = Object.keys(siteData.categories).flatMap(k => siteData.categories[k].subcategories.map(s => `<option value="${s.id}">${siteData.categories[k].title} > ${s.title}</option>`)).join('');
-            let productsListHtml = '';
-            Object.keys(siteData.categories).forEach(catId => {
-                const cat = siteData.categories[catId];
-                if(cat.subcategories.length > 0) {
-                    productsListHtml += `<div class="mb-4"><h5 class="text-xs font-bold text-stone-500 uppercase mb-2 pl-2">${cat.title}</h5>`;
-                    productsListHtml += cat.subcategories.map((sub, index) => `
-                        <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2">
-                            <span class="text-sm font-bold text-white">${sub.title}</span>
-                            <div class="flex gap-2">
-                                <button onclick="window.editProduct('${catId}', ${index})" class="text-blue-400 text-xs">Edytuj</button>
-                                <button onclick="window.delSub('${catId}', ${index})" class="text-red-500 text-xs">Usuń</button>
-                            </div>
-                        </div>
-                    `).join('');
-                    productsListHtml += `</div>`;
-                }
-            });
+            
             container.innerHTML = `
-                <h3 class="text-3xl font-bold mb-6">Produkty i Galerie</h3>
+                <h3 class="text-3xl font-bold mb-6">Dodaj Nowe Produkty</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Zarządzaj Produktem</h4>
-                    <input type="hidden" id="edit-prod-index"><input type="hidden" id="edit-prod-cat-id">
-                    <select id="p-cat" class="calc-input text-white">${categoryOptions}</select>
-                    <input id="p-t" class="calc-input" placeholder="Nazwa produktu">
+                    <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Nowy Produkt</h4>
+                    
+                    <select id="new-p-cat" class="calc-input text-white font-bold">${categoryOptions}</select>
+                    <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4">
-                        <input id="p-code" class="calc-input" placeholder="Kod produktu">
-                        <input id="p-price" class="calc-input" placeholder="Cena">
+                        <input id="new-p-code" class="calc-input" placeholder="Kod produktu">
+                        <input id="new-p-price" class="calc-input" placeholder="Cena">
                     </div>
-                    <textarea id="p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
-                    <input id="p-i" class="calc-input" placeholder="Miniatura">
-                    <div class="flex gap-2">
-                        <button id="p-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj Produkt</button>
-                        <button id="cancel-p-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
+                    <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
+                    <input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
+                    
+                    <div class="pt-4 border-t border-white/5">
+                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label>
+                        <div id="new-gallery-container" class="space-y-2">
+                             <input class="calc-input gallery-input" placeholder="Link do zdjęcia" oninput="addGalleryInput(this)">
+                        </div>
                     </div>
-                </div>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-400">Lista Produktów</h4>
-                    <div class="max-h-60 overflow-y-auto pr-2">${productsListHtml}</div>
-                </div>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-400">Dodaj Zdjęcia do Galerii</h4>
-                    <select id="p-gal-select" class="calc-input text-white">${productOptions}</select>
-                    <input id="gal-img-url" class="calc-input" placeholder="Link do zdjęcia">
-                    <button id="gal-btn" class="bg-stone-600 w-full py-3 rounded-xl font-bold">Dodaj zdjęcie</button>
+
+                    <button id="btn-add-prod" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-4">Dodaj Produkt</button>
                 </div>`;
             
-            document.getElementById('p-btn').onclick = () => {
-                const cid = document.getElementById('p-cat').value;
-                const t = document.getElementById('p-t').value;
-                const img = document.getElementById('p-i').value;
-                const code = document.getElementById('p-code').value;
-                const price = document.getElementById('p-price').value;
-                const desc = document.getElementById('p-desc').value;
-                const editIndex = document.getElementById('edit-prod-index').value;
-                const editCatId = document.getElementById('edit-prod-cat-id').value;
+            document.getElementById('btn-add-prod').onclick = () => {
+                const cid = document.getElementById('new-p-cat').value;
+                const t = document.getElementById('new-p-t').value;
+                const img = document.getElementById('new-p-i').value;
+                const code = document.getElementById('new-p-code').value;
+                const price = document.getElementById('new-p-price').value;
+                const desc = document.getElementById('new-p-desc').value;
 
                 if(cid && t) {
-                    if (editIndex !== "") {
-                        const product = siteData.categories[editCatId].subcategories[editIndex];
-                        product.title = t; product.image = img; product.code = code; product.price = price; product.desc = desc;
-                    } else {
-                        const sid = 's' + Date.now();
-                        siteData.categories[cid].subcategories.push({ id: sid, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
-                        siteData.galleries[sid] = { images: [] };
-                    }
-                    saveData(); renderProductsAdmin();
-                }
-            };
-            document.getElementById('cancel-p-btn').onclick = () => { renderProductsAdmin(); };
-            document.getElementById('gal-btn').onclick = () => {
-                const sid = document.getElementById('p-gal-select').value;
-                const url = document.getElementById('gal-img-url').value;
-                if(sid && url) {
-                    if(!siteData.galleries[sid]) siteData.galleries[sid] = { images: [] };
-                    siteData.galleries[sid].images.push({ src: url });
-                    saveData(); document.getElementById('gal-img-url').value = "";
+                    const sid = 's' + Date.now();
+                    // Zbieranie linków z galerii
+                    const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
+                    const galleryImages = [];
+                    galleryInputs.forEach(inp => {
+                        if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() });
+                    });
+
+                    siteData.categories[cid].subcategories.push({ id: sid, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
+                    siteData.galleries[sid] = { images: galleryImages };
+                    
+                    saveData(); 
+                    alert("Produkt dodany!");
+                    renderAddProductView(); // Reset formularza
+                } else {
+                    alert("Wybierz kategorię i podaj nazwę produktu.");
                 }
             };
         }
 
-        window.editProduct = (catId, index) => {
+        window.addGalleryInput = (el) => {
+            if(el.value.trim() !== '' && el === el.parentElement.lastElementChild) {
+                const newInput = document.createElement('input');
+                newInput.className = "calc-input gallery-input animate-fade-in";
+                newInput.placeholder = "Link do zdjęcia";
+                newInput.oninput = function() { window.addGalleryInput(this); };
+                el.parentElement.appendChild(newInput);
+            }
+        };
+
+        // --- NOWA FUNKCJA: LISTA PRODUKTÓW (KROKOWA) ---
+        window.renderProductListView = () => {
+            const catSelect = document.getElementById('list-cat-select');
+            catSelect.innerHTML = '<option value="">-- Wybierz kategorię --</option>';
+            Object.keys(siteData.categories).forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.text = siteData.categories[id].title;
+                catSelect.appendChild(opt);
+            });
+            
+            // Ukryj dalsze kroki
+            document.getElementById('list-prod-container').classList.add('hidden');
+            document.getElementById('list-actions').classList.add('hidden');
+            document.getElementById('list-edit-form').classList.add('hidden');
+        };
+
+        window.onSelectListCategory = () => {
+            const catId = document.getElementById('list-cat-select').value;
+            window.selectedListCatId = catId;
+            const prodSelect = document.getElementById('list-prod-select');
+            const prodContainer = document.getElementById('list-prod-container');
+
+            document.getElementById('list-actions').classList.add('hidden');
+            document.getElementById('list-edit-form').classList.add('hidden');
+
+            if (!catId) {
+                prodContainer.classList.add('hidden');
+                return;
+            }
+
+            prodSelect.innerHTML = '<option value="">-- Wybierz produkt --</option>';
+            const products = siteData.categories[catId].subcategories;
+            
+            if(products.length === 0) {
+                prodSelect.innerHTML = '<option value="">Brak produktów w tej kategorii</option>';
+            } else {
+                products.forEach((p, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.text = `${p.title} ${p.isHidden ? '(UKRYTY)' : ''}`;
+                    prodSelect.appendChild(opt);
+                });
+            }
+            prodContainer.classList.remove('hidden');
+        };
+
+        window.onSelectListProduct = () => {
+            const index = document.getElementById('list-prod-select').value;
+            window.selectedListProdIndex = index;
+            const actions = document.getElementById('list-actions');
+            const editForm = document.getElementById('list-edit-form');
+            
+            actions.classList.add('hidden');
+            editForm.classList.add('hidden');
+
+            if (index === "") return;
+
+            const product = siteData.categories[window.selectedListCatId].subcategories[index];
+            
+            // Zaktualizuj przycisk Ukryj/Pokaż
+            const btnHide = document.getElementById('btn-toggle-hide');
+            if(product.isHidden) {
+                btnHide.innerHTML = '<i class="fa-regular fa-eye"></i> Pokaż';
+                btnHide.classList.replace('bg-stone-600', 'bg-green-600');
+                btnHide.classList.replace('hover:bg-stone-500', 'hover:bg-green-500');
+            } else {
+                btnHide.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Ukryj';
+                btnHide.classList.replace('bg-green-600', 'bg-stone-600');
+                btnHide.classList.replace('hover:bg-green-500', 'hover:bg-stone-500');
+            }
+
+            actions.classList.remove('hidden');
+        };
+
+        window.toggleHideProduct = () => {
+            const catId = window.selectedListCatId;
+            const index = window.selectedListProdIndex;
             const product = siteData.categories[catId].subcategories[index];
-            document.getElementById('p-t').value = product.title;
-            document.getElementById('p-i').value = product.image;
-            document.getElementById('p-code').value = product.code || '';
-            document.getElementById('p-price').value = product.price || '';
-            document.getElementById('p-desc').value = product.desc || '';
-            document.getElementById('p-cat').value = catId;
-            document.getElementById('p-cat').disabled = true;
-            document.getElementById('edit-prod-index').value = index;
-            document.getElementById('edit-prod-cat-id').value = catId;
-            document.getElementById('p-btn').textContent = "Zapisz Zmiany";
-            document.getElementById('cancel-p-btn').classList.remove('hidden');
-            document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
+            
+            product.isHidden = !product.isHidden;
+            saveData();
+            
+            // Odśwież listę, aby zaktualizować tekst (Ukryty) i przycisk
+            onSelectListCategory();
+            document.getElementById('list-prod-select').value = index;
+            onSelectListProduct();
+        };
+
+        window.deleteProductFromList = () => {
+            if(confirm("Czy na pewno chcesz usunąć ten produkt?")) {
+                const catId = window.selectedListCatId;
+                const index = window.selectedListProdIndex;
+                siteData.categories[catId].subcategories.splice(index, 1);
+                saveData();
+                onSelectListCategory(); // Odśwież listę produktów (usunie stary)
+            }
+        };
+
+        window.editProductFromList = () => {
+            const catId = window.selectedListCatId;
+            const index = window.selectedListProdIndex;
+            const product = siteData.categories[catId].subcategories[index];
+            const form = document.getElementById('list-edit-form');
+            const sid = product.id;
+
+            document.getElementById('edit-p-t').value = product.title;
+            document.getElementById('edit-p-code').value = product.code || '';
+            document.getElementById('edit-p-price').value = product.price || '';
+            document.getElementById('edit-p-desc').value = product.desc || '';
+            document.getElementById('edit-p-i').value = product.image;
+
+            // Galeria w edycji
+            const galContainer = document.getElementById('edit-gallery-container');
+            galContainer.innerHTML = '';
+            
+            const currentGallery = siteData.galleries[sid] ? siteData.galleries[sid].images : [];
+            
+            // Wypełnij istniejącymi linkami
+            currentGallery.forEach(img => {
+                const inp = document.createElement('input');
+                inp.className = "calc-input gallery-input";
+                inp.value = img.src;
+                inp.oninput = function() { window.addGalleryInput(this); };
+                galContainer.appendChild(inp);
+            });
+
+            // Dodaj jedno puste na końcu
+            const emptyInp = document.createElement('input');
+            emptyInp.className = "calc-input gallery-input";
+            emptyInp.placeholder = "Link do zdjęcia";
+            emptyInp.oninput = function() { window.addGalleryInput(this); };
+            galContainer.appendChild(emptyInp);
+
+            form.classList.remove('hidden');
+            // Scroll to form
+            form.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.saveEditedProduct = () => {
+            const catId = window.selectedListCatId;
+            const index = window.selectedListProdIndex;
+            const product = siteData.categories[catId].subcategories[index];
+            const sid = product.id;
+
+            product.title = document.getElementById('edit-p-t').value;
+            product.code = document.getElementById('edit-p-code').value;
+            product.price = document.getElementById('edit-p-price').value;
+            product.desc = document.getElementById('edit-p-desc').value;
+            product.image = document.getElementById('edit-p-i').value;
+
+            // Zapisz galerię
+            const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
+            const galleryImages = [];
+            galleryInputs.forEach(inp => {
+                if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() });
+            });
+            siteData.galleries[sid] = { images: galleryImages };
+
+            saveData();
+            alert("Zapisano zmiany!");
+            document.getElementById('list-edit-form').classList.add('hidden');
+            onSelectListCategory(); // Odśwież nazwy w liście (jeśli zmieniono tytuł)
+            document.getElementById('list-prod-select').value = index;
         };
 
         function updateStatusUI(online, message = "") {
@@ -1744,7 +1816,6 @@
             if(sessionStorage.getItem('xeomsc_admin') === 'true') { 
                 document.body.classList.add('is-admin'); 
                 document.getElementById('admin-bar').classList.remove('hidden');
-                // Jeśli jesteśmy adminem, uruchom nasłuchiwanie wiadomości od razu
                 setTimeout(() => { if(isOnline) startMessageListener(); }, 1000);
             }
             else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
@@ -1763,10 +1834,7 @@
                     onAuthStateChanged(auth, (u) => {
                         if(u) {
                             updateStatusUI(true);
-                            // Sprawdź czy jesteśmy adminem po zalogowaniu do firebase
-                            if(sessionStorage.getItem('xeomsc_admin') === 'true') {
-                                startMessageListener();
-                            }
+                            if(sessionStorage.getItem('xeomsc_admin') === 'true') { startMessageListener(); }
 
                             onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
                                 if (snap.exists()) {
