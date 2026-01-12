@@ -393,7 +393,7 @@
                         <p id="prod-desc" class="text-stone-600 text-lg leading-relaxed whitespace-pre-line">Brak opisu.</p>
                     </div>
                     <div class="pt-6">
-                        <button id="ask-btn" onclick="openContactModal()" class="inline-flex items-center gap-3 px-8 py-4 bg-wood-600 text-white rounded-full font-bold hover:bg-wood-700 transition shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-auto justify-center"><i class="fa-regular fa-envelope"></i> Zapytaj o ten produkt</button>
+                        <button id="ask-btn" class="inline-flex items-center gap-3 px-8 py-4 bg-wood-600 text-white rounded-full font-bold hover:bg-wood-700 transition shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-auto justify-center"><i class="fa-regular fa-envelope"></i> Zapytaj o ten produkt</button>
                     </div>
                 </div>
             </div>
@@ -792,7 +792,12 @@
             if(!cat || !cat.subs || !cat.subs[subId]) return;
             const sub = cat.subs[subId];
             document.getElementById('subcategory-title').textContent = sub.title;
-            document.getElementById('back-to-cat-btn').onclick = () => { goHome(); setTimeout(() => window.selectMainCategory(catId), 100); };
+            // NAPRAWIONY PRZYCISK POWROTU
+            document.getElementById('back-to-cat-btn').onclick = () => { 
+                document.getElementById('subcategory-view').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                setTimeout(() => window.selectMainCategory(catId), 100); 
+            };
             const grid = document.getElementById('subcategory-grid');
             if(grid) {
                 grid.innerHTML = '';
@@ -817,9 +822,18 @@
             document.getElementById('prod-code').textContent = product.code ? `Kod: ${product.code}` : 'Kod: ---';
             document.getElementById('prod-price').textContent = product.price || '--- PLN';
             document.getElementById('prod-desc').textContent = product.desc || 'Brak opisu.';
-            const askBtn = document.getElementById('ask-btn'); const codeToPass = product.code || '';
+            
+            // NAPRAWIONY PRZYCISK KONTAKTU O PRODUKT
+            const askBtn = document.getElementById('ask-btn'); 
+            const codeToPass = product.code || product.title;
             askBtn.onclick = () => window.openContactModal(codeToPass);
-            document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
+            
+            // NAPRAWIONY PRZYCISK POWROTU
+            document.getElementById('back-to-sub-btn').onclick = () => {
+                 document.getElementById('gallery-view').classList.add('hidden');
+                 window.openSubcategoryView(catId, subId);
+            };
+
             const galleryData = siteData.galleries[product.id] || { images: [] };
             const allImages = [ { src: product.image }, ...galleryData.images ];
             window.currentLightboxImages = allImages; window.currentImgIndex = 0;
@@ -833,6 +847,50 @@
             document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('gallery-view').classList.remove('hidden'); window.scrollTo(0,0);
         };
 
+        // --- OBSŁUGA FORMULARZA KONTAKTOWEGO (NOWE FUNKCJE) ---
+        window.openContactModal = (code = '') => {
+            const modal = document.getElementById('contact-modal');
+            modal.classList.remove('hidden');
+            // Reset
+            document.getElementById('product-codes-container').innerHTML = '';
+            if(code) {
+                document.getElementById('product-codes-section').classList.remove('hidden');
+                document.getElementById('code-input-0').value = code;
+                document.getElementById('contact-message').placeholder = "Dzień dobry, interesuje mnie produkt o kodzie " + code + ". Proszę o wycenę...";
+            } else {
+                document.getElementById('product-codes-section').classList.add('hidden');
+                document.getElementById('contact-message').placeholder = "Dzień dobry, chciałbym zapytać o...";
+            }
+        };
+
+        window.openGeneralContactModal = () => {
+            window.openContactModal(''); 
+        };
+
+        window.closeContactModal = () => {
+            document.getElementById('contact-modal').classList.add('hidden');
+        };
+
+        window.addCodeField = () => {
+             const container = document.getElementById('product-codes-container');
+             const input = document.createElement('input');
+             input.className = "w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700 mt-2";
+             input.placeholder = "Kolejny kod produktu...";
+             container.appendChild(input);
+        };
+
+        window.submitContactForm = () => {
+            const btn = document.getElementById('submit-contact-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Wysyłanie...';
+            setTimeout(() => {
+                alert("Wiadomość została wysłana! (Symulacja)");
+                btn.innerHTML = originalText;
+                window.closeContactModal();
+            }, 1500);
+        };
+        // -----------------------------------------------------
+
         window.updateMainImage = (index) => { window.currentImgIndex = index; const mainImg = document.getElementById('main-product-img'); const images = window.currentLightboxImages; if(images[index]) { mainImg.style.opacity = '0.5'; setTimeout(() => { mainImg.src = images[index].src; mainImg.style.opacity = '1'; }, 150); const thumbs = document.getElementById('product-thumbnails').children; for(let i=0; i<thumbs.length; i++) { if(i === index) { thumbs[i].classList.add('thumb-active'); thumbs[i].classList.remove('opacity-60'); } else { thumbs[i].classList.remove('thumb-active'); thumbs[i].classList.add('opacity-60'); } } } };
         window.openCustomOrdersGallery = (d = false, i = 0) => { const orders = siteData.customOrders || []; if(orders.length === 0) return; window.currentLightboxImages = orders.map(url => ({ src: url })); if(d) { window.openLightbox(i); } else { const grid = document.getElementById('custom-orders-grid'); grid.innerHTML = orders.map((url, x) => `<div class="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition group" onclick="openLightbox(${x})"><img src="${url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></div>`).join(''); document.getElementById('main-content').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.remove('hidden'); window.scrollTo(0,0); } };
         window.openLightbox = (index = 0) => { const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter'); window.currentImgIndex = index; const images = window.currentLightboxImages; if(images.length > 0 && images[index]) { imgEl.src = images[index].src; counterEl.textContent = `${index + 1} / ${images.length}`; lb.classList.remove('hidden'); setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10); } };
@@ -841,7 +899,23 @@
         window.goHome = () => { document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden'); document.getElementById('sub-categories-container').classList.add('hidden'); document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200')); window.scrollTo(0,0); };
         
         window.toggleMobileMenu = () => { document.getElementById('mobile-menu').classList.toggle('hidden'); };
-        window.handleLogin = () => { if(document.getElementById('login-user').value === 'AdminXeons1308' && document.getElementById('login-pass').value === 'Ktymnyy5') { sessionStorage.setItem('xeomsc_admin', 'true'); location.reload(); } else { document.getElementById('login-error').classList.remove('hidden'); } };
+        
+        // --- POPRAWIONE LOGOWANIE (BEZ ODŚWIEŻANIA) ---
+        window.handleLogin = () => { 
+            if(document.getElementById('login-user').value === 'AdminXeons1308' && document.getElementById('login-pass').value === 'Ktymnyy5') { 
+                sessionStorage.setItem('xeomsc_admin', 'true'); 
+                // Ukryj modal logowania
+                document.getElementById('login-screen').classList.add('hidden');
+                // Pokaż panel admina
+                document.body.classList.add('is-admin'); 
+                document.getElementById('admin-bar').classList.remove('hidden'); 
+                alert("Zalogowano pomyślnie!");
+            } else { 
+                document.getElementById('login-error').classList.remove('hidden'); 
+            } 
+        };
+        // ----------------------------------------------
+
         window.handleLogout = () => { sessionStorage.removeItem('xeomsc_admin'); if(messageUnsubscribe) messageUnsubscribe(); location.reload(); };
         window.toggleAdminPanel = () => { const p = document.getElementById('admin-panel'); p.classList.toggle('hidden'); if(!p.classList.contains('hidden')) window.switchAdminView('messages'); };
         window.exitLogin = () => { document.getElementById('login-screen').classList.add('hidden'); window.location.hash = ''; };
