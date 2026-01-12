@@ -296,6 +296,11 @@
         .custom-order-item:hover img {
             transform: scale(1.05);
         }
+
+        .selected-category-border {
+            border-color: #b45309 !important;
+            box-shadow: 0 0 15px rgba(180, 83, 9, 0.3);
+        }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -438,7 +443,10 @@
             <div class="max-w-7xl mx-auto px-6 text-center">
                 <h2 class="text-4xl font-bold mb-4 text-stone-900">Nasze Produkty</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
-                <div class="relative group" onmouseenter="window.stopAutoScroll()" onmouseleave="window.startAutoScroll()">
+                
+                <!-- KARUZELA 1: KATEGORIE GŁÓWNE -->
+                <p class="text-stone-400 text-sm font-bold uppercase tracking-widest mb-4">Krok 1: Wybierz Kategorię</p>
+                <div class="relative group mb-12" onmouseenter="window.stopAutoScroll()" onmouseleave="window.startAutoScroll()">
                     <button onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
@@ -447,6 +455,20 @@
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
+
+                <!-- KARUZELA 2: PODKATEGORIE (DYNAMICZNA) -->
+                <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
+                    <p class="text-wood-600 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
+                    <h3 id="selected-cat-title" class="text-3xl font-bold text-stone-800 mb-8"></h3>
+                    
+                    <div class="relative group">
+                        <!-- Scrollowanie Podkategorii -->
+                        <div id="sub-categories-grid" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar text-left px-2 justify-center">
+                            <!-- Tu renderują się podkategorie -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -508,23 +530,11 @@
 
     <!-- WIDOKI DYNAMICZNE (Podstrony) -->
     
-    <!-- Widok Kategorii - POZIOM 2 (Lista Podkategorii) -->
-    <div id="category-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[100] overflow-y-auto">
-        <div class="max-w-7xl mx-auto px-6">
-            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do strony głównej
-            </button>
-            <h2 id="category-view-title" class="text-5xl font-bold text-stone-900 mb-4 border-b border-stone-100 pb-6">Wybierz podkategorię</h2>
-            <p class="text-stone-500 mb-12 text-lg">Poniżej znajdziesz kolekcje w tej kategorii.</p>
-            <div id="category-view-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
-        </div>
-    </div>
-
     <!-- Widok Podkategorii - POZIOM 3 (Lista Produktów) -->
     <div id="subcategory-view" class="hidden min-h-screen bg-white pt-32 pb-20 fade-in fixed inset-0 z-[105] overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-cat-btn" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do kategorii
+            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do strony głównej
             </button>
             <h2 id="subcategory-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6">Wybierz produkt</h2>
             <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
@@ -1039,18 +1049,18 @@
                     grid.innerHTML = '<p class="text-stone-400 w-full text-center py-10">Brak widocznych kategorii.</p>';
                 } else {
                     const createCardHTML = ([id, c]) => `
-                        <div class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in min-w-[320px] md:min-w-[400px] snap-center shrink-0 category-card-item">
-                            <div class="h-72 overflow-hidden relative" onclick="window.openCategoryView('${id}')">
+                        <div id="main-cat-${id}" class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in min-w-[320px] md:min-w-[400px] snap-center shrink-0 category-card-item">
+                            <div class="h-72 overflow-hidden relative" onclick="window.selectMainCategory('${id}')">
                                 <img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
                                 <div class="absolute bottom-6 left-8 text-white">
                                     <h3 class="font-bold text-2xl">${c.title}</h3>
                                 </div>
                             </div>
-                            <div class="p-8 flex justify-between items-center" onclick="window.openCategoryView('${id}')">
-                                <span class="text-stone-500 font-medium text-sm">Zobacz kolekcję</span>
+                            <div class="p-8 flex justify-between items-center" onclick="window.selectMainCategory('${id}')">
+                                <span class="text-stone-500 font-medium text-sm">Pokaż podkategorie</span>
                                 <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition">
-                                    <i class="fa-solid fa-arrow-right"></i>
+                                    <i class="fa-solid fa-arrow-down"></i>
                                 </div>
                             </div>
                         </div>`;
@@ -1086,6 +1096,59 @@
             window.startAutoScroll();
         }
 
+        // --- DYNAMICZNE RENDEROWANIE PODKATEGORII NA STRONIE GŁÓWNEJ ---
+        window.selectMainCategory = (id) => {
+            // Reset stylów
+            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
+            
+            // Highlight selected
+            const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
+            selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
+
+            const cat = siteData.categories[id];
+            if(!cat) return;
+
+            const container = document.getElementById('sub-categories-container');
+            const title = document.getElementById('selected-cat-title');
+            const grid = document.getElementById('sub-categories-grid');
+
+            title.textContent = cat.title;
+            grid.innerHTML = '';
+
+            const subs = cat.subs || {};
+            const subKeys = Object.keys(subs);
+
+            if(subKeys.length > 0) {
+                grid.innerHTML = subKeys.map(sid => {
+                    const sub = subs[sid];
+                    return `
+                        <div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 min-w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
+                             <div class="h-48 overflow-hidden relative">
+                                <img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                                    <span class="bg-white/90 text-stone-900 px-6 py-2 rounded-full font-bold text-xs opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition duration-300 shadow-lg">Otwórz</span>
+                                </div>
+                            </div>
+                            <div class="p-5">
+                                <h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${sub.title}</h3>
+                                <p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii. Dodaj je w panelu administratora.</p>';
+            }
+
+            container.classList.remove('hidden');
+            
+            // Płynne przewinięcie do podkategorii
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        };
+
+
         // --- OBSŁUGA GALERII ZLECEŃ ---
         window.openCustomOrdersGallery = (lightboxDirect = false, index = 0) => {
              const orders = siteData.customOrders || [];
@@ -1111,45 +1174,10 @@
 
         // --- ZMODYFIKOWANA LOGIKA: WIDOK KATEGORII I PODKATEGORII ---
         
-        // Krok 1: Otwórz widok Kategorii (Pokaż Podkategorie)
+        // Krok 1: Otwórz widok Kategorii (Pokaż Podkategorie) - TERAZ ROBIMY TO DYNAMICZNIE NA MAIN
         window.openCategoryView = (id) => {
-            const cat = siteData.categories[id];
-            if (!cat) return;
-            
-            const titleEl = document.getElementById('category-view-title');
-            if(titleEl) titleEl.textContent = cat.title;
-
-            const grid = document.getElementById('category-view-grid');
-            if(grid) {
-                grid.innerHTML = '';
-                const subs = cat.subs || {};
-                const subKeys = Object.keys(subs);
-                
-                if (subKeys.length > 0) {
-                    grid.innerHTML = subKeys.map((sid) => {
-                        const sub = subs[sid];
-                        return `
-                        <div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openSubcategoryView('${id}', '${sid}')">
-                            <div class="h-64 overflow-hidden relative">
-                                <img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
-                                    <span class="bg-white/90 text-stone-900 px-6 py-2 rounded-full font-bold text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition duration-300 shadow-lg">Zobacz produkty</span>
-                                </div>
-                            </div>
-                            <div class="p-6">
-                                <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
-                                <p class="text-sm text-stone-400 mt-2">${sub.products ? sub.products.length : 0} produktów</p>
-                            </div>
-                        </div>`;
-                    }).join('');
-                } else {
-                    grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-folder-open"></i></div><p class="text-stone-500 text-lg">Brak podkategorii w tej sekcji.</p></div>';
-                }
-            }
-            
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('category-view').classList.remove('hidden');
-            window.scrollTo(0,0);
+            // Ta funkcja jest teraz aliasem do selectMainCategory dla kompatybilności
+            window.selectMainCategory(id);
         };
 
         // Krok 2: Otwórz widok Podkategorii (Pokaż Produkty)
@@ -1161,8 +1189,12 @@
             const titleEl = document.getElementById('subcategory-title');
             if(titleEl) titleEl.textContent = sub.title;
             
+            // Powrót kieruje teraz do strony głównej, ale scrolluje do wybranej kategorii
             const backBtn = document.getElementById('back-to-cat-btn');
-            backBtn.onclick = () => window.openCategoryView(catId);
+            backBtn.onclick = () => {
+                goHome();
+                setTimeout(() => window.selectMainCategory(catId), 100);
+            };
 
             const grid = document.getElementById('subcategory-grid');
             if(grid) {
@@ -1195,7 +1227,7 @@
                 }
             }
 
-            document.getElementById('category-view').classList.add('hidden');
+            document.getElementById('main-content').classList.add('hidden'); // Ukryj main
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
@@ -1312,6 +1344,8 @@
             document.getElementById('gallery-view').classList.add('hidden'); 
             document.getElementById('custom-orders-full-view').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('sub-categories-container').classList.add('hidden'); // Ukryj podkategorie przy resecie
+            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200')); // Zdejmij zaznaczenie
             window.scrollTo(0,0);
         };
         
