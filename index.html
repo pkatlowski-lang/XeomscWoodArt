@@ -107,7 +107,7 @@
         #send-by-qrcode-button,
         #lucid-mode-button,
         #skip-button,
-        div[class*="rgx"],     
+        div[class*="rgx"],      
         div[class*="custom-button"] {
             display: none !important;
             opacity: 0 !important;
@@ -471,10 +471,20 @@
                     <h3 id="selected-cat-title" class="text-3xl font-bold text-stone-800 mb-8"></h3>
                     
                     <div class="relative group">
+                        <!-- Left Button -->
+                        <button onclick="scrollSubCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
                         <!-- Scrollowanie Podkategorii -->
-                        <div id="sub-categories-grid" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar text-left px-2 justify-center">
+                        <div id="sub-categories-grid" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar text-left px-2">
                             <!-- Tu renderują się podkategorie -->
                         </div>
+
+                        <!-- Right Button -->
+                        <button onclick="scrollSubCategories(1)" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -mr-4 flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -963,6 +973,14 @@
             const container = document.getElementById('main-categories-grid');
             if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 320 : 420;
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        };
+
+        // Scrollowanie podkategorii - NOWE
+        window.scrollSubCategories = (direction) => {
+            const container = document.getElementById('sub-categories-grid');
+            if(!container) return;
+            const scrollAmount = window.innerWidth < 768 ? 300 : 400;
             container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         };
 
