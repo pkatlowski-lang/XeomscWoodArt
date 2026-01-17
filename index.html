@@ -517,8 +517,13 @@
             <i class="fa-solid fa-chevron-left text-4xl"></i>
         </button>
         <div class="relative max-w-7xl max-h-screen w-full flex flex-col items-center justify-center p-2" onclick="event.stopPropagation()">
-            <img id="lightbox-img" src="" alt="Powiększenie" class="rounded-lg shadow-2xl max-h-[85vh] object-contain transition-all duration-300">
+            <img id="lightbox-img" src="" alt="Powiększenie" class="rounded-lg shadow-2xl max-h-[95vh] object-contain transition-all duration-300">
             <p id="lightbox-counter" class="text-white/40 mt-4 text-sm font-mono">1 / 5</p>
+            
+            <!-- NOWE: Przycisk zoomu w lightboxie dla załączników -->
+            <button id="lightbox-zoom-toggle" onclick="event.stopPropagation(); window.toggleLightboxZoom()" class="hidden absolute bottom-[-40px] right-0 bg-stone-800 text-white px-4 py-2 rounded-lg text-xs font-bold border border-white/20 hover:bg-stone-700 transition">
+                <i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty
+            </button>
         </div>
         <button onclick="event.stopPropagation(); changeLightboxImage(1)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white p-6 transition z-[5010] hidden md:block hover:bg-white/5 rounded-full">
             <i class="fa-solid fa-chevron-right text-4xl"></i>
@@ -694,6 +699,7 @@
         window.selectedListSubId = null; 
         window.selectedListProdIndex = null;
         window.openMessageIds = new Set(); // Śledzenie otwartych wiadomości
+        window.isZoomed = false; // Stan zoomu w lightboxie
         
         // Modal Confirm logic
         let confirmCallback = null;
@@ -977,8 +983,15 @@
         window.openLightbox = (index = 0) => { 
             const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter');
             window.currentImgIndex = index; const images = window.currentLightboxImages;
+            // Ukryj przycisk zoomu dla zwykłej galerii (chyba że chcemy go wszędzie, ale tutaj skupiamy się na załącznikach)
+            document.getElementById('lightbox-zoom-toggle').classList.add('hidden');
+            
             if(images.length > 0 && images[index]) {
                 imgEl.src = images[index].src; counterEl.textContent = `${index + 1} / ${images.length}`;
+                imgEl.classList.remove('max-h-none', 'max-w-none'); // Reset zoomu
+                imgEl.classList.add('max-h-[95vh]', 'object-contain');
+                window.isZoomed = false;
+                
                 lb.classList.remove('hidden'); setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
             }
         };
@@ -990,12 +1003,41 @@
             const lb = document.getElementById('lightbox');
             const imgEl = document.getElementById('lightbox-img');
             const counterEl = document.getElementById('lightbox-counter');
+            const zoomBtn = document.getElementById('lightbox-zoom-toggle');
             
             imgEl.src = url;
             counterEl.textContent = "Załącznik";
             
+            // Reset zoomu
+            imgEl.classList.remove('max-h-none', 'max-w-none');
+            imgEl.classList.add('max-h-[95vh]', 'object-contain');
+            window.isZoomed = false;
+            zoomBtn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty';
+            
+            // Pokaż przycisk zoomu
+            zoomBtn.classList.remove('hidden');
+            
             lb.classList.remove('hidden');
             setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+        };
+
+        window.toggleLightboxZoom = () => {
+            const imgEl = document.getElementById('lightbox-img');
+            const btn = document.getElementById('lightbox-zoom-toggle');
+            
+            if(window.isZoomed) {
+                // Wróć do dopasowania
+                imgEl.classList.remove('max-h-none', 'max-w-none');
+                imgEl.classList.add('max-h-[95vh]', 'object-contain');
+                btn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty';
+                window.isZoomed = false;
+            } else {
+                // Rozmiar rzeczywisty (usuń ograniczenia)
+                imgEl.classList.remove('max-h-[95vh]', 'object-contain');
+                imgEl.classList.add('max-h-none', 'max-w-none');
+                btn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Dopasuj do ekranu';
+                window.isZoomed = true;
+            }
         };
 
         window.changeLightboxImage = (direction) => {
@@ -1004,6 +1046,10 @@
             if(newIndex >= images.length) newIndex = 0; if(newIndex < 0) newIndex = images.length - 1;
             window.currentImgIndex = newIndex;
             const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter');
+            
+            // Reset zoom przy zmianie zdjęcia
+            if(window.isZoomed) window.toggleLightboxZoom();
+            
             imgEl.style.opacity = 0.5;
             setTimeout(() => { imgEl.src = images[newIndex].src; counterEl.textContent = `${newIndex + 1} / ${images.length}`; imgEl.style.opacity = 1; }, 150);
         };
@@ -1094,7 +1140,7 @@
                          const statusKey = m.status || (m.read ? 'read' : 'new');
                          const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
                          const unreadClass = isUnread ? 'message-unread-header' : '';
-                         const isOpen = window.openMessageIds.has(m.id); // Sprawdź czy ma być otwarta
+                         const isOpen = window.openMessageIds.has(m.id); 
 
                          return `
                          <div class="message-row-wrapper">
@@ -1124,7 +1170,7 @@
                                      <div>
                                          <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p>
                                          <div class="flex flex-wrap items-end gap-4">
-                                             <!-- Miniatura (Kliknij aby powiększyć) -->
+                                             <!-- Miniatura (Kliknij aby powiększyć w lightboxie z zoomem) -->
                                              <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(this.querySelector('img').src)">
                                                  <img src="${m.attachment}" class="w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20">
                                                  <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
@@ -1132,7 +1178,7 @@
                                                  </div>
                                              </div>
                                              
-                                             <!-- Przycisk Pobierania -->
+                                             <!-- Przycisk Pobierania ORYGINAŁU -->
                                              <a href="${m.attachment}" download="zalacznik_xeomsc_${m.id}.png" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
                                                  <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz oryginał
                                              </a>
@@ -1173,7 +1219,7 @@
                     window.openMessageIds.add(id);
                     body.classList.add('open');
 
-                    // Logika Auto-Read: Jeśli wiadomość jest "Nowa", oznacz jako "Przeczytana"
+                    // Logika Auto-Read
                     const wrapper = body.closest('.message-row-wrapper');
                     const statusBadge = wrapper ? wrapper.querySelector('.status-new') : null;
                     
@@ -1496,12 +1542,23 @@
         window.submitContactForm = async () => {
              const btn = document.getElementById('submit-contact-btn');
              const name = document.getElementById('contact-name').value;
-             const email = document.getElementById('contact-email-input').value;
+             const emailInp = document.getElementById('contact-email-input');
+             const email = emailInp.value.trim(); // Trim whitespace
              const msg = document.getElementById('contact-message').value;
              const fileInput = document.getElementById('contact-file-input');
              const file = fileInput.files[0];
 
              if(!name || !email || !msg) { showToast("Wypełnij wszystkie pola!"); return; }
+
+             // WALIDACJA EMAILA
+             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+             if (!emailRegex.test(email)) {
+                 showToast("Podaj poprawny adres email!");
+                 emailInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+                 setTimeout(() => emailInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
+                 emailInp.focus();
+                 return;
+             }
 
              // Zabezpieczenie przed zbyt dużym plikiem (limit 1MB dla bezpieczeństwa Firestore)
              if(file && file.size > 1024 * 1024) {
