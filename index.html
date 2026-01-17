@@ -1634,7 +1634,11 @@
 
         // --- KONTAKT MODALS ---
         window.openContactModal = (code = '') => {
-             document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.remove('hidden'); document.getElementById('contact-upload-section').classList.add('hidden');
+             document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.remove('hidden'); 
+             
+             // ZMIANA: Zawsze pokazuj sekcję uploadu (usuwamy klasę hidden)
+             document.getElementById('contact-upload-section').classList.remove('hidden'); 
+             
              const container = document.getElementById('product-codes-container'); container.innerHTML = `<div class="flex gap-2"><input type="text" id="code-input-0" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" readonly value="${code}"></div>`;
              document.getElementById('contact-message').value = code ? `Dzień dobry, interesuje mnie produkt o kodzie ${code}. Proszę o informację o dostępności.` : '';
         };
@@ -1647,23 +1651,43 @@
 
         window.submitContactForm = async () => {
              const btn = document.getElementById('submit-contact-btn');
-             const name = document.getElementById('contact-name').value;
+             const nameInp = document.getElementById('contact-name');
+             const name = nameInp.value.trim();
              const emailInp = document.getElementById('contact-email-input');
-             const email = emailInp.value.trim(); // Trim whitespace
-             const msg = document.getElementById('contact-message').value;
+             const email = emailInp.value.trim();
+             const msgInp = document.getElementById('contact-message');
+             const msg = msgInp.value.trim();
              const fileInput = document.getElementById('contact-file-input');
              const file = fileInput.files[0];
 
-             if(!name || !email || !msg) { showToast("Wypełnij wszystkie pola!"); return; }
+             // Reset stylów błędów
+             [nameInp, emailInp, msgInp].forEach(el => el.classList.remove('border-red-500', 'ring-2', 'ring-red-200'));
 
-             // WALIDACJA EMAILA
-             // Sprawdza czy email ma znak @, czy ma kropkę po @ i czy nie ma spacji
+             // 1. Walidacja Imienia (min 3 znaki)
+             if(name.length < 3) {
+                 showToast("Podaj swoje pełne imię (min. 3 znaki)!");
+                 nameInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+                 setTimeout(() => nameInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
+                 nameInp.focus();
+                 return;
+             }
+
+             // 2. Walidacja Emaila (Regex)
              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
              if (!emailRegex.test(email)) {
-                 showToast("Nieprawidłowy email! Musi zawierać @ i kropkę (np. jan@domena.pl)");
+                 showToast("Wprowadź poprawny adres email (np. jan@domena.pl)!");
                  emailInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
                  setTimeout(() => emailInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
                  emailInp.focus();
+                 return;
+             }
+
+             // 3. Walidacja Treści (min 10 znaków)
+             if(msg.length < 10) {
+                 showToast("Wiadomość jest zbyt krótka (min. 10 znaków)!");
+                 msgInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+                 setTimeout(() => msgInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
+                 msgInp.focus();
                  return;
              }
 
