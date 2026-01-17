@@ -1657,9 +1657,10 @@
              if(!name || !email || !msg) { showToast("Wypełnij wszystkie pola!"); return; }
 
              // WALIDACJA EMAILA
-             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+             // Sprawdza czy email ma znak @, czy ma kropkę po @ i czy nie ma spacji
+             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
              if (!emailRegex.test(email)) {
-                 showToast("Podaj poprawny adres email!");
+                 showToast("Nieprawidłowy email! Musi zawierać @ i kropkę (np. jan@domena.pl)");
                  emailInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
                  setTimeout(() => emailInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
                  emailInp.focus();
