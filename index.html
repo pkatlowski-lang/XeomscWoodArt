@@ -145,38 +145,55 @@
 
         .thumb-active { border: 2px solid #b45309; opacity: 1; transform: scale(1.05); }
 
-        /* STYL WIADOMOŚCI */
+        /* STYL WIADOMOŚCI - POPRAWIONY */
+        .message-row-wrapper {
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
         .message-row-header {
             transition: background-color 0.2s;
             cursor: pointer;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 2fr 3fr 4fr 3fr 1fr; /* Dodana kolumna na akcje */
+            gap: 10px;
+            align-items: center;
         }
         .message-row-header:hover {
             background-color: rgba(255,255,255,0.08);
         }
         .message-unread-header {
-            background-color: rgba(255,255,255,0.03);
+            background-color: rgba(239, 68, 68, 0.1);
             font-weight: bold;
+            border-left: 4px solid #ef4444;
         }
         
-        /* Akordeon wiadomości */
+        /* Akordeon wiadomości - NAPRAWIONY */
         .msg-body-wrapper {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease-in-out, opacity 0.3s;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s;
             opacity: 0;
             background-color: rgba(0,0,0,0.2);
         }
         .msg-body-wrapper.open {
             opacity: 1;
+            max-height: 2000px; /* Wystarczająco dużo */
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .status-badge {
-            padding: 2px 8px;
-            border-radius: 999px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 10px;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
             display: inline-block;
+            letter-spacing: 0.05em;
         }
         .status-new { background: #ef4444; color: white; } /* Czerwony */
         .status-read { background: #d97706; color: white; } /* Pomarańcz */
@@ -526,7 +543,8 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twój Email</label>
-                    <input type="email" id="contact-email-input" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="np. jan@example.com">
+                    <!-- DODANO AUTOCOMPLETE OFF -->
+                    <input type="email" id="contact-email-input" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="np. jan@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
                 
                 <div id="product-codes-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
@@ -585,13 +603,13 @@
              <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
                  <div id="view-messages" class="admin-view hidden space-y-6">
                     <h3 class="text-3xl font-bold">Skrzynka Odbiorcza</h3>
-                    <div class="bg-black/20 rounded-xl overflow-hidden border border-white/10">
+                    <div class="bg-black/20 rounded-xl overflow-hidden border border-white/10 min-h-[200px]">
                         <!-- Header tabeli -->
                         <div class="grid grid-cols-12 gap-2 p-4 bg-white/5 text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-white/5">
                             <div class="col-span-2">Status</div>
                             <div class="col-span-3">Nadawca</div>
                             <div class="col-span-4">Email</div>
-                            <div class="col-span-3 text-right">Data</div>
+                            <div class="col-span-3 text-right">Data/Akcje</div>
                         </div>
                         <div id="messages-list" class="divide-y divide-white/5"></div>
                     </div>
@@ -636,9 +654,7 @@
             <div class="text-left">
                 <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
                 <p class="text-xs">Pasja. Precyzja. Drewno.</p>
-                <div class="diag-footer" onclick="showDetailedError()">
-                    <p id="data-source-indicator">Inicjowanie...</p>
-                </div>
+                <!-- USUNIĘTO WSKAŹNIK ŹRÓDŁA DANYCH -->
             </div>
             <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
         </div>
@@ -1049,9 +1065,8 @@
                  let html = '';
                  let msgs = [];
                  snap.forEach(doc => { msgs.push({ id: doc.id, ...doc.data() }); });
-                 msgs.sort((a,b) => new Date(b.date) - new Date(a.date)); // Sortowanie po dacie (najnowsze na górze)
+                 msgs.sort((a,b) => new Date(b.date) - new Date(a.date)); 
                  
-                 // Licznik nieprzeczytanych
                  const unread = msgs.filter(m => (m.status === 'new' || (!m.read && !m.status))).length;
                  if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); } 
                  else { countBadge.classList.add('hidden'); }
@@ -1063,30 +1078,29 @@
                          const statusKey = m.status || (m.read ? 'read' : 'new');
                          const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
                          const unreadClass = isUnread ? 'message-unread-header' : '';
-                         const borderStyle = isUnread ? `border-l-4 border-${statusData.class.split('-')[1]}` : ''; // Prosty trick, ale lepiej style inline
-                         const inlineBorder = isUnread ? `border-left: 4px solid ${statusData.class.includes('new') ? '#ef4444' : '#d97706'};` : '';
 
                          return `
-                         <div class="message-group">
-                             <!-- HEADER -->
-                             <div class="grid grid-cols-12 gap-2 p-4 items-center message-row-header ${unreadClass}" style="${inlineBorder}" onclick="window.toggleMessageBody('${m.id}')">
-                                 <div class="col-span-2">
-                                     <span class="status-badge ${statusData.class}">${statusData.label}</span>
+                         <div class="message-row-wrapper">
+                             <!-- HEADER: Kliknięcie otwiera wiadomość -->
+                             <div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')">
+                                 <div><span class="status-badge ${statusData.class}">${statusData.label}</span></div>
+                                 <div class="font-medium truncate">${m.name}</div>
+                                 <div class="text-sm text-stone-400 truncate">${m.email}</div>
+                                 <div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString()}</div>
+                                 
+                                 <!-- AKCJE: KOSZ (Widoczny zawsze) -->
+                                 <div class="text-right flex items-center justify-end gap-3">
+                                     <button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń"><i class="fa-solid fa-trash"></i></button>
+                                     <i class="fa-solid fa-chevron-down text-stone-600 transition-transform duration-300 transform group-open:rotate-180"></i>
                                  </div>
-                                 <div class="col-span-3 font-medium truncate">${m.name}</div>
-                                 <div class="col-span-4 text-sm text-stone-400 truncate">${m.email}</div>
-                                 <div class="col-span-3 text-right text-xs text-stone-500">${new Date(m.date).toLocaleString()}</div>
                              </div>
                              
                              <!-- BODY (ACCORDION) -->
                              <div id="msg-body-${m.id}" class="msg-body-wrapper">
-                                 <div class="p-6 bg-black/10 border-t border-white/5 space-y-4">
-                                     <div class="flex justify-between items-start">
-                                         <div>
-                                             <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
-                                             <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${m.message}</p>
-                                         </div>
-                                         <button onclick="deleteMessage('${m.id}')" class="text-stone-600 hover:text-red-500 transition px-2"><i class="fa-solid fa-trash"></i></button>
+                                 <div class="p-6 space-y-4">
+                                     <div>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
+                                         <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${m.message}</p>
                                      </div>
                                      
                                      ${m.attachment ? `
@@ -1097,12 +1111,14 @@
                                          </a>
                                      </div>` : ''}
 
-                                     <div class="pt-4 border-t border-white/5 flex items-center gap-4">
-                                         <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
-                                         <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
-                                             ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
-                                         </select>
-                                         <a href="mailto:${m.email}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2">
+                                     <div class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-4">
+                                         <div class="flex items-center gap-2">
+                                             <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
+                                             <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
+                                                 ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
+                                             </select>
+                                         </div>
+                                         <a href="mailto:${m.email}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2 px-4 py-2 bg-wood-500/10 rounded-lg hover:bg-wood-500/20 transition">
                                              <i class="fa-solid fa-reply"></i> Odpowiedz
                                          </a>
                                      </div>
@@ -1122,17 +1138,21 @@
         window.toggleMessageBody = (id) => {
             const body = document.getElementById(`msg-body-${id}`);
             if (body) {
-                // Jeśli otwieramy, oznaczmy jako przeczytaną (jeśli jest nowa)
-                if (!body.classList.contains('open')) {
-                    // Opcjonalnie: można tu dodać logikę auto-read, ale na razie status zmienia się ręcznie lub przy zmianie statusu
-                }
+                // Automatyczne oznaczanie jako przeczytane przy otwarciu (opcjonalne, ale pomocne)
+                // Można to odkomentować, jeśli chcesz, żeby otwarcie zmieniało status z "Nowa" na "Przeczytana"
+                /* if (!body.classList.contains('open')) {
+                    const statusBadge = body.parentElement.querySelector('.status-new');
+                    if (statusBadge) {
+                        window.updateMessageStatus(id, 'read');
+                    }
+                } 
+                */
                 body.classList.toggle('open');
             }
         };
 
         window.updateMessageStatus = async (id, newStatus) => {
             try {
-                // Jeśli status jest inny niż 'new', oznaczamy też jako read: true
                 const isRead = newStatus !== 'new';
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id), {
                     status: newStatus,
@@ -1513,8 +1533,7 @@
         window.showDetailedError = () => { if(lastError) alert("Ostatni błąd:\n" + lastError); else showToast("Połączenie aktywne."); };
         function updateDataSourceIndicator(source, isError=false) {
             const el = document.getElementById('data-source-indicator');
-            if(source === 'cloud') { el.innerHTML = 'Źródło: <span class="source-live">CHMURA</span>'; } 
-            else { el.innerHTML = 'Źródło: <span class="source-default">OFFLINE</span>'; }
+            // Usunięto tekst dla wersji klienckiej, ale zostawiamy pustą funkcję dla bezpieczeństwa wywołań
         }
 
         async function saveData() {
