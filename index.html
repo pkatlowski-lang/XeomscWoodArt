@@ -145,9 +145,45 @@
 
         .thumb-active { border: 2px solid #b45309; opacity: 1; transform: scale(1.05); }
 
-        .message-row { transition: background-color 0.2s; cursor: pointer; }
-        .message-row:hover { background-color: rgba(255,255,255,0.05); }
-        .message-unread { border-left: 3px solid #d97706; background-color: rgba(217, 119, 6, 0.05); }
+        /* STYL WIADOMOŚCI */
+        .message-row-header {
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .message-row-header:hover {
+            background-color: rgba(255,255,255,0.08);
+        }
+        .message-unread-header {
+            background-color: rgba(255,255,255,0.03);
+            font-weight: bold;
+        }
+        
+        /* Akordeon wiadomości */
+        .msg-body-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, opacity 0.3s;
+            opacity: 0;
+            background-color: rgba(0,0,0,0.2);
+        }
+        .msg-body-wrapper.open {
+            opacity: 1;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .status-new { background: #ef4444; color: white; } /* Czerwony */
+        .status-read { background: #d97706; color: white; } /* Pomarańcz */
+        .status-inprogress { background: #eab308; color: black; } /* Żółty */
+        .status-replied { background: #3b82f6; color: white; } /* Niebieski */
+        .status-closed { background: #22c55e; color: white; } /* Zielony */
+        .status-archive { background: #57534e; color: #d6d3d1; } /* Szary */
         
         .notification-badge {
             position: absolute; top: -6px; right: -6px; background-color: #ef4444; color: white;
@@ -295,7 +331,6 @@
                         <a href="#portfolio" class="px-10 py-4 bg-wood-600 text-white rounded-full hover:bg-wood-700 hover:scale-105 transform transition shadow-xl font-bold text-center">
                             Zobacz nasze prace
                         </a>
-                        <!-- Usunięto przycisk "Wycena online" -->
                     </div>
                 </div>
             </div>
@@ -504,7 +539,7 @@
                 </div>
 
                 <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
-                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie)</label>
+                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie, max 1MB)</label>
                     <div class="relative">
                         <input type="file" id="contact-file-input" accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
                     </div>
@@ -544,12 +579,23 @@
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-6"></i> Lista Produktów</button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('custom-orders')" id="btn-custom-orders" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-camera-retro w-6"></i> Galeria Zleceń</button>
-                    <!-- Usunięto Kalkulator Admina -->
                  </nav>
                  <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
              </div>
              <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
-                 <div id="view-messages" class="admin-view hidden space-y-6"><h3 class="text-3xl font-bold">Wiadomości od Klientów</h3><div id="messages-list" class="space-y-4"></div></div>
+                 <div id="view-messages" class="admin-view hidden space-y-6">
+                    <h3 class="text-3xl font-bold">Skrzynka Odbiorcza</h3>
+                    <div class="bg-black/20 rounded-xl overflow-hidden border border-white/10">
+                        <!-- Header tabeli -->
+                        <div class="grid grid-cols-12 gap-2 p-4 bg-white/5 text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-white/5">
+                            <div class="col-span-2">Status</div>
+                            <div class="col-span-3">Nadawca</div>
+                            <div class="col-span-4">Email</div>
+                            <div class="col-span-3 text-right">Data</div>
+                        </div>
+                        <div id="messages-list" class="divide-y divide-white/5"></div>
+                    </div>
+                 </div>
                  <div id="view-content" class="admin-view hidden space-y-10">
                     <h3 class="text-3xl font-bold mb-6">Edycja Treści</h3>
                     <div class="space-y-6">
@@ -634,6 +680,16 @@
         
         // Modal Confirm logic
         let confirmCallback = null;
+
+        // Status Map
+        const STATUS_MAP = {
+            'new': { label: 'Nowa', class: 'status-new' },
+            'read': { label: 'Przeczytana', class: 'status-read' },
+            'in-progress': { label: 'W trakcie', class: 'status-inprogress' },
+            'replied': { label: 'Odp. wysłana', class: 'status-replied' },
+            'closed': { label: 'Zrealizowane', class: 'status-closed' },
+            'archive': { label: 'Archiwum', class: 'status-archive' }
+        };
 
         // Dane domyślne
         const initialData = {
@@ -985,10 +1041,8 @@
              const list = document.getElementById('messages-list');
              const countBadge = document.getElementById('msg-count-bar');
              if(!isOnline) return;
-             // Nasłuchiwanie na kolekcję wiadomości - POPRAWIONE
-             const msgCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
              
-             // Odpinamy poprzedni listener jeśli istnieje
+             const msgCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
              if (messageUnsubscribe) messageUnsubscribe();
              
              messageUnsubscribe = onSnapshot(msgCollection, (snap) => {
@@ -998,24 +1052,65 @@
                  msgs.sort((a,b) => new Date(b.date) - new Date(a.date)); // Sortowanie po dacie (najnowsze na górze)
                  
                  // Licznik nieprzeczytanych
-                 const unread = msgs.filter(m => !m.read).length;
+                 const unread = msgs.filter(m => (m.status === 'new' || (!m.read && !m.status))).length;
                  if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); } 
                  else { countBadge.classList.add('hidden'); }
 
                  if(msgs.length === 0) { html = '<p class="text-stone-500 text-center py-10">Brak wiadomości.</p>'; } 
                  else {
-                     html = msgs.map(m => `
-                         <div class="bg-black/40 p-5 rounded-2xl border border-white/5 ${m.read ? '' : 'message-unread'}">
-                             <div class="flex justify-between items-start mb-2">
-                                 <div>
-                                     <span class="font-bold text-lg">${m.name}</span>
-                                     <span class="block text-xs text-stone-500">${m.email} | ${new Date(m.date).toLocaleString()}</span>
+                     html = msgs.map(m => {
+                         const isUnread = (m.status === 'new' || (!m.read && !m.status));
+                         const statusKey = m.status || (m.read ? 'read' : 'new');
+                         const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
+                         const unreadClass = isUnread ? 'message-unread-header' : '';
+                         const borderStyle = isUnread ? `border-l-4 border-${statusData.class.split('-')[1]}` : ''; // Prosty trick, ale lepiej style inline
+                         const inlineBorder = isUnread ? `border-left: 4px solid ${statusData.class.includes('new') ? '#ef4444' : '#d97706'};` : '';
+
+                         return `
+                         <div class="message-group">
+                             <!-- HEADER -->
+                             <div class="grid grid-cols-12 gap-2 p-4 items-center message-row-header ${unreadClass}" style="${inlineBorder}" onclick="window.toggleMessageBody('${m.id}')">
+                                 <div class="col-span-2">
+                                     <span class="status-badge ${statusData.class}">${statusData.label}</span>
                                  </div>
-                                 <button onclick="deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>
+                                 <div class="col-span-3 font-medium truncate">${m.name}</div>
+                                 <div class="col-span-4 text-sm text-stone-400 truncate">${m.email}</div>
+                                 <div class="col-span-3 text-right text-xs text-stone-500">${new Date(m.date).toLocaleString()}</div>
                              </div>
-                             <p class="text-stone-300 text-sm whitespace-pre-wrap">${m.message}</p>
+                             
+                             <!-- BODY (ACCORDION) -->
+                             <div id="msg-body-${m.id}" class="msg-body-wrapper">
+                                 <div class="p-6 bg-black/10 border-t border-white/5 space-y-4">
+                                     <div class="flex justify-between items-start">
+                                         <div>
+                                             <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
+                                             <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${m.message}</p>
+                                         </div>
+                                         <button onclick="deleteMessage('${m.id}')" class="text-stone-600 hover:text-red-500 transition px-2"><i class="fa-solid fa-trash"></i></button>
+                                     </div>
+                                     
+                                     ${m.attachment ? `
+                                     <div>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p>
+                                         <a href="${m.attachment}" target="_blank">
+                                             <img src="${m.attachment}" class="max-w-xs max-h-48 rounded-lg border border-white/10 hover:opacity-90 cursor-zoom-in">
+                                         </a>
+                                     </div>` : ''}
+
+                                     <div class="pt-4 border-t border-white/5 flex items-center gap-4">
+                                         <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
+                                         <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
+                                             ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
+                                         </select>
+                                         <a href="mailto:${m.email}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2">
+                                             <i class="fa-solid fa-reply"></i> Odpowiedz
+                                         </a>
+                                     </div>
+                                 </div>
+                             </div>
                          </div>
-                     `).join('');
+                     `;
+                     }).join('');
                  }
                  if(list) list.innerHTML = html;
              }, (error) => {
@@ -1023,6 +1118,32 @@
                  if(list) list.innerHTML = '<p class="text-red-500 text-center py-10">Błąd połączenia z bazą wiadomości.</p>';
              });
         }
+        
+        window.toggleMessageBody = (id) => {
+            const body = document.getElementById(`msg-body-${id}`);
+            if (body) {
+                // Jeśli otwieramy, oznaczmy jako przeczytaną (jeśli jest nowa)
+                if (!body.classList.contains('open')) {
+                    // Opcjonalnie: można tu dodać logikę auto-read, ale na razie status zmienia się ręcznie lub przy zmianie statusu
+                }
+                body.classList.toggle('open');
+            }
+        };
+
+        window.updateMessageStatus = async (id, newStatus) => {
+            try {
+                // Jeśli status jest inny niż 'new', oznaczamy też jako read: true
+                const isRead = newStatus !== 'new';
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id), {
+                    status: newStatus,
+                    read: isRead
+                });
+                showToast(`Status zmieniony na: ${STATUS_MAP[newStatus].label}`);
+            } catch (e) {
+                console.error(e);
+                showToast("Błąd aktualizacji statusu");
+            }
+        };
         
         window.deleteMessage = async (id) => {
             window.openConfirm("Usunąć tę wiadomość?", async () => {
@@ -1033,7 +1154,6 @@
 
         function renderMessagesAdmin() {
             const list = document.getElementById('messages-list');
-            // Jeśli nasłuchiwanie jest aktywne, lista odświeża się sama.
             if(!auth.currentUser) { list.innerHTML = '<p class="text-center py-10">Brak dostępu.</p>'; return; }
             if(!isOnline) list.innerHTML = '<p class="text-stone-500 text-center py-10">Funkcja wiadomości wymaga połączenia.</p>';
         }
@@ -1321,19 +1441,50 @@
              const name = document.getElementById('contact-name').value;
              const email = document.getElementById('contact-email-input').value;
              const msg = document.getElementById('contact-message').value;
+             const fileInput = document.getElementById('contact-file-input');
+             const file = fileInput.files[0];
 
              if(!name || !email || !msg) { showToast("Wypełnij wszystkie pola!"); return; }
+
+             // Zabezpieczenie przed zbyt dużym plikiem (limit 1MB dla bezpieczeństwa Firestore)
+             if(file && file.size > 1024 * 1024) {
+                 alert("Plik jest za duży! Maksymalny rozmiar to 1MB.");
+                 return;
+             }
 
              const originalText = btn.innerHTML;
              btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Wysyłanie...';
              
              try {
+                let attachmentData = null;
+                
+                // Konwersja pliku na Base64
+                if (file) {
+                    attachmentData = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                }
+
                 if(isOnline) {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
-                        name: name, email: email, message: msg, date: new Date().toISOString(), read: false
+                        name: name, 
+                        email: email, 
+                        message: msg, 
+                        attachment: attachmentData,
+                        date: new Date().toISOString(), 
+                        status: 'new', // Domyślny status
+                        read: false
                     });
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Wysłano!';
-                    setTimeout(() => { btn.innerHTML = originalText; closeContactModal(); showToast("Wiadomość wysłana!"); }, 1500);
+                    setTimeout(() => { 
+                        btn.innerHTML = originalText; 
+                        closeContactModal(); 
+                        showToast("Wiadomość wysłana!");
+                        document.getElementById('contact-file-input').value = ""; // Reset inputu
+                    }, 1500);
                 } else {
                     alert("Jesteś offline. Nie można wysłać wiadomości.");
                     btn.innerHTML = originalText;
