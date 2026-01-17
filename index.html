@@ -1128,8 +1128,11 @@
                     }).join('');
                 } else { grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>'; }
             }
+            
+            // FIX: Ukrywanie innych widoków przy powrocie
             document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('subcategories-full-view').classList.add('hidden'); // Ukryj pełną listę jeśli otwarta
+            document.getElementById('subcategories-full-view').classList.add('hidden'); 
+            document.getElementById('gallery-view').classList.add('hidden'); // Ważne: ukryj widok produktu
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
@@ -1141,6 +1144,46 @@
              } else {
                  window.goHome();
              }
+        };
+        
+        // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
+        window.openFullSubcategoryList = (catId) => {
+            const cat = siteData.categories[catId];
+            if(!cat) return;
+            
+            const container = document.getElementById('subcategories-full-view');
+            const title = document.getElementById('subcategories-full-title');
+            const grid = document.getElementById('subcategories-full-grid');
+            
+            title.textContent = cat.title;
+            grid.innerHTML = '';
+            
+            // Przechowujemy ID kategorii, aby wiedzieć gdzie wrócić z widoku produktów
+            window.currentCatId = catId;
+            
+            const subs = cat.subs || {};
+            const subKeys = Object.keys(subs);
+            
+             if(subKeys.length > 0) {
+                grid.innerHTML = subKeys.map(sid => {
+                    const sub = subs[sid];
+                    return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openSubcategoryView('${catId}', '${sid}')">
+                        <div class="h-64 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
+                            <p class="text-stone-500 mt-2">${sub.products ? sub.products.length : 0} produktów</p>
+                        </div></div>`;
+                }).join('');
+            } else {
+                grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak podkategorii.</p></div>';
+            }
+            
+            // FIX: Ukrywanie widoku podkategorii (listy produktów)
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.add('hidden'); // Ważne: ukryj listę produktów
+            document.getElementById('gallery-view').classList.add('hidden');
+            container.classList.remove('hidden');
+            window.scrollTo(0,0);
         };
 
         window.openGallery = (catId, subId, prodIndex) => {
