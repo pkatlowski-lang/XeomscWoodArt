@@ -216,6 +216,10 @@
         #confirm-modal {
             background-color: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
         }
+
+        /* DRAG CURSORS - NOWE STYLE DO PRZESUWANIA */
+        .cursor-grab { cursor: grab; }
+        .cursor-grabbing { cursor: grabbing; user-select: none; }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -373,7 +377,8 @@
                     <button onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <div id="main-categories-grid" class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar text-left px-2"></div>
+                    <!-- Dodano cursor-grab -->
+                    <div id="main-categories-grid" class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar text-left px-2 cursor-grab"></div>
                     <button onclick="scrollCategories(1)" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -mr-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
@@ -382,8 +387,21 @@
                 <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
                     <p class="text-wood-600 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
                     <h3 id="selected-cat-title" class="text-3xl font-bold text-stone-800 mb-8"></h3>
+                    
+                    <!-- ZMODYFIKOWANA SEKCJA PODKATEGORII Z PRZYCISKAMI -->
                     <div class="relative group">
-                        <div id="sub-categories-grid" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar text-left px-2 justify-center"></div>
+                        <!-- Przycisk Lewy Podkategorie -->
+                        <button onclick="scrollSubCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-stone-800 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-600 -ml-4 flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        
+                        <!-- Kontener Podkategorii z cursor-grab -->
+                        <div id="sub-categories-grid" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar text-left px-2 justify-center cursor-grab"></div>
+                        
+                        <!-- Przycisk Prawy Podkategorie -->
+                        <button onclick="scrollSubCategories(1)" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-stone-800 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-600 -mr-4 flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -399,7 +417,8 @@
                     <button onclick="scrollCustomOrders(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-stone-800 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-600 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <div id="custom-orders-carousel" class="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar text-left px-2"></div>
+                    <!-- Dodano cursor-grab -->
+                    <div id="custom-orders-carousel" class="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar text-left px-2 cursor-grab"></div>
                     <button onclick="scrollCustomOrders(1)" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-stone-800 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-600 -mr-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
@@ -764,16 +783,94 @@
         };
         window.addEventListener('scroll', window.updateNavbar);
         
+        // Funkcja obsługująca Drag to Scroll (Przesuwanie myszką)
+        window.enableDragScroll = (elementId) => {
+            const slider = document.getElementById(elementId);
+            if(!slider) return;
+            
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('cursor-grabbing');
+                slider.classList.remove('cursor-grab');
+                // Wyłącz snap podczas przeciągania dla płynności
+                slider.style.scrollSnapType = 'none';
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+                window.stopAutoScroll(); // Zatrzymaj auto-scroll podczas interakcji
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+                slider.style.scrollSnapType = 'x mandatory'; // Przywróć snap
+                window.startAutoScroll(); // Wznów auto-scroll
+            });
+
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+                slider.style.scrollSnapType = 'x mandatory';
+                window.startAutoScroll();
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; // Szybkość przewijania
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        };
+
         window.scrollCategories = (direction) => {
             const container = document.getElementById('main-categories-grid'); if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 320 : 420;
-            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            
+            // Logika pętli (360 stopni)
+            // Jeśli idziemy w prawo i jesteśmy przy końcu -> skocz na początek
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
+                container.scrollTo({ left: 0, behavior: 'smooth' }); 
+            } 
+            // Jeśli idziemy w lewo i jesteśmy na początku -> skocz na koniec
+            else if (direction === -1 && container.scrollLeft <= 0) {
+                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); 
+            } else {
+                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
+        };
+
+        // Nowa funkcja do przewijania podkategorii (z logiką 360)
+        window.scrollSubCategories = (direction) => {
+            const container = document.getElementById('sub-categories-grid'); if(!container) return;
+            const scrollAmount = window.innerWidth < 768 ? 280 : 320;
+
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else if (direction === -1 && container.scrollLeft <= 0) {
+                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
         };
 
         window.scrollCustomOrders = (direction) => {
             const container = document.getElementById('custom-orders-carousel'); if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 300 : 400;
-            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+
+            // Logika pętli (360 stopni)
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else if (direction === -1 && container.scrollLeft <= 0) {
+                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
         };
         
         window.startAutoScroll = () => {
@@ -832,8 +929,8 @@
                     const createCardHTML = ([id, c]) => `
                         <div id="main-cat-${id}" class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in min-w-[320px] md:min-w-[400px] snap-center shrink-0 category-card-item">
                             <div class="h-72 overflow-hidden relative" onclick="window.selectMainCategory('${id}')">
-                                <img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                                <img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
                                 <div class="absolute bottom-6 left-8 text-white"><h3 class="font-bold text-2xl">${c.title}</h3></div>
                             </div>
                             <div class="p-8 flex justify-between items-center" onclick="window.selectMainCategory('${id}')">
@@ -844,6 +941,8 @@
                     const allItems = visibleCategories.length < 3 ? [...visibleCategories, ...visibleCategories, ...visibleCategories] : visibleCategories;
                     allItems.forEach(item => { grid.innerHTML += createCardHTML(item); });
                 }
+                // Aktywuj drag dla kategorii głównych
+                window.enableDragScroll('main-categories-grid');
             }
 
             const coContainer = document.getElementById('custom-orders-carousel');
@@ -853,10 +952,13 @@
                 if (orders.length === 0) { document.getElementById('custom-orders').classList.add('hidden'); } 
                 else {
                     document.getElementById('custom-orders').classList.remove('hidden');
-                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" class="w-full h-full object-cover transition duration-500 hover:scale-105"></div>`;
+                    // Dodano pointer-events-none do obrazka, żeby nie przeszkadzał w dragowaniu
+                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" class="w-full h-full object-cover transition duration-500 hover:scale-105 pointer-events-none"></div>`;
                     const displayOrders = orders.length < 4 ? [...orders, ...orders] : orders;
                     displayOrders.forEach((url, index) => { coContainer.innerHTML += createOrderHTML(url, index % orders.length); });
                 }
+                // Aktywuj drag dla zleceń
+                window.enableDragScroll('custom-orders-carousel');
             }
             window.startAutoScroll();
         }
@@ -878,10 +980,14 @@
                 grid.innerHTML = subKeys.map(sid => {
                     const sub = subs[sid];
                     return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 min-w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
-                             <div class="h-48 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                             <div class="h-48 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"></div>
                             <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${sub.title}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
                 }).join('');
             } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
+            
+            // Aktywuj drag dla podkategorii
+            window.enableDragScroll('sub-categories-grid');
+
             container.classList.remove('hidden');
             setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
         };
