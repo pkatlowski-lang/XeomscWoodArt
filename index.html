@@ -977,7 +977,14 @@
             if (grid) {
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
-                const visibleCategories = Object.entries(cats).filter(([, c]) => !c.isHidden).sort(([, a], [, b]) => a.title.localeCompare(b.title, 'pl'));
+                // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
+                const visibleCategories = Object.entries(cats)
+                    .filter(([, c]) => !c.isHidden)
+                    .sort(([, a], [, b]) => {
+                        const orderA = a.order !== undefined ? a.order : 9999;
+                        const orderB = b.order !== undefined ? b.order : 9999;
+                        return orderA - orderB;
+                    });
                 
                 if (visibleCategories.length === 0) { grid.innerHTML = '<p class="text-stone-400 w-full text-center py-10">Brak widocznych kategorii.</p>'; } 
                 else {
@@ -1034,7 +1041,10 @@
             // Konfiguracja przycisku "Zobacz wszystkie"
             btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
 
-            const subs = cat.subs || {}; const subKeys = Object.keys(subs);
+            const subs = cat.subs || {}; 
+            
+            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
+            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
 
             if(subKeys.length > 0) {
                 // Wyświetl wszystkie podkategorie w karuzeli
@@ -1069,7 +1079,9 @@
             window.currentCatId = catId;
             
             const subs = cat.subs || {};
-            const subKeys = Object.keys(subs);
+            
+            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
+            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
             
              if(subKeys.length > 0) {
                 grid.innerHTML = subKeys.map(sid => {
@@ -1162,7 +1174,8 @@
             window.currentCatId = catId;
             
             const subs = cat.subs || {};
-            const subKeys = Object.keys(subs);
+            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
+            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
             
              if(subKeys.length > 0) {
                 grid.innerHTML = subKeys.map(sid => {
@@ -1555,6 +1568,14 @@
 
         function renderCategoriesAdmin() {
             const container = document.getElementById('view-categories');
+            
+            // SORTUJEMY KATEGORIE DO WYŚWIETLENIA W PANELU WG KOLEJNOŚCI
+            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => {
+                const orderA = a.order !== undefined ? a.order : 9999;
+                const orderB = b.order !== undefined ? b.order : 9999;
+                return orderA - orderB;
+            });
+
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Kategorie Główne</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
@@ -1568,23 +1589,70 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    ${Object.keys(siteData.categories).map(k => `
+                    ${sortedCats.map(([k, c]) => `
                         <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5">
-                            <span class="font-bold">${siteData.categories[k].title}</span>
-                            <div class="flex gap-2"><button onclick="window.editCat('${k}')" class="text-blue-400 text-sm">EDYTUJ</button><button onclick="window.delCat('${k}')" class="text-red-500 text-sm">USUŃ</button></div>
+                            <span class="font-bold">${c.title}</span>
+                            <div class="flex gap-2 items-center">
+                                <!-- STRZAŁKI DO ZMIANY KOLEJNOŚCI -->
+                                <button onclick="window.moveCategory('${k}', -1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-1" title="Przesuń wyżej"><i class="fa-solid fa-arrow-up"></i></button>
+                                <button onclick="window.moveCategory('${k}', 1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-2" title="Przesuń niżej"><i class="fa-solid fa-arrow-down"></i></button>
+                                
+                                <button onclick="window.editCat('${k}')" class="text-blue-400 text-sm font-bold hover:text-white transition px-2">EDYTUJ</button>
+                                <button onclick="window.delCat('${k}')" class="text-red-500 text-sm font-bold hover:text-white transition px-2">USUŃ</button>
+                            </div>
                         </div>`).join('')}
                 </div>`;
             document.getElementById('add-cat-btn').onclick = () => {
                 const t = document.getElementById('cat-t').value; const i = document.getElementById('cat-i').value; const editId = document.getElementById('edit-cat-id').value;
                 if(t) {
-                    if (editId) { siteData.categories[editId].title = t; siteData.categories[editId].image = i; } 
-                    else { const id = 'c' + Date.now(); siteData.categories[id] = { title: t, image: i, subs: {}, isHidden: false }; }
+                    if (editId) { 
+                        siteData.categories[editId].title = t; 
+                        siteData.categories[editId].image = i; 
+                    } else { 
+                        const id = 'c' + Date.now(); 
+                        // Nowa kategoria trafia na koniec
+                        const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
+                        siteData.categories[id] = { title: t, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
+                    }
                     saveData(); renderCategoriesAdmin(); renderMain();
                 }
             };
             document.getElementById('cancel-cat-btn').onclick = () => { renderCategoriesAdmin(); };
         }
         
+        // NOWA FUNKCJA DO ZMIANY KOLEJNOŚCI KATEGORII
+        window.moveCategory = (id, direction) => {
+            // 1. Pobierz posortowaną tablicę [key, object]
+            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => {
+                const orderA = a.order !== undefined ? a.order : 9999;
+                const orderB = b.order !== undefined ? b.order : 9999;
+                return orderA - orderB;
+            });
+
+            // 2. Znajdź indeks elementu do przesunięcia
+            const index = sortedCats.findIndex(([k]) => k === id);
+            if (index === -1) return;
+
+            // 3. Sprawdź czy ruch jest możliwy
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= sortedCats.length) return;
+
+            // 4. Zamień elementy w tablicy
+            const temp = sortedCats[index];
+            sortedCats[index] = sortedCats[newIndex];
+            sortedCats[newIndex] = temp;
+
+            // 5. Przypisz nowe wartości 'order' wszystkim elementom (reindeksacja)
+            sortedCats.forEach(([key], idx) => {
+                siteData.categories[key].order = idx;
+            });
+
+            // 6. Zapisz i odśwież
+            saveData();
+            renderCategoriesAdmin();
+            renderMain();
+        };
+
         window.editCat = (id) => {
             const cat = siteData.categories[id];
             document.getElementById('cat-t').value = cat.title; document.getElementById('cat-i').value = cat.image;
@@ -1597,13 +1665,17 @@
             const cats = siteData.categories || {};
             const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
             let subListHTML = '';
+            
             Object.keys(cats).forEach(catId => {
                 const cat = cats[catId];
                 if(cat.subs) {
-                    Object.keys(cat.subs).forEach(subId => {
-                        const sub = cat.subs[subId];
-                        subListHTML += `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5 mb-2"><div><span class="text-xs text-stone-500 uppercase block">${cat.title}</span><span class="font-bold">${sub.title}</span></div><button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-sm">USUŃ</button></div>`;
-                    });
+                    // SORTOWANIE PODKATEGORII W ADMINIE TEŻ ALFABETYCZNIE
+                    Object.keys(cat.subs)
+                        .sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl'))
+                        .forEach(subId => {
+                            const sub = cat.subs[subId];
+                            subListHTML += `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5 mb-2"><div><span class="text-xs text-stone-500 uppercase block">${cat.title}</span><span class="font-bold">${sub.title}</span></div><button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-sm">USUŃ</button></div>`;
+                        });
                 }
             });
             container.innerHTML = `
@@ -1668,7 +1740,17 @@
             subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
             if(cid && siteData.categories[cid].subs) {
                 const subs = siteData.categories[cid].subs;
-                Object.keys(subs).forEach(sid => { const opt = document.createElement('option'); opt.value = sid; opt.text = subs[sid].title; subSelect.appendChild(opt); });
+                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
+                Object.keys(subs)
+                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
+                    .forEach(sid => { 
+                        const opt = document.createElement('option'); 
+                        opt.value = sid; 
+                        // DODANO LICZNIK PRODUKTÓW
+                        const count = subs[sid].products ? subs[sid].products.length : 0;
+                        opt.text = `${subs[sid].title} (${count})`; 
+                        subSelect.appendChild(opt); 
+                    });
                 subSelect.disabled = false;
             } else { subSelect.disabled = true; }
         };
@@ -1713,7 +1795,17 @@
             if(catId && siteData.categories[catId].subs) {
                 subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
                 const subs = siteData.categories[catId].subs;
-                Object.keys(subs).forEach(sid => { const opt = document.createElement('option'); opt.value = sid; opt.text = subs[sid].title; subSelect.appendChild(opt); });
+                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
+                Object.keys(subs)
+                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
+                    .forEach(sid => { 
+                        const opt = document.createElement('option'); 
+                        opt.value = sid; 
+                        // DODANO LICZNIK PRODUKTÓW
+                        const count = subs[sid].products ? subs[sid].products.length : 0;
+                        opt.text = `${subs[sid].title} (${count})`; 
+                        subSelect.appendChild(opt); 
+                    });
                 subSelect.classList.remove('hidden');
             }
         };
