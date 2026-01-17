@@ -145,7 +145,7 @@
 
         .thumb-active { border: 2px solid #b45309; opacity: 1; transform: scale(1.05); }
 
-        /* STYL WIADOMOŚCI - POPRAWIONY */
+        /* STYL WIADOMOŚCI */
         .message-row-wrapper {
             background-color: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.05);
@@ -159,7 +159,7 @@
             cursor: pointer;
             padding: 1rem;
             display: grid;
-            grid-template-columns: 2fr 3fr 4fr 3fr 1fr; /* Dodana kolumna na akcje */
+            grid-template-columns: 2fr 3fr 4fr 3fr 1fr;
             gap: 10px;
             align-items: center;
         }
@@ -172,7 +172,7 @@
             border-left: 4px solid #ef4444;
         }
         
-        /* Akordeon wiadomości - NAPRAWIONY */
+        /* Akordeon wiadomości */
         .msg-body-wrapper {
             max-height: 0;
             overflow: hidden;
@@ -182,7 +182,7 @@
         }
         .msg-body-wrapper.open {
             opacity: 1;
-            max-height: 2000px; /* Wystarczająco dużo */
+            max-height: 2000px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -195,12 +195,12 @@
             display: inline-block;
             letter-spacing: 0.05em;
         }
-        .status-new { background: #ef4444; color: white; } /* Czerwony */
-        .status-read { background: #d97706; color: white; } /* Pomarańcz */
-        .status-inprogress { background: #eab308; color: black; } /* Żółty */
-        .status-replied { background: #3b82f6; color: white; } /* Niebieski */
-        .status-closed { background: #22c55e; color: white; } /* Zielony */
-        .status-archive { background: #57534e; color: #d6d3d1; } /* Szary */
+        .status-new { background: #ef4444; color: white; }
+        .status-read { background: #d97706; color: white; }
+        .status-inprogress { background: #eab308; color: black; }
+        .status-replied { background: #3b82f6; color: white; }
+        .status-closed { background: #22c55e; color: white; }
+        .status-archive { background: #57534e; color: #d6d3d1; }
         
         .notification-badge {
             position: absolute; top: -6px; right: -6px; background-color: #ef4444; color: white;
@@ -693,6 +693,7 @@
         window.selectedListCatId = null;
         window.selectedListSubId = null; 
         window.selectedListProdIndex = null;
+        window.openMessageIds = new Set(); // Śledzenie otwartych wiadomości
         
         // Modal Confirm logic
         let confirmCallback = null;
@@ -982,6 +983,21 @@
             }
         };
 
+        // NOWA FUNKCJA DO PODGLĄDU ZAŁĄCZNIKA WIADOMOŚCI
+        window.openMessageLightbox = (url) => {
+            window.currentLightboxImages = [{ src: url }];
+            window.currentImgIndex = 0;
+            const lb = document.getElementById('lightbox');
+            const imgEl = document.getElementById('lightbox-img');
+            const counterEl = document.getElementById('lightbox-counter');
+            
+            imgEl.src = url;
+            counterEl.textContent = "Załącznik";
+            
+            lb.classList.remove('hidden');
+            setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+        };
+
         window.changeLightboxImage = (direction) => {
             const images = window.currentLightboxImages; if(!images || images.length === 0) return;
             let newIndex = window.currentImgIndex + direction;
@@ -1078,6 +1094,7 @@
                          const statusKey = m.status || (m.read ? 'read' : 'new');
                          const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
                          const unreadClass = isUnread ? 'message-unread-header' : '';
+                         const isOpen = window.openMessageIds.has(m.id); // Sprawdź czy ma być otwarta
 
                          return `
                          <div class="message-row-wrapper">
@@ -1091,12 +1108,12 @@
                                  <!-- AKCJE: KOSZ (Widoczny zawsze) -->
                                  <div class="text-right flex items-center justify-end gap-3">
                                      <button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń"><i class="fa-solid fa-trash"></i></button>
-                                     <i class="fa-solid fa-chevron-down text-stone-600 transition-transform duration-300 transform group-open:rotate-180"></i>
+                                     <i class="fa-solid fa-chevron-down text-stone-600 transition-transform duration-300 transform ${isOpen ? 'rotate-180' : ''}"></i>
                                  </div>
                              </div>
                              
                              <!-- BODY (ACCORDION) -->
-                             <div id="msg-body-${m.id}" class="msg-body-wrapper">
+                             <div id="msg-body-${m.id}" class="msg-body-wrapper ${isOpen ? 'open' : ''}">
                                  <div class="p-6 space-y-4">
                                      <div>
                                          <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
@@ -1106,9 +1123,20 @@
                                      ${m.attachment ? `
                                      <div>
                                          <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p>
-                                         <a href="${m.attachment}" target="_blank">
-                                             <img src="${m.attachment}" class="max-w-xs max-h-48 rounded-lg border border-white/10 hover:opacity-90 cursor-zoom-in">
-                                         </a>
+                                         <div class="flex flex-wrap items-end gap-4">
+                                             <!-- Miniatura (Kliknij aby powiększyć) -->
+                                             <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(this.querySelector('img').src)">
+                                                 <img src="${m.attachment}" class="w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20">
+                                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
+                                                     <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
+                                                 </div>
+                                             </div>
+                                             
+                                             <!-- Przycisk Pobierania -->
+                                             <a href="${m.attachment}" download="zalacznik_xeomsc_${m.id}.png" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz oryginał
+                                             </a>
+                                         </div>
                                      </div>` : ''}
 
                                      <div class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-4">
@@ -1138,16 +1166,25 @@
         window.toggleMessageBody = (id) => {
             const body = document.getElementById(`msg-body-${id}`);
             if (body) {
-                // Automatyczne oznaczanie jako przeczytane przy otwarciu (opcjonalne, ale pomocne)
-                // Można to odkomentować, jeśli chcesz, żeby otwarcie zmieniało status z "Nowa" na "Przeczytana"
-                /* if (!body.classList.contains('open')) {
-                    const statusBadge = body.parentElement.querySelector('.status-new');
+                const isOpen = body.classList.contains('open');
+                
+                if (!isOpen) {
+                    // Otwieranie wiadomości
+                    window.openMessageIds.add(id);
+                    body.classList.add('open');
+
+                    // Logika Auto-Read: Jeśli wiadomość jest "Nowa", oznacz jako "Przeczytana"
+                    const wrapper = body.closest('.message-row-wrapper');
+                    const statusBadge = wrapper ? wrapper.querySelector('.status-new') : null;
+                    
                     if (statusBadge) {
                         window.updateMessageStatus(id, 'read');
                     }
-                } 
-                */
-                body.classList.toggle('open');
+                } else {
+                    // Zamykanie wiadomości
+                    window.openMessageIds.delete(id);
+                    body.classList.remove('open');
+                }
             }
         };
 
