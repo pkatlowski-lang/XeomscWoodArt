@@ -773,6 +773,7 @@
         window.selectedListProdIndex = null;
         window.openMessageIds = new Set(); // Śledzenie otwartych wiadomości
         window.isZoomed = false; // Stan zoomu w lightboxie
+        window.currentContactProductImage = null; // ZMIENNA DO PRZECHOWYWANIA URL ZDJĘCIA PRODUKTU
         
         // Modal Confirm logic
         let confirmCallback = null;
@@ -1154,7 +1155,11 @@
             
             const askBtn = document.getElementById('ask-btn');
             const codeToPass = product.code || '';
-            askBtn.onclick = () => window.openContactModal(codeToPass);
+            const imageToPass = product.image || ''; // Pobieramy zdjęcie produktu
+            
+            // Przekazujemy zdjęcie do funkcji modala
+            askBtn.onclick = () => window.openContactModal(codeToPass, imageToPass);
+            
             // ZMIANA: Przycisk powrotu cofa do podkategorii
             document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
             
@@ -1746,21 +1751,47 @@
         window.deleteCustomOrder = (index) => { window.openConfirm('Usunąć to zdjęcie?', () => { siteData.customOrders.splice(index, 1); saveData(); renderCustomOrdersAdmin(); renderMain(); }); };
 
         // --- KONTAKT MODALS ---
-        window.openContactModal = (code = '') => {
-             document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.remove('hidden'); 
+        window.openContactModal = (code = '', imageUrl = '') => {
+             document.getElementById('contact-modal').classList.remove('hidden'); 
+             document.getElementById('product-codes-section').classList.remove('hidden'); 
              
-             // ZMIANA: Zawsze pokazuj sekcję uploadu (usuwamy klasę hidden)
-             document.getElementById('contact-upload-section').classList.remove('hidden'); 
+             // Ukrywamy upload użytkownika, bo załączamy zdjęcie produktu automatycznie
+             // Jeśli chcesz pozwolić użytkownikowi zmienić zdjęcie, usuń tę linię, ale wtedy trzeba obsłużyć logikę priorytetów
+             document.getElementById('contact-upload-section').classList.add('hidden'); 
              
-             const container = document.getElementById('product-codes-container'); container.innerHTML = `<div class="flex gap-2"><input type="text" id="code-input-0" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" readonly value="${code}"></div>`;
+             // Zapisujemy URL zdjęcia do zmiennej globalnej
+             window.currentContactProductImage = imageUrl;
+
+             const container = document.getElementById('product-codes-container'); 
+             
+             // Generujemy HTML z miniaturką zdjęcia i kodem
+             let imgHtml = imageUrl ? `<img src="${imageUrl}" class="w-16 h-16 object-cover rounded-lg border border-stone-200 bg-white shadow-sm shrink-0">` : '';
+             
+             container.innerHTML = `
+                <div class="flex items-center gap-4 p-2 bg-stone-50 rounded-xl border border-stone-100">
+                    ${imgHtml}
+                    <div class="flex-1 overflow-hidden">
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">Dotyczy produktu</label>
+                        <input type="text" id="code-input-0" class="w-full bg-transparent font-mono font-bold text-stone-800 text-sm outline-none truncate" readonly value="${code || 'Produkt bez kodu'}">
+                    </div>
+                </div>`;
+             
              document.getElementById('contact-message').value = code ? `Dzień dobry, interesuje mnie produkt o kodzie ${code}. Proszę o informację o dostępności.` : '';
         };
 
         window.openGeneralContactModal = () => {
-             document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.add('hidden'); document.getElementById('contact-upload-section').classList.remove('hidden'); document.getElementById('contact-message').value = '';
+             // Resetujemy zdjęcie produktu przy ogólnym kontakcie
+             window.currentContactProductImage = null;
+             document.getElementById('contact-modal').classList.remove('hidden'); 
+             document.getElementById('product-codes-section').classList.add('hidden'); 
+             document.getElementById('contact-upload-section').classList.remove('hidden'); 
+             document.getElementById('contact-message').value = '';
         };
 
-        window.closeContactModal = () => { document.getElementById('contact-modal').classList.add('hidden'); };
+        window.closeContactModal = () => { 
+            document.getElementById('contact-modal').classList.add('hidden'); 
+            window.currentContactProductImage = null; // Czyścimy po zamknięciu
+        };
 
         window.submitContactForm = async () => {
              const btn = document.getElementById('submit-contact-btn');
@@ -1816,7 +1847,7 @@
              try {
                 let attachmentData = null;
                 
-                // Konwersja pliku na Base64
+                // Priorytet 1: Plik wgrany przez użytkownika (jeśli dostępny)
                 if (file) {
                     attachmentData = await new Promise((resolve, reject) => {
                         const reader = new FileReader();
@@ -1824,6 +1855,10 @@
                         reader.onerror = reject;
                         reader.readAsDataURL(file);
                     });
+                } 
+                // Priorytet 2: Automatyczne zdjęcie produktu (jeśli brak pliku użytkownika)
+                else if (window.currentContactProductImage) {
+                    attachmentData = window.currentContactProductImage;
                 }
 
                 if(isOnline) {
