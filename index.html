@@ -462,6 +462,23 @@
                  </div>
             </div>
         </section>
+
+        <!-- Stopka Główna -->
+        <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-left">
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
+                    <p id="footer-slogan" class="text-xs mb-4">Pasja. Precyzja. Drewno.</p>
+                    
+                    <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
+                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <span class="text-stone-700">|</span>
+                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                    </div>
+                </div>
+                <p id="footer-copyright">&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </footer>
     </div>
 
     <!-- WIDOKI DYNAMICZNE (Podstrony) -->
@@ -477,16 +494,32 @@
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-6 pb-20">
             <button onclick="window.goBackToSubcategoryList()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do listy kategorii
             </button>
             <h2 id="subcategory-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6">Wybierz produkt</h2>
             <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
         </div>
+
+        <!-- Stopka w widoku podkategorii -->
+        <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
+            <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-left">
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
+                    <p class="text-xs mb-4">Pasja. Precyzja. Drewno.</p>
+                    <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
+                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <span class="text-stone-700">|</span>
+                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                    </div>
+                </div>
+                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </footer>
     </div>
 
-    <!-- Widok WSZYSTKICH Podkategorii (Nowy) -->
+    <!-- Widok WSZYSTKICH Podkategorii -->
     <div id="subcategories-full-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[104] overflow-y-auto">
         <!-- LOGO HEADER -->
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
@@ -497,7 +530,7 @@
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-6 pb-20">
             <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do strony głównej
             </button>
@@ -505,6 +538,22 @@
             <p class="text-stone-500 mb-12">Wybierz kategorię, aby zobaczyć dostępne produkty.</p>
             <div id="subcategories-full-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
+
+        <!-- Stopka w widoku wszystkich podkategorii -->
+        <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
+            <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-left">
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
+                    <p class="text-xs mb-4">Pasja. Precyzja. Drewno.</p>
+                    <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
+                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <span class="text-stone-700">|</span>
+                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                    </div>
+                </div>
+                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </footer>
     </div>
 
     <!-- Widok Produktu -->
@@ -517,46 +566,74 @@
             </a>
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
-
-        <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-sub-btn" class="mb-8 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy
-            </button>
-            
-            <div id="product-layout" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- LEWA KOLUMNA: ZDJĘCIA -->
-                <div class="space-y-6">
-                    <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden shadow-2xl border border-stone-100 group cursor-zoom-in" onclick="openLightbox(window.currentImgIndex)">
-                         <img id="main-product-img" src="" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
-                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
-                             <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-50 group-hover:scale-100"></i>
-                         </div>
+        
+        <!-- Zawartość Produktu (dynamiczna) -->
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start pb-20">
+            <!-- Lewa: Zdjęcia -->
+            <div class="space-y-4">
+                <div class="aspect-square bg-stone-50 rounded-3xl overflow-hidden border border-stone-100 shadow-lg cursor-zoom-in relative group" onclick="openLightbox(window.currentImgIndex)">
+                    <img id="main-product-img" src="" class="w-full h-full object-cover transition duration-500">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                        <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-75 group-hover:scale-100 drop-shadow-md"></i>
                     </div>
-                    <div id="product-thumbnails" class="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x"></div>
                 </div>
-
-                <!-- PRAWA KOLUMNA: OPIS -->
-                <div class="flex flex-col justify-center space-y-8">
-                    <div>
-                        <span id="prod-code" class="inline-block py-1 px-3 bg-stone-100 text-stone-500 text-xs font-mono rounded-lg mb-4">Kod: ---</span>
-                        <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-stone-900 mb-4 leading-tight">Nazwa Produktu</h2>
-                        <p id="prod-price" class="text-3xl font-bold text-wood-600">0.00 PLN</p>
-                    </div>
-
-                    <div class="w-full h-px bg-stone-100"></div>
-
-                    <div>
-                        <h4 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-3">Opis Produktu</h4>
-                        <p id="prod-desc" class="text-stone-600 text-lg leading-relaxed whitespace-pre-line">Brak opisu.</p>
-                    </div>
-
-                    <div class="pt-6">
-                        <button id="ask-btn" onclick="openContactModal()" class="inline-flex items-center gap-3 px-8 py-4 bg-wood-600 text-white rounded-full font-bold hover:bg-wood-700 transition shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-auto justify-center">
-                            <i class="fa-regular fa-envelope"></i> Zapytaj o ten produkt
-                        </button>
-                    </div>
+                <!-- Miniaturki z przewijaniem -->
+                <div class="relative group">
+                    <div id="product-thumbnails" class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar px-1 snap-x snap-mandatory"></div>
+                    <div class="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
                 </div>
             </div>
+
+            <!-- Prawa: Info -->
+            <div class="space-y-8 lg:sticky lg:top-32">
+                 <div>
+                     <button id="back-to-sub-btn" class="mb-6 flex items-center gap-2 text-stone-400 hover:text-wood-600 text-sm font-bold uppercase tracking-wider transition">
+                        <i class="fa-solid fa-arrow-left"></i> Powrót do listy
+                     </button>
+                     <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-stone-900 mb-2 leading-tight"></h2>
+                     <div class="flex items-center gap-4 text-sm font-mono text-stone-400">
+                        <span id="prod-code"></span>
+                     </div>
+                 </div>
+
+                 <div class="flex items-baseline gap-4 border-b border-stone-100 pb-8">
+                     <span id="prod-price" class="text-4xl font-bold text-wood-600"></span>
+                 </div>
+
+                 <div class="prose prose-stone text-stone-600 leading-relaxed">
+                     <h3 class="text-stone-900 font-bold uppercase text-xs tracking-widest mb-2">Opis produktu</h3>
+                     <p id="prod-desc"></p>
+                 </div>
+
+                 <div class="pt-6 space-y-4">
+                     <button id="ask-btn" class="w-full bg-wood-600 text-white py-5 rounded-2xl font-bold text-lg hover:bg-wood-700 hover:-translate-y-1 transition shadow-xl flex items-center justify-center gap-3">
+                        <i class="fa-regular fa-comments"></i> Zapytaj o ten produkt
+                     </button>
+                     <p class="text-center text-xs text-stone-400">
+                        <i class="fa-solid fa-shield-halved mr-1"></i> Gwarancja jakości i bezpieczna dostawa
+                     </p>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOWY WIDOK: DOKUMENTY PRAWNE (Polityka / Regulamin) -->
+    <div id="legal-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[130] overflow-y-auto">
+        <!-- LOGO HEADER -->
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
+                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-scale-balanced"></i></div>
+                <span>Xeomsc <span class="text-wood-600">Legal</span></span>
+            </a>
+            <button onclick="closeLegal()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6">
+            <button onclick="closeLegal()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót
+            </button>
+            <h2 id="legal-title" class="text-4xl font-bold text-stone-900 mb-8 border-b border-stone-100 pb-6"></h2>
+            <div id="legal-content" class="text-stone-600 text-lg leading-relaxed whitespace-pre-wrap font-light text-justify"></div>
         </div>
     </div>
 
@@ -571,7 +648,7 @@
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-6 pb-20">
             <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do strony głównej
             </button>
@@ -579,6 +656,22 @@
             <p class="text-stone-500 mb-12 text-lg">Przegląd indywidualnych projektów wykonanych dla naszych klientów.</p>
             <div id="custom-orders-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
+
+        <!-- Stopka w galerii zleceń -->
+        <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
+            <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-left">
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
+                    <p class="text-xs mb-4">Pasja. Precyzja. Drewno.</p>
+                    <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
+                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <span class="text-stone-700">|</span>
+                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                    </div>
+                </div>
+                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </footer>
     </div>
 
     <!-- LIGHTBOX -->
@@ -702,6 +795,37 @@
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Email Kontaktowy</label><input id="edit-contact-email" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Telefon</label><input id="edit-contact-phone" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis w sekcji Kontakt</label><textarea id="edit-contact-desc" class="calc-input h-24"></textarea></div>
+                        
+                        <!-- EDYCJA DOKUMENTÓW PRAWNYCH -->
+                        <div class="border-t border-white/5 pt-6">
+                            <h4 class="text-xl font-bold mb-4 text-wood-500">Dokumenty Prawne</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Polityka Prywatności (Treść)</label>
+                                    <textarea id="edit-privacy" class="calc-input h-48 font-mono text-xs"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Regulamin (Treść)</label>
+                                    <textarea id="edit-terms" class="calc-input h-48 font-mono text-xs"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOWA SEKCJA: EDYCJA STOPKI -->
+                        <div class="border-t border-white/5 pt-6">
+                            <h4 class="text-xl font-bold mb-4 text-wood-500">Stopka</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Slogan pod logo</label>
+                                    <input id="edit-footer-slogan" class="calc-input" placeholder="np. Pasja. Precyzja. Drewno.">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Tekst Copyright</label>
+                                    <input id="edit-footer-copyright" class="calc-input" placeholder="np. &copy; 2024 Xeomsc...">
+                                </div>
+                            </div>
+                        </div>
+
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Klucz API ImgBB (Opcjonalny - Hosting Zdjęć)</label><input id="edit-imgbb-key" type="password" class="calc-input" placeholder="Wklej API Key jeśli używasz"></div>
                         <button onclick="saveContentSettings()" class="bg-wood-600 hover:bg-wood-500 px-8 py-3 rounded-xl font-bold transition">Zapisz Zmiany</button>
                     </div>
@@ -725,18 +849,6 @@
              </div>
         </div>
     </div>
-
-    <!-- Stopka -->
-    <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-left">
-                <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
-                <p class="text-xs">Pasja. Precyzja. Drewno.</p>
-                <!-- USUNIĘTO WSKAŹNIK ŹRÓDŁA DANYCH -->
-            </div>
-            <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
-        </div>
-    </footer>
 
     <!-- LOGIKA SYSTEMU -->
     <script type="module">
@@ -802,7 +914,17 @@
                     { icon: "fa-solid fa-scissors", title: "Precyzyjne Cięcie", desc: "Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki." },
                     { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
                 ],
-                contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe." }
+                contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe." },
+                // DOKUMENTY PRAWNE (Teksty domyślne)
+                legal: {
+                    privacy: "Tu wpisz treść Polityki Prywatności...\n\n1. Administrator Danych\nAdministratorem danych jest Xeomsc FusionArt.\n\n2. Cele przetwarzania\nDane przetwarzane są w celu realizacji zamówień i kontaktu z klientem.",
+                    terms: "Tu wpisz treść Regulaminu...\n\n1. Postanowienia ogólne\nNiniejszy regulamin określa zasady korzystania ze sklepu.\n\n2. Zamówienia\nZamówienia można składać poprzez formularz kontaktowy."
+                },
+                // NOWE: STOPKA
+                footer: {
+                    slogan: "Pasja. Precyzja. Drewno.",
+                    copyright: "&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone."
+                }
             }
         };
 
@@ -937,6 +1059,11 @@
 
         function renderTexts() {
             if(!siteData.textContent || !siteData.textContent.aboutCards) { siteData.textContent = initialData.textContent; }
+            
+            // Zabezpieczenie brakujących obiektów (dla starszych danych)
+            if(!siteData.textContent.legal) siteData.textContent.legal = initialData.textContent.legal;
+            if(!siteData.textContent.footer) siteData.textContent.footer = initialData.textContent.footer;
+
             const t = siteData.textContent;
             if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
             if(document.getElementById('hero-title-accent')) document.getElementById('hero-title-accent').textContent = t.hero.accent;
@@ -944,6 +1071,11 @@
             if(document.getElementById('contact-email')) document.getElementById('contact-email').textContent = t.contact.email;
             if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
             if(document.getElementById('contact-desc')) document.getElementById('contact-desc').textContent = t.contact.desc;
+
+            // Render Stopki
+            // ZMIEŃ WSZYSTKIE STOPKI
+            document.querySelectorAll('[id="footer-slogan"]').forEach(el => el.textContent = t.footer.slogan);
+            document.querySelectorAll('[id="footer-copyright"]').forEach(el => el.innerHTML = t.footer.copyright);
 
             const grid = document.getElementById('about-grid');
             if(grid && t.aboutCards) {
@@ -1336,11 +1468,46 @@
 
         window.closeLightbox = () => { const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100','opacity-0'); setTimeout(() => { lb.classList.add('hidden'); }, 300); };
         window.goHome = () => { 
-            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden');
+            // Ukryj również legal-view
+            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden'); document.getElementById('legal-view').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden'); document.getElementById('sub-categories-container').classList.add('hidden'); 
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
             window.scrollTo(0,0);
         };
+        
+        // NOWE FUNKCJE OBSŁUGI DOKUMENTÓW PRAWNYCH
+        window.openLegal = (type) => {
+            const container = document.getElementById('legal-view');
+            const titleEl = document.getElementById('legal-title');
+            const contentEl = document.getElementById('legal-content');
+            
+            // Pobierz tekst z siteData lub initialData
+            // Upewnij się, że obiekt istnieje
+            const content = siteData.textContent || initialData.textContent;
+            const legal = content.legal || initialData.textContent.legal;
+            
+            if (type === 'privacy') {
+                titleEl.textContent = "Polityka Prywatności";
+                contentEl.textContent = legal.privacy || "Brak treści.";
+            } else if (type === 'terms') {
+                titleEl.textContent = "Regulamin";
+                contentEl.textContent = legal.terms || "Brak treści.";
+            }
+            
+            document.getElementById('main-content').classList.add('hidden');
+            // Ukryj inne widoki na wszelki wypadek
+            document.getElementById('subcategory-view').classList.add('hidden');
+            document.getElementById('gallery-view').classList.add('hidden');
+            
+            container.classList.remove('hidden');
+            window.scrollTo(0,0);
+        };
+
+        window.closeLegal = () => {
+            // Po prostu wróć do strony głównej
+            window.goHome();
+        };
+
         window.toggleMobileMenu = () => { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         window.handleLogin = () => {
@@ -1371,26 +1538,51 @@
             else if (id === 'product-list') { renderProductListView(); }
             else if (id === 'custom-orders') { renderCustomOrdersAdmin(); }
             else if (id === 'content') {
-                if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                // AUTO-NAPRAWA STRUKTURY DANYCH (Jeśli brakuje nowych pól w bazie)
+                if(!siteData.textContent) siteData.textContent = JSON.parse(JSON.stringify(initialData.textContent));
+                if(!siteData.textContent.legal) siteData.textContent.legal = JSON.parse(JSON.stringify(initialData.textContent.legal));
+                if(!siteData.textContent.footer) siteData.textContent.footer = JSON.parse(JSON.stringify(initialData.textContent.footer));
+                
                 const t = siteData.textContent;
-                document.getElementById('edit-hero-main').value = t.hero.main;
-                document.getElementById('edit-hero-accent').value = t.hero.accent;
-                document.getElementById('edit-hero-desc').value = t.hero.desc;
-                document.getElementById('edit-contact-email').value = t.contact.email;
-                document.getElementById('edit-contact-phone').value = t.contact.phone;
-                document.getElementById('edit-contact-desc').value = t.contact.desc;
+                document.getElementById('edit-hero-main').value = t.hero.main || "";
+                document.getElementById('edit-hero-accent').value = t.hero.accent || "";
+                document.getElementById('edit-hero-desc').value = t.hero.desc || "";
+                document.getElementById('edit-contact-email').value = t.contact.email || "";
+                document.getElementById('edit-contact-phone').value = t.contact.phone || "";
+                document.getElementById('edit-contact-desc').value = t.contact.desc || "";
+                
+                // Wypełnij pola prawne
+                document.getElementById('edit-privacy').value = t.legal.privacy || "";
+                document.getElementById('edit-terms').value = t.legal.terms || "";
+                
+                // Wypełnij pola stopki
+                document.getElementById('edit-footer-slogan').value = t.footer.slogan || "";
+                document.getElementById('edit-footer-copyright').value = t.footer.copyright || "";
+                
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
         };
 
         window.saveContentSettings = async () => {
             if(!siteData.textContent) siteData.textContent = initialData.textContent;
+            if(!siteData.textContent.legal) siteData.textContent.legal = {};
+            if(!siteData.textContent.footer) siteData.textContent.footer = {};
+
             siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
             siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
             siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
             siteData.textContent.contact.email = document.getElementById('edit-contact-email').value;
             siteData.textContent.contact.phone = document.getElementById('edit-contact-phone').value;
             siteData.textContent.contact.desc = document.getElementById('edit-contact-desc').value;
+            
+            // Zapisz dokumenty prawne
+            siteData.textContent.legal.privacy = document.getElementById('edit-privacy').value;
+            siteData.textContent.legal.terms = document.getElementById('edit-terms').value;
+            
+            // Zapisz stopkę
+            siteData.textContent.footer.slogan = document.getElementById('edit-footer-slogan').value;
+            siteData.textContent.footer.copyright = document.getElementById('edit-footer-copyright').value;
+            
             siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
             await saveData(); renderTexts(); showToast("Zapisano zmiany!");
         };
@@ -2103,76 +2295,3 @@
         };
 
         // --- STARTUP ---
-        function updateStatusUI(online, message = "") {
-            isOnline = online;
-            const dot = document.getElementById('status-dot'); const txt = document.getElementById('status-text'); const banner = document.getElementById('error-banner');
-            if(online) {
-                dot.className = "status-dot status-online"; txt.textContent = "ONLINE (CHMURA)";
-                txt.classList.add('text-green-400'); txt.classList.remove('text-stone-400'); banner.style.display = 'none';
-            } else {
-                dot.className = "status-dot status-offline"; txt.textContent = "OFFLINE (BŁĄD)";
-                txt.classList.add('text-red-400'); txt.classList.remove('text-green-400');
-                if(message) { lastError = message; banner.textContent = "BŁĄD POŁĄCZENIA: " + message; banner.style.display = 'block'; }
-            }
-        }
-        
-        window.showDetailedError = () => { if(lastError) alert("Ostatni błąd:\n" + lastError); else showToast("Połączenie aktywne."); };
-        function updateDataSourceIndicator(source, isError=false) {
-            const el = document.getElementById('data-source-indicator');
-            // Usunięto tekst dla wersji klienckiej, ale zostawiamy pustą funkcję dla bezpieczeństwa wywołań
-        }
-
-        async function saveData() {
-            try {
-                siteData.categories = siteData.categories || {};
-                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                if(isOnline && auth && auth.currentUser) {
-                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
-                    console.log("Zapisano w chmurze");
-                }
-            } catch(e) { console.error("Błąd zapisu", e); showToast("Błąd zapisu!"); }
-        }
-
-        async function start() {
-            if(sessionStorage.getItem('xeomsc_admin') === 'true') { 
-                document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); 
-            } else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
-            window.addEventListener('hashchange', () => { if(window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
-
-            try {
-                if (Object.keys(firebaseConfig).length > 0) {
-                    const appObj = initializeApp(firebaseConfig);
-                    auth = getAuth(appObj);
-                    db = getFirestore(appObj);
-                    try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } } catch (authError) { updateStatusUI(false, authError.message); return; }
-
-                    onAuthStateChanged(auth, (u) => {
-                        if(u) {
-                            updateStatusUI(true);
-                            if(sessionStorage.getItem('xeomsc_admin') === 'true') { startMessageListener(); }
-                            onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
-                                if (snap.exists()) {
-                                    siteData = snap.data();
-                                    updateDataSourceIndicator('cloud');
-                                    if(!siteData.textContent) siteData.textContent = initialData.textContent;
-                                    localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                    renderHero(); renderMain(); renderTexts();
-                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
-                                        if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
-                                    }
-                                } else { 
-                                    if(sessionStorage.getItem('xeomsc_admin') === 'true') { saveData(); } 
-                                    else { updateDataSourceIndicator('local'); } 
-                                }
-                            }, (error) => { console.error("Snapshot error:", error); updateStatusUI(false, error.message); updateDataSourceIndicator('local', true); });
-                        }
-                    });
-                } else { updateStatusUI(false, "Brak konfiguracji Firebase"); updateDataSourceIndicator('local'); }
-            } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
-        }
-
-        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
-        renderHero(); renderMain(); renderTexts(); start();
-    </script>
-</body>
-</html>
