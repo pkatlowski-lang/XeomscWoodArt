@@ -2295,3 +2295,76 @@
         };
 
         // --- STARTUP ---
+        function updateStatusUI(online, message = "") {
+            isOnline = online;
+            const dot = document.getElementById('status-dot'); const txt = document.getElementById('status-text'); const banner = document.getElementById('error-banner');
+            if(online) {
+                dot.className = "status-dot status-online"; txt.textContent = "ONLINE (CHMURA)";
+                txt.classList.add('text-green-400'); txt.classList.remove('text-stone-400'); banner.style.display = 'none';
+            } else {
+                dot.className = "status-dot status-offline"; txt.textContent = "OFFLINE (BŁĄD)";
+                txt.classList.add('text-red-400'); txt.classList.remove('text-green-400');
+                if(message) { lastError = message; banner.textContent = "BŁĄD POŁĄCZENIA: " + message; banner.style.display = 'block'; }
+            }
+        }
+        
+        window.showDetailedError = () => { if(lastError) alert("Ostatni błąd:\n" + lastError); else showToast("Połączenie aktywne."); };
+        function updateDataSourceIndicator(source, isError=false) {
+            const el = document.getElementById('data-source-indicator');
+            // Usunięto tekst dla wersji klienckiej, ale zostawiamy pustą funkcję dla bezpieczeństwa wywołań
+        }
+
+        async function saveData() {
+            try {
+                siteData.categories = siteData.categories || {};
+                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                if(isOnline && auth && auth.currentUser) {
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
+                    console.log("Zapisano w chmurze");
+                }
+            } catch(e) { console.error("Błąd zapisu", e); showToast("Błąd zapisu!"); }
+        }
+
+        async function start() {
+            if(sessionStorage.getItem('xeomsc_admin') === 'true') { 
+                document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); 
+            } else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
+            window.addEventListener('hashchange', () => { if(window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
+
+            try {
+                if (Object.keys(firebaseConfig).length > 0) {
+                    const appObj = initializeApp(firebaseConfig);
+                    auth = getAuth(appObj);
+                    db = getFirestore(appObj);
+                    try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } } catch (authError) { updateStatusUI(false, authError.message); return; }
+
+                    onAuthStateChanged(auth, (u) => {
+                        if(u) {
+                            updateStatusUI(true);
+                            if(sessionStorage.getItem('xeomsc_admin') === 'true') { startMessageListener(); }
+                            onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
+                                if (snap.exists()) {
+                                    siteData = snap.data();
+                                    updateDataSourceIndicator('cloud');
+                                    if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                                    localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                    renderHero(); renderMain(); renderTexts();
+                                    if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
+                                        if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
+                                    }
+                                } else { 
+                                    if(sessionStorage.getItem('xeomsc_admin') === 'true') { saveData(); } 
+                                    else { updateDataSourceIndicator('local'); } 
+                                }
+                            }, (error) => { console.error("Snapshot error:", error); updateStatusUI(false, error.message); updateDataSourceIndicator('local', true); });
+                        }
+                    });
+                } else { updateStatusUI(false, "Brak konfiguracji Firebase"); updateDataSourceIndicator('local'); }
+            } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
+        }
+
+        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        renderHero(); renderMain(); renderTexts(); start();
+    </script>
+</body>
+</html>
