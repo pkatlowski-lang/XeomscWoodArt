@@ -1674,30 +1674,108 @@
                         .sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl'))
                         .forEach(subId => {
                             const sub = cat.subs[subId];
-                            subListHTML += `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5 mb-2"><div><span class="text-xs text-stone-500 uppercase block">${cat.title}</span><span class="font-bold">${sub.title}</span></div><button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-sm">USUŃ</button></div>`;
+                            subListHTML += `
+                            <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5 mb-2">
+                                <div>
+                                    <span class="text-xs text-stone-500 uppercase block">${cat.title}</span>
+                                    <span class="font-bold">${sub.title}</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-sm font-bold hover:text-white transition px-2">EDYTUJ</button>
+                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-sm font-bold hover:text-white transition px-2">USUŃ</button>
+                                </div>
+                            </div>`;
                         });
                 }
             });
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Podkategorie</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-500">Dodaj Podkategorię</h4>
+                    <h4 class="text-xs uppercase font-bold text-stone-500" id="sub-form-title">Dodaj Podkategorię</h4>
+                    
+                    <!-- Ukryte pola do edycji -->
+                    <input type="hidden" id="edit-sub-cat-id">
+                    <input type="hidden" id="edit-sub-parent-id">
+                    
                     <select id="new-sub-cat-parent" class="calc-input text-white font-bold"><option value="">-- Wybierz Kategorię Główną --</option>${categoryOptions}</select>
                     <input id="sub-t" class="calc-input" placeholder="Nazwa Podkategorii">
                     <input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
-                    <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz Podkategorię</button>
+                    
+                    <div class="flex gap-2">
+                        <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz Podkategorię</button>
+                        <button id="cancel-sub-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
+                    </div>
                 </div>
                 <h4 class="text-xl font-bold mb-4">Lista Podkategorii</h4><div class="space-y-1">${subListHTML || '<p class="text-stone-500">Brak podkategorii.</p>'}</div>`;
+            
             document.getElementById('add-sub-btn').onclick = () => {
-                const parentId = document.getElementById('new-sub-cat-parent').value; const t = document.getElementById('sub-t').value; const i = document.getElementById('sub-i').value;
+                const parentId = document.getElementById('new-sub-cat-parent').value; 
+                const t = document.getElementById('sub-t').value; 
+                const i = document.getElementById('sub-i').value;
+                
+                // Dane do edycji
+                const editSubId = document.getElementById('edit-sub-cat-id').value;
+                const oldParentId = document.getElementById('edit-sub-parent-id').value;
+
                 if(parentId && t) {
-                    const subId = 's' + Date.now();
-                    if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
-                    siteData.categories[parentId].subs[subId] = { title: t, image: i, products: [] };
-                    saveData(); renderSubcategoriesAdmin(); showToast("Podkategoria dodana!");
+                    if (editSubId) {
+                        // TRYB EDYCJI
+                        // Sprawdzamy czy zmieniono kategorię nadrzędną
+                        if (oldParentId && oldParentId !== parentId) {
+                            // 1. Pobierz produkty i dane ze starej lokalizacji
+                            const products = siteData.categories[oldParentId].subs[editSubId].products || [];
+                            
+                            // 2. Usuń ze starej kategorii
+                            delete siteData.categories[oldParentId].subs[editSubId];
+                            
+                            // 3. Dodaj do nowej kategorii (zachowując ID podkategorii)
+                            if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
+                            siteData.categories[parentId].subs[editSubId] = { title: t, image: i, products: products };
+                        } else {
+                            // Tylko aktualizacja danych w tej samej kategorii
+                            siteData.categories[parentId].subs[editSubId].title = t;
+                            siteData.categories[parentId].subs[editSubId].image = i;
+                        }
+                        showToast("Zapisano zmiany w podkategorii!");
+                    } else {
+                        // TRYB DODAWANIA NOWEJ
+                        const subId = 's' + Date.now();
+                        if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
+                        siteData.categories[parentId].subs[subId] = { title: t, image: i, products: [] };
+                        showToast("Podkategoria dodana!");
+                    }
+                    saveData(); 
+                    renderSubcategoriesAdmin(); 
                 } else { showToast("Wybierz kategorię nadrzędną i wpisz nazwę."); }
             };
+            
+            document.getElementById('cancel-sub-btn').onclick = () => {
+                renderSubcategoriesAdmin(); // Reset formularza
+            };
         }
+        
+        // NOWA FUNKCJA DO EDYCJI PODKATEGORII
+        window.editSubCat = (parentId, subId) => {
+            const sub = siteData.categories[parentId].subs[subId];
+            if(!sub) return;
+            
+            // Wypełnij formularz
+            document.getElementById('new-sub-cat-parent').value = parentId;
+            document.getElementById('sub-t').value = sub.title;
+            document.getElementById('sub-i').value = sub.image;
+            
+            // Ustaw flagi edycji
+            document.getElementById('edit-sub-cat-id').value = subId;
+            document.getElementById('edit-sub-parent-id').value = parentId;
+            
+            // Zmień wygląd
+            document.getElementById('sub-form-title').textContent = "Edytuj Podkategorię";
+            document.getElementById('add-sub-btn').textContent = "Zapisz Zmiany";
+            document.getElementById('cancel-sub-btn').classList.remove('hidden');
+            
+            // Przewiń do góry panelu
+            document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
         window.delSubCat = (catId, subId) => { window.openConfirm("Usunąć podkategorię?", () => { delete siteData.categories[catId].subs[subId]; saveData(); renderSubcategoriesAdmin(); }); };
 
