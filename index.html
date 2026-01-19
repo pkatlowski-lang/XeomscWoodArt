@@ -518,45 +518,23 @@
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6">
-            <button id="back-to-sub-btn" class="mb-8 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do listy
+    <!-- NOWY WIDOK: DOKUMENTY PRAWNE (Polityka / Regulamin) -->
+    <div id="legal-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[130] overflow-y-auto">
+        <!-- LOGO HEADER -->
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
+                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-scale-balanced"></i></div>
+                <span>Xeomsc <span class="text-wood-600">Legal</span></span>
+            </a>
+            <button onclick="closeLegal()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6">
+            <button onclick="closeLegal()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót
             </button>
-            
-            <div id="product-layout" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- LEWA KOLUMNA: ZDJĘCIA -->
-                <div class="space-y-6">
-                    <div class="relative w-full aspect-square rounded-[2rem] overflow-hidden shadow-2xl border border-stone-100 group cursor-zoom-in" onclick="openLightbox(window.currentImgIndex)">
-                         <img id="main-product-img" src="" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
-                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
-                             <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-50 group-hover:scale-100"></i>
-                         </div>
-                    </div>
-                    <div id="product-thumbnails" class="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x"></div>
-                </div>
-
-                <!-- PRAWA KOLUMNA: OPIS -->
-                <div class="flex flex-col justify-center space-y-8">
-                    <div>
-                        <span id="prod-code" class="inline-block py-1 px-3 bg-stone-100 text-stone-500 text-xs font-mono rounded-lg mb-4">Kod: ---</span>
-                        <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-stone-900 mb-4 leading-tight">Nazwa Produktu</h2>
-                        <p id="prod-price" class="text-3xl font-bold text-wood-600">0.00 PLN</p>
-                    </div>
-
-                    <div class="w-full h-px bg-stone-100"></div>
-
-                    <div>
-                        <h4 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-3">Opis Produktu</h4>
-                        <p id="prod-desc" class="text-stone-600 text-lg leading-relaxed whitespace-pre-line">Brak opisu.</p>
-                    </div>
-
-                    <div class="pt-6">
-                        <button id="ask-btn" onclick="openContactModal()" class="inline-flex items-center gap-3 px-8 py-4 bg-wood-600 text-white rounded-full font-bold hover:bg-wood-700 transition shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full md:w-auto justify-center">
-                            <i class="fa-regular fa-envelope"></i> Zapytaj o ten produkt
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <h2 id="legal-title" class="text-4xl font-bold text-stone-900 mb-8 border-b border-stone-100 pb-6"></h2>
+            <div id="legal-content" class="text-stone-600 text-lg leading-relaxed whitespace-pre-wrap font-light text-justify"></div>
         </div>
     </div>
 
@@ -702,6 +680,22 @@
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Email Kontaktowy</label><input id="edit-contact-email" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Telefon</label><input id="edit-contact-phone" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis w sekcji Kontakt</label><textarea id="edit-contact-desc" class="calc-input h-24"></textarea></div>
+                        
+                        <!-- NOWE POLA DO EDYCJI DOKUMENTÓW -->
+                        <div class="border-t border-white/5 pt-6">
+                            <h4 class="text-xl font-bold mb-4 text-wood-500">Dokumenty Prawne</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Polityka Prywatności (Treść)</label>
+                                    <textarea id="edit-privacy" class="calc-input h-48 font-mono text-xs"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 mb-2">Regulamin (Treść)</label>
+                                    <textarea id="edit-terms" class="calc-input h-48 font-mono text-xs"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Klucz API ImgBB (Opcjonalny - Hosting Zdjęć)</label><input id="edit-imgbb-key" type="password" class="calc-input" placeholder="Wklej API Key jeśli używasz"></div>
                         <button onclick="saveContentSettings()" class="bg-wood-600 hover:bg-wood-500 px-8 py-3 rounded-xl font-bold transition">Zapisz Zmiany</button>
                     </div>
@@ -731,8 +725,14 @@
         <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
             <div class="text-left">
                 <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">FusionArt</span></h2>
-                <p class="text-xs">Pasja. Precyzja. Drewno.</p>
-                <!-- USUNIĘTO WSKAŹNIK ŹRÓDŁA DANYCH -->
+                <p class="text-xs mb-4">Pasja. Precyzja. Drewno.</p>
+                
+                <!-- NOWE LINKI W STOPCE -->
+                <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
+                    <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                    <span class="text-stone-700">|</span>
+                    <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                </div>
             </div>
             <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
         </div>
@@ -802,7 +802,12 @@
                     { icon: "fa-solid fa-scissors", title: "Precyzyjne Cięcie", desc: "Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki." },
                     { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
                 ],
-                contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe." }
+                contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe." },
+                // NOWE POLA: DOKUMENTY PRAWNE (Teksty domyślne)
+                legal: {
+                    privacy: "Tu wpisz treść Polityki Prywatności...\n\n1. Administrator Danych\nAdministratorem danych jest Xeomsc FusionArt.\n\n2. Cele przetwarzania\nDane przetwarzane są w celu realizacji zamówień i kontaktu z klientem.",
+                    terms: "Tu wpisz treść Regulaminu...\n\n1. Postanowienia ogólne\nNiniejszy regulamin określa zasady korzystania ze sklepu.\n\n2. Zamówienia\nZamówienia można składać poprzez formularz kontaktowy."
+                }
             }
         };
 
@@ -1336,11 +1341,44 @@
 
         window.closeLightbox = () => { const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100','opacity-0'); setTimeout(() => { lb.classList.add('hidden'); }, 300); };
         window.goHome = () => { 
-            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden');
+            // Ukryj również legal-view
+            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden'); document.getElementById('legal-view').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden'); document.getElementById('sub-categories-container').classList.add('hidden'); 
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
             window.scrollTo(0,0);
         };
+        
+        // NOWE FUNKCJE OBSŁUGI DOKUMENTÓW PRAWNYCH
+        window.openLegal = (type) => {
+            const container = document.getElementById('legal-view');
+            const titleEl = document.getElementById('legal-title');
+            const contentEl = document.getElementById('legal-content');
+            
+            // Pobierz tekst z siteData lub initialData
+            const t = siteData.textContent.legal || initialData.textContent.legal;
+            
+            if (type === 'privacy') {
+                titleEl.textContent = "Polityka Prywatności";
+                contentEl.textContent = t.privacy || "Brak treści.";
+            } else if (type === 'terms') {
+                titleEl.textContent = "Regulamin";
+                contentEl.textContent = t.terms || "Brak treści.";
+            }
+            
+            document.getElementById('main-content').classList.add('hidden');
+            // Ukryj inne widoki na wszelki wypadek
+            document.getElementById('subcategory-view').classList.add('hidden');
+            document.getElementById('gallery-view').classList.add('hidden');
+            
+            container.classList.remove('hidden');
+            window.scrollTo(0,0);
+        };
+
+        window.closeLegal = () => {
+            // Po prostu wróć do strony głównej
+            window.goHome();
+        };
+
         window.toggleMobileMenu = () => { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         window.handleLogin = () => {
@@ -1372,6 +1410,9 @@
             else if (id === 'custom-orders') { renderCustomOrdersAdmin(); }
             else if (id === 'content') {
                 if(!siteData.textContent) siteData.textContent = initialData.textContent;
+                // Upewnij się, że obiekt legal istnieje (dla starszych wersji danych)
+                if(!siteData.textContent.legal) siteData.textContent.legal = initialData.textContent.legal;
+                
                 const t = siteData.textContent;
                 document.getElementById('edit-hero-main').value = t.hero.main;
                 document.getElementById('edit-hero-accent').value = t.hero.accent;
@@ -1379,18 +1420,30 @@
                 document.getElementById('edit-contact-email').value = t.contact.email;
                 document.getElementById('edit-contact-phone').value = t.contact.phone;
                 document.getElementById('edit-contact-desc').value = t.contact.desc;
+                
+                // Wypełnij pola prawne
+                document.getElementById('edit-privacy').value = t.legal.privacy;
+                document.getElementById('edit-terms').value = t.legal.terms;
+                
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
         };
 
         window.saveContentSettings = async () => {
             if(!siteData.textContent) siteData.textContent = initialData.textContent;
+            if(!siteData.textContent.legal) siteData.textContent.legal = {};
+
             siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
             siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
             siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
             siteData.textContent.contact.email = document.getElementById('edit-contact-email').value;
             siteData.textContent.contact.phone = document.getElementById('edit-contact-phone').value;
             siteData.textContent.contact.desc = document.getElementById('edit-contact-desc').value;
+            
+            // Zapisz dokumenty prawne
+            siteData.textContent.legal.privacy = document.getElementById('edit-privacy').value;
+            siteData.textContent.legal.terms = document.getElementById('edit-terms').value;
+            
             siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
             await saveData(); renderTexts(); showToast("Zapisano zmiany!");
         };
