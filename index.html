@@ -1229,7 +1229,10 @@
                 grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak podkategorii.</p></div>';
             }
             
+            // FIX: Ukrywanie widoku podkategorii (listy produktów)
             document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.add('hidden'); // Ważne: ukryj listę produktów
+            document.getElementById('gallery-view').classList.add('hidden');
             container.classList.remove('hidden');
             window.scrollTo(0,0);
         };
@@ -1795,7 +1798,7 @@
                         </div>`).join('')}
                 </div>`;
             document.getElementById('add-cat-btn').onclick = () => {
-                const t = document.getElementById('cat-t').value; const i = document.getElementById('cat-i').value; const editId = document.getElementById('edit-cat-id').value;
+                const t = document.getElementById('cat-t').value; const i = document.getElementById('cat-i').value.trim(); const editId = document.getElementById('edit-cat-id').value;
                 if(t) {
                     if (editId) { 
                         siteData.categories[editId].title = t; 
@@ -1903,7 +1906,7 @@
             document.getElementById('add-sub-btn').onclick = () => {
                 const parentId = document.getElementById('new-sub-cat-parent').value; 
                 const t = document.getElementById('sub-t').value; 
-                const i = document.getElementById('sub-i').value;
+                const i = document.getElementById('sub-i').value.trim(); // Trim added
                 
                 // Dane do edycji
                 const editSubId = document.getElementById('edit-sub-cat-id').value;
@@ -1984,19 +1987,36 @@
                     <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
-                    <input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
+                    
+                    <div>
+                        <input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
+                        <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
+                    </div>
+
                     <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2"><input class="calc-input gallery-input" placeholder="Link do zdjęcia" oninput="addGalleryInput(this)"></div></div>
                     <button id="btn-add-prod" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-4">Dodaj Produkt</button>
                 </div>`;
+            
             document.getElementById('btn-add-prod').onclick = () => {
                 const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
-                const t = document.getElementById('new-p-t').value; const img = document.getElementById('new-p-i').value;
+                const t = document.getElementById('new-p-t').value; 
+                let img = document.getElementById('new-p-i').value.trim(); // Trim added
+                
                 const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value;
                 const desc = document.getElementById('new-p-desc').value;
+                
                 if(cid && sid && t) {
                     const prodId = 'p' + Date.now();
                     const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
-                    const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+                    const galleryImages = []; 
+                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+                    
+                    // --- AUTO-MINIATURA FIX ---
+                    // Jeśli nie podano miniatury, weź pierwsze zdjęcie z galerii
+                    if (!img && galleryImages.length > 0) {
+                        img = galleryImages[0].src;
+                    }
+
                     if(!siteData.categories[cid].subs[sid].products) siteData.categories[cid].subs[sid].products = [];
                     siteData.categories[cid].subs[sid].products.push({ id: prodId, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
                     siteData.galleries[prodId] = { images: galleryImages };
@@ -2052,7 +2072,12 @@
                     <input id="edit-p-t" class="calc-input">
                     <div class="grid grid-cols-2 gap-4"><input id="edit-p-code" class="calc-input"><input id="edit-p-price" class="calc-input"></div>
                     <textarea id="edit-p-desc" class="calc-input h-24"></textarea>
-                    <input id="edit-p-i" class="calc-input">
+                    
+                    <div>
+                         <input id="edit-p-i" class="calc-input">
+                         <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
+                    </div>
+
                     <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label><div id="edit-gallery-container" class="space-y-2"></div></div>
                     <button onclick="window.saveEditedProduct()" class="bg-green-600 hover:bg-green-500 w-full py-4 rounded-xl font-bold transition">Zapisz Zmiany</button>
                 </div>`;
@@ -2132,9 +2157,19 @@
         window.saveEditedProduct = () => {
             const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
             const product = siteData.categories[catId].subs[subId].products[index]; const prodId = product.id;
-            product.title = document.getElementById('edit-p-t').value; product.code = document.getElementById('edit-p-code').value; product.price = document.getElementById('edit-p-price').value; product.desc = document.getElementById('edit-p-desc').value; product.image = document.getElementById('edit-p-i').value;
+            product.title = document.getElementById('edit-p-t').value; product.code = document.getElementById('edit-p-code').value; product.price = document.getElementById('edit-p-price').value; product.desc = document.getElementById('edit-p-desc').value; 
+            
+            let img = document.getElementById('edit-p-i').value.trim(); // Trim added
+
             const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
             const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+            
+            // --- AUTO-MINIATURA FIX W EDYCJI ---
+            if (!img && galleryImages.length > 0) {
+                img = galleryImages[0].src;
+            }
+            product.image = img;
+
             siteData.galleries[prodId] = { images: galleryImages };
             saveData(); showToast("Zapisano zmiany!"); document.getElementById('list-edit-form').classList.add('hidden');
             const prodSelect = document.getElementById('list-prod-select'); prodSelect.options[prodSelect.selectedIndex].text = `${product.title} ${product.isHidden ? '(UKRYTY)' : ''}`;
