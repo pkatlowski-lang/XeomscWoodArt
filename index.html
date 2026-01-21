@@ -1056,6 +1056,9 @@
             customOrdersAutoScroll = setInterval(() => { window.scrollCustomOrders(1); }, 4000);
         };
         window.stopAutoScroll = () => { if(categoryAutoScroll) clearInterval(categoryAutoScroll); if(customOrdersAutoScroll) clearInterval(customOrdersAutoScroll); };
+        
+        // ZMIENNA DO ŚLEDZENIA AKTYWNEJ KATEGORII NA STRONIE GŁÓWNEJ
+        window.activeMainCatId = null;
 
         function renderTexts() {
             if(!siteData.textContent || !siteData.textContent.aboutCards) { siteData.textContent = initialData.textContent; }
@@ -1147,22 +1150,32 @@
                 else {
                     document.getElementById('custom-orders').classList.remove('hidden');
                     // Dodano pointer-events-none do obrazka, żeby nie przeszkadzał w dragowaniu
-                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" class="w-full h-full object-cover transition duration-500 hover:scale-105 pointer-events-none"></div>`;
+                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" onerror="this.src='https://via.placeholder.com/300?text=Błąd+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover transition duration-500 hover:scale-105 pointer-events-none"></div>`;
                     const displayOrders = orders.length < 4 ? [...orders, ...orders] : orders;
                     displayOrders.forEach((url, index) => { coContainer.innerHTML += createOrderHTML(url, index % orders.length); });
                 }
                 // Aktywuj drag dla zleceń
                 window.enableDragScroll('custom-orders-carousel');
             }
+            
+            // FIX: ODŚWIEŻ WIDOK PODKATEGORII JEŚLI JEST OTWARTY
+            if(window.activeMainCatId && siteData.categories[window.activeMainCatId]) {
+                window.selectMainCategory(window.activeMainCatId, true); // true = preventScroll
+            }
+
             window.startAutoScroll();
         }
 
-        window.selectMainCategory = (id) => {
+        window.selectMainCategory = (id, preventScroll = false) => {
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
             const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
             selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
 
             const cat = siteData.categories[id]; if(!cat) return;
+            
+            // Zapisz aktywną kategorię
+            window.activeMainCatId = id;
+
             const container = document.getElementById('sub-categories-container');
             const title = document.getElementById('selected-cat-title');
             const grid = document.getElementById('sub-categories-grid');
@@ -1182,8 +1195,9 @@
                 // Wyświetl wszystkie podkategorie w karuzeli
                 grid.innerHTML = subKeys.map(sid => {
                     const sub = subs[sid];
+                    // FIX: DODANO ONERROR DO ZDJĘĆ
                     return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 min-w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
-                             <div class="h-48 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"></div>
+                             <div class="h-48 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"></div>
                             <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${sub.title}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
                 }).join('');
             } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
@@ -1192,7 +1206,11 @@
             window.enableDragScroll('sub-categories-grid');
 
             container.classList.remove('hidden');
-            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            
+            // Scrollujemy tylko jeśli to nowa interakcja, a nie odświeżenie danych
+            if (!preventScroll) {
+                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            }
         };
         
         // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
@@ -1218,8 +1236,9 @@
              if(subKeys.length > 0) {
                 grid.innerHTML = subKeys.map(sid => {
                     const sub = subs[sid];
+                    // FIX: DODANO ONERROR DO ZDJĘĆ
                     return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openSubcategoryView('${catId}', '${sid}')">
-                        <div class="h-64 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                        <div class="h-64 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
                         <div class="p-6">
                             <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
                             <p class="text-stone-500 mt-2">${sub.products ? sub.products.length : 0} produktów</p>
@@ -1858,43 +1877,75 @@
         function renderSubcategoriesAdmin() {
             const container = document.getElementById('view-subcategories');
             const cats = siteData.categories || {};
-            const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
+            
+            // Sortowanie opcji w select (alfabetycznie)
+            const categoryOptions = Object.keys(cats)
+                .sort((a, b) => cats[a].title.localeCompare(cats[b].title, 'pl'))
+                .map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
+            
             let subListHTML = '';
             
-            Object.keys(cats).forEach(catId => {
+            // Sortowanie kategorii głównych (żeby grupy wyświetlały się w sensownej kolejności)
+            const sortedCatKeys = Object.keys(cats).sort((a, b) => {
+                const orderA = cats[a].order !== undefined ? cats[a].order : 9999;
+                const orderB = cats[b].order !== undefined ? cats[b].order : 9999;
+                return orderA - orderB;
+            });
+            
+            // GENEROWANIE LISTY POGRUPOWANEJ
+            sortedCatKeys.forEach(catId => {
                 const cat = cats[catId];
-                if(cat.subs) {
-                    // SORTOWANIE PODKATEGORII W ADMINIE TEŻ ALFABETYCZNIE
+                
+                // Sprawdzamy, czy kategoria ma podkategorie
+                if(cat.subs && Object.keys(cat.subs).length > 0) {
+                    
+                    // NAGŁÓWEK GRUPY (KATEGORIA GŁÓWNA)
+                    subListHTML += `
+                    <div class="mb-6 bg-stone-800/40 p-4 rounded-2xl border border-white/5">
+                        <h4 class="text-wood-500 font-bold text-lg mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
+                            <i class="fa-solid fa-layer-group text-sm"></i> ${cat.title}
+                        </h4>
+                        <div class="space-y-2">
+                    `;
+
+                    // LISTA PODKATEGORII W TEJ GRUPIE
                     Object.keys(cat.subs)
                         .sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl'))
                         .forEach(subId => {
                             const sub = cat.subs[subId];
                             
-                            // Wyświetlanie miniatury (lub ikony, jeśli brak zdjęcia)
+                            // Wyświetlanie miniatury
                             const imgHtml = sub.image 
-                                ? `<img src="${sub.image}" class="w-10 h-10 rounded object-cover border border-white/10 bg-white/5 shrink-0">` 
+                                ? `<img src="${sub.image}" onerror="this.src='https://via.placeholder.com/40?text=ERR'; this.onerror=null;" class="w-10 h-10 rounded object-cover border border-white/10 bg-white/5 shrink-0">` 
                                 : `<div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-white/20 text-xs shrink-0"><i class="fa-solid fa-image"></i></div>`;
 
                             subListHTML += `
-                            <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2 gap-3">
+                            <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 hover:border-wood-600/30 transition group">
                                 <div class="flex items-center gap-3 overflow-hidden">
                                     ${imgHtml}
                                     <div class="min-w-0">
-                                        <span class="text-[10px] text-stone-500 uppercase block tracking-wider truncate">${cat.title}</span>
-                                        <span class="font-bold text-sm text-stone-200 truncate block">${sub.title}</span>
+                                        <!-- Usunięto nazwę kategorii nadrzędnej z pojedynczego elementu, bo jest w nagłówku grupy -->
+                                        <span class="font-bold text-sm text-stone-200 truncate block group-hover:text-wood-500 transition">${sub.title}</span>
+                                        <span class="text-[10px] text-stone-500 block">${sub.products ? sub.products.length : 0} produktów</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-2 shrink-0">
-                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-xs font-bold hover:text-white transition px-2 py-1 bg-blue-400/10 rounded hover:bg-blue-400/20">EDYTUJ</button>
-                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-xs font-bold hover:text-white transition px-2 py-1 bg-red-500/10 rounded hover:bg-red-500/20">USUŃ</button>
+                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-xs font-bold hover:text-white transition px-3 py-2 bg-blue-400/10 rounded-lg hover:bg-blue-600 hover:shadow-lg hover:scale-105 transform duration-200">EDYTUJ</button>
+                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-xs font-bold hover:text-white transition px-3 py-2 bg-red-500/10 rounded-lg hover:bg-red-600 hover:shadow-lg hover:scale-105 transform duration-200">USUŃ</button>
                                 </div>
                             </div>`;
                         });
+
+                    // ZAMKNIĘCIE GRUPY
+                    subListHTML += `</div></div>`;
                 }
             });
+
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Podkategorie</h3>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
+                
+                <!-- Formularz dodawania -->
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8 shadow-xl">
                     <h4 class="text-xs uppercase font-bold text-stone-500" id="sub-form-title">Dodaj Podkategorię</h4>
                     
                     <!-- Ukryte pola do edycji -->
@@ -1906,11 +1957,17 @@
                     <input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
                     
                     <div class="flex gap-2">
-                        <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz Podkategorię</button>
-                        <button id="cancel-sub-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
+                        <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition shadow-lg">Utwórz Podkategorię</button>
+                        <button id="cancel-sub-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold shadow-lg">Anuluj</button>
                     </div>
                 </div>
-                <h4 class="text-xl font-bold mb-4">Lista Podkategorii</h4><div class="space-y-1">${subListHTML || '<p class="text-stone-500">Brak podkategorii.</p>'}</div>`;
+                
+                <h4 class="text-xl font-bold mb-4">Lista Podkategorii (wg Grup)</h4>
+                
+                <!-- Lista pogrupowana -->
+                <div class="space-y-1 pb-10">
+                    ${subListHTML || '<p class="text-stone-500 text-center py-8 bg-stone-900/50 rounded-2xl border border-white/5">Brak podkategorii. Dodaj pierwszą powyżej.</p>'}
+                </div>`;
             
             document.getElementById('add-sub-btn').onclick = () => {
                 const parentId = document.getElementById('new-sub-cat-parent').value; 
