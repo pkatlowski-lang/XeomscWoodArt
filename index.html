@@ -1869,15 +1869,24 @@
                         .sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl'))
                         .forEach(subId => {
                             const sub = cat.subs[subId];
+                            
+                            // Wyświetlanie miniatury (lub ikony, jeśli brak zdjęcia)
+                            const imgHtml = sub.image 
+                                ? `<img src="${sub.image}" class="w-10 h-10 rounded object-cover border border-white/10 bg-white/5 shrink-0">` 
+                                : `<div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-white/20 text-xs shrink-0"><i class="fa-solid fa-image"></i></div>`;
+
                             subListHTML += `
-                            <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5 mb-2">
-                                <div>
-                                    <span class="text-xs text-stone-500 uppercase block">${cat.title}</span>
-                                    <span class="font-bold">${sub.title}</span>
+                            <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 mb-2 gap-3">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    ${imgHtml}
+                                    <div class="min-w-0">
+                                        <span class="text-[10px] text-stone-500 uppercase block tracking-wider truncate">${cat.title}</span>
+                                        <span class="font-bold text-sm text-stone-200 truncate block">${sub.title}</span>
+                                    </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-sm font-bold hover:text-white transition px-2">EDYTUJ</button>
-                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-sm font-bold hover:text-white transition px-2">USUŃ</button>
+                                <div class="flex gap-2 shrink-0">
+                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-xs font-bold hover:text-white transition px-2 py-1 bg-blue-400/10 rounded hover:bg-blue-400/20">EDYTUJ</button>
+                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-xs font-bold hover:text-white transition px-2 py-1 bg-red-500/10 rounded hover:bg-red-500/20">USUŃ</button>
                                 </div>
                             </div>`;
                         });
@@ -1941,6 +1950,7 @@
                     }
                     saveData(); 
                     renderSubcategoriesAdmin(); 
+                    renderMain(); // ODŚWIEŻ STRONĘ GŁÓWNĄ, ABY POKAZAĆ NOWE ZDJĘCIA
                 } else { showToast("Wybierz kategorię nadrzędną i wpisz nazwę."); }
             };
             
@@ -1972,7 +1982,7 @@
             document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.delSubCat = (catId, subId) => { window.openConfirm("Usunąć podkategorię?", () => { delete siteData.categories[catId].subs[subId]; saveData(); renderSubcategoriesAdmin(); }); };
+        window.delSubCat = (catId, subId) => { window.openConfirm("Usunąć podkategorię?", () => { delete siteData.categories[catId].subs[subId]; saveData(); renderSubcategoriesAdmin(); renderMain(); }); };
 
         function renderAddProductView() {
             const container = document.getElementById('view-products');
