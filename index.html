@@ -571,9 +571,10 @@
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start pb-20">
             <!-- Lewa: Zdjęcia -->
             <div class="space-y-4">
-                <div class="aspect-square bg-stone-50 rounded-3xl overflow-hidden border border-stone-100 shadow-lg cursor-zoom-in relative group" onclick="openLightbox(window.currentImgIndex)">
-                    <img id="main-product-img" src="" class="w-full h-full object-cover transition duration-500">
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                <!-- ZMIANA: object-cover na object-contain, aby pokazać całe zdjęcie -->
+                <div class="aspect-square bg-stone-100 rounded-3xl overflow-hidden border border-stone-100 shadow-lg cursor-zoom-in relative group flex items-center justify-center" onclick="openLightbox(window.currentImgIndex)">
+                    <img id="main-product-img" src="" class="w-full h-full object-contain transition duration-500">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center pointer-events-none">
                         <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-75 group-hover:scale-100 drop-shadow-md"></i>
                     </div>
                 </div>
@@ -1149,8 +1150,8 @@
                 if (orders.length === 0) { document.getElementById('custom-orders').classList.add('hidden'); } 
                 else {
                     document.getElementById('custom-orders').classList.remove('hidden');
-                    // Dodano pointer-events-none do obrazka, żeby nie przeszkadzał w dragowaniu
-                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" onerror="this.src='https://via.placeholder.com/300?text=Błąd+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover transition duration-500 hover:scale-105 pointer-events-none"></div>`;
+                    // ZMIANA: object-contain w karuzeli zleceń + szare tło (bg-stone-100)
+                    const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md bg-stone-100 flex items-center justify-center" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" onerror="this.src='https://via.placeholder.com/300?text=Błąd+Zdjecia'; this.onerror=null;" class="w-full h-full object-contain transition duration-500 hover:scale-105 pointer-events-none"></div>`;
                     const displayOrders = orders.length < 4 ? [...orders, ...orders] : orders;
                     displayOrders.forEach((url, index) => { coContainer.innerHTML += createOrderHTML(url, index % orders.length); });
                 }
@@ -1262,7 +1263,8 @@
              if(lightboxDirect) { window.openLightbox(index); } 
              else {
                  const grid = document.getElementById('custom-orders-grid');
-                 grid.innerHTML = orders.map((url, i) => `<div class="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition group" onclick="openLightbox(${i})"><img src="${url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></div>`).join('');
+                 // ZMIANA: object-contain w pełnej galerii zleceń + tło
+                 grid.innerHTML = orders.map((url, i) => `<div class="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition group bg-stone-100 flex items-center justify-center" onclick="openLightbox(${i})"><img src="${url}" class="w-full h-full object-contain group-hover:scale-105 transition duration-500"></div>`).join('');
                  document.getElementById('main-content').classList.add('hidden');
                  document.getElementById('custom-orders-full-view').classList.remove('hidden');
                  window.scrollTo(0,0);
@@ -1386,7 +1388,9 @@
             if(allImages.length > 1) {
                 allImages.forEach((img, i) => {
                     const thumb = document.createElement('img');
-                    thumb.src = img.src; thumb.className = `w-20 h-20 rounded-xl object-cover cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`;
+                    // ZMIANA: Miniatury też object-contain i białe tło
+                    thumb.src = img.src; 
+                    thumb.className = `w-20 h-20 rounded-xl object-contain bg-stone-100 cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`;
                     thumb.onclick = () => { window.updateMainImage(i); };
                     thumbsContainer.appendChild(thumb);
                 });
