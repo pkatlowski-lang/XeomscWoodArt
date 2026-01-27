@@ -220,6 +220,12 @@
         /* DRAG CURSORS - NOWE STYLE DO PRZESUWANIA */
         .cursor-grab { cursor: grab; }
         .cursor-grabbing { cursor: grabbing; user-select: none; }
+        
+        /* Kalkulator Table Styles */
+        .calc-table-header { font-size: 10px; text-transform: uppercase; color: #78716c; font-weight: 700; letter-spacing: 0.05em; padding-bottom: 8px; }
+        .calc-row-input { background: transparent; border-bottom: 1px solid #44403c; color: white; width: 100%; padding: 4px; font-size: 14px; text-align: center; outline: none; transition: border 0.3s; }
+        .calc-row-input:focus { border-color: #d97706; }
+        .calc-row-input.text-left { text-align: left; }
     </style>
 </head>
 <body class="text-stone-800 bg-stone-50">
@@ -769,6 +775,8 @@
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-6"></i> Lista Produktów</button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('custom-orders')" id="btn-custom-orders" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-camera-retro w-6"></i> Galeria Zleceń</button>
+                    <!-- NOWA ZAKŁADKA KALKULATORA -->
+                    <button onclick="switchAdminView('laser-calc')" id="btn-laser-calc" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-wood-500 hover:text-white border border-wood-600/30 hover:bg-wood-600/10"><i class="fa-solid fa-calculator w-6"></i> Kalkulator Laserowy</button>
                  </nav>
                  <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
              </div>
@@ -847,7 +855,140 @@
                      </div>
                      <div id="admin-custom-orders-list" class="grid grid-cols-4 gap-4"></div>
                  </div>
+                 
+                 <!-- NOWY WIDOK: ZAAWANSOWANY KALKULATOR LASEROWY -->
+                 <div id="view-laser-calc" class="admin-view hidden space-y-6">
+                     <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h3 class="text-3xl font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-wood-500"></i> Kalkulator Laserowy
+                            </h3>
+                            <p class="text-stone-400 text-sm mt-1">Precyzyjna wycena cięcia i grawerowania</p>
+                        </div>
+                        <button onclick="window.saveLaserCalcState()" class="bg-wood-600 hover:bg-wood-500 px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg flex items-center gap-2">
+                             <i class="fa-solid fa-save"></i> Zapisz Stan
+                        </button>
+                     </div>
+
+                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- KOLUMNA LEWA: Ustawienia Globalne -->
+                        <div class="bg-stone-800 p-5 rounded-2xl border border-white/5 space-y-4 h-fit">
+                            <h4 class="text-xs uppercase font-bold text-stone-500 flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-cog"></i> Ustawienia Stawek
+                            </h4>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Cena materiału 3mm (za 1cm²)</label>
+                                <input id="lc-rate-3mm" type="number" step="0.0001" class="calc-input text-right" onchange="window.updateLcGlobal('baseRate3mm', this.value)">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-stone-400 uppercase font-bold mb-1">Koszt minuty lasera (PLN)</label>
+                                <input id="lc-rate-laser" type="number" step="0.01" class="calc-input text-right" onchange="window.updateLcGlobal('laserPerMinute', this.value)">
+                            </div>
+                            
+                            <div class="border-t border-white/5 pt-4 mt-2">
+                                <h4 class="text-xs uppercase font-bold text-stone-500 flex items-center gap-2 mb-3">
+                                    <i class="fa-solid fa-percent"></i> Twój Narzut
+                                </h4>
+                                <div class="relative flex items-center">
+                                    <input id="lc-markup" type="number" class="w-full bg-stone-900 border-2 border-wood-600/50 text-wood-500 font-bold text-xl text-center rounded-xl py-2 outline-none focus:border-wood-600 transition" onchange="window.updateLcMarkup(this.value)">
+                                    <div class="absolute right-4 text-wood-600 pointer-events-none font-bold">%</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Podsumowanie -->
+                            <div class="bg-wood-600 rounded-xl p-4 mt-4 shadow-lg">
+                                <span class="block text-[10px] text-white/70 uppercase font-bold">Cena Końcowa</span>
+                                <span id="lc-total-price" class="block text-3xl font-black text-white">0.00 PLN</span>
+                            </div>
+                        </div>
+
+                        <!-- KOLUMNA PRAWA: Tabela Elementów -->
+                        <div class="lg:col-span-2 bg-stone-800 p-5 rounded-2xl border border-white/5 flex flex-col h-full min-h-[500px]">
+                             <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-xs uppercase font-bold text-stone-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-layer-group"></i> Elementy do wyceny
+                                </h4>
+                                <button onclick="window.addLaserItem()" class="bg-stone-700 hover:bg-wood-600 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-white shadow">
+                                    <i class="fa-solid fa-plus"></i> Dodaj Element
+                                </button>
+                             </div>
+                             
+                             <!-- Nagłówki Tabeli -->
+                             <div class="grid grid-cols-12 gap-2 mb-2 px-2">
+                                 <div class="col-span-3 calc-table-header">Nazwa</div>
+                                 <div class="col-span-2 calc-table-header text-center">Wymiary (mm)</div>
+                                 <div class="col-span-2 calc-table-header text-center">Czas (min)</div>
+                                 <div class="col-span-2 calc-table-header text-center">Grubość</div>
+                                 <div class="col-span-2 calc-table-header text-right">Koszt</div>
+                                 <div class="col-span-1 calc-table-header"></div>
+                             </div>
+                             
+                             <!-- Lista Elementów -->
+                             <div id="lc-items-list" class="flex-1 overflow-y-auto space-y-1 pr-1">
+                                <!-- Generowane dynamicznie -->
+                             </div>
+                             
+                             <!-- Podsumowanie Kosztów -->
+                             <div class="border-t border-white/10 mt-4 pt-4 grid grid-cols-2 gap-4">
+                                 <div class="bg-black/30 p-3 rounded-xl flex justify-between items-center">
+                                     <span class="text-xs text-stone-400 font-bold"><i class="fa-solid fa-cube mr-2"></i>Suma Materiał</span>
+                                     <span id="lc-sum-material" class="font-mono font-bold text-stone-200">0.00 PLN</span>
+                                 </div>
+                                 <div class="bg-black/30 p-3 rounded-xl flex justify-between items-center">
+                                     <span class="text-xs text-stone-400 font-bold"><i class="fa-solid fa-clock mr-2"></i>Suma Laser</span>
+                                     <span id="lc-sum-laser" class="font-mono font-bold text-stone-200">0.00 PLN</span>
+                                 </div>
+                             </div>
+                        </div>
+                     </div>
+                 </div>
              </div>
+        </div>
+    </div>
+    
+    <!-- (Poprzedni Prosty Kalkulator wciąż istnieje jako overlay, jeśli chcesz go używać osobno) -->
+    <div id="calculator-view" class="fixed inset-0 z-[2001] bg-stone-900 hidden flex items-center justify-center p-4">
+        <!-- ... existing simple calculator code ... -->
+        <div class="bg-stone-800 text-white w-full max-w-6xl h-[90vh] rounded-[2rem] overflow-hidden flex flex-col shadow-2xl border border-white/10 ring-1 ring-white/5 relative">
+            <div class="bg-stone-950 p-6 border-b border-white/10 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">Prosty Kalkulator</h2>
+                        <p class="text-xs text-stone-400">Szybka wycena bez detali</p>
+                    </div>
+                </div>
+                <button onclick="toggleCalculator()" class="text-stone-400 hover:text-white transition p-2 bg-white/5 hover:bg-white/10 rounded-lg"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <!-- ... content of simple calculator ... -->
+             <div class="flex flex-1 overflow-hidden">
+                <div class="w-full md:w-1/3 p-6 border-r border-white/5 overflow-y-auto bg-black/20">
+                    <h3 class="font-bold text-lg mb-4 text-wood-500">Dane do wyceny</h3>
+                    <div class="space-y-4">
+                        <div><label class="block text-xs font-bold text-stone-500 uppercase mb-1">Nazwa Produktu</label><input id="calc-name" class="calc-input" placeholder="np. Deska do krojenia - Dąb"></div>
+                        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-stone-500 uppercase mb-1">Koszt Materiału (PLN)</label><input id="calc-material" type="number" step="0.01" class="calc-input text-right" placeholder="0.00"></div><div><label class="block text-xs font-bold text-stone-500 uppercase mb-1">Czas Pracy (minuty)</label><input id="calc-time" type="number" class="calc-input text-right" placeholder="0"></div></div>
+                        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-stone-500 uppercase mb-1">Stawka Roboczogodziny</label><input id="calc-rate" type="number" step="0.01" class="calc-input text-right" value="100"></div><div><label class="block text-xs font-bold text-stone-500 uppercase mb-1">Marża (%)</label><input id="calc-markup" type="number" class="calc-input text-right" value="30"></div></div>
+                        <div class="pt-4 border-t border-white/10"><button onclick="performCalculation()" class="w-full bg-wood-600 hover:bg-wood-500 py-3 rounded-xl font-bold transition shadow-lg mb-2"><i class="fa-solid fa-play mr-2"></i> Oblicz i Zapisz</button><button onclick="clearCalculator()" class="w-full bg-stone-700 hover:bg-stone-600 py-2 rounded-xl text-sm font-bold transition text-stone-300">Wyczyść pola</button></div>
+                    </div>
+                </div>
+                <div class="flex-1 p-6 overflow-y-auto bg-stone-900 flex flex-col">
+                    <div id="calc-result-box" class="bg-wood-900/20 border border-wood-600/30 rounded-2xl p-6 mb-8 hidden animate-fade-in">
+                        <h4 class="text-wood-500 font-bold uppercase text-xs mb-4 tracking-widest">Wynik Ostatniej Kalkulacji</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                            <div class="bg-black/20 p-4 rounded-xl"><span class="text-stone-400 text-xs block mb-1">Koszt Robocizny</span><span id="res-labor" class="text-xl font-bold text-white">0.00 PLN</span></div>
+                            <div class="bg-black/20 p-4 rounded-xl"><span class="text-stone-400 text-xs block mb-1">Koszt Całkowity (Baza)</span><span id="res-total-cost" class="text-xl font-bold text-white">0.00 PLN</span></div>
+                            <div class="bg-wood-600 p-4 rounded-xl shadow-lg transform scale-105 border border-wood-400"><span class="text-white/80 text-xs block mb-1 font-bold uppercase">Sugerowana Cena</span><span id="res-final-price" class="text-2xl font-black text-white">0.00 PLN</span></div>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-stone-500"></i> Historia Wycen</h3>
+                    <div class="flex-1 bg-black/20 rounded-xl overflow-hidden border border-white/5">
+                        <div class="grid grid-cols-12 gap-2 p-3 bg-white/5 text-[10px] font-bold text-stone-400 uppercase tracking-wider border-b border-white/5"><div class="col-span-3">Produkt</div><div class="col-span-2 text-right">Materiał</div><div class="col-span-2 text-right">Robocizna</div><div class="col-span-2 text-right text-wood-500">Cena Końcowa</div><div class="col-span-2 text-right">Data</div><div class="col-span-1"></div></div>
+                        <div id="calc-history-list" class="divide-y divide-white/5 overflow-y-auto max-h-[400px]"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -884,9 +1025,9 @@
         window.selectedListCatId = null;
         window.selectedListSubId = null; 
         window.selectedListProdIndex = null;
-        window.openMessageIds = new Set(); // Śledzenie otwartych wiadomości
-        window.isZoomed = false; // Stan zoomu w lightboxie
-        window.currentContactProductImage = null; // ZMIENNA DO PRZECHOWYWANIA URL ZDJĘCIA PRODUKTU
+        window.openMessageIds = new Set(); 
+        window.isZoomed = false; 
+        window.currentContactProductImage = null; 
         
         // Modal Confirm logic
         let confirmCallback = null;
@@ -907,6 +1048,18 @@
             categories: {},
             galleries: {},
             customOrders: [],
+            savedCalculations: [],
+            // DANE ZAAWANSOWANEGO KALKULATORA LASEROWEGO
+            laserCalc: {
+                settings: {
+                    baseRate3mm: 0.0038, // Cena za 1cm² dla 3mm
+                    laserPerMinute: 0.50, // 50 groszy za minutę lasera
+                    markupPercent: 20
+                },
+                items: [
+                    { id: 1, name: 'Element Przykładowy', width: 100, height: 100, time: 10, thickness: 3, customRate: 0.0038 }
+                ]
+            },
             imgbbKey: "",
             textContent: {
                 hero: { main: "Precyzja Lasera,<br>Ciepło", accent: "Drewna", desc: "Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą." },
@@ -916,12 +1069,10 @@
                     { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
                 ],
                 contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz do mnie, a pomogę Ci go zrealizować i przygotuję indywidualną wycenę. Odpowiadam najszybciej jak to możliwe." },
-                // DOKUMENTY PRAWNE (Teksty domyślne)
                 legal: {
                     privacy: "Tu wpisz treść Polityki Prywatności...\n\n1. Administrator Danych\nAdministratorem danych jest Xeomsc FusionArt.\n\n2. Cele przetwarzania\nDane przetwarzane są w celu realizacji zamówień i kontaktu z klientem.",
                     terms: "Tu wpisz treść Regulaminu...\n\n1. Postanowienia ogólne\nNiniejszy regulamin określa zasady korzystania ze sklepu.\n\n2. Zamówienia\nZamówienia można składać poprzez formularz kontaktowy."
                 },
-                // NOWE: STOPKA
                 footer: {
                     slogan: "Pasja. Precyzja. Drewno.",
                     copyright: "&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone."
@@ -929,6 +1080,7 @@
             }
         };
 
+        // ... [Reszta funkcji powiadomień, okien modalnych itd. bez zmian] ...
         // --- POWIADOMIENIA UI ---
         window.showToast = (msg) => {
             const toast = document.getElementById('toast-notification');
@@ -948,6 +1100,159 @@
             if(confirmCallback && result) confirmCallback();
             confirmCallback = null;
         };
+        
+        // --- LOGIKA PROSTEGO KALKULATORA (STARA) ---
+        window.toggleCalculator = () => {
+            const el = document.getElementById('calculator-view');
+            el.classList.toggle('hidden');
+            if (!el.classList.contains('hidden')) { window.renderCalculatorHistory(); }
+        };
+        // ... [Reszta funkcji prostego kalkulatora zachowana] ...
+        window.performCalculation = () => {
+            const name = document.getElementById('calc-name').value || "Produkt bez nazwy";
+            const material = parseFloat(document.getElementById('calc-material').value) || 0;
+            const timeMin = parseFloat(document.getElementById('calc-time').value) || 0;
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const markup = parseFloat(document.getElementById('calc-markup').value) || 0;
+            const laborCost = (timeMin / 60) * rate; const totalCost = material + laborCost; const finalPrice = totalCost * (1 + markup / 100);
+            document.getElementById('res-labor').textContent = laborCost.toFixed(2) + ' PLN'; document.getElementById('res-total-cost').textContent = totalCost.toFixed(2) + ' PLN'; document.getElementById('res-final-price').textContent = finalPrice.toFixed(2) + ' PLN'; document.getElementById('calc-result-box').classList.remove('hidden');
+            if (!siteData.savedCalculations) siteData.savedCalculations = [];
+            siteData.savedCalculations.unshift({ id: Date.now(), name: name, material: material, time: timeMin, labor: laborCost, price: finalPrice, date: new Date().toISOString() });
+            saveData(); window.renderCalculatorHistory(); showToast("Wycena zapisana w historii!");
+        };
+        window.clearCalculator = () => { document.getElementById('calc-name').value = ''; document.getElementById('calc-material').value = ''; document.getElementById('calc-time').value = ''; document.getElementById('calc-result-box').classList.add('hidden'); };
+        window.renderCalculatorHistory = () => {
+            const list = document.getElementById('calc-history-list'); const data = siteData.savedCalculations || [];
+            if (data.length === 0) { list.innerHTML = '<div class="p-6 text-center text-stone-500 italic">Brak zapisanych wycen.</div>'; return; }
+            list.innerHTML = data.map((item, index) => `<div class="grid grid-cols-12 gap-2 p-3 text-sm hover:bg-white/5 items-center transition"><div class="col-span-3 font-medium text-white truncate" title="${item.name}">${item.name}</div><div class="col-span-2 text-right text-stone-400">${item.material.toFixed(2)}</div><div class="col-span-2 text-right text-stone-400">${item.labor.toFixed(2)}</div><div class="col-span-2 text-right font-bold text-wood-500">${item.price.toFixed(2)} PLN</div><div class="col-span-2 text-right text-[10px] text-stone-500">${new Date(item.date).toLocaleDateString()}</div><div class="col-span-1 text-right"><button onclick="deleteCalculation(${index})" class="text-stone-600 hover:text-red-500 transition p-1"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
+        };
+        window.deleteCalculation = (index) => { window.openConfirm("Usunąć tę wycenę z historii?", () => { siteData.savedCalculations.splice(index, 1); saveData(); window.renderCalculatorHistory(); }); };
+
+        // ==========================================
+        // NOWY ZAAWANSOWANY KALKULATOR LASEROWY
+        // ==========================================
+
+        window.initLaserCalc = () => {
+             // Inicjalizacja danych jeśli nie istnieją
+             if(!siteData.laserCalc) {
+                 siteData.laserCalc = JSON.parse(JSON.stringify(initialData.laserCalc));
+             }
+             window.renderLaserCalc();
+        };
+
+        window.renderLaserCalc = () => {
+            const data = siteData.laserCalc;
+            const settings = data.settings;
+            const items = data.items || [];
+            
+            // 1. Wypełnij ustawienia
+            document.getElementById('lc-rate-3mm').value = settings.baseRate3mm;
+            document.getElementById('lc-rate-laser').value = settings.laserPerMinute;
+            document.getElementById('lc-markup').value = settings.markupPercent;
+
+            // 2. Wypełnij tabelę
+            const listEl = document.getElementById('lc-items-list');
+            listEl.innerHTML = '';
+
+            let totalMaterial = 0;
+            let totalLaser = 0;
+
+            items.forEach((item, index) => {
+                // Obliczenia per element
+                // Przelicznik powierzchni: (width_mm * height_mm) / 100 = cm2
+                const areaSqCm = (item.width * item.height) / 100;
+                
+                // Obliczanie sugerowanej stawki za materiał (jeśli grubość > 3mm to drożej)
+                // Logika z pliku react: ratePerMm = base3mmRate / 3; suggested = ratePerMm * thickness
+                const ratePerMm = settings.baseRate3mm / 3;
+                const suggestedRate = ratePerMm * item.thickness;
+                
+                // Jeśli item ma customRate, użyj go, w przeciwnym razie wyliczona
+                const effectiveRate = item.customRate > 0 ? item.customRate : suggestedRate;
+                
+                const matCost = areaSqCm * effectiveRate;
+                const laserCost = item.time * settings.laserPerMinute;
+                const itemTotal = matCost + laserCost;
+
+                totalMaterial += matCost;
+                totalLaser += laserCost;
+
+                listEl.innerHTML += `
+                <div class="grid grid-cols-12 gap-2 bg-black/20 p-2 rounded-lg items-center text-sm border border-transparent hover:border-white/10 transition group">
+                    <div class="col-span-3">
+                        <input class="calc-row-input text-left" value="${item.name}" onchange="window.updateLcItem(${index}, 'name', this.value)">
+                    </div>
+                    <div class="col-span-2 flex gap-1">
+                         <input class="calc-row-input" type="number" value="${item.width}" placeholder="Szer" onchange="window.updateLcItem(${index}, 'width', this.value)">
+                         <span class="text-stone-500 text-xs py-1">x</span>
+                         <input class="calc-row-input" type="number" value="${item.height}" placeholder="Wys" onchange="window.updateLcItem(${index}, 'height', this.value)">
+                    </div>
+                    <div class="col-span-2 text-center">
+                         <input class="calc-row-input" type="number" value="${item.time}" onchange="window.updateLcItem(${index}, 'time', this.value)">
+                    </div>
+                    <div class="col-span-2 text-center relative group/tip">
+                         <input class="calc-row-input" type="number" value="${item.thickness}" onchange="window.updateLcItem(${index}, 'thickness', this.value)">
+                         <!-- Tooltip z ceną za materiał -->
+                         <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded text-stone-300 opacity-0 group-hover/tip:opacity-100 pointer-events-none transition whitespace-nowrap z-10">
+                            Stawka: ${effectiveRate.toFixed(4)}/cm²
+                         </div>
+                    </div>
+                    <div class="col-span-2 text-right font-bold text-stone-300">
+                         ${itemTotal.toFixed(2)}
+                    </div>
+                    <div class="col-span-1 text-right">
+                         <button onclick="window.delLcItem(${index})" class="text-stone-600 hover:text-red-500 transition px-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+
+            // 3. Podsumowanie
+            const sumBase = totalMaterial + totalLaser;
+            const finalPrice = sumBase * (1 + settings.markupPercent / 100);
+
+            document.getElementById('lc-sum-material').textContent = totalMaterial.toFixed(2) + ' PLN';
+            document.getElementById('lc-sum-laser').textContent = totalLaser.toFixed(2) + ' PLN';
+            document.getElementById('lc-total-price').textContent = finalPrice.toFixed(2) + ' PLN';
+        };
+
+        // Funkcje obsługi Kalkulatora Laserowego
+        window.updateLcGlobal = (key, val) => {
+            siteData.laserCalc.settings[key] = parseFloat(val) || 0;
+            window.renderLaserCalc();
+        };
+        
+        window.updateLcMarkup = (val) => {
+             siteData.laserCalc.settings.markupPercent = parseFloat(val) || 0;
+             window.renderLaserCalc();
+        };
+
+        window.addLaserItem = () => {
+            const newItem = { 
+                id: Date.now(), 
+                name: 'Nowy Element', 
+                width: 100, height: 100, 
+                time: 5, thickness: 3, 
+                customRate: 0 // 0 oznacza "użyj automatycznej"
+            };
+            siteData.laserCalc.items.push(newItem);
+            window.renderLaserCalc();
+        };
+
+        window.updateLcItem = (index, field, value) => {
+            const val = (field === 'name') ? value : (parseFloat(value) || 0);
+            siteData.laserCalc.items[index][field] = val;
+            window.renderLaserCalc();
+        };
+
+        window.delLcItem = (index) => {
+            siteData.laserCalc.items.splice(index, 1);
+            window.renderLaserCalc();
+        };
+
+        window.saveLaserCalcState = () => {
+            saveData();
+            showToast("Zapisano stan kalkulatora!");
+        };
 
         // ==========================================
         // STANDARDOWA LOGIKA STRONY
@@ -965,90 +1270,33 @@
         window.enableDragScroll = (elementId) => {
             const slider = document.getElementById(elementId);
             if(!slider) return;
-            
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                slider.classList.add('cursor-grabbing');
-                slider.classList.remove('cursor-grab');
-                // Wyłącz snap podczas przeciągania dla płynności
-                slider.style.scrollSnapType = 'none';
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-                window.stopAutoScroll(); // Zatrzymaj auto-scroll podczas interakcji
-            });
-
-            slider.addEventListener('mouseleave', () => {
-                isDown = false;
-                slider.classList.remove('cursor-grabbing');
-                slider.classList.add('cursor-grab');
-                slider.style.scrollSnapType = 'x mandatory'; // Przywróć snap
-                window.startAutoScroll(); // Wznów auto-scroll
-            });
-
-            slider.addEventListener('mouseup', () => {
-                isDown = false;
-                slider.classList.remove('cursor-grabbing');
-                slider.classList.add('cursor-grab');
-                slider.style.scrollSnapType = 'x mandatory';
-                window.startAutoScroll();
-            });
-
-            slider.addEventListener('mousemove', (e) => {
-                if(!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2; // Szybkość przewijania
-                slider.scrollLeft = scrollLeft - walk;
-            });
+            let isDown = false; let startX; let scrollLeft;
+            slider.addEventListener('mousedown', (e) => { isDown = true; slider.classList.add('cursor-grabbing'); slider.classList.remove('cursor-grab'); slider.style.scrollSnapType = 'none'; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; window.stopAutoScroll(); });
+            slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('cursor-grabbing'); slider.classList.add('cursor-grab'); slider.style.scrollSnapType = 'x mandatory'; window.startAutoScroll(); });
+            slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('cursor-grabbing'); slider.classList.add('cursor-grab'); slider.style.scrollSnapType = 'x mandatory'; window.startAutoScroll(); });
+            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         };
 
         window.scrollCategories = (direction) => {
             const container = document.getElementById('main-categories-grid'); if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 320 : 420;
-            
-            // Logika pętli (360 stopni)
-            // Jeśli idziemy w prawo i jesteśmy przy końcu -> skocz na początek
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' }); 
-            } 
-            // Jeśli idziemy w lewo i jesteśmy na początku -> skocz na koniec
-            else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); 
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) { container.scrollTo({ left: 0, behavior: 'smooth' }); } 
+            else if (direction === -1 && container.scrollLeft <= 0) { container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); } 
+            else { container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' }); }
         };
-
-        // Nowa funkcja do przewijania podkategorii (z logiką 360)
         window.scrollSubCategories = (direction) => {
             const container = document.getElementById('sub-categories-grid'); if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 280 : 320;
-
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
-            } else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) { container.scrollTo({ left: 0, behavior: 'smooth' }); } 
+            else if (direction === -1 && container.scrollLeft <= 0) { container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); } 
+            else { container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' }); }
         };
-
         window.scrollCustomOrders = (direction) => {
             const container = document.getElementById('custom-orders-carousel'); if(!container) return;
             const scrollAmount = window.innerWidth < 768 ? 300 : 400;
-
-            // Logika pętli (360 stopni)
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
-            } else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) { container.scrollTo({ left: 0, behavior: 'smooth' }); } 
+            else if (direction === -1 && container.scrollLeft <= 0) { container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); } 
+            else { container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' }); }
         };
         
         window.startAutoScroll = () => {
@@ -1058,15 +1306,13 @@
         };
         window.stopAutoScroll = () => { if(categoryAutoScroll) clearInterval(categoryAutoScroll); if(customOrdersAutoScroll) clearInterval(customOrdersAutoScroll); };
         
-        // ZMIENNA DO ŚLEDZENIA AKTYWNEJ KATEGORII NA STRONIE GŁÓWNEJ
         window.activeMainCatId = null;
 
         function renderTexts() {
             if(!siteData.textContent || !siteData.textContent.aboutCards) { siteData.textContent = initialData.textContent; }
-            
-            // Zabezpieczenie brakujących obiektów (dla starszych danych)
             if(!siteData.textContent.legal) siteData.textContent.legal = initialData.textContent.legal;
             if(!siteData.textContent.footer) siteData.textContent.footer = initialData.textContent.footer;
+            if(!siteData.savedCalculations) siteData.savedCalculations = [];
 
             const t = siteData.textContent;
             if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
@@ -1076,8 +1322,6 @@
             if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
             if(document.getElementById('contact-desc')) document.getElementById('contact-desc').textContent = t.contact.desc;
 
-            // Render Stopki
-            // ZMIEŃ WSZYSTKIE STOPKI
             document.querySelectorAll('[id="footer-slogan"]').forEach(el => el.textContent = t.footer.slogan);
             document.querySelectorAll('[id="footer-copyright"]').forEach(el => el.innerHTML = t.footer.copyright);
 
@@ -1095,17 +1339,11 @@
         function renderHero() {
             const container = document.getElementById('hero-carousel-container');
             if (!container || !siteData.heroItems) return;
-            container.innerHTML = siteData.heroItems.map((it, idx) => `
-                <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-                    ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover object-center">` : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
-                </div>`).join('');
+            container.innerHTML = siteData.heroItems.map((it, idx) => `<div class="hero-slide ${idx === 0 ? 'active' : ''}">${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover object-center">` : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}</div>`).join('');
             
             let cur = 0; const slides = document.querySelectorAll('.hero-slide');
             if(window.heroInterval) clearInterval(window.heroInterval);
-            window.heroInterval = setInterval(() => {
-                if (slides.length < 2) return; slides[cur].classList.remove('active');
-                cur = (cur + 1) % slides.length; slides[cur].classList.add('active');
-            }, 6000);
+            window.heroInterval = setInterval(() => { if (slides.length < 2) return; slides[cur].classList.remove('active'); cur = (cur + 1) % slides.length; slides[cur].classList.add('active'); }, 6000);
         }
 
         function renderMain() {
@@ -1113,33 +1351,16 @@
             if (grid) {
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
-                // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
-                const visibleCategories = Object.entries(cats)
-                    .filter(([, c]) => !c.isHidden)
-                    .sort(([, a], [, b]) => {
-                        const orderA = a.order !== undefined ? a.order : 9999;
-                        const orderB = b.order !== undefined ? b.order : 9999;
-                        return orderA - orderB;
-                    });
-                
+                const visibleCategories = Object.entries(cats).filter(([, c]) => !c.isHidden).sort(([, a], [, b]) => { const orderA = a.order !== undefined ? a.order : 9999; const orderB = b.order !== undefined ? b.order : 9999; return orderA - orderB; });
                 if (visibleCategories.length === 0) { grid.innerHTML = '<p class="text-stone-400 w-full text-center py-10">Brak widocznych kategorii.</p>'; } 
                 else {
                     const createCardHTML = ([id, c]) => `
                         <div id="main-cat-${id}" class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in min-w-[320px] md:min-w-[400px] snap-center shrink-0 category-card-item">
-                            <div class="h-72 overflow-hidden relative" onclick="window.selectMainCategory('${id}')">
-                                <img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
-                                <div class="absolute bottom-6 left-8 text-white"><h3 class="font-bold text-2xl">${c.title}</h3></div>
-                            </div>
-                            <div class="p-8 flex justify-between items-center" onclick="window.selectMainCategory('${id}')">
-                                <span class="text-stone-500 font-medium text-sm">Pokaż podkategorie</span>
-                                <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition"><i class="fa-solid fa-arrow-down"></i></div>
-                            </div>
-                        </div>`;
+                            <div class="h-72 overflow-hidden relative" onclick="window.selectMainCategory('${id}')"><img src="${c.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"><div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div><div class="absolute bottom-6 left-8 text-white"><h3 class="font-bold text-2xl">${c.title}</h3></div></div>
+                            <div class="p-8 flex justify-between items-center" onclick="window.selectMainCategory('${id}')"><span class="text-stone-500 font-medium text-sm">Pokaż podkategorie</span><div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition"><i class="fa-solid fa-arrow-down"></i></div></div></div>`;
                     const allItems = visibleCategories.length < 3 ? [...visibleCategories, ...visibleCategories, ...visibleCategories] : visibleCategories;
                     allItems.forEach(item => { grid.innerHTML += createCardHTML(item); });
                 }
-                // Aktywuj drag dla kategorii głównych
                 window.enableDragScroll('main-categories-grid');
             }
 
@@ -1150,20 +1371,13 @@
                 if (orders.length === 0) { document.getElementById('custom-orders').classList.add('hidden'); } 
                 else {
                     document.getElementById('custom-orders').classList.remove('hidden');
-                    // ZMIANA: object-contain w karuzeli zleceń + szare tło (bg-stone-100)
                     const createOrderHTML = (url, index) => `<div class="custom-order-item snap-center shrink-0 min-w-[280px] h-[280px] rounded-3xl overflow-hidden cursor-pointer shadow-md bg-stone-100 flex items-center justify-center" onclick="openCustomOrdersGallery(true, ${index})"><img src="${url}" onerror="this.src='https://via.placeholder.com/300?text=Błąd+Zdjecia'; this.onerror=null;" class="w-full h-full object-contain transition duration-500 hover:scale-105 pointer-events-none"></div>`;
                     const displayOrders = orders.length < 4 ? [...orders, ...orders] : orders;
                     displayOrders.forEach((url, index) => { coContainer.innerHTML += createOrderHTML(url, index % orders.length); });
                 }
-                // Aktywuj drag dla zleceń
                 window.enableDragScroll('custom-orders-carousel');
             }
-            
-            // FIX: ODŚWIEŻ WIDOK PODKATEGORII JEŚLI JEST OTWARTY
-            if(window.activeMainCatId && siteData.categories[window.activeMainCatId]) {
-                window.selectMainCategory(window.activeMainCatId, true); // true = preventScroll
-            }
-
+            if(window.activeMainCatId && siteData.categories[window.activeMainCatId]) { window.selectMainCategory(window.activeMainCatId, true); }
             window.startAutoScroll();
         }
 
@@ -1171,90 +1385,46 @@
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
             const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
             selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-
             const cat = siteData.categories[id]; if(!cat) return;
-            
-            // Zapisz aktywną kategorię
             window.activeMainCatId = id;
-
             const container = document.getElementById('sub-categories-container');
             const title = document.getElementById('selected-cat-title');
             const grid = document.getElementById('sub-categories-grid');
             const btnSeeAll = document.getElementById('btn-see-all-subcats');
-
             title.textContent = cat.title; grid.innerHTML = '';
-            
-            // Konfiguracja przycisku "Zobacz wszystkie"
             btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
-
             const subs = cat.subs || {}; 
-            
-            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
             const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
-
             if(subKeys.length > 0) {
-                // Wyświetl wszystkie podkategorie w karuzeli
                 grid.innerHTML = subKeys.map(sid => {
                     const sub = subs[sid];
-                    // FIX: DODANO ONERROR DO ZDJĘĆ
                     return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 min-w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
                              <div class="h-48 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"></div>
                             <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${sub.title}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
                 }).join('');
             } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
-            
-            // Aktywuj drag dla podkategorii
             window.enableDragScroll('sub-categories-grid');
-
             container.classList.remove('hidden');
-            
-            // Scrollujemy tylko jeśli to nowa interakcja, a nie odświeżenie danych
-            if (!preventScroll) {
-                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-            }
+            if (!preventScroll) { setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100); }
         };
         
-        // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
         window.openFullSubcategoryList = (catId) => {
-            const cat = siteData.categories[catId];
-            if(!cat) return;
-            
-            const container = document.getElementById('subcategories-full-view');
-            const title = document.getElementById('subcategories-full-title');
-            const grid = document.getElementById('subcategories-full-grid');
-            
-            title.textContent = cat.title;
-            grid.innerHTML = '';
-            
-            // Przechowujemy ID kategorii, aby wiedzieć gdzie wrócić z widoku produktów
+            const cat = siteData.categories[catId]; if(!cat) return;
+            const container = document.getElementById('subcategories-full-view'); const title = document.getElementById('subcategories-full-title'); const grid = document.getElementById('subcategories-full-grid');
+            title.textContent = cat.title; grid.innerHTML = '';
             window.currentCatId = catId;
-            
             const subs = cat.subs || {};
-            
-            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
             const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
-            
              if(subKeys.length > 0) {
                 grid.innerHTML = subKeys.map(sid => {
                     const sub = subs[sid];
-                    // FIX: DODANO ONERROR DO ZDJĘĆ
                     return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openSubcategoryView('${catId}', '${sid}')">
                         <div class="h-64 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia'; this.onerror=null;" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
-                        <div class="p-6">
-                            <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
-                            <p class="text-stone-500 mt-2">${sub.products ? sub.products.length : 0} produktów</p>
-                        </div></div>`;
+                        <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3><p class="text-stone-500 mt-2">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
                 }).join('');
-            } else {
-                grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak podkategorii.</p></div>';
-            }
-            
-            // FIX: Ukrywanie widoku podkategorii (listy produktów)
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('subcategory-view').classList.add('hidden'); // Ważne: ukryj listę produktów
-            document.getElementById('gallery-view').classList.add('hidden');
-            container.classList.remove('hidden');
-            window.scrollTo(0,0);
+            } else { grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak podkategorii.</p></div>'; }
+            document.getElementById('main-content').classList.add('hidden'); document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden');
+            container.classList.remove('hidden'); window.scrollTo(0,0);
         };
 
         window.openCustomOrdersGallery = (lightboxDirect = false, index = 0) => {
@@ -1263,27 +1433,18 @@
              if(lightboxDirect) { window.openLightbox(index); } 
              else {
                  const grid = document.getElementById('custom-orders-grid');
-                 // ZMIANA: object-contain w pełnej galerii zleceń + tło
                  grid.innerHTML = orders.map((url, i) => `<div class="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition group bg-stone-100 flex items-center justify-center" onclick="openLightbox(${i})"><img src="${url}" class="w-full h-full object-contain group-hover:scale-105 transition duration-500"></div>`).join('');
-                 document.getElementById('main-content').classList.add('hidden');
-                 document.getElementById('custom-orders-full-view').classList.remove('hidden');
-                 window.scrollTo(0,0);
+                 document.getElementById('main-content').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.remove('hidden'); window.scrollTo(0,0);
              }
         };
 
         window.openCategoryView = (id) => { window.selectMainCategory(id); };
 
         window.openSubcategoryView = (catId, subId) => {
-            const cat = siteData.categories[catId];
-            if(!cat || !cat.subs || !cat.subs[subId]) return;
+            const cat = siteData.categories[catId]; if(!cat || !cat.subs || !cat.subs[subId]) return;
             const sub = cat.subs[subId];
-            document.getElementById('subcategory-title').textContent = sub.title;
-            const grid = document.getElementById('subcategory-grid');
-            
-            // Przechowywanie ID dla przycisku powrotu w widoku produktu
-            window.currentCatId = catId;
-            window.currentSubId = subId;
-
+            document.getElementById('subcategory-title').textContent = sub.title; const grid = document.getElementById('subcategory-grid');
+            window.currentCatId = catId; window.currentSubId = subId;
             if(grid) {
                 grid.innerHTML = '';
                 const products = sub.products || [];
@@ -1296,123 +1457,32 @@
                     }).join('');
                 } else { grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>'; }
             }
-            
-            // FIX: Ukrywanie innych widoków przy powrocie
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('subcategories-full-view').classList.add('hidden'); 
-            document.getElementById('gallery-view').classList.add('hidden'); // Ważne: ukryj widok produktu
-            document.getElementById('subcategory-view').classList.remove('hidden');
-            window.scrollTo(0,0);
+            document.getElementById('main-content').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.remove('hidden'); window.scrollTo(0,0);
         };
         
-        // Funkcja powrotu z listy produktów (subcategory-view) do listy podkategorii (full-view)
-        window.goBackToSubcategoryList = () => {
-             if(window.currentCatId) {
-                 window.openFullSubcategoryList(window.currentCatId);
-             } else {
-                 window.goHome();
-             }
-        };
+        window.goBackToSubcategoryList = () => { if(window.currentCatId) { window.openFullSubcategoryList(window.currentCatId); } else { window.goHome(); } };
         
-        // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
-        window.openFullSubcategoryList = (catId) => {
-            const cat = siteData.categories[catId];
-            if(!cat) return;
-            
-            const container = document.getElementById('subcategories-full-view');
-            const title = document.getElementById('subcategories-full-title');
-            const grid = document.getElementById('subcategories-full-grid');
-            
-            title.textContent = cat.title;
-            grid.innerHTML = '';
-            
-            // Przechowujemy ID kategorii, aby wiedzieć gdzie wrócić z widoku produktów
-            window.currentCatId = catId;
-            
-            const subs = cat.subs || {};
-            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
-            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
-            
-             if(subKeys.length > 0) {
-                grid.innerHTML = subKeys.map(sid => {
-                    const sub = subs[sid];
-                    return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openSubcategoryView('${catId}', '${sid}')">
-                        <div class="h-64 overflow-hidden relative"><img src="${sub.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
-                        <div class="p-6">
-                            <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${sub.title}</h3>
-                            <p class="text-stone-500 mt-2">${sub.products ? sub.products.length : 0} produktów</p>
-                        </div></div>`;
-                }).join('');
-            } else {
-                grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak podkategorii.</p></div>';
-            }
-            
-            // FIX: Ukrywanie widoku podkategorii (listy produktów)
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('subcategory-view').classList.add('hidden'); // Ważne: ukryj listę produktów
-            document.getElementById('gallery-view').classList.add('hidden');
-            container.classList.remove('hidden');
-            window.scrollTo(0,0);
-        };
-
         window.openGallery = (catId, subId, prodIndex) => {
-            const cat = siteData.categories[catId];
-            if(!cat || !cat.subs || !cat.subs[subId]) return;
+            const cat = siteData.categories[catId]; if(!cat || !cat.subs || !cat.subs[subId]) return;
             const sub = cat.subs[subId]; const product = sub.products[prodIndex]; if (!product) return;
-
-            document.getElementById('prod-title').textContent = product.title;
-            document.getElementById('prod-code').textContent = product.code ? `Kod: ${product.code}` : 'Kod: ---';
-            document.getElementById('prod-price').textContent = product.price || '--- PLN';
-            document.getElementById('prod-desc').textContent = product.desc || 'Brak opisu.';
-            
-            const askBtn = document.getElementById('ask-btn');
-            const codeToPass = product.code || '';
-            const imageToPass = product.image || ''; // Pobieramy zdjęcie produktu
-            
-            // Przekazujemy zdjęcie do funkcji modala
+            document.getElementById('prod-title').textContent = product.title; document.getElementById('prod-code').textContent = product.code ? `Kod: ${product.code}` : 'Kod: ---'; document.getElementById('prod-price').textContent = product.price || '--- PLN'; document.getElementById('prod-desc').textContent = product.desc || 'Brak opisu.';
+            const askBtn = document.getElementById('ask-btn'); const codeToPass = product.code || ''; const imageToPass = product.image || '';
             askBtn.onclick = () => window.openContactModal(codeToPass, imageToPass);
-            
-            // ZMIANA: Przycisk powrotu cofa do podkategorii
             document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
-            
             const galleryData = siteData.galleries[product.id] || { images: [] };
             const allImages = [ { src: product.image, isCover: true }, ...galleryData.images ];
-            window.currentLightboxImages = allImages;
-            window.currentImgIndex = 0;
-
-            const mainImgEl = document.getElementById('main-product-img');
-            mainImgEl.src = allImages[0].src;
-
-            const thumbsContainer = document.getElementById('product-thumbnails');
-            thumbsContainer.innerHTML = '';
-            if(allImages.length > 1) {
-                allImages.forEach((img, i) => {
-                    const thumb = document.createElement('img');
-                    // ZMIANA: Miniatury też object-contain i białe tło
-                    thumb.src = img.src; 
-                    thumb.className = `w-20 h-20 rounded-xl object-contain bg-stone-100 cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`;
-                    thumb.onclick = () => { window.updateMainImage(i); };
-                    thumbsContainer.appendChild(thumb);
-                });
+            window.currentLightboxImages = allImages; window.currentImgIndex = 0;
+            const mainImgEl = document.getElementById('main-product-img'); mainImgEl.src = allImages[0].src;
+            const thumbsContainer = document.getElementById('product-thumbnails'); thumbsContainer.innerHTML = '';
+            if(allImages.length > 1) { allImages.forEach((img, i) => { const thumb = document.createElement('img'); thumb.src = img.src; thumb.className = `w-20 h-20 rounded-xl object-contain bg-stone-100 cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`; thumb.onclick = () => { window.updateMainImage(i); }; thumbsContainer.appendChild(thumb); });
             } else { thumbsContainer.innerHTML = '<span class="text-xs text-stone-400">Brak dodatkowych zdjęć.</span>'; }
-            document.getElementById('subcategory-view').classList.add('hidden');
-            document.getElementById('gallery-view').classList.remove('hidden'); 
-            window.scrollTo(0,0);
+            document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('gallery-view').classList.remove('hidden'); window.scrollTo(0,0);
         };
 
         window.updateMainImage = (index) => {
-            window.currentImgIndex = index;
-            const mainImg = document.getElementById('main-product-img');
-            const images = window.currentLightboxImages;
-            if(images[index]) {
-                mainImg.style.opacity = '0.5';
-                setTimeout(() => { mainImg.src = images[index].src; mainImg.style.opacity = '1'; }, 150);
-                const thumbs = document.getElementById('product-thumbnails').children;
-                for(let i=0; i<thumbs.length; i++) {
-                    if(i === index) { thumbs[i].classList.add('thumb-active'); thumbs[i].classList.remove('opacity-60'); } 
-                    else { thumbs[i].classList.remove('thumb-active'); thumbs[i].classList.add('opacity-60'); }
-                }
-            }
+            window.currentImgIndex = index; const mainImg = document.getElementById('main-product-img'); const images = window.currentLightboxImages;
+            if(images[index]) { mainImg.style.opacity = '0.5'; setTimeout(() => { mainImg.src = images[index].src; mainImg.style.opacity = '1'; }, 150); const thumbs = document.getElementById('product-thumbnails').children; for(let i=0; i<thumbs.length; i++) { if(i === index) { thumbs[i].classList.add('thumb-active'); thumbs[i].classList.remove('opacity-60'); } else { thumbs[i].classList.remove('thumb-active'); thumbs[i].classList.add('opacity-60'); } } }
         };
 
         window.delHero = (i) => { window.openConfirm("Usunąć ten slajd?", () => { siteData.heroItems.splice(i,1); saveData(); renderHeroAdmin(); renderHero(); }); };
@@ -1421,119 +1491,47 @@
         window.openLightbox = (index = 0) => { 
             const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter');
             window.currentImgIndex = index; const images = window.currentLightboxImages;
-            // Ukryj przycisk zoomu dla zwykłej galerii (chyba że chcemy go wszędzie, ale tutaj skupiamy się na załącznikach)
             document.getElementById('lightbox-zoom-toggle').classList.add('hidden');
-            
-            if(images.length > 0 && images[index]) {
-                imgEl.src = images[index].src; counterEl.textContent = `${index + 1} / ${images.length}`;
-                imgEl.classList.remove('max-h-none', 'max-w-none'); // Reset zoomu
-                imgEl.classList.add('max-h-[95vh]', 'object-contain');
-                window.isZoomed = false;
-                
-                lb.classList.remove('hidden'); setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
-            }
+            if(images.length > 0 && images[index]) { imgEl.src = images[index].src; counterEl.textContent = `${index + 1} / ${images.length}`; imgEl.classList.remove('max-h-none', 'max-w-none'); imgEl.classList.add('max-h-[95vh]', 'object-contain'); window.isZoomed = false; lb.classList.remove('hidden'); setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10); }
         };
 
-        // NOWA FUNKCJA DO PODGLĄDU ZAŁĄCZNIKA WIADOMOŚCI
         window.openMessageLightbox = (url) => {
-            window.currentLightboxImages = [{ src: url }];
-            window.currentImgIndex = 0;
-            const lb = document.getElementById('lightbox');
-            const imgEl = document.getElementById('lightbox-img');
-            const counterEl = document.getElementById('lightbox-counter');
-            const zoomBtn = document.getElementById('lightbox-zoom-toggle');
-            
-            imgEl.src = url;
-            counterEl.textContent = "Załącznik";
-            
-            // Reset zoomu
-            imgEl.classList.remove('max-h-none', 'max-w-none');
-            imgEl.classList.add('max-h-[95vh]', 'object-contain');
-            window.isZoomed = false;
-            zoomBtn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty';
-            
-            // Pokaż przycisk zoomu
-            zoomBtn.classList.remove('hidden');
-            
-            lb.classList.remove('hidden');
-            setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
+            window.currentLightboxImages = [{ src: url }]; window.currentImgIndex = 0;
+            const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter'); const zoomBtn = document.getElementById('lightbox-zoom-toggle');
+            imgEl.src = url; counterEl.textContent = "Załącznik"; imgEl.classList.remove('max-h-none', 'max-w-none'); imgEl.classList.add('max-h-[95vh]', 'object-contain'); window.isZoomed = false; zoomBtn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty'; zoomBtn.classList.remove('hidden'); lb.classList.remove('hidden'); setTimeout(() => { lb.classList.replace('opacity-0','opacity-100'); }, 10);
         };
 
         window.toggleLightboxZoom = () => {
-            const imgEl = document.getElementById('lightbox-img');
-            const btn = document.getElementById('lightbox-zoom-toggle');
-            
-            if(window.isZoomed) {
-                // Wróć do dopasowania
-                imgEl.classList.remove('max-h-none', 'max-w-none');
-                imgEl.classList.add('max-h-[95vh]', 'object-contain');
-                btn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty';
-                window.isZoomed = false;
-            } else {
-                // Rozmiar rzeczywisty (usuń ograniczenia)
-                imgEl.classList.remove('max-h-[95vh]', 'object-contain');
-                imgEl.classList.add('max-h-none', 'max-w-none');
-                btn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Dopasuj do ekranu';
-                window.isZoomed = true;
-            }
+            const imgEl = document.getElementById('lightbox-img'); const btn = document.getElementById('lightbox-zoom-toggle');
+            if(window.isZoomed) { imgEl.classList.remove('max-h-none', 'max-w-none'); imgEl.classList.add('max-h-[95vh]', 'object-contain'); btn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Rozmiar rzeczywisty'; window.isZoomed = false; } 
+            else { imgEl.classList.remove('max-h-[95vh]', 'object-contain'); imgEl.classList.add('max-h-none', 'max-w-none'); btn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Dopasuj do ekranu'; window.isZoomed = true; }
         };
 
         window.changeLightboxImage = (direction) => {
             const images = window.currentLightboxImages; if(!images || images.length === 0) return;
-            let newIndex = window.currentImgIndex + direction;
-            if(newIndex >= images.length) newIndex = 0; if(newIndex < 0) newIndex = images.length - 1;
-            window.currentImgIndex = newIndex;
-            const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter');
-            
-            // Reset zoom przy zmianie zdjęcia
+            let newIndex = window.currentImgIndex + direction; if(newIndex >= images.length) newIndex = 0; if(newIndex < 0) newIndex = images.length - 1;
+            window.currentImgIndex = newIndex; const imgEl = document.getElementById('lightbox-img'); const counterEl = document.getElementById('lightbox-counter');
             if(window.isZoomed) window.toggleLightboxZoom();
-            
-            imgEl.style.opacity = 0.5;
-            setTimeout(() => { imgEl.src = images[newIndex].src; counterEl.textContent = `${newIndex + 1} / ${images.length}`; imgEl.style.opacity = 1; }, 150);
+            imgEl.style.opacity = 0.5; setTimeout(() => { imgEl.src = images[newIndex].src; counterEl.textContent = `${newIndex + 1} / ${images.length}`; imgEl.style.opacity = 1; }, 150);
         };
 
         window.closeLightbox = () => { const lb = document.getElementById('lightbox'); lb.classList.replace('opacity-100','opacity-0'); setTimeout(() => { lb.classList.add('hidden'); }, 300); };
         window.goHome = () => { 
-            // Ukryj również legal-view
             document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('subcategories-full-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden'); document.getElementById('custom-orders-full-view').classList.add('hidden'); document.getElementById('legal-view').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden'); document.getElementById('sub-categories-container').classList.add('hidden'); 
-            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-            window.scrollTo(0,0);
+            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200')); window.scrollTo(0,0);
         };
         
-        // NOWE FUNKCJE OBSŁUGI DOKUMENTÓW PRAWNYCH
         window.openLegal = (type) => {
-            const container = document.getElementById('legal-view');
-            const titleEl = document.getElementById('legal-title');
-            const contentEl = document.getElementById('legal-content');
-            
-            // Pobierz tekst z siteData lub initialData
-            // Upewnij się, że obiekt istnieje
-            const content = siteData.textContent || initialData.textContent;
-            const legal = content.legal || initialData.textContent.legal;
-            
-            if (type === 'privacy') {
-                titleEl.textContent = "Polityka Prywatności";
-                contentEl.textContent = legal.privacy || "Brak treści.";
-            } else if (type === 'terms') {
-                titleEl.textContent = "Regulamin";
-                contentEl.textContent = legal.terms || "Brak treści.";
-            }
-            
-            document.getElementById('main-content').classList.add('hidden');
-            // Ukryj inne widoki na wszelki wypadek
-            document.getElementById('subcategory-view').classList.add('hidden');
-            document.getElementById('gallery-view').classList.add('hidden');
-            
-            container.classList.remove('hidden');
-            window.scrollTo(0,0);
+            const container = document.getElementById('legal-view'); const titleEl = document.getElementById('legal-title'); const contentEl = document.getElementById('legal-content');
+            const content = siteData.textContent || initialData.textContent; const legal = content.legal || initialData.textContent.legal;
+            if (type === 'privacy') { titleEl.textContent = "Polityka Prywatności"; contentEl.textContent = legal.privacy || "Brak treści."; } 
+            else if (type === 'terms') { titleEl.textContent = "Regulamin"; contentEl.textContent = legal.terms || "Brak treści."; }
+            document.getElementById('main-content').classList.add('hidden'); document.getElementById('subcategory-view').classList.add('hidden'); document.getElementById('gallery-view').classList.add('hidden');
+            container.classList.remove('hidden'); window.scrollTo(0,0);
         };
 
-        window.closeLegal = () => {
-            // Po prostu wróć do strony głównej
-            window.goHome();
-        };
-
+        window.closeLegal = () => { window.goHome(); };
         window.toggleMobileMenu = () => { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
         window.handleLogin = () => {
@@ -1564,11 +1562,9 @@
             else if (id === 'product-list') { renderProductListView(); }
             else if (id === 'custom-orders') { renderCustomOrdersAdmin(); }
             else if (id === 'content') {
-                // AUTO-NAPRAWA STRUKTURY DANYCH (Jeśli brakuje nowych pól w bazie)
                 if(!siteData.textContent) siteData.textContent = JSON.parse(JSON.stringify(initialData.textContent));
                 if(!siteData.textContent.legal) siteData.textContent.legal = JSON.parse(JSON.stringify(initialData.textContent.legal));
                 if(!siteData.textContent.footer) siteData.textContent.footer = JSON.parse(JSON.stringify(initialData.textContent.footer));
-                
                 const t = siteData.textContent;
                 document.getElementById('edit-hero-main').value = t.hero.main || "";
                 document.getElementById('edit-hero-accent').value = t.hero.accent || "";
@@ -1576,39 +1572,29 @@
                 document.getElementById('edit-contact-email').value = t.contact.email || "";
                 document.getElementById('edit-contact-phone').value = t.contact.phone || "";
                 document.getElementById('edit-contact-desc').value = t.contact.desc || "";
-                
-                // Wypełnij pola prawne
                 document.getElementById('edit-privacy').value = t.legal.privacy || "";
                 document.getElementById('edit-terms').value = t.legal.terms || "";
-                
-                // Wypełnij pola stopki
                 document.getElementById('edit-footer-slogan').value = t.footer.slogan || "";
                 document.getElementById('edit-footer-copyright').value = t.footer.copyright || "";
-                
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
+            else if (id === 'laser-calc') { window.initLaserCalc(); }
         };
 
         window.saveContentSettings = async () => {
             if(!siteData.textContent) siteData.textContent = initialData.textContent;
             if(!siteData.textContent.legal) siteData.textContent.legal = {};
             if(!siteData.textContent.footer) siteData.textContent.footer = {};
-
             siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
             siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
             siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
             siteData.textContent.contact.email = document.getElementById('edit-contact-email').value;
             siteData.textContent.contact.phone = document.getElementById('edit-contact-phone').value;
             siteData.textContent.contact.desc = document.getElementById('edit-contact-desc').value;
-            
-            // Zapisz dokumenty prawne
             siteData.textContent.legal.privacy = document.getElementById('edit-privacy').value;
             siteData.textContent.legal.terms = document.getElementById('edit-terms').value;
-            
-            // Zapisz stopkę
             siteData.textContent.footer.slogan = document.getElementById('edit-footer-slogan').value;
             siteData.textContent.footer.copyright = document.getElementById('edit-footer-copyright').value;
-            
             siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
             await saveData(); renderTexts(); showToast("Zapisano zmiany!");
         };
@@ -1617,141 +1603,39 @@
              const list = document.getElementById('messages-list');
              const countBadge = document.getElementById('msg-count-bar');
              if(!isOnline) return;
-             
              const msgCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
              if (messageUnsubscribe) messageUnsubscribe();
-             
              messageUnsubscribe = onSnapshot(msgCollection, (snap) => {
-                 let html = '';
-                 let msgs = [];
-                 snap.forEach(doc => { msgs.push({ id: doc.id, ...doc.data() }); });
+                 let html = ''; let msgs = []; snap.forEach(doc => { msgs.push({ id: doc.id, ...doc.data() }); });
                  msgs.sort((a,b) => new Date(b.date) - new Date(a.date)); 
-                 
                  const unread = msgs.filter(m => (m.status === 'new' || (!m.read && !m.status))).length;
-                 if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); } 
-                 else { countBadge.classList.add('hidden'); }
-
+                 if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); } else { countBadge.classList.add('hidden'); }
                  if(msgs.length === 0) { html = '<p class="text-stone-500 text-center py-10">Brak wiadomości.</p>'; } 
                  else {
                      html = msgs.map(m => {
-                         const isUnread = (m.status === 'new' || (!m.read && !m.status));
-                         const statusKey = m.status || (m.read ? 'read' : 'new');
-                         const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
-                         const unreadClass = isUnread ? 'message-unread-header' : '';
-                         const isOpen = window.openMessageIds.has(m.id); 
-
-                         return `
-                         <div class="message-row-wrapper">
-                             <!-- HEADER: Kliknięcie otwiera wiadomość -->
-                             <div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')">
-                                 <div><span class="status-badge ${statusData.class}">${statusData.label}</span></div>
-                                 <div class="font-medium truncate">${m.name}</div>
-                                 <div class="text-sm text-stone-400 truncate">${m.email}</div>
-                                 <div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString()}</div>
-                                 
-                                 <!-- AKCJE: KOSZ (Widoczny zawsze) -->
-                                 <div class="text-right flex items-center justify-end gap-3">
-                                     <button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń"><i class="fa-solid fa-trash"></i></button>
-                                     <i class="fa-solid fa-chevron-down text-stone-600 transition-transform duration-300 transform ${isOpen ? 'rotate-180' : ''}"></i>
-                                 </div>
-                             </div>
-                             
-                             <!-- BODY (ACCORDION) -->
-                             <div id="msg-body-${m.id}" class="msg-body-wrapper ${isOpen ? 'open' : ''}">
-                                 <div class="p-6 space-y-4">
-                                     <div>
-                                         <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
-                                         <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${m.message}</p>
-                                     </div>
-                                     
-                                     ${m.attachment ? `
-                                     <div>
-                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p>
-                                         <div class="flex flex-wrap items-end gap-4">
-                                             <!-- Miniatura (Kliknij aby powiększyć w lightboxie z zoomem) -->
-                                             <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(this.querySelector('img').src)">
-                                                 <img src="${m.attachment}" class="w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20">
-                                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
-                                                     <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
-                                                 </div>
-                                             </div>
-                                             
-                                             <!-- Przycisk Pobierania ORYGINAŁU -->
-                                             <a href="${m.attachment}" download="zalacznik_xeomsc_${m.id}.png" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
-                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz oryginał
-                                             </a>
-                                         </div>
-                                     </div>` : ''}
-
-                                     <div class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-4">
-                                         <div class="flex items-center gap-2">
-                                             <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
-                                             <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
-                                                 ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
-                                             </select>
-                                         </div>
-                                         <a href="mailto:${m.email}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2 px-4 py-2 bg-wood-500/10 rounded-lg hover:bg-wood-500/20 transition">
-                                             <i class="fa-solid fa-reply"></i> Odpowiedz
-                                         </a>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                     `;
+                         const isUnread = (m.status === 'new' || (!m.read && !m.status)); const statusKey = m.status || (m.read ? 'read' : 'new'); const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new']; const unreadClass = isUnread ? 'message-unread-header' : ''; const isOpen = window.openMessageIds.has(m.id); 
+                         return `<div class="message-row-wrapper"><div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')"><div><span class="status-badge ${statusData.class}">${statusData.label}</span></div><div class="font-medium truncate">${m.name}</div><div class="text-sm text-stone-400 truncate">${m.email}</div><div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString()}</div><div class="text-right flex items-center justify-end gap-3"><button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń"><i class="fa-solid fa-trash"></i></button><i class="fa-solid fa-chevron-down text-stone-600 transition-transform duration-300 transform ${isOpen ? 'rotate-180' : ''}"></i></div></div><div id="msg-body-${m.id}" class="msg-body-wrapper ${isOpen ? 'open' : ''}"><div class="p-6 space-y-4"><div><p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p><p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${m.message}</p></div>${m.attachment ? `<div><p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p><div class="flex flex-wrap items-end gap-4"><div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(this.querySelector('img').src)"><img src="${m.attachment}" class="w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20"><div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none"><span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span></div></div><a href="${m.attachment}" download="zalacznik_xeomsc_${m.id}.png" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group"><i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz oryginał</a></div></div>` : ''}<div class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-4"><div class="flex items-center gap-2"><label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label><select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}</select></div><a href="mailto:${m.email}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2 px-4 py-2 bg-wood-500/10 rounded-lg hover:bg-wood-500/20 transition"><i class="fa-solid fa-reply"></i> Odpowiedz</a></div></div></div></div>`;
                      }).join('');
                  }
                  if(list) list.innerHTML = html;
-             }, (error) => {
-                 console.error("Błąd pobierania wiadomości:", error);
-                 if(list) list.innerHTML = '<p class="text-red-500 text-center py-10">Błąd połączenia z bazą wiadomości.</p>';
-             });
+             }, (error) => { console.error("Błąd pobierania wiadomości:", error); if(list) list.innerHTML = '<p class="text-red-500 text-center py-10">Błąd połączenia z bazą wiadomości.</p>'; });
         }
         
         window.toggleMessageBody = (id) => {
             const body = document.getElementById(`msg-body-${id}`);
             if (body) {
                 const isOpen = body.classList.contains('open');
-                
-                if (!isOpen) {
-                    // Otwieranie wiadomości
-                    window.openMessageIds.add(id);
-                    body.classList.add('open');
-
-                    // Logika Auto-Read
-                    const wrapper = body.closest('.message-row-wrapper');
-                    const statusBadge = wrapper ? wrapper.querySelector('.status-new') : null;
-                    
-                    if (statusBadge) {
-                        window.updateMessageStatus(id, 'read');
-                    }
-                } else {
-                    // Zamykanie wiadomości
-                    window.openMessageIds.delete(id);
-                    body.classList.remove('open');
-                }
+                if (!isOpen) { window.openMessageIds.add(id); body.classList.add('open'); const wrapper = body.closest('.message-row-wrapper'); const statusBadge = wrapper ? wrapper.querySelector('.status-new') : null; if (statusBadge) { window.updateMessageStatus(id, 'read'); } } 
+                else { window.openMessageIds.delete(id); body.classList.remove('open'); }
             }
         };
 
         window.updateMessageStatus = async (id, newStatus) => {
-            try {
-                const isRead = newStatus !== 'new';
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id), {
-                    status: newStatus,
-                    read: isRead
-                });
-                showToast(`Status zmieniony na: ${STATUS_MAP[newStatus].label}`);
-            } catch (e) {
-                console.error(e);
-                showToast("Błąd aktualizacji statusu");
-            }
+            try { const isRead = newStatus !== 'new'; await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id), { status: newStatus, read: isRead }); showToast(`Status zmieniony na: ${STATUS_MAP[newStatus].label}`); } 
+            catch (e) { console.error(e); showToast("Błąd aktualizacji statusu"); }
         };
         
-        window.deleteMessage = async (id) => {
-            window.openConfirm("Usunąć tę wiadomość?", async () => {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id));
-                showToast("Wiadomość usunięta.");
-            });
-        };
+        window.deleteMessage = async (id) => { window.openConfirm("Usunąć tę wiadomość?", async () => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', id)); showToast("Wiadomość usunięta."); }); };
 
         function renderMessagesAdmin() {
             const list = document.getElementById('messages-list');
@@ -1770,13 +1654,7 @@
                     <button id="add-hero-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj</button>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    ${siteData.heroItems.map((it, i) => `
-                        <div class="relative group rounded-xl overflow-hidden aspect-video bg-black">
-                            ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover">` : `<video src="${it.url}" class="w-full h-full object-cover"></video>`}
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                <button onclick="delHero(${i})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">USUŃ</button>
-                            </div>
-                        </div>`).join('')}
+                    ${siteData.heroItems.map((it, i) => `<div class="relative group rounded-xl overflow-hidden aspect-video bg-black">${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-cover">` : `<video src="${it.url}" class="w-full h-full object-cover"></video>`}<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"><button onclick="delHero(${i})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">USUŃ</button></div></div>`).join('')}
                 </div>`;
              document.getElementById('add-hero-btn').onclick = () => {
                  const u = document.getElementById('new-hero-url').value; const t = document.getElementById('new-hero-type').value;
@@ -1786,437 +1664,168 @@
 
         function renderCategoriesAdmin() {
             const container = document.getElementById('view-categories');
-            
-            // SORTUJEMY KATEGORIE DO WYŚWIETLENIA W PANELU WG KOLEJNOŚCI
-            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => {
-                const orderA = a.order !== undefined ? a.order : 9999;
-                const orderB = b.order !== undefined ? b.order : 9999;
-                return orderA - orderB;
-            });
-
+            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => { const orderA = a.order !== undefined ? a.order : 9999; const orderB = b.order !== undefined ? b.order : 9999; return orderA - orderB; });
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Kategorie Główne</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-500">Edytuj kategorię</h4>
-                    <input type="hidden" id="edit-cat-id">
-                    <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii">
-                    <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia">
-                    <div class="flex gap-2">
-                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
-                        <button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
-                    </div>
+                    <input type="hidden" id="edit-cat-id"><input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii"><input id="cat-i" class="calc-input" placeholder="Link do zdjęcia">
+                    <div class="flex gap-2"><button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button><button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button></div>
                 </div>
                 <div class="space-y-3">
-                    ${sortedCats.map(([k, c]) => `
-                        <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5">
-                            <span class="font-bold">${c.title}</span>
-                            <div class="flex gap-2 items-center">
-                                <!-- STRZAŁKI DO ZMIANY KOLEJNOŚCI -->
-                                <button onclick="window.moveCategory('${k}', -1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-1" title="Przesuń wyżej"><i class="fa-solid fa-arrow-up"></i></button>
-                                <button onclick="window.moveCategory('${k}', 1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-2" title="Przesuń niżej"><i class="fa-solid fa-arrow-down"></i></button>
-                                
-                                <button onclick="window.editCat('${k}')" class="text-blue-400 text-sm font-bold hover:text-white transition px-2">EDYTUJ</button>
-                                <button onclick="window.delCat('${k}')" class="text-red-500 text-sm font-bold hover:text-white transition px-2">USUŃ</button>
-                            </div>
-                        </div>`).join('')}
+                    ${sortedCats.map(([k, c]) => `<div class="bg-black/40 p-4 rounded-xl flex justify-between items-center border border-white/5"><span class="font-bold">${c.title}</span><div class="flex gap-2 items-center"><button onclick="window.moveCategory('${k}', -1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-1" title="Przesuń wyżej"><i class="fa-solid fa-arrow-up"></i></button><button onclick="window.moveCategory('${k}', 1)" class="bg-stone-700 hover:bg-stone-600 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs transition mr-2" title="Przesuń niżej"><i class="fa-solid fa-arrow-down"></i></button><button onclick="window.editCat('${k}')" class="text-blue-400 text-sm font-bold hover:text-white transition px-2">EDYTUJ</button><button onclick="window.delCat('${k}')" class="text-red-500 text-sm font-bold hover:text-white transition px-2">USUŃ</button></div></div>`).join('')}
                 </div>`;
             document.getElementById('add-cat-btn').onclick = () => {
                 const t = document.getElementById('cat-t').value; const i = document.getElementById('cat-i').value.trim(); const editId = document.getElementById('edit-cat-id').value;
                 if(t) {
-                    if (editId) { 
-                        siteData.categories[editId].title = t; 
-                        siteData.categories[editId].image = i; 
-                    } else { 
-                        const id = 'c' + Date.now(); 
-                        // Nowa kategoria trafia na koniec
-                        const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
-                        siteData.categories[id] = { title: t, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
-                    }
+                    if (editId) { siteData.categories[editId].title = t; siteData.categories[editId].image = i; } 
+                    else { const id = 'c' + Date.now(); const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0); siteData.categories[id] = { title: t, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; }
                     saveData(); renderCategoriesAdmin(); renderMain();
                 }
             };
             document.getElementById('cancel-cat-btn').onclick = () => { renderCategoriesAdmin(); };
         }
         
-        // NOWA FUNKCJA DO ZMIANY KOLEJNOŚCI KATEGORII
         window.moveCategory = (id, direction) => {
-            // 1. Pobierz posortowaną tablicę [key, object]
-            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => {
-                const orderA = a.order !== undefined ? a.order : 9999;
-                const orderB = b.order !== undefined ? b.order : 9999;
-                return orderA - orderB;
-            });
-
-            // 2. Znajdź indeks elementu do przesunięcia
-            const index = sortedCats.findIndex(([k]) => k === id);
-            if (index === -1) return;
-
-            // 3. Sprawdź czy ruch jest możliwy
-            const newIndex = index + direction;
-            if (newIndex < 0 || newIndex >= sortedCats.length) return;
-
-            // 4. Zamień elementy w tablicy
-            const temp = sortedCats[index];
-            sortedCats[index] = sortedCats[newIndex];
-            sortedCats[newIndex] = temp;
-
-            // 5. Przypisz nowe wartości 'order' wszystkim elementom (reindeksacja)
-            sortedCats.forEach(([key], idx) => {
-                siteData.categories[key].order = idx;
-            });
-
-            // 6. Zapisz i odśwież
-            saveData();
-            renderCategoriesAdmin();
-            renderMain();
+            const sortedCats = Object.entries(siteData.categories).sort(([, a], [, b]) => { const orderA = a.order !== undefined ? a.order : 9999; const orderB = b.order !== undefined ? b.order : 9999; return orderA - orderB; });
+            const index = sortedCats.findIndex(([k]) => k === id); if (index === -1) return;
+            const newIndex = index + direction; if (newIndex < 0 || newIndex >= sortedCats.length) return;
+            const temp = sortedCats[index]; sortedCats[index] = sortedCats[newIndex]; sortedCats[newIndex] = temp;
+            sortedCats.forEach(([key], idx) => { siteData.categories[key].order = idx; });
+            saveData(); renderCategoriesAdmin(); renderMain();
         };
 
         window.editCat = (id) => {
-            const cat = siteData.categories[id];
-            document.getElementById('cat-t').value = cat.title; document.getElementById('cat-i').value = cat.image;
-            document.getElementById('edit-cat-id').value = id;
+            const cat = siteData.categories[id]; document.getElementById('cat-t').value = cat.title; document.getElementById('cat-i').value = cat.image; document.getElementById('edit-cat-id').value = id;
             document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany"; document.getElementById('cancel-cat-btn').classList.remove('hidden');
         };
 
         function renderSubcategoriesAdmin() {
-            const container = document.getElementById('view-subcategories');
-            const cats = siteData.categories || {};
-            
-            // Sortowanie opcji w select (alfabetycznie)
-            const categoryOptions = Object.keys(cats)
-                .sort((a, b) => cats[a].title.localeCompare(cats[b].title, 'pl'))
-                .map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
-            
+            const container = document.getElementById('view-subcategories'); const cats = siteData.categories || {};
+            const categoryOptions = Object.keys(cats).sort((a, b) => cats[a].title.localeCompare(cats[b].title, 'pl')).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
             let subListHTML = '';
-            
-            // Sortowanie kategorii głównych (żeby grupy wyświetlały się w sensownej kolejności)
-            const sortedCatKeys = Object.keys(cats).sort((a, b) => {
-                const orderA = cats[a].order !== undefined ? cats[a].order : 9999;
-                const orderB = cats[b].order !== undefined ? cats[b].order : 9999;
-                return orderA - orderB;
-            });
-            
-            // GENEROWANIE LISTY POGRUPOWANEJ
+            const sortedCatKeys = Object.keys(cats).sort((a, b) => { const orderA = cats[a].order !== undefined ? cats[a].order : 9999; const orderB = cats[b].order !== undefined ? cats[b].order : 9999; return orderA - orderB; });
             sortedCatKeys.forEach(catId => {
                 const cat = cats[catId];
-                
-                // Sprawdzamy, czy kategoria ma podkategorie
                 if(cat.subs && Object.keys(cat.subs).length > 0) {
-                    
-                    // NAGŁÓWEK GRUPY (KATEGORIA GŁÓWNA)
-                    subListHTML += `
-                    <div class="mb-6 bg-stone-800/40 p-4 rounded-2xl border border-white/5">
-                        <h4 class="text-wood-500 font-bold text-lg mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
-                            <i class="fa-solid fa-layer-group text-sm"></i> ${cat.title}
-                        </h4>
-                        <div class="space-y-2">
-                    `;
-
-                    // LISTA PODKATEGORII W TEJ GRUPIE
-                    Object.keys(cat.subs)
-                        .sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl'))
-                        .forEach(subId => {
-                            const sub = cat.subs[subId];
-                            
-                            // Wyświetlanie miniatury
-                            const imgHtml = sub.image 
-                                ? `<img src="${sub.image}" onerror="this.src='https://via.placeholder.com/40?text=ERR'; this.onerror=null;" class="w-10 h-10 rounded object-cover border border-white/10 bg-white/5 shrink-0">` 
-                                : `<div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-white/20 text-xs shrink-0"><i class="fa-solid fa-image"></i></div>`;
-
-                            subListHTML += `
-                            <div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 hover:border-wood-600/30 transition group">
-                                <div class="flex items-center gap-3 overflow-hidden">
-                                    ${imgHtml}
-                                    <div class="min-w-0">
-                                        <!-- Usunięto nazwę kategorii nadrzędnej z pojedynczego elementu, bo jest w nagłówku grupy -->
-                                        <span class="font-bold text-sm text-stone-200 truncate block group-hover:text-wood-500 transition">${sub.title}</span>
-                                        <span class="text-[10px] text-stone-500 block">${sub.products ? sub.products.length : 0} produktów</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2 shrink-0">
-                                    <button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-xs font-bold hover:text-white transition px-3 py-2 bg-blue-400/10 rounded-lg hover:bg-blue-600 hover:shadow-lg hover:scale-105 transform duration-200">EDYTUJ</button>
-                                    <button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-xs font-bold hover:text-white transition px-3 py-2 bg-red-500/10 rounded-lg hover:bg-red-600 hover:shadow-lg hover:scale-105 transform duration-200">USUŃ</button>
-                                </div>
-                            </div>`;
+                    subListHTML += `<div class="mb-6 bg-stone-800/40 p-4 rounded-2xl border border-white/5"><h4 class="text-wood-500 font-bold text-lg mb-3 flex items-center gap-2 border-b border-white/5 pb-2"><i class="fa-solid fa-layer-group text-sm"></i> ${cat.title}</h4><div class="space-y-2">`;
+                    Object.keys(cat.subs).sort((a, b) => cat.subs[a].title.localeCompare(cat.subs[b].title, 'pl')).forEach(subId => {
+                            const sub = cat.subs[subId]; const imgHtml = sub.image ? `<img src="${sub.image}" onerror="this.src='https://via.placeholder.com/40?text=ERR'; this.onerror=null;" class="w-10 h-10 rounded object-cover border border-white/10 bg-white/5 shrink-0">` : `<div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-white/20 text-xs shrink-0"><i class="fa-solid fa-image"></i></div>`;
+                            subListHTML += `<div class="bg-black/40 p-3 rounded-xl flex justify-between items-center border border-white/5 hover:border-wood-600/30 transition group"><div class="flex items-center gap-3 overflow-hidden">${imgHtml}<div class="min-w-0"><span class="font-bold text-sm text-stone-200 truncate block group-hover:text-wood-500 transition">${sub.title}</span><span class="text-[10px] text-stone-500 block">${sub.products ? sub.products.length : 0} produktów</span></div></div><div class="flex gap-2 shrink-0"><button onclick="window.editSubCat('${catId}', '${subId}')" class="text-blue-400 text-xs font-bold hover:text-white transition px-3 py-2 bg-blue-400/10 rounded-lg hover:bg-blue-600 hover:shadow-lg hover:scale-105 transform duration-200">EDYTUJ</button><button onclick="window.delSubCat('${catId}', '${subId}')" class="text-red-500 text-xs font-bold hover:text-white transition px-3 py-2 bg-red-500/10 rounded-lg hover:bg-red-600 hover:shadow-lg hover:scale-105 transform duration-200">USUŃ</button></div></div>`;
                         });
-
-                    // ZAMKNIĘCIE GRUPY
                     subListHTML += `</div></div>`;
                 }
             });
 
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Podkategorie</h3>
-                
-                <!-- Formularz dodawania -->
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8 shadow-xl">
                     <h4 class="text-xs uppercase font-bold text-stone-500" id="sub-form-title">Dodaj Podkategorię</h4>
-                    
-                    <!-- Ukryte pola do edycji -->
-                    <input type="hidden" id="edit-sub-cat-id">
-                    <input type="hidden" id="edit-sub-parent-id">
-                    
-                    <select id="new-sub-cat-parent" class="calc-input text-white font-bold"><option value="">-- Wybierz Kategorię Główną --</option>${categoryOptions}</select>
-                    <input id="sub-t" class="calc-input" placeholder="Nazwa Podkategorii">
-                    <input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
-                    
-                    <div class="flex gap-2">
-                        <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition shadow-lg">Utwórz Podkategorię</button>
-                        <button id="cancel-sub-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold shadow-lg">Anuluj</button>
-                    </div>
+                    <input type="hidden" id="edit-sub-cat-id"><input type="hidden" id="edit-sub-parent-id">
+                    <select id="new-sub-cat-parent" class="calc-input text-white font-bold"><option value="">-- Wybierz Kategorię Główną --</option>${categoryOptions}</select><input id="sub-t" class="calc-input" placeholder="Nazwa Podkategorii"><input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
+                    <div class="flex gap-2"><button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition shadow-lg">Utwórz Podkategorię</button><button id="cancel-sub-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold shadow-lg">Anuluj</button></div>
                 </div>
-                
-                <h4 class="text-xl font-bold mb-4">Lista Podkategorii (wg Grup)</h4>
-                
-                <!-- Lista pogrupowana -->
-                <div class="space-y-1 pb-10">
-                    ${subListHTML || '<p class="text-stone-500 text-center py-8 bg-stone-900/50 rounded-2xl border border-white/5">Brak podkategorii. Dodaj pierwszą powyżej.</p>'}
-                </div>`;
+                <h4 class="text-xl font-bold mb-4">Lista Podkategorii (wg Grup)</h4><div class="space-y-1 pb-10">${subListHTML || '<p class="text-stone-500 text-center py-8 bg-stone-900/50 rounded-2xl border border-white/5">Brak podkategorii. Dodaj pierwszą powyżej.</p>'}</div>`;
             
             document.getElementById('add-sub-btn').onclick = () => {
-                const parentId = document.getElementById('new-sub-cat-parent').value; 
-                const t = document.getElementById('sub-t').value; 
-                const i = document.getElementById('sub-i').value.trim(); // Trim added
-                
-                // Dane do edycji
-                const editSubId = document.getElementById('edit-sub-cat-id').value;
-                const oldParentId = document.getElementById('edit-sub-parent-id').value;
-
+                const parentId = document.getElementById('new-sub-cat-parent').value; const t = document.getElementById('sub-t').value; const i = document.getElementById('sub-i').value.trim(); 
+                const editSubId = document.getElementById('edit-sub-cat-id').value; const oldParentId = document.getElementById('edit-sub-parent-id').value;
                 if(parentId && t) {
                     if (editSubId) {
-                        // TRYB EDYCJI
-                        // Sprawdzamy czy zmieniono kategorię nadrzędną
-                        if (oldParentId && oldParentId !== parentId) {
-                            // 1. Pobierz produkty i dane ze starej lokalizacji
-                            const products = siteData.categories[oldParentId].subs[editSubId].products || [];
-                            
-                            // 2. Usuń ze starej kategorii
-                            delete siteData.categories[oldParentId].subs[editSubId];
-                            
-                            // 3. Dodaj do nowej kategorii (zachowując ID podkategorii)
-                            if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
-                            siteData.categories[parentId].subs[editSubId] = { title: t, image: i, products: products };
-                        } else {
-                            // Tylko aktualizacja danych w tej samej kategorii
-                            siteData.categories[parentId].subs[editSubId].title = t;
-                            siteData.categories[parentId].subs[editSubId].image = i;
-                        }
+                        if (oldParentId && oldParentId !== parentId) { const products = siteData.categories[oldParentId].subs[editSubId].products || []; delete siteData.categories[oldParentId].subs[editSubId]; if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {}; siteData.categories[parentId].subs[editSubId] = { title: t, image: i, products: products }; } 
+                        else { siteData.categories[parentId].subs[editSubId].title = t; siteData.categories[parentId].subs[editSubId].image = i; }
                         showToast("Zapisano zmiany w podkategorii!");
-                    } else {
-                        // TRYB DODAWANIA NOWEJ
-                        const subId = 's' + Date.now();
-                        if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
-                        siteData.categories[parentId].subs[subId] = { title: t, image: i, products: [] };
-                        showToast("Podkategoria dodana!");
-                    }
-                    saveData(); 
-                    renderSubcategoriesAdmin(); 
-                    renderMain(); // ODŚWIEŻ STRONĘ GŁÓWNĄ, ABY POKAZAĆ NOWE ZDJĘCIA
+                    } else { const subId = 's' + Date.now(); if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {}; siteData.categories[parentId].subs[subId] = { title: t, image: i, products: [] }; showToast("Podkategoria dodana!"); }
+                    saveData(); renderSubcategoriesAdmin(); renderMain(); 
                 } else { showToast("Wybierz kategorię nadrzędną i wpisz nazwę."); }
             };
-            
-            document.getElementById('cancel-sub-btn').onclick = () => {
-                renderSubcategoriesAdmin(); // Reset formularza
-            };
+            document.getElementById('cancel-sub-btn').onclick = () => { renderSubcategoriesAdmin(); };
         }
         
-        // NOWA FUNKCJA DO EDYCJI PODKATEGORII
         window.editSubCat = (parentId, subId) => {
-            const sub = siteData.categories[parentId].subs[subId];
-            if(!sub) return;
-            
-            // Wypełnij formularz
-            document.getElementById('new-sub-cat-parent').value = parentId;
-            document.getElementById('sub-t').value = sub.title;
-            document.getElementById('sub-i').value = sub.image;
-            
-            // Ustaw flagi edycji
-            document.getElementById('edit-sub-cat-id').value = subId;
-            document.getElementById('edit-sub-parent-id').value = parentId;
-            
-            // Zmień wygląd
-            document.getElementById('sub-form-title').textContent = "Edytuj Podkategorię";
-            document.getElementById('add-sub-btn').textContent = "Zapisz Zmiany";
-            document.getElementById('cancel-sub-btn').classList.remove('hidden');
-            
-            // Przewiń do góry panelu
-            document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
+            const sub = siteData.categories[parentId].subs[subId]; if(!sub) return;
+            document.getElementById('new-sub-cat-parent').value = parentId; document.getElementById('sub-t').value = sub.title; document.getElementById('sub-i').value = sub.image;
+            document.getElementById('edit-sub-cat-id').value = subId; document.getElementById('edit-sub-parent-id').value = parentId;
+            document.getElementById('sub-form-title').textContent = "Edytuj Podkategorię"; document.getElementById('add-sub-btn').textContent = "Zapisz Zmiany"; document.getElementById('cancel-sub-btn').classList.remove('hidden'); document.getElementById('admin-content-area').scrollTo({ top: 0, behavior: 'smooth' });
         };
-
         window.delSubCat = (catId, subId) => { window.openConfirm("Usunąć podkategorię?", () => { delete siteData.categories[catId].subs[subId]; saveData(); renderSubcategoriesAdmin(); renderMain(); }); };
 
         function renderAddProductView() {
-            const container = document.getElementById('view-products');
-            const cats = siteData.categories || {};
-            const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
+            const container = document.getElementById('view-products'); const cats = siteData.categories || {}; const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Dodaj Nowe Produkty</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Nowy Produkt</h4>
                     <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria Główna</label><select id="new-p-cat" class="calc-input text-white font-bold" onchange="updateSubSelectForAdd()"><option value="">-- Wybierz --</option>${categoryOptions}</select></div>
                     <div><label class="text-[10px] uppercase font-bold text-stone-500">Podkategoria</label><select id="new-p-sub" class="calc-input text-white font-bold" disabled><option value="">-- Najpierw wybierz kategorię --</option></select></div>
-                    <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
-                    <div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
+                    <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu"><div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
-                    
-                    <div>
-                        <input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
-                        <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
-                    </div>
-
+                    <div><input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)"><p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p></div>
                     <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2"><input class="calc-input gallery-input" placeholder="Link do zdjęcia" oninput="addGalleryInput(this)"></div></div>
                     <button id="btn-add-prod" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-4">Dodaj Produkt</button>
                 </div>`;
-            
             document.getElementById('btn-add-prod').onclick = () => {
-                const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
-                const t = document.getElementById('new-p-t').value; 
-                let img = document.getElementById('new-p-i').value.trim(); // Trim added
-                
-                const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value;
-                const desc = document.getElementById('new-p-desc').value;
-                
+                const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value; const t = document.getElementById('new-p-t').value; let img = document.getElementById('new-p-i').value.trim(); const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value; const desc = document.getElementById('new-p-desc').value;
                 if(cid && sid && t) {
-                    const prodId = 'p' + Date.now();
-                    const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
-                    const galleryImages = []; 
-                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
-                    
-                    // --- AUTO-MINIATURA FIX ---
-                    // Jeśli nie podano miniatury, weź pierwsze zdjęcie z galerii
-                    if (!img && galleryImages.length > 0) {
-                        img = galleryImages[0].src;
-                    }
-
+                    const prodId = 'p' + Date.now(); const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input'); const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+                    if (!img && galleryImages.length > 0) { img = galleryImages[0].src; }
                     if(!siteData.categories[cid].subs[sid].products) siteData.categories[cid].subs[sid].products = [];
                     siteData.categories[cid].subs[sid].products.push({ id: prodId, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
-                    siteData.galleries[prodId] = { images: galleryImages };
-                    saveData(); showToast("Produkt dodany!"); renderAddProductView();
+                    siteData.galleries[prodId] = { images: galleryImages }; saveData(); showToast("Produkt dodany!"); renderAddProductView();
                 } else { showToast("Wybierz kategorię, podkategorię i podaj nazwę produktu."); }
             };
         }
 
         window.updateSubSelectForAdd = () => {
-            const cid = document.getElementById('new-p-cat').value; const subSelect = document.getElementById('new-p-sub');
-            subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
+            const cid = document.getElementById('new-p-cat').value; const subSelect = document.getElementById('new-p-sub'); subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
             if(cid && siteData.categories[cid].subs) {
-                const subs = siteData.categories[cid].subs;
-                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
-                Object.keys(subs)
-                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
-                    .forEach(sid => { 
-                        const opt = document.createElement('option'); 
-                        opt.value = sid; 
-                        // DODANO LICZNIK PRODUKTÓW
-                        const count = subs[sid].products ? subs[sid].products.length : 0;
-                        opt.text = `${subs[sid].title} (${count})`; 
-                        subSelect.appendChild(opt); 
-                    });
+                const subs = siteData.categories[cid].subs; Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl')).forEach(sid => { const opt = document.createElement('option'); opt.value = sid; const count = subs[sid].products ? subs[sid].products.length : 0; opt.text = `${subs[sid].title} (${count})`; subSelect.appendChild(opt); });
                 subSelect.disabled = false;
             } else { subSelect.disabled = true; }
         };
 
-        window.addGalleryInput = (el) => {
-            if(el.value.trim() !== '' && el === el.parentElement.lastElementChild) {
-                const newInput = document.createElement('input'); newInput.className = "calc-input gallery-input animate-fade-in"; newInput.placeholder = "Link do zdjęcia"; newInput.oninput = function() { window.addGalleryInput(this); }; el.parentElement.appendChild(newInput);
-            }
-        };
+        window.addGalleryInput = (el) => { if(el.value.trim() !== '' && el === el.parentElement.lastElementChild) { const newInput = document.createElement('input'); newInput.className = "calc-input gallery-input animate-fade-in"; newInput.placeholder = "Link do zdjęcia"; newInput.oninput = function() { window.addGalleryInput(this); }; el.parentElement.appendChild(newInput); } };
 
         window.renderProductListView = () => {
-            const container = document.getElementById('view-product-list');
-            const cats = siteData.categories || {};
-            const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
+            const container = document.getElementById('view-product-list'); const cats = siteData.categories || {}; const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Lista Produktów</h3>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                      <select id="list-cat-select" class="calc-input" onchange="window.onSelectListCategory()"><option value="">-- Wybierz Kategorię --</option>${categoryOptions}</select>
-                      <select id="list-sub-select" class="calc-input hidden" onchange="window.onSelectListSubcategory()"><option value="">-- Wybierz Podkategorię --</option></select>
-                      <select id="list-prod-select" class="calc-input hidden" onchange="window.onSelectListProduct()"><option value="">-- Wybierz Produkt --</option></select>
-                </div>
-                <div id="list-actions" class="hidden flex gap-2 mb-6">
-                    <button id="btn-toggle-hide" onclick="window.toggleHideProduct()" class="bg-stone-600 hover:bg-stone-500 px-6 py-2 rounded-lg font-bold transition">Ukryj</button>
-                    <button onclick="window.editProductFromList()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold transition">Edytuj</button>
-                    <button onclick="window.deleteProductFromList()" class="bg-red-600 hover:bg-red-500 px-6 py-2 rounded-lg font-bold transition">Usuń</button>
-                </div>
-                <div id="list-edit-form" class="hidden bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
-                    <h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4>
-                    <input id="edit-p-t" class="calc-input">
-                    <div class="grid grid-cols-2 gap-4"><input id="edit-p-code" class="calc-input"><input id="edit-p-price" class="calc-input"></div>
-                    <textarea id="edit-p-desc" class="calc-input h-24"></textarea>
-                    
-                    <div>
-                         <input id="edit-p-i" class="calc-input">
-                         <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
-                    </div>
-
-                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label><div id="edit-gallery-container" class="space-y-2"></div></div>
-                    <button onclick="window.saveEditedProduct()" class="bg-green-600 hover:bg-green-500 w-full py-4 rounded-xl font-bold transition">Zapisz Zmiany</button>
-                </div>`;
+                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8"><select id="list-cat-select" class="calc-input" onchange="window.onSelectListCategory()"><option value="">-- Wybierz Kategorię --</option>${categoryOptions}</select><select id="list-sub-select" class="calc-input hidden" onchange="window.onSelectListSubcategory()"><option value="">-- Wybierz Podkategorię --</option></select><select id="list-prod-select" class="calc-input hidden" onchange="window.onSelectListProduct()"><option value="">-- Wybierz Produkt --</option></select></div>
+                <div id="list-actions" class="hidden flex gap-2 mb-6"><button id="btn-toggle-hide" onclick="window.toggleHideProduct()" class="bg-stone-600 hover:bg-stone-500 px-6 py-2 rounded-lg font-bold transition">Ukryj</button><button onclick="window.editProductFromList()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold transition">Edytuj</button><button onclick="window.deleteProductFromList()" class="bg-red-600 hover:bg-red-500 px-6 py-2 rounded-lg font-bold transition">Usuń</button></div>
+                <div id="list-edit-form" class="hidden bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4"><h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4><input id="edit-p-t" class="calc-input"><div class="grid grid-cols-2 gap-4"><input id="edit-p-code" class="calc-input"><input id="edit-p-price" class="calc-input"></div><textarea id="edit-p-desc" class="calc-input h-24"></textarea><div><input id="edit-p-i" class="calc-input"><p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p></div><div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label><div id="edit-gallery-container" class="space-y-2"></div></div><button onclick="window.saveEditedProduct()" class="bg-green-600 hover:bg-green-500 w-full py-4 rounded-xl font-bold transition">Zapisz Zmiany</button></div>`;
         };
 
         window.onSelectListCategory = () => {
-            const catId = document.getElementById('list-cat-select').value; window.selectedListCatId = catId; window.selectedListSubId = null;
-            const subSelect = document.getElementById('list-sub-select'); const prodSelect = document.getElementById('list-prod-select');
+            const catId = document.getElementById('list-cat-select').value; window.selectedListCatId = catId; window.selectedListSubId = null; const subSelect = document.getElementById('list-sub-select'); const prodSelect = document.getElementById('list-prod-select');
             subSelect.classList.add('hidden'); prodSelect.classList.add('hidden'); document.getElementById('list-actions').classList.add('hidden'); document.getElementById('list-edit-form').classList.add('hidden');
-            if(catId && siteData.categories[catId].subs) {
-                subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
-                const subs = siteData.categories[catId].subs;
-                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
-                Object.keys(subs)
-                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
-                    .forEach(sid => { 
-                        const opt = document.createElement('option'); 
-                        opt.value = sid; 
-                        // DODANO LICZNIK PRODUKTÓW
-                        const count = subs[sid].products ? subs[sid].products.length : 0;
-                        opt.text = `${subs[sid].title} (${count})`; 
-                        subSelect.appendChild(opt); 
-                    });
-                subSelect.classList.remove('hidden');
-            }
+            if(catId && siteData.categories[catId].subs) { subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>'; const subs = siteData.categories[catId].subs; Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl')).forEach(sid => { const opt = document.createElement('option'); opt.value = sid; const count = subs[sid].products ? subs[sid].products.length : 0; opt.text = `${subs[sid].title} (${count})`; subSelect.appendChild(opt); }); subSelect.classList.remove('hidden'); }
         };
 
         window.onSelectListSubcategory = () => {
-            const catId = window.selectedListCatId; const subId = document.getElementById('list-sub-select').value; window.selectedListSubId = subId;
-            const prodSelect = document.getElementById('list-prod-select'); prodSelect.classList.add('hidden'); document.getElementById('list-actions').classList.add('hidden'); document.getElementById('list-edit-form').classList.add('hidden');
-            if(subId && siteData.categories[catId].subs[subId].products) {
-                prodSelect.innerHTML = '<option value="">-- Wybierz Produkt --</option>';
-                const products = siteData.categories[catId].subs[subId].products;
-                products.forEach((p, index) => { const opt = document.createElement('option'); opt.value = index; opt.text = `${p.title} ${p.isHidden ? '(UKRYTY)' : ''}`; prodSelect.appendChild(opt); });
-                prodSelect.classList.remove('hidden');
-            }
+            const catId = window.selectedListCatId; const subId = document.getElementById('list-sub-select').value; window.selectedListSubId = subId; const prodSelect = document.getElementById('list-prod-select'); prodSelect.classList.add('hidden'); document.getElementById('list-actions').classList.add('hidden'); document.getElementById('list-edit-form').classList.add('hidden');
+            if(subId && siteData.categories[catId].subs[subId].products) { prodSelect.innerHTML = '<option value="">-- Wybierz Produkt --</option>'; const products = siteData.categories[catId].subs[subId].products; products.forEach((p, index) => { const opt = document.createElement('option'); opt.value = index; opt.text = `${p.title} ${p.isHidden ? '(UKRYTY)' : ''}`; prodSelect.appendChild(opt); }); prodSelect.classList.remove('hidden'); }
         };
 
         window.onSelectListProduct = () => {
-            const index = document.getElementById('list-prod-select').value; window.selectedListProdIndex = index;
-            const actions = document.getElementById('list-actions'); const editForm = document.getElementById('list-edit-form');
-            actions.classList.add('hidden'); editForm.classList.add('hidden');
+            const index = document.getElementById('list-prod-select').value; window.selectedListProdIndex = index; const actions = document.getElementById('list-actions'); const editForm = document.getElementById('list-edit-form'); actions.classList.add('hidden'); editForm.classList.add('hidden');
             if (index === "") return;
             const product = siteData.categories[window.selectedListCatId].subs[window.selectedListSubId].products[index];
             const btnHide = document.getElementById('btn-toggle-hide');
-            if(product.isHidden) { btnHide.innerHTML = '<i class="fa-regular fa-eye"></i> Pokaż'; btnHide.classList.replace('bg-stone-600', 'bg-green-600'); } 
-            else { btnHide.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Ukryj'; btnHide.classList.replace('bg-green-600', 'bg-stone-600'); }
+            if(product.isHidden) { btnHide.innerHTML = '<i class="fa-regular fa-eye"></i> Pokaż'; btnHide.classList.replace('bg-stone-600', 'bg-green-600'); } else { btnHide.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Ukryj'; btnHide.classList.replace('bg-green-600', 'bg-stone-600'); }
             actions.classList.remove('hidden');
         };
 
         window.toggleHideProduct = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index];
-            product.isHidden = !product.isHidden; saveData();
+            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex; const product = siteData.categories[catId].subs[subId].products[index]; product.isHidden = !product.isHidden; saveData();
             const prodSelect = document.getElementById('list-prod-select'); prodSelect.options[prodSelect.selectedIndex].text = `${product.title} ${product.isHidden ? '(UKRYTY)' : ''}`; window.onSelectListProduct();
         };
 
         window.deleteProductFromList = () => {
-            window.openConfirm("Czy na pewno chcesz usunąć ten produkt?", () => {
-                const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-                siteData.categories[catId].subs[subId].products.splice(index, 1);
-                saveData(); window.onSelectListSubcategory(); 
-            });
+            window.openConfirm("Czy na pewno chcesz usunąć ten produkt?", () => { const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex; siteData.categories[catId].subs[subId].products.splice(index, 1); saveData(); window.onSelectListSubcategory(); });
         };
 
         window.editProductFromList = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index]; const form = document.getElementById('list-edit-form'); const prodId = product.id;
+            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex; const product = siteData.categories[catId].subs[subId].products[index]; const form = document.getElementById('list-edit-form'); const prodId = product.id;
             document.getElementById('edit-p-t').value = product.title; document.getElementById('edit-p-code').value = product.code || ''; document.getElementById('edit-p-price').value = product.price || ''; document.getElementById('edit-p-desc').value = product.desc || ''; document.getElementById('edit-p-i').value = product.image;
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
             const currentGallery = siteData.galleries[prodId] ? siteData.galleries[prodId].images : [];
@@ -2226,36 +1835,21 @@
         };
 
         window.saveEditedProduct = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index]; const prodId = product.id;
-            product.title = document.getElementById('edit-p-t').value; product.code = document.getElementById('edit-p-code').value; product.price = document.getElementById('edit-p-price').value; product.desc = document.getElementById('edit-p-desc').value; 
-            
-            let img = document.getElementById('edit-p-i').value.trim(); // Trim added
-
-            const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
-            const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
-            
-            // --- AUTO-MINIATURA FIX W EDYCJI ---
-            if (!img && galleryImages.length > 0) {
-                img = galleryImages[0].src;
-            }
-            product.image = img;
-
-            siteData.galleries[prodId] = { images: galleryImages };
-            saveData(); showToast("Zapisano zmiany!"); document.getElementById('list-edit-form').classList.add('hidden');
+            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex; const product = siteData.categories[catId].subs[subId].products[index]; const prodId = product.id;
+            product.title = document.getElementById('edit-p-t').value; product.code = document.getElementById('edit-p-code').value; product.price = document.getElementById('edit-p-price').value; product.desc = document.getElementById('edit-p-desc').value; let img = document.getElementById('edit-p-i').value.trim();
+            const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input'); const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+            if (!img && galleryImages.length > 0) { img = galleryImages[0].src; } product.image = img;
+            siteData.galleries[prodId] = { images: galleryImages }; saveData(); showToast("Zapisano zmiany!"); document.getElementById('list-edit-form').classList.add('hidden');
             const prodSelect = document.getElementById('list-prod-select'); prodSelect.options[prodSelect.selectedIndex].text = `${product.title} ${product.isHidden ? '(UKRYTY)' : ''}`;
         };
 
         function renderCustomOrdersAdmin() {
             const container = document.getElementById('admin-custom-orders-list'); const orders = siteData.customOrders || [];
-            if (container) {
-                container.innerHTML = orders.map((url, i) => `<div class="relative group aspect-square rounded-xl overflow-hidden"><img src="${url}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"><button onclick="deleteCustomOrder(${i})" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">USUŃ</button></div></div>`).join('');
-            }
+            if (container) { container.innerHTML = orders.map((url, i) => `<div class="relative group aspect-square rounded-xl overflow-hidden"><img src="${url}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"><button onclick="deleteCustomOrder(${i})" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">USUŃ</button></div></div>`).join(''); }
         }
         
         window.saveCustomOrders = () => {
-            const inputs = document.querySelectorAll('#custom-orders-input-container .gallery-input'); let added = false;
-            inputs.forEach(inp => { if(inp.value.trim()) { if(!siteData.customOrders) siteData.customOrders = []; siteData.customOrders.push(inp.value.trim()); inp.value = ''; added = true; } });
+            const inputs = document.querySelectorAll('#custom-orders-input-container .gallery-input'); let added = false; inputs.forEach(inp => { if(inp.value.trim()) { if(!siteData.customOrders) siteData.customOrders = []; siteData.customOrders.push(inp.value.trim()); inp.value = ''; added = true; } });
             if(added) { saveData(); renderCustomOrdersAdmin(); renderMain(); showToast('Dodano zdjęcia!'); }
         };
 
@@ -2263,185 +1857,61 @@
 
         // --- KONTAKT MODALS ---
         window.openContactModal = (code = '', imageUrl = '') => {
-             document.getElementById('contact-modal').classList.remove('hidden'); 
-             document.getElementById('product-codes-section').classList.remove('hidden'); 
-             
-             // Ukrywamy upload użytkownika, bo załączamy zdjęcie produktu automatycznie
-             // Jeśli chcesz pozwolić użytkownikowi zmienić zdjęcie, usuń tę linię, ale wtedy trzeba obsłużyć logikę priorytetów
-             document.getElementById('contact-upload-section').classList.add('hidden'); 
-             
-             // Zapisujemy URL zdjęcia do zmiennej globalnej
-             window.currentContactProductImage = imageUrl;
-
-             const container = document.getElementById('product-codes-container'); 
-             
-             // Generujemy HTML z miniaturką zdjęcia i kodem
-             let imgHtml = imageUrl ? `<img src="${imageUrl}" class="w-16 h-16 object-cover rounded-lg border border-stone-200 bg-white shadow-sm shrink-0">` : '';
-             
-             container.innerHTML = `
-                <div class="flex items-center gap-4 p-2 bg-stone-50 rounded-xl border border-stone-100">
-                    ${imgHtml}
-                    <div class="flex-1 overflow-hidden">
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">Dotyczy produktu</label>
-                        <input type="text" id="code-input-0" class="w-full bg-transparent font-mono font-bold text-stone-800 text-sm outline-none truncate" readonly value="${code || 'Produkt bez kodu'}">
-                    </div>
-                </div>`;
-             
+             document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.remove('hidden'); document.getElementById('contact-upload-section').classList.add('hidden'); window.currentContactProductImage = imageUrl;
+             const container = document.getElementById('product-codes-container'); let imgHtml = imageUrl ? `<img src="${imageUrl}" class="w-16 h-16 object-cover rounded-lg border border-stone-200 bg-white shadow-sm shrink-0">` : '';
+             container.innerHTML = `<div class="flex items-center gap-4 p-2 bg-stone-50 rounded-xl border border-stone-100">${imgHtml}<div class="flex-1 overflow-hidden"><label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">Dotyczy produktu</label><input type="text" id="code-input-0" class="w-full bg-transparent font-mono font-bold text-stone-800 text-sm outline-none truncate" readonly value="${code || 'Produkt bez kodu'}"></div></div>`;
              document.getElementById('contact-message').value = code ? `Dzień dobry, interesuje mnie produkt o kodzie ${code}. Proszę o informację o dostępności.` : '';
         };
 
         window.openGeneralContactModal = () => {
-             // Resetujemy zdjęcie produktu przy ogólnym kontakcie
-             window.currentContactProductImage = null;
-             document.getElementById('contact-modal').classList.remove('hidden'); 
-             document.getElementById('product-codes-section').classList.add('hidden'); 
-             document.getElementById('contact-upload-section').classList.remove('hidden'); 
-             document.getElementById('contact-message').value = '';
+             window.currentContactProductImage = null; document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('product-codes-section').classList.add('hidden'); document.getElementById('contact-upload-section').classList.remove('hidden'); document.getElementById('contact-message').value = '';
         };
 
-        window.closeContactModal = () => { 
-            document.getElementById('contact-modal').classList.add('hidden'); 
-            window.currentContactProductImage = null; // Czyścimy po zamknięciu
-        };
+        window.closeContactModal = () => { document.getElementById('contact-modal').classList.add('hidden'); window.currentContactProductImage = null; };
 
         window.submitContactForm = async () => {
-             const btn = document.getElementById('submit-contact-btn');
-             const nameInp = document.getElementById('contact-name');
-             const name = nameInp.value.trim();
-             const emailInp = document.getElementById('contact-email-input');
-             const email = emailInp.value.trim();
-             const msgInp = document.getElementById('contact-message');
-             const msg = msgInp.value.trim();
-             const fileInput = document.getElementById('contact-file-input');
-             const file = fileInput.files[0];
-
-             // Reset stylów błędów
+             const btn = document.getElementById('submit-contact-btn'); const nameInp = document.getElementById('contact-name'); const name = nameInp.value.trim(); const emailInp = document.getElementById('contact-email-input'); const email = emailInp.value.trim(); const msgInp = document.getElementById('contact-message'); const msg = msgInp.value.trim(); const fileInput = document.getElementById('contact-file-input'); const file = fileInput.files[0];
              [nameInp, emailInp, msgInp].forEach(el => el.classList.remove('border-red-500', 'ring-2', 'ring-red-200'));
-
-             // 1. Walidacja Imienia (min 3 znaki)
-             if(name.length < 3) {
-                 showToast("Podaj swoje pełne imię (min. 3 znaki)!");
-                 nameInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
-                 setTimeout(() => nameInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
-                 nameInp.focus();
-                 return;
-             }
-
-             // 2. Walidacja Emaila (Regex)
-             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-             if (!emailRegex.test(email)) {
-                 showToast("Wprowadź poprawny adres email (np. jan@domena.pl)!");
-                 emailInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
-                 setTimeout(() => emailInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
-                 emailInp.focus();
-                 return;
-             }
-
-             // 3. Walidacja Treści (min 10 znaków)
-             if(msg.length < 10) {
-                 showToast("Wiadomość jest zbyt krótka (min. 10 znaków)!");
-                 msgInp.classList.add('border-red-500', 'ring-2', 'ring-red-200');
-                 setTimeout(() => msgInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000);
-                 msgInp.focus();
-                 return;
-             }
-
-             // Zabezpieczenie przed zbyt dużym plikiem (limit 1MB dla bezpieczeństwa Firestore)
-             if(file && file.size > 1024 * 1024) {
-                 alert("Plik jest za duży! Maksymalny rozmiar to 1MB.");
-                 return;
-             }
-
-             const originalText = btn.innerHTML;
-             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Wysyłanie...';
-             
+             if(name.length < 3) { showToast("Podaj swoje pełne imię (min. 3 znaki)!"); nameInp.classList.add('border-red-500', 'ring-2', 'ring-red-200'); setTimeout(() => nameInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000); nameInp.focus(); return; }
+             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; if (!emailRegex.test(email)) { showToast("Wprowadź poprawny adres email (np. jan@domena.pl)!"); emailInp.classList.add('border-red-500', 'ring-2', 'ring-red-200'); setTimeout(() => emailInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000); emailInp.focus(); return; }
+             if(msg.length < 10) { showToast("Wiadomość jest zbyt krótka (min. 10 znaków)!"); msgInp.classList.add('border-red-500', 'ring-2', 'ring-red-200'); setTimeout(() => msgInp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'), 3000); msgInp.focus(); return; }
+             if(file && file.size > 1024 * 1024) { alert("Plik jest za duży! Maksymalny rozmiar to 1MB."); return; }
+             const originalText = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Wysyłanie...';
              try {
                 let attachmentData = null;
-                
-                // Priorytet 1: Plik wgrany przez użytkownika (jeśli dostępny)
-                if (file) {
-                    attachmentData = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-                } 
-                // Priorytet 2: Automatyczne zdjęcie produktu (jeśli brak pliku użytkownika)
-                else if (window.currentContactProductImage) {
-                    attachmentData = window.currentContactProductImage;
-                }
-
+                if (file) { attachmentData = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => resolve(e.target.result); reader.onerror = reject; reader.readAsDataURL(file); }); } 
+                else if (window.currentContactProductImage) { attachmentData = window.currentContactProductImage; }
                 if(isOnline) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
-                        name: name, 
-                        email: email, 
-                        message: msg, 
-                        attachment: attachmentData,
-                        date: new Date().toISOString(), 
-                        status: 'new', // Domyślny status
-                        read: false
-                    });
-                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Wysłano!';
-                    setTimeout(() => { 
-                        btn.innerHTML = originalText; 
-                        closeContactModal(); 
-                        showToast("Wiadomość wysłana!");
-                        document.getElementById('contact-file-input').value = ""; // Reset inputu
-                    }, 1500);
-                } else {
-                    alert("Jesteś offline. Nie można wysłać wiadomości.");
-                    btn.innerHTML = originalText;
-                }
-             } catch(e) {
-                 console.error(e);
-                 alert("Błąd wysyłania: " + e.message);
-                 btn.innerHTML = originalText;
-             }
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), { name: name, email: email, message: msg, attachment: attachmentData, date: new Date().toISOString(), status: 'new', read: false });
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Wysłano!'; setTimeout(() => { btn.innerHTML = originalText; closeContactModal(); showToast("Wiadomość wysłana!"); document.getElementById('contact-file-input').value = ""; }, 1500);
+                } else { alert("Jesteś offline. Nie można wysłać wiadomości."); btn.innerHTML = originalText; }
+             } catch(e) { console.error(e); alert("Błąd wysyłania: " + e.message); btn.innerHTML = originalText; }
         };
 
         // --- STARTUP ---
         function updateStatusUI(online, message = "") {
-            isOnline = online;
-            const dot = document.getElementById('status-dot'); const txt = document.getElementById('status-text'); const banner = document.getElementById('error-banner');
-            if(online) {
-                dot.className = "status-dot status-online"; txt.textContent = "ONLINE (CHMURA)";
-                txt.classList.add('text-green-400'); txt.classList.remove('text-stone-400'); banner.style.display = 'none';
-            } else {
-                dot.className = "status-dot status-offline"; txt.textContent = "OFFLINE (BŁĄD)";
-                txt.classList.add('text-red-400'); txt.classList.remove('text-green-400');
-                if(message) { lastError = message; banner.textContent = "BŁĄD POŁĄCZENIA: " + message; banner.style.display = 'block'; }
-            }
+            isOnline = online; const dot = document.getElementById('status-dot'); const txt = document.getElementById('status-text'); const banner = document.getElementById('error-banner');
+            if(online) { dot.className = "status-dot status-online"; txt.textContent = "ONLINE (CHMURA)"; txt.classList.add('text-green-400'); txt.classList.remove('text-stone-400'); banner.style.display = 'none'; } 
+            else { dot.className = "status-dot status-offline"; txt.textContent = "OFFLINE (BŁĄD)"; txt.classList.add('text-red-400'); txt.classList.remove('text-green-400'); if(message) { lastError = message; banner.textContent = "BŁĄD POŁĄCZENIA: " + message; banner.style.display = 'block'; } }
         }
         
         window.showDetailedError = () => { if(lastError) alert("Ostatni błąd:\n" + lastError); else showToast("Połączenie aktywne."); };
-        function updateDataSourceIndicator(source, isError=false) {
-            const el = document.getElementById('data-source-indicator');
-            // Usunięto tekst dla wersji klienckiej, ale zostawiamy pustą funkcję dla bezpieczeństwa wywołań
-        }
+        function updateDataSourceIndicator(source, isError=false) {}
 
         async function saveData() {
             try {
-                siteData.categories = siteData.categories || {};
-                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                if(isOnline && auth && auth.currentUser) {
-                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
-                    console.log("Zapisano w chmurze");
-                }
+                siteData.categories = siteData.categories || {}; localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                if(isOnline && auth && auth.currentUser) { await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData); console.log("Zapisano w chmurze"); }
             } catch(e) { console.error("Błąd zapisu", e); showToast("Błąd zapisu!"); }
         }
 
         async function start() {
-            if(sessionStorage.getItem('xeomsc_admin') === 'true') { 
-                document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); 
-            } else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
+            if(sessionStorage.getItem('xeomsc_admin') === 'true') { document.body.classList.add('is-admin'); document.getElementById('admin-bar').classList.remove('hidden'); } else if(window.location.hash === '#admin') { document.getElementById('login-screen').classList.remove('hidden'); }
             window.addEventListener('hashchange', () => { if(window.location.hash === '#admin') document.getElementById('login-screen').classList.remove('hidden'); });
 
             try {
                 if (Object.keys(firebaseConfig).length > 0) {
-                    const appObj = initializeApp(firebaseConfig);
-                    auth = getAuth(appObj);
-                    db = getFirestore(appObj);
+                    const appObj = initializeApp(firebaseConfig); auth = getAuth(appObj); db = getFirestore(appObj);
                     try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } } catch (authError) { updateStatusUI(false, authError.message); return; }
 
                     onAuthStateChanged(auth, (u) => {
@@ -2450,18 +1920,14 @@
                             if(sessionStorage.getItem('xeomsc_admin') === 'true') { startMessageListener(); }
                             onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
                                 if (snap.exists()) {
-                                    siteData = snap.data();
-                                    updateDataSourceIndicator('cloud');
+                                    siteData = snap.data(); updateDataSourceIndicator('cloud');
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
                                     renderHero(); renderMain(); renderTexts();
                                     if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
                                         if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
                                     }
-                                } else { 
-                                    if(sessionStorage.getItem('xeomsc_admin') === 'true') { saveData(); } 
-                                    else { updateDataSourceIndicator('local'); } 
-                                }
+                                } else { if(sessionStorage.getItem('xeomsc_admin') === 'true') { saveData(); } else { updateDataSourceIndicator('local'); } }
                             }, (error) => { console.error("Snapshot error:", error); updateStatusUI(false, error.message); updateDataSourceIndicator('local', true); });
                         }
                     });
