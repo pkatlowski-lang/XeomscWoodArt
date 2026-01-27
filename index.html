@@ -769,6 +769,8 @@
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-6"></i> Lista Produktów</button>
                     <div class="h-px bg-white/10 my-2"></div>
                     <button onclick="switchAdminView('custom-orders')" id="btn-custom-orders" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-camera-retro w-6"></i> Galeria Zleceń</button>
+                    <!-- NOWY PRZYCISK: Kalkulator -->
+                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-calculator w-6"></i> Kalkulator Wyceny</button>
                  </nav>
                  <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
              </div>
@@ -847,6 +849,29 @@
                      </div>
                      <div id="admin-custom-orders-list" class="grid grid-cols-4 gap-4"></div>
                  </div>
+                 
+                 <!-- NOWY WIDOK: KALKULATOR WYCENY -->
+                 <div id="view-calculator" class="admin-view hidden space-y-8">
+                    <h3 class="text-3xl font-bold mb-6">Kalkulator Wyceny</h3>
+                    <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 max-w-2xl">
+                        <div class="space-y-4">
+                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Koszt Materiału (PLN)</label><input type="number" id="calc-material" class="calc-input" value="0"></div>
+                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Pracy Lasera (Minuty)</label><input type="number" id="calc-time" class="calc-input" value="0"></div>
+                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Stawka za godzinę pracy (PLN)</label><input type="number" id="calc-rate" class="calc-input" value="120"></div>
+                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Koszty dodatkowe (Projekt/Pakowanie) (PLN)</label><input type="number" id="calc-extra" class="calc-input" value="0"></div>
+                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Marża (%)</label><input type="number" id="calc-margin" class="calc-input" value="30"></div>
+                            
+                            <button onclick="calculatePrice()" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-6 text-lg">Oblicz Cenę</button>
+                        </div>
+                        
+                        <div id="calc-result" class="mt-8 p-6 bg-black/40 rounded-2xl border border-white/10 hidden animate-fade-in text-center">
+                            <p class="text-stone-400 text-sm uppercase font-bold mb-2">Sugerowana Cena Końcowa</p>
+                            <div class="text-4xl font-bold text-wood-500" id="calc-final-price">0.00 PLN</div>
+                            <div class="text-xs text-stone-500 mt-2">Koszt wytworzenia: <span id="calc-base-cost">0.00</span> PLN | Zysk: <span id="calc-profit">0.00</span> PLN</div>
+                        </div>
+                    </div>
+                </div>
+
              </div>
         </div>
     </div>
@@ -1587,6 +1612,29 @@
                 
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
+            // NOWE: Dla kalkulatora nie potrzeba renderowania dynamicznego, formularz jest statyczny
+        };
+        
+        // NOWA FUNKCJA KALKULATORA
+        window.calculatePrice = () => {
+            const material = parseFloat(document.getElementById('calc-material').value) || 0;
+            const time = parseFloat(document.getElementById('calc-time').value) || 0;
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const extra = parseFloat(document.getElementById('calc-extra').value) || 0;
+            const margin = parseFloat(document.getElementById('calc-margin').value) || 0;
+
+            // Koszt lasera = czas * (stawka / 60)
+            const laserCost = time * (rate / 60);
+            
+            const baseCost = material + laserCost + extra;
+            const finalPrice = baseCost * (1 + margin / 100);
+            const profit = finalPrice - baseCost;
+
+            document.getElementById('calc-final-price').textContent = finalPrice.toFixed(2) + ' PLN';
+            document.getElementById('calc-base-cost').textContent = baseCost.toFixed(2);
+            document.getElementById('calc-profit').textContent = profit.toFixed(2);
+            
+            document.getElementById('calc-result').classList.remove('hidden');
         };
 
         window.saveContentSettings = async () => {
@@ -1697,8 +1745,8 @@
                                  </div>
                              </div>
                          </div>
-                     `;
-                     }).join('');
+                      `;
+                      }).join('');
                  }
                  if(list) list.innerHTML = html;
              }, (error) => {
@@ -2417,7 +2465,6 @@
         window.showDetailedError = () => { if(lastError) alert("Ostatni błąd:\n" + lastError); else showToast("Połączenie aktywne."); };
         function updateDataSourceIndicator(source, isError=false) {
             const el = document.getElementById('data-source-indicator');
-            // Usunięto tekst dla wersji klienckiej, ale zostawiamy pustą funkcję dla bezpieczeństwa wywołań
         }
 
         async function saveData() {
