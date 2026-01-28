@@ -853,11 +853,49 @@
                  <!-- NOWY WIDOK: KALKULATOR WYCENY -->
                  <div id="view-calculator" class="admin-view hidden space-y-8">
                     <h3 class="text-3xl font-bold mb-6">Kalkulator Wyceny</h3>
+                    
+                    <!-- 1. GÓRNA CZĘŚĆ: USTAWIENIA STAWEK (ZAPISYWALNE) -->
+                    <div class="bg-stone-800 p-6 rounded-3xl border border-wood-600/30 mb-8 shadow-xl">
+                        <h4 class="text-wood-500 font-bold uppercase text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-gear"></i> Konfiguracja Stawek (Zapisywalne)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena materiału za cm² (3mm) [PLN]</label>
+                                <input type="number" id="setting-material-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.0001" value="0.0038">
+                            </div>
+                            <div>
+                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena pracy lasera za minutę [PLN]</label>
+                                <input type="number" id="setting-laser-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.01" value="0.50">
+                            </div>
+                        </div>
+                        <button onclick="saveCalculatorSettings()" class="bg-stone-700 hover:bg-wood-600 text-white px-6 py-2 rounded-lg text-xs font-bold mt-4 transition border border-white/10 uppercase tracking-wider">Zapisz domyślne stawki</button>
+                    </div>
+
+                    <!-- 2. CZĘŚĆ OBLICZENIOWA -->
                     <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 max-w-2xl">
                         <div class="space-y-4">
-                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Koszt Materiału (PLN)</label><input type="number" id="calc-material" class="calc-input" value="0"></div>
-                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Pracy Lasera (Minuty)</label><input type="number" id="calc-time" class="calc-input" value="0"></div>
-                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Stawka za godzinę pracy (PLN)</label><input type="number" id="calc-rate" class="calc-input" value="120"></div>
+                            <!-- Wymiary do obliczenia materiału -->
+                            <div class="bg-black/20 p-4 rounded-xl border border-white/5">
+                                <label class="text-xs uppercase font-bold text-stone-400 mb-2 block">Wymiary Elementu (do obliczenia materiału)</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] text-stone-500 block">Szerokość (cm)</label>
+                                        <input type="number" id="calc-width" class="calc-input" placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-stone-500 block">Wysokość (cm)</label>
+                                        <input type="number" id="calc-height" class="calc-input" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="text-right mt-2 text-xs text-stone-500">
+                                    Koszt materiału: <span id="display-material-cost" class="text-white font-bold">0.00</span> PLN
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Pracy Lasera (Minuty)</label>
+                                <input type="number" id="calc-time" class="calc-input" placeholder="0">
+                            </div>
+                            
                             <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Koszty dodatkowe (Projekt/Pakowanie) (PLN)</label><input type="number" id="calc-extra" class="calc-input" value="0"></div>
                             <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Marża (%)</label><input type="number" id="calc-margin" class="calc-input" value="30"></div>
                             
@@ -933,6 +971,11 @@
             galleries: {},
             customOrders: [],
             imgbbKey: "",
+            // USTAWIENIA KALKULATORA
+            calcSettings: {
+                materialRate: 0.0038, // Cena za cm2
+                laserRate: 0.50       // Cena za minutę
+            },
             textContent: {
                 hero: { main: "Precyzja Lasera,<br>Ciepło", accent: "Drewna", desc: "Witaj w Xeomsc FusionArt. Tworzymy spersonalizowane dekoracje, pamiątki oraz gadżety reklamowe z duszą." },
                 aboutCards: [
@@ -1589,7 +1632,7 @@
             else if (id === 'product-list') { renderProductListView(); }
             else if (id === 'custom-orders') { renderCustomOrdersAdmin(); }
             else if (id === 'content') {
-                // AUTO-NAPRAWA STRUKTURY DANYCH (Jeśli brakuje nowych pól w bazie)
+                // AUTO-NAPRAWA STRUKTURY DANYCH
                 if(!siteData.textContent) siteData.textContent = JSON.parse(JSON.stringify(initialData.textContent));
                 if(!siteData.textContent.legal) siteData.textContent.legal = JSON.parse(JSON.stringify(initialData.textContent.legal));
                 if(!siteData.textContent.footer) siteData.textContent.footer = JSON.parse(JSON.stringify(initialData.textContent.footer));
@@ -1602,31 +1645,66 @@
                 document.getElementById('edit-contact-phone').value = t.contact.phone || "";
                 document.getElementById('edit-contact-desc').value = t.contact.desc || "";
                 
-                // Wypełnij pola prawne
                 document.getElementById('edit-privacy').value = t.legal.privacy || "";
                 document.getElementById('edit-terms').value = t.legal.terms || "";
                 
-                // Wypełnij pola stopki
                 document.getElementById('edit-footer-slogan').value = t.footer.slogan || "";
                 document.getElementById('edit-footer-copyright').value = t.footer.copyright || "";
                 
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
             }
-            // NOWE: Dla kalkulatora nie potrzeba renderowania dynamicznego, formularz jest statyczny
+            // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
+            else if (id === 'calculator') {
+                if(!siteData.calcSettings) siteData.calcSettings = initialData.calcSettings;
+                document.getElementById('setting-material-rate').value = siteData.calcSettings.materialRate || 0.0038;
+                document.getElementById('setting-laser-rate').value = siteData.calcSettings.laserRate || 0.50;
+            }
         };
         
-        // NOWA FUNKCJA KALKULATORA
+        // --- FUNKCJE KALKULATORA ---
+        
+        // Zapisywanie domyślnych stawek
+        window.saveCalculatorSettings = async () => {
+             const matRate = parseFloat(document.getElementById('setting-material-rate').value);
+             const laserRate = parseFloat(document.getElementById('setting-laser-rate').value);
+             
+             if(isNaN(matRate) || isNaN(laserRate)) {
+                 alert("Wprowadź poprawne liczby!");
+                 return;
+             }
+             
+             siteData.calcSettings = {
+                 materialRate: matRate,
+                 laserRate: laserRate
+             };
+             
+             await saveData();
+             showToast("Zapisano domyślne stawki kalkulatora!");
+        };
+
+        // Obliczanie ceny
         window.calculatePrice = () => {
-            const material = parseFloat(document.getElementById('calc-material').value) || 0;
+            // Pobranie stawek z inputów na górze (na wypadek gdyby użytkownik je zmienił tymczasowo)
+            const matRate = parseFloat(document.getElementById('setting-material-rate').value) || 0;
+            const laserRate = parseFloat(document.getElementById('setting-laser-rate').value) || 0;
+
+            // Pobranie danych projektu
+            const w = parseFloat(document.getElementById('calc-width').value) || 0;
+            const h = parseFloat(document.getElementById('calc-height').value) || 0;
             const time = parseFloat(document.getElementById('calc-time').value) || 0;
-            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
             const extra = parseFloat(document.getElementById('calc-extra').value) || 0;
             const margin = parseFloat(document.getElementById('calc-margin').value) || 0;
 
-            // Koszt lasera = czas * (stawka / 60)
-            const laserCost = time * (rate / 60);
+            // Obliczenia
+            const area = w * h; // cm2
+            const materialCost = area * matRate;
             
-            const baseCost = material + laserCost + extra;
+            // Wyświetlenie kosztu materiału na bieżąco
+            document.getElementById('display-material-cost').textContent = materialCost.toFixed(2);
+
+            const laserCost = time * laserRate;
+            
+            const baseCost = materialCost + laserCost + extra;
             const finalPrice = baseCost * (1 + margin / 100);
             const profit = finalPrice - baseCost;
 
