@@ -856,56 +856,89 @@
                     
                     <!-- 1. GÓRNA CZĘŚĆ: USTAWIENIA STAWEK (ZAPISYWALNE) -->
                     <div class="bg-stone-800 p-6 rounded-3xl border border-wood-600/30 mb-8 shadow-xl">
-                        <h4 class="text-wood-500 font-bold uppercase text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-gear"></i> Konfiguracja Stawek (Zapisywalne)</h4>
+                        <h4 class="text-wood-500 font-bold uppercase text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-gear"></i> Konfiguracja Stawek Bazowych (Zapisywalne)</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena materiału za cm² (3mm) [PLN]</label>
-                                <input type="number" id="setting-material-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.0001" value="0.0038">
+                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena bazowa za cm² (dla 3mm) [PLN]</label>
+                                <input type="number" id="setting-material-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.0001" value="0.0038" oninput="calculatePrice()">
                             </div>
                             <div>
                                 <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena pracy lasera za minutę [PLN]</label>
-                                <input type="number" id="setting-laser-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.01" value="0.50">
+                                <input type="number" id="setting-laser-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.01" value="0.50" oninput="calculatePrice()">
                             </div>
                         </div>
                         <button onclick="saveCalculatorSettings()" class="bg-stone-700 hover:bg-wood-600 text-white px-6 py-2 rounded-lg text-xs font-bold mt-4 transition border border-white/10 uppercase tracking-wider">Zapisz domyślne stawki</button>
                     </div>
 
                     <!-- 2. CZĘŚĆ OBLICZENIOWA -->
-                    <div class="bg-stone-800 p-8 rounded-3xl border border-white/5 max-w-2xl">
-                        <div class="space-y-4">
-                            <!-- Wymiary do obliczenia materiału -->
-                            <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                <label class="text-xs uppercase font-bold text-stone-400 mb-2 block">Wymiary Elementu (do obliczenia materiału)</label>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] text-stone-500 block">Szerokość (cm)</label>
-                                        <input type="number" id="calc-width" class="calc-input" placeholder="0">
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] text-stone-500 block">Wysokość (cm)</label>
-                                        <input type="number" id="calc-height" class="calc-input" placeholder="0">
-                                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5">
+                            <h4 class="text-xl font-bold mb-6">Parametry Wyceny</h4>
+                            <div class="space-y-5">
+                                <input type="hidden" id="calc-edit-id"> <!-- ID edytowanej kalkulacji -->
+                                <div>
+                                    <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Nazwa Wyceny (dla zapisu)</label>
+                                    <input type="text" id="calc-name" class="calc-input border-wood-600/30 focus:border-wood-500" placeholder="np. Pudełko dla Klienta X">
                                 </div>
-                                <div class="text-right mt-2 text-xs text-stone-500">
-                                    Koszt materiału: <span id="display-material-cost" class="text-white font-bold">0.00</span> PLN
-                                </div>
-                            </div>
 
-                            <div>
-                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Pracy Lasera (Minuty)</label>
-                                <input type="number" id="calc-time" class="calc-input" placeholder="0">
+                                <div class="bg-black/20 p-4 rounded-xl border border-white/5">
+                                    <label class="text-xs uppercase font-bold text-stone-400 mb-3 block">Materiał</label>
+                                    <div class="grid grid-cols-3 gap-3 mb-3">
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 block">Szer. (mm)</label>
+                                            <input type="number" id="calc-width" class="calc-input" placeholder="0" oninput="calculatePrice()">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 block">Wys. (mm)</label>
+                                            <input type="number" id="calc-height" class="calc-input" placeholder="0" oninput="calculatePrice()">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 block">Grubość (mm)</label>
+                                            <input type="number" id="calc-thickness" class="calc-input" value="3" oninput="calculatePrice()">
+                                        </div>
+                                    </div>
+                                    <div class="text-right mt-2">
+                                        <div class="text-[10px] text-stone-500">Koszt materiału:</div>
+                                        <div class="text-2xl font-bold text-white"><span id="display-material-cost">0.00</span> PLN</div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Lasera (min)</label>
+                                    <input type="number" id="calc-time" class="calc-input" placeholder="0" oninput="calculatePrice()">
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Dodatkowe (PLN)</label><input type="number" id="calc-extra" class="calc-input" value="0" oninput="calculatePrice()"></div>
+                                    <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Marża (%)</label><input type="number" id="calc-margin" class="calc-input" value="30" oninput="calculatePrice()"></div>
+                                </div>
+                                
+                                <button onclick="saveCalculation()" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-2 text-lg shadow-lg">Zapisz Wycenę</button>
+                                <button id="btn-calc-cancel" onclick="clearCalculator()" class="hidden bg-stone-600 hover:bg-stone-500 w-full py-3 rounded-xl font-bold transition">Anuluj Edycję</button>
                             </div>
-                            
-                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Koszty dodatkowe (Projekt/Pakowanie) (PLN)</label><input type="number" id="calc-extra" class="calc-input" value="0"></div>
-                            <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Marża (%)</label><input type="number" id="calc-margin" class="calc-input" value="30"></div>
-                            
-                            <button onclick="calculatePrice()" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-6 text-lg">Oblicz Cenę</button>
                         </div>
                         
-                        <div id="calc-result" class="mt-8 p-6 bg-black/40 rounded-2xl border border-white/10 hidden animate-fade-in text-center">
-                            <p class="text-stone-400 text-sm uppercase font-bold mb-2">Sugerowana Cena Końcowa</p>
-                            <div class="text-4xl font-bold text-wood-500" id="calc-final-price">0.00 PLN</div>
-                            <div class="text-xs text-stone-500 mt-2">Koszt wytworzenia: <span id="calc-base-cost">0.00</span> PLN | Zysk: <span id="calc-profit">0.00</span> PLN</div>
+                        <!-- WYNIKI NA ŻYWO -->
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-black/40 p-8 rounded-3xl border border-white/10 text-center flex flex-col justify-center h-full">
+                                <div class="mb-8">
+                                    <p class="text-stone-500 text-xs uppercase font-bold mb-2">Koszt Produkcji (Netto)</p>
+                                    <div class="text-3xl font-bold text-stone-300"><span id="calc-net-price">0.00</span> PLN</div>
+                                </div>
+                                <div class="border-t border-white/10 pt-8">
+                                    <p class="text-wood-500 text-sm uppercase font-bold mb-2">Cena Końcowa (Brutto)</p>
+                                    <div class="text-6xl font-bold text-white"><span id="calc-gross-price">0.00</span> PLN</div>
+                                    <p class="text-xs text-stone-500 mt-4">Zysk: <span id="calc-profit" class="text-green-500 font-bold">0.00</span> PLN</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LISTA ZAPISANYCH WYCEN -->
+                    <div class="mt-12 border-t border-white/10 pt-8">
+                        <h4 class="text-2xl font-bold mb-6">Zapisane Wyceny</h4>
+                        <div id="saved-calcs-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Tu pojawią się kafelki -->
                         </div>
                     </div>
                 </div>
@@ -970,10 +1003,11 @@
             categories: {},
             galleries: {},
             customOrders: [],
+            savedCalculations: [], // NOWA TABLICA NA ZAPISANE WYCENY
             imgbbKey: "",
             // USTAWIENIA KALKULATORA
             calcSettings: {
-                materialRate: 0.0038, // Cena za cm2
+                materialRate: 0.0038, // Cena za cm2 (bazowa dla 3mm)
                 laserRate: 0.50       // Cena za minutę
             },
             textContent: {
@@ -1658,6 +1692,9 @@
                 if(!siteData.calcSettings) siteData.calcSettings = initialData.calcSettings;
                 document.getElementById('setting-material-rate').value = siteData.calcSettings.materialRate || 0.0038;
                 document.getElementById('setting-laser-rate').value = siteData.calcSettings.laserRate || 0.50;
+                
+                renderSavedCalculations();
+                calculatePrice(); // Uruchom przeliczenie na starcie
             }
         };
         
@@ -1680,39 +1717,168 @@
              
              await saveData();
              showToast("Zapisano domyślne stawki kalkulatora!");
+             calculatePrice(); // Przelicz przy nowej stawce
         };
 
-        // Obliczanie ceny
+        // Obliczanie ceny (Automatyczne)
         window.calculatePrice = () => {
-            // Pobranie stawek z inputów na górze (na wypadek gdyby użytkownik je zmienił tymczasowo)
-            const matRate = parseFloat(document.getElementById('setting-material-rate').value) || 0;
+            // Pobranie stawek BAZOWYCH (dla 3mm)
+            const baseRate3mm = parseFloat(document.getElementById('setting-material-rate').value) || 0;
             const laserRate = parseFloat(document.getElementById('setting-laser-rate').value) || 0;
 
-            // Pobranie danych projektu
-            const w = parseFloat(document.getElementById('calc-width').value) || 0;
-            const h = parseFloat(document.getElementById('calc-height').value) || 0;
+            // Pobranie danych projektu (mm)
+            const width_mm = parseFloat(document.getElementById('calc-width').value) || 0;
+            const height_mm = parseFloat(document.getElementById('calc-height').value) || 0;
+            const thickness_mm = parseFloat(document.getElementById('calc-thickness').value) || 3; // Domyślnie 3
+            
             const time = parseFloat(document.getElementById('calc-time').value) || 0;
             const extra = parseFloat(document.getElementById('calc-extra').value) || 0;
             const margin = parseFloat(document.getElementById('calc-margin').value) || 0;
 
-            // Obliczenia
-            const area = w * h; // cm2
-            const materialCost = area * matRate;
+            // 1. Oblicz powierzchnię w cm2 (mm * mm / 100)
+            const area_cm2 = (width_mm * height_mm) / 100;
+
+            // 2. Skalowanie stawki wg grubości
+            // Logika: 3mm = 1x baseRate, 6mm = 2x, 9mm = 3x itd.
+            // Wzór: (grubość / 3) * stawka_bazowa
+            const scaledRate = (thickness_mm / 3) * baseRate3mm;
+
+            // 3. Koszt materiału
+            const materialCost = area_cm2 * scaledRate;
             
             // Wyświetlenie kosztu materiału na bieżąco
             document.getElementById('display-material-cost').textContent = materialCost.toFixed(2);
 
+            // 4. Koszt lasera
             const laserCost = time * laserRate;
             
-            const baseCost = materialCost + laserCost + extra;
-            const finalPrice = baseCost * (1 + margin / 100);
-            const profit = finalPrice - baseCost;
+            // 5. Sumy
+            const netCost = materialCost + laserCost + extra; // Koszt produkcji
+            const grossPrice = netCost * (1 + margin / 100);  // Cena końcowa
+            const profit = grossPrice - netCost;
 
-            document.getElementById('calc-final-price').textContent = finalPrice.toFixed(2) + ' PLN';
-            document.getElementById('calc-base-cost').textContent = baseCost.toFixed(2);
+            // Wyświetlanie wyników
+            document.getElementById('calc-net-price').textContent = netCost.toFixed(2);
+            document.getElementById('calc-gross-price').textContent = grossPrice.toFixed(2);
             document.getElementById('calc-profit').textContent = profit.toFixed(2);
+        };
+        
+        // Zapisywanie wyceny do listy
+        window.saveCalculation = async () => {
+            const name = document.getElementById('calc-name').value.trim() || "Wycena bez nazwy";
+            const editId = document.getElementById('calc-edit-id').value;
             
-            document.getElementById('calc-result').classList.remove('hidden');
+            // Pobieramy aktualne wartości z UI (bo mogły się zmienić)
+            const calcData = {
+                id: editId || 'calc_' + Date.now(),
+                name: name,
+                width: parseFloat(document.getElementById('calc-width').value) || 0,
+                height: parseFloat(document.getElementById('calc-height').value) || 0,
+                thickness: parseFloat(document.getElementById('calc-thickness').value) || 3,
+                time: parseFloat(document.getElementById('calc-time').value) || 0,
+                extra: parseFloat(document.getElementById('calc-extra').value) || 0,
+                margin: parseFloat(document.getElementById('calc-margin').value) || 0,
+                net: document.getElementById('calc-net-price').textContent,
+                gross: document.getElementById('calc-gross-price').textContent,
+                date: new Date().toISOString()
+            };
+            
+            if(!siteData.savedCalculations) siteData.savedCalculations = [];
+            
+            if(editId) {
+                // Edycja istniejącego
+                const index = siteData.savedCalculations.findIndex(c => c.id === editId);
+                if(index !== -1) siteData.savedCalculations[index] = calcData;
+            } else {
+                // Nowy
+                siteData.savedCalculations.push(calcData);
+            }
+            
+            await saveData();
+            showToast("Zapisano wycenę!");
+            renderSavedCalculations();
+            window.clearCalculator(); // Czyść formularz po zapisie
+        };
+        
+        window.clearCalculator = () => {
+            document.getElementById('calc-name').value = "";
+            document.getElementById('calc-width').value = "";
+            document.getElementById('calc-height').value = "";
+            document.getElementById('calc-thickness').value = "3";
+            document.getElementById('calc-time').value = "";
+            document.getElementById('calc-extra').value = "0";
+            document.getElementById('calc-margin').value = "30";
+            document.getElementById('calc-edit-id').value = "";
+            document.getElementById('btn-calc-cancel').classList.add('hidden');
+            window.calculatePrice(); // Resetuje zera
+        };
+        
+        window.editCalculation = (id) => {
+            const calc = siteData.savedCalculations.find(c => c.id === id);
+            if(!calc) return;
+            
+            document.getElementById('calc-edit-id').value = calc.id;
+            document.getElementById('calc-name').value = calc.name;
+            document.getElementById('calc-width').value = calc.width;
+            document.getElementById('calc-height').value = calc.height;
+            document.getElementById('calc-thickness').value = calc.thickness;
+            document.getElementById('calc-time').value = calc.time;
+            document.getElementById('calc-extra').value = calc.extra;
+            document.getElementById('calc-margin').value = calc.margin;
+            
+            document.getElementById('btn-calc-cancel').classList.remove('hidden');
+            
+            // Przewiń do góry i przelicz
+            document.getElementById('view-calculator').scrollIntoView({ behavior: 'smooth' });
+            window.calculatePrice();
+        };
+        
+        window.deleteCalculation = (id) => {
+            window.openConfirm("Usunąć zapisaną wycenę?", async () => {
+                siteData.savedCalculations = siteData.savedCalculations.filter(c => c.id !== id);
+                await saveData();
+                renderSavedCalculations();
+            });
+        };
+        
+        window.renderSavedCalculations = () => {
+            const container = document.getElementById('saved-calcs-list');
+            const list = siteData.savedCalculations || [];
+            
+            // Sortowanie po dacie (najnowsze na górze)
+            list.sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            if(list.length === 0) {
+                container.innerHTML = '<p class="text-stone-500 col-span-full text-center py-6">Brak zapisanych wycen.</p>';
+                return;
+            }
+            
+            container.innerHTML = list.map(c => `
+                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 hover:border-wood-600/50 transition group relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <h5 class="font-bold text-lg text-white truncate pr-8" title="${c.name}">${c.name}</h5>
+                        <div class="text-[10px] text-stone-500">${new Date(c.date).toLocaleDateString()}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-xs text-stone-400 mb-4 font-mono">
+                        <div>Wym: ${c.width}x${c.height}mm</div>
+                        <div>Grub: ${c.thickness}mm</div>
+                        <div>Laser: ${c.time}min</div>
+                        <div>Marża: ${c.margin}%</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-end border-t border-white/10 pt-3">
+                        <div>
+                            <div class="text-[10px] uppercase text-stone-500 font-bold">Cena Końcowa</div>
+                            <div class="text-xl font-bold text-wood-500">${c.gross} PLN</div>
+                        </div>
+                        <div class="flex gap-2">
+                             <button onclick="editCalculation('${c.id}')" class="bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white p-2 rounded-lg transition"><i class="fa-solid fa-pen"></i></button>
+                             <button onclick="deleteCalculation('${c.id}')" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         };
 
         window.saveContentSettings = async () => {
