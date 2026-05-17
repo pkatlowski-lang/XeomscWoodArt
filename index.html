@@ -113,14 +113,15 @@
         body.is-admin .admin-controls { display: flex !important; }
         body.is-admin #navbar { top: 58px; }
 
-        .admin-sidebar-item.active { background-color: #b45309; color: white; border-right: 4px solid #fff; }
+        .admin-sidebar-item.active { background-color: rgba(180,83,9,0.2); color: #fdba74; border-right: 3px solid #b45309; font-weight: 700; }
         #admin-panel.hidden { display: none !important; }
 
         .calc-input {
-            background: #1c1917; border: 1px solid #444; color: white; padding: 0.75rem;
-            border-radius: 0.5rem; width: 100%; outline: none; transition: border-color 0.2s;
+            background: #1c1917; border: 1px solid #3d3835; color: white; padding: 0.65rem 0.75rem;
+            border-radius: 0.5rem; width: 100%; outline: none; transition: border-color 0.2s, background 0.2s;
+            font-size: 0.9rem;
         }
-        .calc-input:focus { border-color: #d97706; background: #292524; }
+        .calc-input:focus { border-color: #d97706; background: #292524; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
         
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
@@ -476,7 +477,7 @@
                         <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
                     </div>
                 </div>
-                <p id="footer-copyright">&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+                <p id="footer-copyright">&copy; 2025 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
             </div>
         </footer>
     </div>
@@ -514,7 +515,7 @@
                         <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
                     </div>
                 </div>
-                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+                <p>&copy; 2025 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
             </div>
         </footer>
     </div>
@@ -551,7 +552,7 @@
                         <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
                     </div>
                 </div>
-                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+                <p>&copy; 2025 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
             </div>
         </footer>
     </div>
@@ -670,7 +671,7 @@
                         <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
                     </div>
                 </div>
-                <p>&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
+                <p>&copy; 2025 Xeomsc FusionArt. Wszelkie prawa zastrzeżone.</p>
             </div>
         </footer>
     </div>
@@ -752,27 +753,34 @@
     <!-- 6. PANEL ADMINISTRATORA (CMS) -->
     <div id="admin-panel" class="fixed inset-0 z-[2000] bg-stone-950/60 backdrop-blur-md hidden items-center justify-center p-4 sm:p-8">
         <div class="bg-stone-900 text-white w-full max-w-7xl h-full max-h-[90vh] rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border border-white/10 ring-1 ring-white/5">
-             <div class="w-full md:w-72 bg-black/40 border-r border-white/5 p-8 flex flex-col shrink-0">
-                 <div class="mb-10">
-                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
-                        <i class="fa-solid fa-screwdriver-wrench text-wood-500"></i><span>CMS Panel</span>
-                    </h2>
+             <div class="w-full md:w-64 bg-black/50 border-r border-white/5 p-6 flex flex-col shrink-0">
+                 <div class="mb-8 pb-6 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-wood-600/30 rounded-xl flex items-center justify-center border border-wood-600/20">
+                            <i class="fa-solid fa-screwdriver-wrench text-wood-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-white leading-none">CMS Panel</h2>
+                            <p class="text-[10px] text-stone-600 mt-0.5">Xeomsc FusionArt</p>
+                        </div>
+                    </div>
                  </div>
-                 <nav class="space-y-3 flex-1 overflow-y-auto">
-                    <button onclick="switchAdminView('messages')" id="btn-messages" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-inbox w-6"></i> Wiadomości</button>
-                    <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-pen-to-square w-6"></i> Edycja Treści</button>
-                    <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-6"></i> Karuzela Hero</button>
-                    <div class="h-px bg-white/10 my-2"></div>
-                    <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-layer-group w-6"></i> Kategorie</button>
-                    <button onclick="switchAdminView('subcategories')" id="btn-subcategories" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-tree w-6"></i> Podkategorie</button>
-                    <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-plus-circle w-6"></i> Dodaj Produkty</button>
-                    <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-6"></i> Lista Produktów</button>
-                    <div class="h-px bg-white/10 my-2"></div>
-                    <button onclick="switchAdminView('custom-orders')" id="btn-custom-orders" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-camera-retro w-6"></i> Galeria Zleceń</button>
-                    <!-- NOWY PRZYCISK: Kalkulator -->
-                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-5 py-4 rounded-xl hover:bg-white/5 transition flex items-center gap-3 font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-calculator w-6"></i> Kalkulator Wyceny</button>
+                 <nav class="space-y-1 flex-1 overflow-y-auto">
+                    <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1">Komunikacja</p>
+                    <button onclick="switchAdminView('messages')" id="btn-messages" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-inbox w-5 text-center text-xs"></i> Wiadomości</button>
+                    <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Treść Strony</p>
+                    <button onclick="switchAdminView('content')" id="btn-content" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-pen-to-square w-5 text-center text-xs"></i> Edycja Treści</button>
+                    <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-5 text-center text-xs"></i> Karuzela Hero</button>
+                    <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Katalog Produktów</p>
+                    <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-layer-group w-5 text-center text-xs"></i> Kategorie</button>
+                    <button onclick="switchAdminView('subcategories')" id="btn-subcategories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-tree w-5 text-center text-xs"></i> Podkategorie</button>
+                    <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-plus-circle w-5 text-center text-xs"></i> Dodaj Produkty</button>
+                    <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-5 text-center text-xs"></i> Lista Produktów</button>
+                    <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Narzędzia</p>
+                    <button onclick="switchAdminView('custom-orders')" id="btn-custom-orders" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-camera-retro w-5 text-center text-xs"></i> Galeria Zleceń</button>
+                    <button onclick="switchAdminView('calculator')" id="btn-calculator" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-calculator w-5 text-center text-xs"></i> Kalkulator Wyceny</button>
                  </nav>
-                 <button onclick="toggleAdminPanel()" class="mt-6 py-3 text-stone-500 hover:text-white transition flex items-center gap-2 text-sm border-t border-white/10 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
+                 <button onclick="toggleAdminPanel()" class="mt-4 py-2.5 text-stone-600 hover:text-stone-300 transition flex items-center gap-2 text-xs border-t border-white/5 justify-center"><i class="fa-solid fa-xmark"></i> Zamknij Panel</button>
              </div>
              <div id="admin-content-area" class="flex-1 overflow-y-auto p-8 md:p-12 bg-stone-900 relative">
                  <div id="view-messages" class="admin-view hidden space-y-6">
@@ -850,94 +858,217 @@
                      <div id="admin-custom-orders-list" class="grid grid-cols-4 gap-4"></div>
                  </div>
                  
-                 <!-- NOWY WIDOK: KALKULATOR WYCENY -->
-                 <div id="view-calculator" class="admin-view hidden space-y-8">
-                    <h3 class="text-3xl font-bold mb-6">Kalkulator Wyceny</h3>
-                    
-                    <!-- 1. GÓRNA CZĘŚĆ: USTAWIENIA STAWEK (ZAPISYWALNE) -->
-                    <div class="bg-stone-800 p-6 rounded-3xl border border-wood-600/30 mb-8 shadow-xl">
-                        <h4 class="text-wood-500 font-bold uppercase text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-gear"></i> Konfiguracja Stawek Bazowych (Zapisywalne)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena bazowa za cm² (dla 3mm) [PLN]</label>
-                                <input type="number" id="setting-material-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.0001" value="0.0038" oninput="calculatePrice()">
-                            </div>
-                            <div>
-                                <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Cena pracy lasera za minutę [PLN]</label>
-                                <input type="number" id="setting-laser-rate" class="calc-input bg-black/40 border-wood-600/50 text-wood-100 font-mono" step="0.01" value="0.50" oninput="calculatePrice()">
-                            </div>
+                 <!-- KALKULATOR WYCENY — NOWY DESIGN -->
+                 <div id="view-calculator" class="admin-view hidden">
+
+                    <!-- NAGŁÓWEK -->
+                    <div class="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
+                        <div>
+                            <h3 class="text-3xl font-bold text-white">Kalkulator Wyceny</h3>
+                            <p class="text-stone-500 text-sm mt-1">Oblicz koszt produkcji i cenę końcową dla klienta</p>
                         </div>
-                        <button onclick="saveCalculatorSettings()" class="bg-stone-700 hover:bg-wood-600 text-white px-6 py-2 rounded-lg text-xs font-bold mt-4 transition border border-white/10 uppercase tracking-wider">Zapisz domyślne stawki</button>
+                        <div class="w-14 h-14 bg-wood-600/20 rounded-2xl flex items-center justify-center border border-wood-600/30">
+                            <i class="fa-solid fa-calculator text-wood-500 text-2xl"></i>
+                        </div>
                     </div>
 
-                    <!-- 2. CZĘŚĆ OBLICZENIOWA -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-stone-800 p-8 rounded-3xl border border-white/5">
-                            <h4 class="text-xl font-bold mb-6">Parametry Wyceny</h4>
-                            <div class="space-y-5">
-                                <input type="hidden" id="calc-edit-id"> <!-- ID edytowanej kalkulacji -->
-                                <div>
-                                    <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Nazwa Wyceny (dla zapisu)</label>
-                                    <input type="text" id="calc-name" class="calc-input border-wood-600/30 focus:border-wood-500" placeholder="np. Pudełko dla Klienta X">
-                                </div>
-
-                                <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                                    <label class="text-xs uppercase font-bold text-stone-400 mb-3 block">Materiał</label>
-                                    <div class="grid grid-cols-3 gap-3 mb-3">
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 block">Szer. (mm)</label>
-                                            <input type="number" id="calc-width" class="calc-input" placeholder="0" oninput="calculatePrice()">
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 block">Wys. (mm)</label>
-                                            <input type="number" id="calc-height" class="calc-input" placeholder="0" oninput="calculatePrice()">
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 block">Grubość (mm)</label>
-                                            <input type="number" id="calc-thickness" class="calc-input" value="3" oninput="calculatePrice()">
-                                        </div>
-                                    </div>
-                                    <div class="text-right mt-2">
-                                        <div class="text-[10px] text-stone-500">Koszt materiału:</div>
-                                        <div class="text-2xl font-bold text-white"><span id="display-material-cost">0.00</span> PLN</div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Czas Lasera (min)</label>
-                                    <input type="number" id="calc-time" class="calc-input" placeholder="0" oninput="calculatePrice()">
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Dodatkowe (PLN)</label><input type="number" id="calc-extra" class="calc-input" value="0" oninput="calculatePrice()"></div>
-                                    <div><label class="text-xs uppercase font-bold text-stone-500 mb-1 block">Marża (%)</label><input type="number" id="calc-margin" class="calc-input" value="30" oninput="calculatePrice()"></div>
-                                </div>
-                                
-                                <button onclick="saveCalculation()" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-2 text-lg shadow-lg">Zapisz Wycenę</button>
-                                <button id="btn-calc-cancel" onclick="clearCalculator()" class="hidden bg-stone-600 hover:bg-stone-500 w-full py-3 rounded-xl font-bold transition">Anuluj Edycję</button>
+                    <!-- STAWKI BAZOWE -->
+                    <div class="bg-gradient-to-r from-stone-800 to-stone-800/60 p-6 rounded-2xl border border-wood-600/25 mb-8 shadow-lg">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-8 h-8 bg-wood-600/30 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-sliders text-wood-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Stawki Bazowe</h4>
+                                <p class="text-stone-500 text-xs">Używane do wszystkich obliczeń — zapisz po zmianie</p>
                             </div>
                         </div>
-                        
-                        <!-- WYNIKI NA ŻYWO -->
-                        <div class="flex flex-col gap-6">
-                            <div class="bg-black/40 p-8 rounded-3xl border border-white/10 text-center flex flex-col justify-center h-full">
-                                <div class="mb-8">
-                                    <p class="text-stone-500 text-xs uppercase font-bold mb-2">Koszt Produkcji (Netto)</p>
-                                    <div class="text-3xl font-bold text-stone-300"><span id="calc-net-price">0.00</span> PLN</div>
-                                </div>
-                                <div class="border-t border-white/10 pt-8">
-                                    <p class="text-wood-500 text-sm uppercase font-bold mb-2">Cena Końcowa (Brutto)</p>
-                                    <div class="text-6xl font-bold text-white"><span id="calc-gross-price">0.00</span> PLN</div>
-                                    <p class="text-xs text-stone-500 mt-4">Zysk: <span id="calc-profit" class="text-green-500 font-bold">0.00</span> PLN</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
+                                    <i class="fa-solid fa-layer-group mr-1"></i> Materiał — cena za cm² (3mm)
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="setting-material-rate" class="calc-input flex-1 font-mono text-lg" step="0.0001" value="0.0038" oninput="calculatePrice()">
+                                    <span class="text-stone-400 text-sm font-bold shrink-0">PLN/cm²</span>
                                 </div>
                             </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
+                                    <i class="fa-solid fa-bolt mr-1"></i> Laser — cena za minutę pracy
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="setting-laser-rate" class="calc-input flex-1 font-mono text-lg" step="0.01" value="0.50" oninput="calculatePrice()">
+                                    <span class="text-stone-400 text-sm font-bold shrink-0">PLN/min</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="saveCalculatorSettings()" class="mt-4 bg-wood-700 hover:bg-wood-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-wood-600/50 w-fit">
+                            <i class="fa-solid fa-floppy-disk"></i> Zapisz stawki jako domyślne
+                        </button>
+                    </div>
+
+                    <!-- GŁÓWNA SEKCJA: FORMULARZ + WYNIKI -->
+                    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 mb-8">
+
+                        <!-- FORMULARZ (3/5) -->
+                        <div class="xl:col-span-3 bg-stone-800 rounded-2xl border border-white/8 overflow-hidden">
+                            <div class="px-6 py-5 border-b border-white/8 flex items-center gap-3">
+                                <i class="fa-solid fa-pen-ruler text-wood-400"></i>
+                                <h4 class="font-bold text-white">Parametry projektu</h4>
+                            </div>
+                            <div class="p-6 space-y-5">
+                                <input type="hidden" id="calc-edit-id">
+
+                                <!-- Nazwa -->
+                                <div>
+                                    <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
+                                        <i class="fa-solid fa-tag mr-1 text-stone-600"></i> Nazwa wyceny
+                                    </label>
+                                    <input type="text" id="calc-name" class="calc-input" placeholder="np. Pudełko na biżuterię — Klient Jan K.">
+                                </div>
+
+                                <!-- Wymiary materiału -->
+                                <div class="bg-black/25 rounded-xl border border-white/5 overflow-hidden">
+                                    <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-stone-400 uppercase tracking-wider">
+                                            <i class="fa-solid fa-vector-square text-stone-500"></i> Wymiary materiału
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="text-[10px] text-stone-600 uppercase">Koszt materiału:</span>
+                                            <span class="text-wood-400 font-bold text-sm ml-2"><span id="display-material-cost">0.00</span> PLN</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 grid grid-cols-3 gap-3">
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Szerokość</label>
+                                            <div class="relative">
+                                                <input type="number" id="calc-width" class="calc-input pr-10" placeholder="0" oninput="calculatePrice()">
+                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Wysokość</label>
+                                            <div class="relative">
+                                                <input type="number" id="calc-height" class="calc-input pr-10" placeholder="0" oninput="calculatePrice()">
+                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Grubość</label>
+                                            <div class="relative">
+                                                <input type="number" id="calc-thickness" class="calc-input pr-10" value="3" oninput="calculatePrice()">
+                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Czas lasera -->
+                                <div>
+                                    <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
+                                        <i class="fa-solid fa-stopwatch mr-1 text-stone-600"></i> Czas pracy lasera
+                                    </label>
+                                    <div class="relative">
+                                        <input type="number" id="calc-time" class="calc-input pr-14" placeholder="0" oninput="calculatePrice()">
+                                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">min</span>
+                                    </div>
+                                </div>
+
+                                <!-- Dodatkowe + Marża -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
+                                            <i class="fa-solid fa-circle-plus mr-1 text-stone-600"></i> Koszty dodatkowe
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="calc-extra" class="calc-input pr-12" value="0" oninput="calculatePrice()">
+                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">PLN</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
+                                            <i class="fa-solid fa-percent mr-1 text-stone-600"></i> Marża
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="calc-margin" class="calc-input pr-8" value="30" oninput="calculatePrice()">
+                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Przyciski -->
+                                <div class="flex flex-col gap-2 pt-2">
+                                    <button onclick="saveCalculation()" class="bg-wood-600 hover:bg-wood-500 w-full py-3.5 rounded-xl font-bold transition text-base shadow-lg flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-floppy-disk"></i> Zapisz wycenę
+                                    </button>
+                                    <button id="btn-calc-cancel" onclick="clearCalculator()" class="hidden bg-stone-700 hover:bg-stone-600 w-full py-3 rounded-xl font-bold transition text-sm text-stone-300 flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-xmark"></i> Anuluj edycję
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WYNIKI (2/5) -->
+                        <div class="xl:col-span-2 flex flex-col gap-4">
+
+                            <!-- Rozbicie kosztów -->
+                            <div class="bg-stone-800 rounded-2xl border border-white/8 overflow-hidden flex-1">
+                                <div class="px-5 py-4 border-b border-white/8 flex items-center gap-3">
+                                    <i class="fa-solid fa-chart-pie text-stone-400 text-sm"></i>
+                                    <h4 class="font-bold text-white text-sm">Rozbicie kosztów</h4>
+                                </div>
+                                <div class="p-5 space-y-3">
+                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                        <div class="flex items-center gap-2 text-xs text-stone-400">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span> Materiał
+                                        </div>
+                                        <span id="display-material-cost-2" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                        <div class="flex items-center gap-2 text-xs text-stone-400">
+                                            <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span> Laser
+                                        </div>
+                                        <span id="display-laser-cost" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                        <div class="flex items-center gap-2 text-xs text-stone-400">
+                                            <span class="w-2 h-2 rounded-full bg-purple-400 inline-block"></span> Dodatkowe
+                                        </div>
+                                        <span id="display-extra-cost" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2.5">
+                                        <div class="text-xs text-stone-400 font-bold uppercase tracking-wider">Koszt netto</div>
+                                        <span id="calc-net-price" class="text-base font-bold text-stone-200 font-mono">0.00 PLN</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cena końcowa — duże wyróżnienie -->
+                            <div class="bg-gradient-to-br from-wood-900/60 to-stone-800 rounded-2xl border border-wood-600/40 p-6 text-center shadow-xl">
+                                <p class="text-wood-400 text-[10px] font-bold uppercase tracking-widest mb-1">Cena dla klienta</p>
+                                <div class="text-5xl font-bold text-white my-3 leading-none">
+                                    <span id="calc-gross-price">0.00</span>
+                                    <span class="text-xl text-wood-400 ml-1">PLN</span>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-white/10 flex justify-between text-xs">
+                                    <span class="text-stone-500">Zysk (marża):</span>
+                                    <span id="calc-profit" class="text-green-400 font-bold font-mono">0.00 PLN</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
                     <!-- LISTA ZAPISANYCH WYCEN -->
-                    <div class="mt-12 border-t border-white/10 pt-8">
-                        <h4 class="text-2xl font-bold mb-6">Zapisane Wyceny</h4>
-                        <div id="saved-calcs-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="border-t border-white/10 pt-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h4 class="text-xl font-bold text-white">Zapisane Wyceny</h4>
+                                <p class="text-stone-500 text-xs mt-0.5">Kliknij <i class="fa-solid fa-pen text-xs"></i> aby edytować, <i class="fa-solid fa-trash text-xs"></i> aby usunąć</p>
+                            </div>
+                        </div>
+                        <div id="saved-calcs-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             <!-- Tu pojawią się kafelki -->
                         </div>
                     </div>
@@ -1026,7 +1157,7 @@
                 // NOWE: STOPKA
                 footer: {
                     slogan: "Pasja. Precyzja. Drewno.",
-                    copyright: "&copy; 2024 Xeomsc FusionArt. Wszelkie prawa zastrzeżone."
+                    copyright: "&copy; 2025 Xeomsc FusionArt. Wszelkie prawa zastrzeżone."
                 }
             }
         };
@@ -1761,6 +1892,14 @@
             document.getElementById('calc-net-price').textContent = netCost.toFixed(2);
             document.getElementById('calc-gross-price').textContent = grossPrice.toFixed(2);
             document.getElementById('calc-profit').textContent = profit.toFixed(2);
+            
+            // Nowe pola rozbicia kosztów
+            const mc2 = document.getElementById('display-material-cost-2');
+            const lc = document.getElementById('display-laser-cost');
+            const ec = document.getElementById('display-extra-cost');
+            if(mc2) mc2.textContent = materialCost.toFixed(2) + ' PLN';
+            if(lc)  lc.textContent  = laserCost.toFixed(2) + ' PLN';
+            if(ec)  ec.textContent  = extra.toFixed(2) + ' PLN';
         };
         
         // Zapisywanie wyceny do listy
@@ -1854,27 +1993,30 @@
             }
             
             container.innerHTML = list.map(c => `
-                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 hover:border-wood-600/50 transition group relative">
-                    <div class="flex justify-between items-start mb-3">
-                        <h5 class="font-bold text-lg text-white truncate pr-8" title="${c.name}">${c.name}</h5>
-                        <div class="text-[10px] text-stone-500">${new Date(c.date).toLocaleDateString()}</div>
+                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 hover:border-wood-600/40 transition group relative flex flex-col gap-3">
+                    <!-- Nagłówek karty -->
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-bold text-base text-white leading-tight pr-8 truncate" title="${c.name}">${c.name}</h5>
+                        <span class="text-[10px] text-stone-600 shrink-0">${new Date(c.date).toLocaleDateString('pl-PL')}</span>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-2 text-xs text-stone-400 mb-4 font-mono">
-                        <div>Wym: ${c.width}x${c.height}mm</div>
-                        <div>Grub: ${c.thickness}mm</div>
-                        <div>Laser: ${c.time}min</div>
-                        <div>Marża: ${c.margin}%</div>
+                    <!-- Parametry -->
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-stone-500 font-mono border-y border-white/5 py-3">
+                        <div><span class="text-stone-700">Wym:</span> ${c.width}×${c.height}mm</div>
+                        <div><span class="text-stone-700">Grub:</span> ${c.thickness}mm</div>
+                        <div><span class="text-stone-700">Laser:</span> ${c.time} min</div>
+                        <div><span class="text-stone-700">Marża:</span> ${c.margin}%</div>
                     </div>
                     
-                    <div class="flex justify-between items-end border-t border-white/10 pt-3">
+                    <!-- Cena + akcje -->
+                    <div class="flex justify-between items-center">
                         <div>
-                            <div class="text-[10px] uppercase text-stone-500 font-bold">Cena Końcowa</div>
-                            <div class="text-xl font-bold text-wood-500">${c.gross} PLN</div>
+                            <div class="text-[10px] text-stone-600 uppercase font-bold mb-0.5">Cena końcowa</div>
+                            <div class="text-2xl font-bold text-wood-400 leading-none">${c.gross} <span class="text-sm text-wood-600">PLN</span></div>
                         </div>
                         <div class="flex gap-2">
-                             <button onclick="editCalculation('${c.id}')" class="bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white p-2 rounded-lg transition"><i class="fa-solid fa-pen"></i></button>
-                             <button onclick="deleteCalculation('${c.id}')" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white p-2 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                             <button onclick="editCalculation('${c.id}')" title="Edytuj" class="w-9 h-9 bg-blue-600/15 text-blue-400 hover:bg-blue-600 hover:text-white rounded-lg transition flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button>
+                             <button onclick="deleteCalculation('${c.id}')" title="Usuń" class="w-9 h-9 bg-red-600/15 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 </div>
