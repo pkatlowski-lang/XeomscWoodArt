@@ -27,17 +27,28 @@
                 extend: {
                     colors: {
                         wood: {
-                            100: '#fef3c7',
-                            500: '#d97706',
-                            600: '#b45309',
-                            800: '#92400e',
-                            900: '#78350f',
+                            100: '#e0f2fe',
+                            500: '#38bdf8',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
                         },
                         stone: {
-                            50: '#fafaf9',
-                            800: '#292524',
-                            900: '#1c1917',
-                            950: '#0c0a09',
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        laser: {
+                            glow: 'rgba(56,189,248,0.15)',
+                            border: 'rgba(56,189,248,0.25)',
                         }
                     },
                     fontFamily: {
@@ -65,10 +76,10 @@
         }
         
         .gradient-text {
-            background: linear-gradient(to right, #b45309, #d97706);
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 0 20px rgba(56,189,248,0.4));
         }
         
         .white-outline-text {
@@ -90,8 +101,8 @@
         }
 
         .hero-bg {
-            background-color: #fafaf9;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d6d3d1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            background-color: #020617;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2338bdf8' fill-opacity='0.04' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E");
         }
         
         /* UKRYWANIE ELEMENTÓW PRZEGLĄDARKI I OPERA GX */
@@ -113,7 +124,7 @@
         body.is-admin .admin-controls { display: flex !important; }
         body.is-admin #navbar { top: 58px; }
 
-        .admin-sidebar-item.active { background-color: rgba(180,83,9,0.2); color: #fdba74; border-right: 3px solid #b45309; font-weight: 700; }
+        .admin-sidebar-item.active { background-color: rgba(56,189,248,0.1); color: #38bdf8; border-right: 3px solid #38bdf8; font-weight: 700; }
         #admin-panel.hidden { display: none !important; }
 
         .calc-input {
@@ -211,7 +222,7 @@
         }
 
         .custom-order-item:hover img { transform: scale(1.05); }
-        .selected-category-border { border-color: #b45309 !important; box-shadow: 0 0 15px rgba(180, 83, 9, 0.3); }
+        .selected-category-border { border-color: #0284c7 !important; box-shadow: 0 0 20px rgba(56,189,248,0.2); }
         
         /* Modal Potwierdzenia */
         #confirm-modal {
@@ -223,7 +234,7 @@
         .cursor-grabbing { cursor: grabbing; user-select: none; }
     </style>
 </head>
-<body class="text-stone-800 bg-stone-50">
+<body class="text-slate-100 bg-slate-950">
 
     <!-- Toast Notification -->
     <div id="toast-notification">
@@ -236,52 +247,52 @@
 
     <!-- Custom Confirm Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-[6000] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center animate-fade-in border-2 border-wood-600">
-            <div class="mb-4 text-wood-600 text-4xl"><i class="fa-solid fa-circle-question"></i></div>
-            <h3 class="text-xl font-bold mb-2">Jesteś pewien?</h3>
-            <p id="confirm-text" class="text-stone-500 mb-6 text-sm">Tej operacji nie można cofnąć.</p>
+        <div class="bg-slate-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center animate-fade-in border border-sky-500/30 text-white">
+            <div class="mb-4 text-sky-400 text-4xl"><i class="fa-solid fa-circle-question"></i></div>
+            <h3 class="text-xl font-bold mb-2 text-white">Jesteś pewien?</h3>
+            <p id="confirm-text" class="text-slate-400 mb-6 text-sm">Tej operacji nie można cofnąć.</p>
             <div class="flex gap-3 justify-center">
-                <button onclick="closeConfirm(false)" class="px-6 py-2 rounded-xl bg-stone-200 text-stone-700 font-bold hover:bg-stone-300 transition">Nie</button>
-                <button onclick="closeConfirm(true)" class="px-6 py-2 rounded-xl bg-wood-600 text-white font-bold hover:bg-wood-700 transition shadow-lg">Tak, usuń</button>
+                <button onclick="closeConfirm(false)" class="px-6 py-2 rounded-xl bg-slate-700 text-slate-200 font-bold hover:bg-slate-600 transition">Nie</button>
+                <button onclick="closeConfirm(true)" class="px-6 py-2 rounded-xl bg-sky-500 text-white font-bold hover:bg-sky-400 transition shadow-lg">Tak, usuń</button>
             </div>
         </div>
     </div>
 
     <!-- 1. EKRAN LOGOWANIA -->
     <div id="login-screen" class="fixed inset-0 z-[9999] bg-stone-900/98 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in border-4 border-wood-600">
-            <div class="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-wood-100 text-wood-600 text-4xl shadow-inner">
+        <div class="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-10 text-center animate-fade-in border border-sky-500/40 text-white">
+            <div class="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-sky-500/10 text-sky-400 text-4xl shadow-inner border border-sky-500/20">
                 <i class="fa-solid fa-user-lock"></i>
             </div>
-            <h2 class="text-3xl font-bold text-stone-900 mb-2">Panel Administratora</h2>
-            <p class="text-stone-500 mb-8 text-sm">Zaloguj się, aby zarządzać treścią strony</p>
+            <h2 class="text-3xl font-bold text-white mb-2">Panel Administratora</h2>
+            <p class="text-slate-400 mb-8 text-sm">Zaloguj się, aby zarządzać treścią strony</p>
             
             <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Login</label>
-                    <input type="text" id="login-user" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition font-medium" placeholder="Login">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Login</label>
+                    <input type="text" id="login-user" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition font-medium text-white placeholder-slate-600" placeholder="Login">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Hasło</label>
-                    <input type="password" id="login-pass" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition font-medium" placeholder="Hasło">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Hasło</label>
+                    <input type="password" id="login-pass" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition font-medium text-white placeholder-slate-600" placeholder="Hasło">
                 </div>
                 <div id="login-error" class="text-red-500 text-sm hidden text-center font-bold bg-red-50 p-2 rounded-lg">
                     <i class="fa-solid fa-circle-exclamation mr-1"></i> Błędny login lub hasło!
                 </div>
-                <button type="submit" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95">Zaloguj się</button>
+                <button type="submit" class="w-full bg-sky-500 text-white py-4 rounded-xl font-bold hover:bg-sky-400 transition shadow-lg shadow-sky-500/20 transform active:scale-95">Zaloguj się</button>
             </form>
-            <button onclick="exitLogin()" class="mt-8 text-sm text-stone-400 hover:text-wood-600 underline transition">Wróć do strony głównej</button>
+            <button onclick="exitLogin()" class="mt-8 text-sm text-slate-500 hover:text-sky-400 underline transition">Wróć do strony głównej</button>
         </div>
     </div>
 
     <!-- 2. PASEK ADMINA -->
-    <div id="admin-bar" class="hidden bg-stone-900 text-white text-sm py-2 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-lg border-b border-wood-600">
+    <div id="admin-bar" class="hidden bg-slate-950 text-white text-sm py-2 px-6 fixed top-0 w-full z-[150] flex justify-between items-center shadow-lg border-b border-sky-500/30">
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10" id="db-status-indicator">
                 <div id="status-dot" class="status-dot status-connecting"></div>
                 <span id="status-text" class="text-xs font-bold uppercase tracking-wider text-stone-400">Łączenie...</span>
             </div>
-            <button onclick="toggleAdminPanel()" class="relative bg-wood-600 hover:bg-wood-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
+            <button onclick="toggleAdminPanel()" class="relative bg-sky-500 hover:bg-sky-400 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md shadow-sky-500/20">
                 <i class="fa-solid fa-gears"></i> Panel CMS
                 <span id="msg-count-bar" class="notification-badge hidden">0</span>
             </button>
@@ -292,32 +303,32 @@
     </div>
 
     <!-- 3. NAWIGACJA STRONY -->
-    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300 top-0 h-24 flex items-center border-b border-stone-100" id="navbar">
+    <nav class="fixed w-full z-50 bg-slate-950/95 backdrop-blur-md shadow-lg transition-all duration-300 top-0 h-24 flex items-center border-b border-white/5" id="navbar">
         <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
-            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors" id="nav-logo">
-                <div class="bg-wood-600 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg group-hover:bg-wood-700 transition">
+            <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 group transition-colors" id="nav-logo">
+                <div class="bg-sky-500 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-lg shadow-sky-500/25 group-hover:bg-sky-400 transition">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <span>Xeomsc <span class="text-wood-600" id="nav-logo-accent">Laser Studio</span></span>
             </a>
             
-            <div class="hidden md:flex space-x-10 items-center font-medium text-stone-600" id="nav-links">
-                <a href="#home" onclick="goHome()" class="hover:text-wood-600 transition">Start</a>
-                <a href="#about" onclick="goHome()" class="hover:text-wood-600 transition">O ofercie</a>
-                <a href="#portfolio" onclick="goHome()" class="hover:text-wood-600 transition">Nasze Produkty</a>
-                <a href="#custom-orders" onclick="goHome()" class="hover:text-wood-600 transition">Zrealizowane Zlecenia</a>
-                <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-wood-600 text-white rounded-full hover:bg-wood-800 transition shadow-lg font-bold">Kontakt</a>
+            <div class="hidden md:flex space-x-10 items-center font-medium text-slate-400" id="nav-links">
+                <a href="#home" onclick="goHome()" class="hover:text-sky-400 transition">Start</a>
+                <a href="#about" onclick="goHome()" class="hover:text-sky-400 transition">O ofercie</a>
+                <a href="#portfolio" onclick="goHome()" class="hover:text-sky-400 transition">Nasze Produkty</a>
+                <a href="#custom-orders" onclick="goHome()" class="hover:text-sky-400 transition">Zrealizowane Zlecenia</a>
+                <a href="#contact" onclick="goHome()" class="px-6 py-3 bg-sky-500 text-white rounded-full hover:bg-sky-400 transition shadow-lg shadow-sky-500/20 font-bold">Kontakt</a>
             </div>
 
             <div class="md:hidden flex items-center">
-                <button onclick="toggleMobileMenu()" class="text-stone-800 p-2 text-2xl transition-colors" id="mobile-menu-btn">
+                <button onclick="toggleMobileMenu()" class="text-white p-2 text-2xl transition-colors" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
         
-        <div class="md:hidden hidden absolute top-24 left-0 w-full bg-white border-t border-stone-100 shadow-xl" id="mobile-menu">
-            <div class="flex flex-col p-4 space-y-2 text-stone-800">
+        <div class="md:hidden hidden absolute top-24 left-0 w-full bg-slate-900 border-t border-white/5 shadow-xl" id="mobile-menu">
+            <div class="flex flex-col p-4 space-y-2 text-slate-300">
                 <a href="#home" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Start</a>
                 <a href="#about" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">O ofercie</a>
                 <a href="#portfolio" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-stone-50 font-medium">Nasze Produkty</a>
@@ -328,18 +339,18 @@
     </nav>
 
     <!-- 4. KONTENER GŁÓWNY -->
-    <div id="main-content" class="pt-24 transition-all duration-300">
+    <div id="main-content" class="pt-24 transition-all duration-300 bg-slate-950">
         <!-- Hero Section -->
         <section id="home" class="relative h-[calc(100vh-6rem)] flex items-center hero-bg overflow-hidden pt-10">
             <div class="absolute inset-0 z-0" id="hero-carousel-container">
                 <div class="w-full h-full bg-stone-200 animate-pulse"></div>
             </div>
             
-            <div class="absolute inset-0 bg-stone-900/40 z-10"></div>
+            <div class="absolute inset-0 bg-slate-950/65 z-10"></div>
             
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
-                    <span class="inline-block py-2 px-5 rounded-full bg-wood-100/90 backdrop-blur text-wood-800 text-xs font-bold mb-6 border border-wood-200 uppercase tracking-widest shadow-lg">
+                    <span class="inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
                         Pracownia Laserowa
                     </span>
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
@@ -350,7 +361,7 @@
                         Witaj w Xeomsc Laser Studio. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.
                     </p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="px-10 py-4 bg-wood-600 text-white rounded-full hover:bg-wood-700 hover:scale-105 transform transition shadow-xl font-bold text-center">
+                        <a href="#portfolio" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
                             Zobacz nasze prace
                         </a>
                     </div>
@@ -359,21 +370,21 @@
         </section>
 
         <!-- Oferta -->
-        <section id="about" class="py-24 bg-white">
+        <section id="about" class="py-24 bg-slate-900">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Co oferujemy?</h2>
-                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
+                <h2 class="text-4xl font-bold mb-4 text-white">Co oferujemy?</h2>
+                <div class="w-24 h-1.5 bg-sky-500 mx-auto rounded-full mb-16 opacity-80"></div>
                 <div id="about-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
             </div>
         </section>
 
         <!-- Nasze Produkty -->
-        <section id="portfolio" class="py-24 bg-stone-50">
+        <section id="portfolio" class="py-24 bg-slate-950">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Nasze Produkty</h2>
+                <h2 class="text-4xl font-bold mb-4 text-white">Nasze Produkty</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 
-                <p class="text-stone-400 text-sm font-bold uppercase tracking-widest mb-4">Krok 1: Wybierz Kategorię</p>
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-4">Krok 1: Wybierz Kategorię</p>
                 <div class="relative group mb-12" onmouseenter="window.stopAutoScroll()" onmouseleave="window.startAutoScroll()">
                     <button onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -386,7 +397,7 @@
                 </div>
 
                 <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
-                    <p class="text-wood-600 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
+                    <p class="text-sky-400 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                         <h3 id="selected-cat-title" class="text-3xl font-bold text-stone-800"></h3>
                         <!-- NOWY PRZYCISK: ZOBACZ WSZYSTKIE -->
@@ -415,9 +426,9 @@
         </section>
 
         <!-- Zlecenia -->
-        <section id="custom-orders" class="py-24 bg-white">
+        <section id="custom-orders" class="py-24 bg-slate-900">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-stone-900">Zrealizowane Zlecenia na zamówienie</h2>
+                <h2 class="text-4xl font-bold mb-4 text-white">Zrealizowane Zlecenia na zamówienie</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-12 opacity-80"></div>
                 
                 <div class="relative group">
@@ -440,25 +451,25 @@
         </section>
 
         <!-- Kontakt -->
-        <section id="contact" class="py-24 bg-stone-50">
+        <section id="contact" class="py-24 bg-slate-950">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                 <h2 class="text-4xl font-bold mb-6">Kontakt i Wycena</h2>
-                 <p id="contact-desc" class="mb-16 text-stone-500 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz lub zadzwoń — wycenę przygotuję tego samego dnia. Realizuję zamówienia z całej Polski, wysyłka kurierem.</p>
+                 <h2 class="text-4xl font-bold mb-6 text-white">Kontakt i Wycena</h2>
+                 <p id="contact-desc" class="mb-16 text-slate-400 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz lub zadzwoń — wycenę przygotuję tego samego dnia. Realizuję zamówienia z całej Polski, wysyłka kurierem.</p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div onclick="openGeneralContactModal()" class="flex flex-col items-center justify-center p-10 bg-white rounded-[2.5rem] border border-stone-100 hover:border-wood-600 hover:bg-wood-50 cursor-pointer transition group shadow-sm transform hover:-translate-y-1">
+                    <div onclick="openGeneralContactModal()" class="flex flex-col items-center justify-center p-10 bg-slate-800/60 rounded-[2.5rem] border border-white/5 hover:border-sky-500/50 hover:bg-sky-500/5 cursor-pointer transition group shadow-sm transform hover:-translate-y-1">
                         <span class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4 group-hover:text-wood-600 transition">Kliknij</span>
-                        <div class="w-20 h-20 bg-stone-50 rounded-full shadow-md flex items-center justify-center text-wood-600 text-3xl mb-6 group-hover:scale-110 group-hover:bg-wood-600 group-hover:text-white transition duration-300">
+                        <div class="w-20 h-20 bg-sky-500/10 rounded-full shadow-md flex items-center justify-center text-sky-400 text-3xl mb-6 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition duration-300">
                             <i class="fa-solid fa-envelope"></i>
                         </div>
-                        <span class="font-bold text-2xl text-stone-900 group-hover:text-wood-700 transition">Wyślij Wiadomość</span>
+                        <span class="font-bold text-2xl text-white group-hover:text-sky-400 transition">Wyślij Wiadomość</span>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center p-10 bg-white rounded-[2.5rem] border border-stone-100 hover:border-wood-200 transition group shadow-sm">
-                        <div class="w-16 h-16 bg-stone-50 rounded-full shadow-md flex items-center justify-center text-wood-600 text-2xl mb-6 group-hover:scale-110 transition">
+                    <div class="flex flex-col items-center justify-center p-10 bg-slate-800/60 rounded-[2.5rem] border border-white/5 hover:border-sky-500/20 transition group shadow-sm">
+                        <div class="w-16 h-16 bg-sky-500/10 rounded-full shadow-md flex items-center justify-center text-sky-400 text-2xl mb-6 group-hover:scale-110 transition">
                             <i class="fa-solid fa-phone"></i>
                         </div>
-                        <span class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2">Zadzwoń</span>
-                        <span id="contact-phone" class="font-bold text-2xl text-stone-900">+48 123 456 789</span>
+                        <span class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Zadzwoń</span>
+                        <span id="contact-phone" class="font-bold text-2xl text-white">+48 123 456 789</span>
                     </div>
                  </div>
             </div>
@@ -468,13 +479,13 @@
         <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5">
             <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-left">
-                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">Laser Studio</span></h2>
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-sky-400">Laser Studio</span></h2>
                     <p id="footer-slogan" class="text-xs mb-4">Pracownia. Pasja. Precyzja.</p>
                     
                     <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <button onclick="openLegal('privacy')" class="hover:text-sky-400 transition">Polityka Prywatności</button>
                         <span class="text-stone-700">|</span>
-                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                        <button onclick="openLegal('terms')" class="hover:text-sky-400 transition">Regulamin</button>
                     </div>
                 </div>
                 <p id="footer-copyright">&copy; 2025 Xeomsc Laser Studio. Wszelkie prawa zastrzeżone.</p>
@@ -485,21 +496,21 @@
     <!-- WIDOKI DYNAMICZNE (Podstrony) -->
     
     <!-- Widok Produktów w Podkategorii -->
-    <div id="subcategory-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[105] overflow-y-auto">
+    <div id="subcategory-view" class="hidden min-h-screen bg-slate-950 pt-20 pb-20 fade-in fixed inset-0 z-[105] overflow-y-auto">
         <!-- LOGO HEADER -->
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-white/5 mb-8 bg-slate-950/95 backdrop-blur sticky top-0 z-50">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
-                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-bolt"></i></div>
-                <span>Xeomsc <span class="text-wood-600">Laser Studio</span></span>
+                <div class="bg-sky-500 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition"><i class="fa-solid fa-bolt"></i></div>
+                <span>Xeomsc <span class="text-sky-400">Laser Studio</span></span>
             </a>
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 pb-20">
-            <button onclick="window.goBackToSubcategoryList()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+            <button onclick="window.goBackToSubcategoryList()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do listy kategorii
             </button>
-            <h2 id="subcategory-title" class="text-5xl font-bold text-stone-900 mb-12 border-b border-stone-100 pb-6">Wybierz produkt</h2>
+            <h2 id="subcategory-title" class="text-5xl font-bold text-white mb-12 border-b border-white/5 pb-6">Wybierz produkt</h2>
             <div id="subcategory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"></div>
         </div>
 
@@ -507,12 +518,12 @@
         <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
             <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-left">
-                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">Laser Studio</span></h2>
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-sky-400">Laser Studio</span></h2>
                     <p class="text-xs mb-4">Pracownia. Pasja. Precyzja.</p>
                     <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <button onclick="openLegal('privacy')" class="hover:text-sky-400 transition">Polityka Prywatności</button>
                         <span class="text-stone-700">|</span>
-                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                        <button onclick="openLegal('terms')" class="hover:text-sky-400 transition">Regulamin</button>
                     </div>
                 </div>
                 <p>&copy; 2025 Xeomsc Laser Studio. Wszelkie prawa zastrzeżone.</p>
@@ -521,22 +532,22 @@
     </div>
 
     <!-- Widok WSZYSTKICH Podkategorii -->
-    <div id="subcategories-full-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[104] overflow-y-auto">
+    <div id="subcategories-full-view" class="hidden min-h-screen bg-slate-950 pt-20 pb-20 fade-in fixed inset-0 z-[104] overflow-y-auto">
         <!-- LOGO HEADER -->
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-white/5 mb-8 bg-slate-950/95 backdrop-blur sticky top-0 z-50">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
-                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-bolt"></i></div>
-                <span>Xeomsc <span class="text-wood-600">Laser Studio</span></span>
+                <div class="bg-sky-500 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition"><i class="fa-solid fa-bolt"></i></div>
+                <span>Xeomsc <span class="text-sky-400">Laser Studio</span></span>
             </a>
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 pb-20">
-            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do strony głównej
             </button>
-            <h2 id="subcategories-full-title" class="text-5xl font-bold text-stone-900 mb-4">Wszystkie kategorie</h2>
-            <p class="text-stone-500 mb-12">Wybierz kategorię, aby zobaczyć dostępne produkty.</p>
+            <h2 id="subcategories-full-title" class="text-5xl font-bold text-white mb-4">Wszystkie kategorie</h2>
+            <p class="text-slate-500 mb-12">Wybierz kategorię, aby zobaczyć dostępne produkty.</p>
             <div id="subcategories-full-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
 
@@ -544,12 +555,12 @@
         <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
             <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-left">
-                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">Laser Studio</span></h2>
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-sky-400">Laser Studio</span></h2>
                     <p class="text-xs mb-4">Pracownia. Pasja. Precyzja.</p>
                     <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <button onclick="openLegal('privacy')" class="hover:text-sky-400 transition">Polityka Prywatności</button>
                         <span class="text-stone-700">|</span>
-                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                        <button onclick="openLegal('terms')" class="hover:text-sky-400 transition">Regulamin</button>
                     </div>
                 </div>
                 <p>&copy; 2025 Xeomsc Laser Studio. Wszelkie prawa zastrzeżone.</p>
@@ -558,12 +569,12 @@
     </div>
 
     <!-- Widok Produktu -->
-    <div id="gallery-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[110] overflow-y-auto">
+    <div id="gallery-view" class="hidden min-h-screen bg-slate-950 pt-20 pb-20 fade-in fixed inset-0 z-[110] overflow-y-auto">
         <!-- LOGO HEADER -->
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-white/5 mb-8 bg-slate-950/95 backdrop-blur sticky top-0 z-50">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
-                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-bolt"></i></div>
-                <span>Xeomsc <span class="text-wood-600">Laser Studio</span></span>
+                <div class="bg-sky-500 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition"><i class="fa-solid fa-bolt"></i></div>
+                <span>Xeomsc <span class="text-sky-400">Laser Studio</span></span>
             </a>
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
@@ -573,7 +584,7 @@
             <!-- Lewa: Zdjęcia -->
             <div class="space-y-4">
                 <!-- ZMIANA: object-cover na object-contain, aby pokazać całe zdjęcie -->
-                <div class="aspect-square bg-stone-100 rounded-3xl overflow-hidden border border-stone-100 shadow-lg cursor-zoom-in relative group flex items-center justify-center" onclick="openLightbox(window.currentImgIndex)">
+                <div class="aspect-square bg-slate-900 rounded-3xl overflow-hidden border border-white/5 shadow-lg cursor-zoom-in relative group flex items-center justify-center" onclick="openLightbox(window.currentImgIndex)">
                     <img id="main-product-img" src="" class="w-full h-full object-contain transition duration-500">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center pointer-events-none">
                         <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-75 group-hover:scale-100 drop-shadow-md"></i>
@@ -592,14 +603,14 @@
                      <button id="back-to-sub-btn" class="mb-6 flex items-center gap-2 text-stone-400 hover:text-wood-600 text-sm font-bold uppercase tracking-wider transition">
                         <i class="fa-solid fa-arrow-left"></i> Powrót do listy
                      </button>
-                     <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-stone-900 mb-2 leading-tight"></h2>
+                     <h2 id="prod-title" class="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight"></h2>
                      <div class="flex items-center gap-4 text-sm font-mono text-stone-400">
                         <span id="prod-code"></span>
                      </div>
                  </div>
 
                  <div class="flex items-baseline gap-4 border-b border-stone-100 pb-8">
-                     <span id="prod-price" class="text-4xl font-bold text-wood-600"></span>
+                     <span id="prod-price" class="text-4xl font-bold text-sky-400"></span>
                  </div>
 
                  <div class="prose prose-stone text-stone-600 leading-relaxed">
@@ -608,7 +619,7 @@
                  </div>
 
                  <div class="pt-6 space-y-4">
-                     <button id="ask-btn" class="w-full bg-wood-600 text-white py-5 rounded-2xl font-bold text-lg hover:bg-wood-700 hover:-translate-y-1 transition shadow-xl flex items-center justify-center gap-3">
+                     <button id="ask-btn" class="w-full bg-sky-500 text-white py-5 rounded-2xl font-bold text-lg hover:bg-sky-400 hover:-translate-y-1 transition shadow-xl shadow-sky-500/20 flex items-center justify-center gap-3">
                         <i class="fa-regular fa-comments"></i> Zapytaj o ten produkt
                      </button>
                      <p class="text-center text-xs text-stone-400">
@@ -620,18 +631,18 @@
     </div>
 
     <!-- NOWY WIDOK: DOKUMENTY PRAWNE (Polityka / Regulamin) -->
-    <div id="legal-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[130] overflow-y-auto">
+    <div id="legal-view" class="hidden min-h-screen bg-slate-950 pt-20 pb-20 fade-in fixed inset-0 z-[130] overflow-y-auto">
         <!-- LOGO HEADER -->
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-white/5 mb-8 bg-slate-950/95 backdrop-blur sticky top-0 z-50">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
-                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="bg-sky-500 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition"><i class="fa-solid fa-scale-balanced"></i></div>
                 <span>Xeomsc <span class="text-wood-600">Legal</span></span>
             </a>
             <button onclick="closeLegal()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
         <div class="max-w-4xl mx-auto px-6">
-            <button onclick="closeLegal()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+            <button onclick="closeLegal()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót
             </button>
             <h2 id="legal-title" class="text-4xl font-bold text-stone-900 mb-8 border-b border-stone-100 pb-6"></h2>
@@ -640,18 +651,18 @@
     </div>
 
     <!-- PEŁNA GALERIA ZLECEŃ -->
-    <div id="custom-orders-full-view" class="hidden min-h-screen bg-white pt-20 pb-20 fade-in fixed inset-0 z-[120] overflow-y-auto">
+    <div id="custom-orders-full-view" class="hidden min-h-screen bg-slate-950 pt-20 pb-20 fade-in fixed inset-0 z-[120] overflow-y-auto">
          <!-- LOGO HEADER -->
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-stone-100 mb-8 bg-white/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-white/5 mb-8 bg-slate-950/95 backdrop-blur sticky top-0 z-50">
             <a href="#" onclick="goHome(); window.scrollTo(0,0);" class="text-xl font-bold text-stone-900 tracking-tight flex items-center gap-2 group transition-colors">
-                <div class="bg-wood-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg group-hover:bg-wood-700 transition"><i class="fa-solid fa-bolt"></i></div>
-                <span>Xeomsc <span class="text-wood-600">Laser Studio</span></span>
+                <div class="bg-sky-500 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition"><i class="fa-solid fa-bolt"></i></div>
+                <span>Xeomsc <span class="text-sky-400">Laser Studio</span></span>
             </a>
             <button onclick="goHome()" class="text-stone-400 hover:text-stone-800 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 pb-20">
-            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-stone-500 hover:text-wood-600 font-bold transition group bg-stone-50 px-6 py-3 rounded-full w-fit">
+            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
                 <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Powrót do strony głównej
             </button>
             <h2 class="text-5xl font-bold text-stone-900 mb-4">Katalog Zrealizowanych Zleceń</h2>
@@ -663,12 +674,12 @@
         <footer class="bg-stone-950 text-stone-600 py-16 text-center text-sm border-t border-white/5 mt-20">
             <div class="max-w-7xl mx-auto px-6 space-y-6 flex flex-col md:flex-row justify-between items-center">
                 <div class="text-left">
-                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-wood-600">Laser Studio</span></h2>
+                    <h2 class="text-xl font-bold text-white mb-1">Xeomsc <span class="text-sky-400">Laser Studio</span></h2>
                     <p class="text-xs mb-4">Pracownia. Pasja. Precyzja.</p>
                     <div class="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-stone-500">
-                        <button onclick="openLegal('privacy')" class="hover:text-wood-600 transition">Polityka Prywatności</button>
+                        <button onclick="openLegal('privacy')" class="hover:text-sky-400 transition">Polityka Prywatności</button>
                         <span class="text-stone-700">|</span>
-                        <button onclick="openLegal('terms')" class="hover:text-wood-600 transition">Regulamin</button>
+                        <button onclick="openLegal('terms')" class="hover:text-sky-400 transition">Regulamin</button>
                     </div>
                 </div>
                 <p>&copy; 2025 Xeomsc Laser Studio. Wszelkie prawa zastrzeżone.</p>
@@ -700,8 +711,8 @@
 
     <!-- MODAL FORMULARZA KONTAKTOWEGO -->
     <div id="contact-modal" class="fixed inset-0 z-[3000] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh]">
-            <div class="bg-wood-600 p-6 text-white flex justify-between items-center shrink-0">
+        <div class="bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh] border border-white/10">
+            <div class="bg-sky-600 p-6 text-white flex justify-between items-center shrink-0">
                 <h3 class="text-xl font-bold flex items-center gap-2">
                     <i class="fa-regular fa-paper-plane"></i> Formularz zapytania
                 </h3>
@@ -711,13 +722,13 @@
             </div>
             <div class="p-6 space-y-4 overflow-y-auto">
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twoje Imię</label>
-                    <input type="text" id="contact-name" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="np. Jan Kowalski">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Twoje Imię</label>
+                    <input type="text" id="contact-name" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. Jan Kowalski">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twój Email</label>
                     <!-- DODANO AUTOCOMPLETE OFF -->
-                    <input type="email" id="contact-email-input" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition" placeholder="np. jan@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. jan@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
                 
                 <div id="product-codes-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
@@ -739,11 +750,11 @@
 
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Treść Wiadomości / Zapytanie</label>
-                    <textarea id="contact-message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-wood-500 outline-none transition h-32 resize-none" placeholder="Dzień dobry, chciałbym zapytać o..."></textarea>
+                    <textarea id="contact-message" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition h-32 resize-none text-white placeholder-slate-600" placeholder="Dzień dobry, chciałbym zapytać o..."></textarea>
                 </div>
             </div>
-            <div class="p-6 border-t border-stone-100 bg-stone-50 shrink-0">
-                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-wood-600 text-white py-4 rounded-xl font-bold hover:bg-wood-700 transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2">
+            <div class="p-6 border-t border-white/5 bg-slate-800/50 shrink-0">
+                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-sky-500 text-white py-4 rounded-xl font-bold hover:bg-sky-400 transition shadow-lg shadow-sky-500/20 transform active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Wyślij zapytanie
                 </button>
             </div>
@@ -939,10 +950,10 @@
                     </div>
 
                     <!-- STAWKI BAZOWE -->
-                    <div class="bg-gradient-to-r from-stone-800 to-stone-800/60 p-6 rounded-2xl border border-wood-600/25 mb-8 shadow-lg">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-800/60 p-6 rounded-2xl border border-sky-500/20 mb-8 shadow-lg">
                         <div class="flex items-center gap-3 mb-5">
-                            <div class="w-8 h-8 bg-wood-600/30 rounded-lg flex items-center justify-center">
-                                <i class="fa-solid fa-sliders text-wood-400 text-sm"></i>
+                            <div class="w-8 h-8 bg-sky-500/10 rounded-lg flex items-center justify-center border border-sky-500/20">
+                                <i class="fa-solid fa-sliders text-sky-400 text-sm"></i>
                             </div>
                             <div>
                                 <h4 class="text-white font-bold text-sm">Stawki Bazowe</h4>
@@ -952,7 +963,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
                                 <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
-                                    <i class="fa-solid fa-layer-group mr-1"></i> Materiał — cena za cm² (3mm)
+                                    <i class="fa-solid fa-layer-group mr-1 text-sky-400"></i> Materiał — cena za cm² (3mm)
                                 </label>
                                 <div class="flex items-center gap-2">
                                     <input type="number" id="setting-material-rate" class="calc-input flex-1 font-mono text-lg" step="0.0001" value="0.0038" oninput="calculatePrice()">
@@ -961,7 +972,7 @@
                             </div>
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
                                 <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
-                                    <i class="fa-solid fa-bolt mr-1"></i> Laser — cena za minutę pracy
+                                    <i class="fa-solid fa-bolt mr-1 text-sky-400"></i> Laser — cena za minutę pracy
                                 </label>
                                 <div class="flex items-center gap-2">
                                     <input type="number" id="setting-laser-rate" class="calc-input flex-1 font-mono text-lg" step="0.01" value="0.50" oninput="calculatePrice()">
@@ -1111,8 +1122,8 @@
                             </div>
 
                             <!-- Cena końcowa — duże wyróżnienie -->
-                            <div class="bg-gradient-to-br from-wood-900/60 to-stone-800 rounded-2xl border border-wood-600/40 p-6 text-center shadow-xl">
-                                <p class="text-wood-400 text-[10px] font-bold uppercase tracking-widest mb-1">Cena dla klienta</p>
+                            <div class="bg-gradient-to-br from-sky-900/40 to-slate-800 rounded-2xl border border-sky-500/30 p-6 text-center shadow-xl shadow-sky-500/5">
+                                <p class="text-sky-400 text-[10px] font-bold uppercase tracking-widest mb-1">Cena dla klienta</p>
                                 <div class="text-5xl font-bold text-white my-3 leading-none">
                                     <span id="calc-gross-price">0.00</span>
                                     <span class="text-xl text-wood-400 ml-1">PLN</span>
@@ -1383,10 +1394,10 @@
             const grid = document.getElementById('about-grid');
             if(grid && t.aboutCards) {
                 grid.innerHTML = t.aboutCards.map(c => `
-                    <div class="p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="w-20 h-20 bg-wood-100 text-wood-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-wood-600 group-hover:text-white transition-colors shadow-sm"><i class="${c.icon} text-3xl"></i></div>
-                        <h3 class="font-bold text-2xl mb-4 text-stone-800">${c.title}</h3>
-                        <p class="text-stone-500 leading-relaxed">${c.desc}</p>
+                    <div class="p-10 bg-slate-800/60 rounded-[2.5rem] border border-white/5 hover:border-sky-500/30 hover:shadow-2xl hover:shadow-sky-500/5 hover:-translate-y-2 transition-all duration-300 group">
+                        <div class="w-20 h-20 bg-sky-500/10 text-sky-400 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-sky-500 group-hover:text-white transition-colors shadow-sm ring-1 ring-sky-500/20"><i class="${c.icon} text-3xl"></i></div>
+                        <h3 class="font-bold text-2xl mb-4 text-white">${c.title}</h3>
+                        <p class="text-slate-400 leading-relaxed">${c.desc}</p>
                     </div>`).join('');
             }
         }
