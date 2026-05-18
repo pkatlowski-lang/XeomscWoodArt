@@ -399,7 +399,8 @@
                 <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
                     <p class="text-sky-400 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                        <h3 id="selected-cat-title" class="text-3xl font-bold text-stone-800"></h3>
+                        <h3 id="selected-cat-title" class="text-3xl font-bold text-white"></h3>
+                        <p id="selected-cat-desc" class="text-slate-400 text-sm mt-1 hidden"></p>
                         <!-- NOWY PRZYCISK: ZOBACZ WSZYSTKIE -->
                         <button id="btn-see-all-subcats" onclick="" class="text-wood-600 hover:text-wood-800 font-bold text-sm flex items-center gap-2 group">
                             Zobacz wszystkie podkategorie <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
@@ -1493,6 +1494,8 @@
             const btnSeeAll = document.getElementById('btn-see-all-subcats');
 
             title.textContent = cat.title; grid.innerHTML = '';
+            const descEl = document.getElementById('selected-cat-desc');
+            if(cat.desc) { descEl.textContent = cat.desc; descEl.classList.remove('hidden'); } else { descEl.classList.add('hidden'); }
             
             // Konfiguracja przycisku "Zobacz wszystkie"
             btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
@@ -2349,6 +2352,7 @@
                     <h4 class="text-xs uppercase font-bold text-stone-500">Edytuj kategorię</h4>
                     <input type="hidden" id="edit-cat-id">
                     <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii">
+                    <textarea id="cat-d" class="calc-input h-20 resize-none" placeholder="Krótki opis kategorii (opcjonalny)"></textarea>
                     <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia">
                     <div class="flex gap-2">
                         <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
@@ -2370,16 +2374,19 @@
                         </div>`).join('')}
                 </div>`;
             document.getElementById('add-cat-btn').onclick = () => {
-                const t = document.getElementById('cat-t').value; const i = document.getElementById('cat-i').value.trim(); const editId = document.getElementById('edit-cat-id').value;
+                const t = document.getElementById('cat-t').value; 
+                const d = document.getElementById('cat-d').value.trim();
+                const i = document.getElementById('cat-i').value.trim(); const editId = document.getElementById('edit-cat-id').value;
                 if(t) {
                     if (editId) { 
                         siteData.categories[editId].title = t; 
+                        siteData.categories[editId].desc = d;
                         siteData.categories[editId].image = i; 
                     } else { 
                         const id = 'c' + Date.now(); 
                         // Nowa kategoria trafia na koniec
                         const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
-                        siteData.categories[id] = { title: t, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
+                        siteData.categories[id] = { title: t, desc: d, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
                     }
                     saveData(); renderCategoriesAdmin(); renderMain();
                 }
@@ -2422,7 +2429,9 @@
 
         window.editCat = (id) => {
             const cat = siteData.categories[id];
-            document.getElementById('cat-t').value = cat.title; document.getElementById('cat-i').value = cat.image;
+            document.getElementById('cat-t').value = cat.title; 
+            document.getElementById('cat-d').value = cat.desc || '';
+            document.getElementById('cat-i').value = cat.image;
             document.getElementById('edit-cat-id').value = id;
             document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany"; document.getElementById('cancel-cat-btn').classList.remove('hidden');
         };
@@ -2507,6 +2516,7 @@
                     
                     <select id="new-sub-cat-parent" class="calc-input text-white font-bold"><option value="">-- Wybierz Kategorię Główną --</option>${categoryOptions}</select>
                     <input id="sub-t" class="calc-input" placeholder="Nazwa Podkategorii">
+                    <textarea id="sub-d" class="calc-input h-20 resize-none" placeholder="Krótki opis podkategorii (opcjonalny)"></textarea>
                     <input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
                     
                     <div class="flex gap-2">
@@ -2525,6 +2535,7 @@
             document.getElementById('add-sub-btn').onclick = () => {
                 const parentId = document.getElementById('new-sub-cat-parent').value; 
                 const t = document.getElementById('sub-t').value; 
+                const d = document.getElementById('sub-d').value.trim();
                 const i = document.getElementById('sub-i').value.trim(); // Trim added
                 
                 // Dane do edycji
@@ -2544,10 +2555,11 @@
                             
                             // 3. Dodaj do nowej kategorii (zachowując ID podkategorii)
                             if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
-                            siteData.categories[parentId].subs[editSubId] = { title: t, image: i, products: products };
+                            siteData.categories[parentId].subs[editSubId] = { title: t, desc: d, image: i, products: products };
                         } else {
                             // Tylko aktualizacja danych w tej samej kategorii
                             siteData.categories[parentId].subs[editSubId].title = t;
+                            siteData.categories[parentId].subs[editSubId].desc = d;
                             siteData.categories[parentId].subs[editSubId].image = i;
                         }
                         showToast("Zapisano zmiany w podkategorii!");
@@ -2555,7 +2567,7 @@
                         // TRYB DODAWANIA NOWEJ
                         const subId = 's' + Date.now();
                         if(!siteData.categories[parentId].subs) siteData.categories[parentId].subs = {};
-                        siteData.categories[parentId].subs[subId] = { title: t, image: i, products: [] };
+                        siteData.categories[parentId].subs[subId] = { title: t, desc: d, image: i, products: [] };
                         showToast("Podkategoria dodana!");
                     }
                     saveData(); 
@@ -2577,6 +2589,7 @@
             // Wypełnij formularz
             document.getElementById('new-sub-cat-parent').value = parentId;
             document.getElementById('sub-t').value = sub.title;
+            document.getElementById('sub-d').value = sub.desc || '';
             document.getElementById('sub-i').value = sub.image;
             
             // Ustaw flagi edycji
