@@ -1,1 +1,527 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0d0d">
+<title>LaserStudio · Kalkulator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d0d;--s1:#161616;--s2:#1e1e1e;--s3:#272727;
+  --bd:#303030;--bd2:#3a3a3a;
+  --ac:#c8f135;--a2:#35c8f1;--a3:#f1c835;
+  --re:#ff5e5e;--gr:#4cff91;
+  --tx:#f0f0f0;--mu:#666;--mu2:#888;
+  --wo:#d4a264;
+  --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);min-height:100vh;}
 
+/* NAV */
+.nav{background:var(--s1);border-bottom:1px solid var(--bd);padding:0 20px;display:flex;align-items:center;height:52px;gap:12px;position:sticky;top:0;z-index:50;}
+.nav-logo{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.nav-logo span{color:var(--ac);}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--mu2);font-family:var(--sans);transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.nav-link:hover{border-color:var(--a2);color:var(--a2);}
+.nav-save{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--mu);transition:color .3s;}
+.nav-save.ok{color:var(--gr);}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:20px;display:grid;grid-template-columns:370px 1fr;gap:18px;align-items:start;}
+@media(max-width:800px){.wrap{grid-template-columns:1fr;padding:12px;}}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px;}
+.card:last-child{margin-bottom:0;}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--mu);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title .dot{width:5px;height:5px;border-radius:50%;display:inline-block;}
+
+/* FIELDS */
+.f{margin-bottom:11px;}
+.f label{display:block;font-size:10px;font-weight:600;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.f input,.f select{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:var(--mono);font-size:14px;padding:9px 11px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.f input:focus,.f select:focus{border-color:var(--ac);}
+.f select option{background:#1e1e1e;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.hint-btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.hbtn{padding:4px 9px;border-radius:5px;font-size:11px;font-weight:700;font-family:var(--mono);cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--a2);transition:all .15s;}
+.hbtn:hover{border-color:var(--a2);background:rgba(53,200,241,.08);}
+
+/* SKLEJKA */
+.ply-box{background:rgba(212,162,100,.05);border:1px solid rgba(212,162,100,.2);border-radius:10px;padding:14px;margin-bottom:12px;}
+.ply-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--wo);margin-bottom:10px;}
+.tb-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.tb{padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;font-family:var(--mono);cursor:pointer;border:1px solid rgba(212,162,100,.28);background:transparent;color:var(--wo);transition:all .15s;}
+.tb:hover{background:rgba(212,162,100,.1);}
+.tb.active{background:var(--wo);color:#000;}
+.price-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.price-row label{font-size:10px;color:var(--mu);white-space:nowrap;text-transform:uppercase;}
+.price-row input{background:var(--s2);border:1px solid rgba(212,162,100,.28);border-radius:5px;color:var(--wo);font-family:var(--mono);font-size:13px;padding:5px 9px;outline:none;width:100px;transition:border-color .2s;}
+.price-row input:focus{border-color:var(--wo);}
+.svb{padding:5px 10px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--sans);cursor:pointer;border:1px solid var(--wo);background:transparent;color:var(--wo);transition:all .15s;white-space:nowrap;}
+.svb:hover{background:var(--wo);color:#000;}
+.svb.ok{background:var(--gr);border-color:var(--gr);color:#000;}
+.ply-result{background:rgba(212,162,100,.09);border:1px solid rgba(212,162,100,.16);border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.ply-result .pl{font-size:10px;color:var(--wo);text-transform:uppercase;}
+.ply-result .pv{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--wo);}
+.apply-btn{margin-top:6px;width:100%;padding:7px;border-radius:7px;border:1px dashed rgba(212,162,100,.3);background:transparent;color:var(--wo);font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.apply-btn:hover{background:rgba(212,162,100,.08);}
+.itip{font-size:9px;color:var(--mu);margin-top:2px;font-style:italic;}
+
+/* WYNIKI */
+.rb{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.rb .rl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
+.rb .rv{font-family:var(--mono);font-size:13px;font-weight:500;}
+.rb.neg .rv{color:var(--re);}
+.rb.hl{border-color:var(--ac);background:rgba(200,241,53,.06);}
+.rb.hl .rv{color:var(--ac);font-size:19px;font-weight:700;}
+.rb.warn{border-color:var(--a3);background:rgba(241,200,53,.05);}
+.rb.warn .rv{color:var(--a3);}
+
+/* BARS */
+.bars{margin:9px 0;}
+.br{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.bl{font-size:9px;color:var(--mu);width:80px;text-align:right;}
+.bt{flex:1;background:var(--s3);border-radius:3px;height:6px;overflow:hidden;}
+.bf{height:100%;border-radius:3px;transition:width .35s ease;}
+.bv{font-family:var(--mono);font-size:9px;width:42px;text-align:right;}
+
+/* BTNS */
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:5px;letter-spacing:.3px;}
+.btn-p{background:var(--ac);color:#000;}.btn-p:hover{filter:brightness(1.1);}
+.btn-g{background:transparent;border:1px solid var(--bd);color:var(--mu);}.btn-g:hover{border-color:var(--ac);color:var(--ac);}
+.btn-kpir{background:rgba(53,200,241,.1);border:1px solid rgba(53,200,241,.3);color:var(--a2);margin-top:4px;}
+.btn-kpir:hover{background:rgba(53,200,241,.18);}
+
+/* HISTORIA TABS */
+.tabs{display:flex;gap:3px;background:var(--s2);border-radius:8px;padding:3px;margin-bottom:14px;overflow-x:auto;}
+.tab{flex:1;min-width:65px;padding:7px 5px;text-align:center;border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;color:var(--mu);transition:all .18s;border:none;background:transparent;font-family:var(--sans);white-space:nowrap;}
+.tab.active{background:var(--s1);color:var(--ac);border:1px solid var(--bd);}
+.tc{display:none;}.tc.active{display:block;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:10px;}
+th{text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);border-bottom:1px solid var(--bd);font-family:var(--sans);white-space:nowrap;}
+td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.025);font-family:var(--mono);font-size:10px;}
+tr:hover td{background:rgba(255,255,255,.015);}
+.pp{color:var(--gr);font-weight:700;}.pn{color:var(--re);font-weight:700;}
+.delbtn{background:none;border:none;cursor:pointer;color:var(--mu);font-size:11px;padding:2px 4px;border-radius:3px;transition:all .12s;}
+.delbtn:hover{color:var(--re);background:rgba(255,94,94,.1);}
+.tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;}
+.t1{background:rgba(53,200,241,.12);color:var(--a2);}
+.t2{background:rgba(212,162,100,.12);color:var(--wo);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px;}
+.sc{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;}
+.sc .sl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;}
+.sc .sv{font-family:var(--mono);font-size:16px;font-weight:700;}
+.sc.acc{border-color:var(--ac);background:rgba(200,241,53,.05);}
+.sc.acc .sv{color:var(--ac);}
+.mf{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;}
+.mb{padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--mu);font-family:var(--sans);transition:all .14s;}
+.mb.active{border-color:var(--a2);color:var(--a2);background:rgba(53,200,241,.07);}
+.empty{text-align:center;padding:30px 16px;color:var(--mu);font-size:12px;}
+.ic{font-size:26px;margin-bottom:7px;}
+
+/* MOBILE NAV */
+@media(max-width:700px){
+  body{padding-bottom:60px;}
+  .mob-nav{display:flex;}
+}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--bd);z-index:100;height:56px;}
+.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:transparent;color:var(--mu);cursor:pointer;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;transition:color .14s;}
+.mob-tab .mi{font-size:18px;}
+.mob-tab.active{color:var(--ac);}
+
+/* TOAST */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--gr);color:#000;padding:8px 18px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:800;z-index:999;transition:opacity .3s;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">Laser<span>Studio</span></div>
+  <a class="nav-link" href="kpir.html">📒 KPiR & Allegro</a>
+  <span class="nav-save" id="save-ind">● zapisano</span>
+</nav>
+
+<!-- ═══ LEWA ═══ -->
+<div class="wrap">
+<div>
+
+  <!-- SKLEJKA -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--wo)"></span> Kalkulator sklejki</div>
+    <div class="ply-box">
+      <div class="ply-title">🪵 Grubość sklejki</div>
+      <div class="tb-row" id="tbrow"></div>
+      <div class="price-row">
+        <label>Cena / cm²:</label>
+        <input type="number" id="ep" step="0.0001" min="0" placeholder="0.0000">
+        <span style="font-size:10px;color:var(--mu)">zł</span>
+        <button class="svb" id="svb" onclick="savePly()">Zapisz</button>
+      </div>
+      <div class="itip" id="ptip"></div>
+      <div class="r3" style="margin-top:10px">
+        <div class="f"><label>Szer. (cm)</label><input type="number" id="pw" placeholder="20" min="0" step=".1"></div>
+        <div class="f"><label>Wys. (cm)</label><input type="number" id="ph" placeholder="15" min="0" step=".1"></div>
+        <div class="f"><label>Sztuk</label><input type="number" id="pq" value="1" min="1"></div>
+      </div>
+      <div class="ply-result" id="plyr" style="display:none">
+        <div><div class="pl">Koszt sklejki</div><div style="font-size:9px;color:var(--mu);margin-top:1px" id="pdet"></div></div>
+        <div class="pv" id="pval">—</div>
+      </div>
+      <button class="apply-btn" onclick="applyPly()">↓ Przenieś do kosztów materiału</button>
+    </div>
+  </div>
+
+  <!-- PROWIZJA I WYSYŁKA -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--a2)"></span> Prowizja i wysyłka</div>
+    <div class="f"><label>Portal sprzedaży</label><input type="text" id="portal" placeholder="np. Allegro, Etsy, OLX..."></div>
+    <div class="f">
+      <label>Prowizja portalu (%)</label>
+      <input type="number" id="comm" value="0" min="0" max="100" step=".1" placeholder="0">
+      <div class="hint-btns">
+        <button class="hbtn" onclick="sv('comm',0)">0%</button><button class="hbtn" onclick="sv('comm',5)">5%</button>
+        <button class="hbtn" onclick="sv('comm',8)">8%</button><button class="hbtn" onclick="sv('comm',9)">9%</button>
+        <button class="hbtn" onclick="sv('comm',10)">10%</button><button class="hbtn" onclick="sv('comm',11)">11%</button>
+        <button class="hbtn" onclick="sv('comm',15)">15%</button><button class="hbtn" onclick="sv('comm',17)">17%</button>
+      </div>
+    </div>
+    <div class="f">
+      <label>Koszt wysyłki (zł)</label>
+      <input type="number" id="ship" value="0" min="0" step=".01" placeholder="0.00">
+      <div class="hint-btns">
+        <button class="hbtn" onclick="sv('ship',0)">Darmowa</button><button class="hbtn" onclick="sv('ship',7.5)">7,50</button>
+        <button class="hbtn" onclick="sv('ship',9)">9,00</button><button class="hbtn" onclick="sv('ship',10.5)">10,50</button>
+        <button class="hbtn" onclick="sv('ship',12)">12,00</button><button class="hbtn" onclick="sv('ship',14)">14,00</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSAKCJA -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--ac)"></span> Nowa transakcja</div>
+    <div class="f"><label>Nazwa produktu</label><input type="text" id="name" placeholder="np. Ramka z grawerem, Pudełko..."></div>
+    <div class="r2">
+      <div class="f"><label>Cena sprzedaży (zł)</label><input type="number" id="price" placeholder="0.00" min="0" step=".01"></div>
+      <div class="f"><label>Koszt materiałów (zł)</label><input type="number" id="cost" placeholder="0.00" min="0" step=".01"></div>
+    </div>
+    <div class="r2">
+      <div class="f"><label>Inne koszty (zł)</label><input type="number" id="extra" placeholder="0.00" min="0" step=".01"></div>
+      <div class="f"><label>Data</label><input type="date" id="date"></div>
+    </div>
+
+    <!-- WYNIKI LIVE -->
+    <div style="margin-top:13px">
+      <div class="rb"><span class="rl">Przychód brutto</span><span class="rv" id="r-rev">—</span></div>
+      <div class="rb neg"><span class="rl">− Materiały</span><span class="rv" id="r-cost">—</span></div>
+      <div class="rb neg"><span class="rl">− Prowizja portalu</span><span class="rv" id="r-comm">—</span></div>
+      <div class="rb neg"><span class="rl">− Wysyłka</span><span class="rv" id="r-ship">—</span></div>
+      <div class="rb neg"><span class="rl">− Inne koszty</span><span class="rv" id="r-extra">—</span></div>
+      <div class="rb hl"><span class="rl">✦ Zysk brutto</span><span class="rv" id="r-profit">—</span></div>
+      <div class="rb"><span class="rl">Marża</span><span class="rv" id="r-margin">—</span></div>
+    </div>
+
+    <div class="bars" id="bars" style="display:none">
+      <div class="br"><span class="bl">Materiały</span><div class="bt"><div class="bf" id="b-cost" style="background:#ff5e5e"></div></div><span class="bv" id="bv-cost"></span></div>
+      <div class="br"><span class="bl">Prowizja</span><div class="bt"><div class="bf" id="b-comm" style="background:#f1c835"></div></div><span class="bv" id="bv-comm"></span></div>
+      <div class="br"><span class="bl">Wysyłka</span><div class="bt"><div class="bf" id="b-ship" style="background:#35c8f1"></div></div><span class="bv" id="bv-ship"></span></div>
+      <div class="br"><span class="bl">Inne</span><div class="bt"><div class="bf" id="b-extra" style="background:#ff9a35"></div></div><span class="bv" id="bv-extra"></span></div>
+      <div class="br"><span class="bl" style="color:var(--ac)">Zysk</span><div class="bt"><div class="bf" id="b-profit" style="background:#c8f135"></div></div><span class="bv" id="bv-profit" style="color:var(--ac)"></span></div>
+    </div>
+
+    <button class="btn btn-p" onclick="addEntry()">+ Zapisz transakcję</button>
+    <button class="btn btn-kpir" onclick="sendToKpir()">📒 Zapisz też do KPiR</button>
+    <button class="btn btn-g" onclick="clearForm()">Wyczyść</button>
+  </div>
+
+</div><!-- /LEWA -->
+
+<!-- ═══ PRAWA ═══ -->
+<div>
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('hist',this)">Historia</button>
+    <button class="tab" onclick="showTab('month',this)">Miesiące</button>
+    <button class="tab" onclick="showTab('sum',this)">Podsumowanie</button>
+    <button class="tab" onclick="showTab('ply',this)">Cennik sklejki</button>
+  </div>
+
+  <div id="tab-hist" class="tc active">
+    <div id="h-empty" class="empty"><div class="ic">📋</div>Brak transakcji.</div>
+    <div id="h-wrap" style="display:none;overflow-x:auto">
+      <table><thead><tr><th>Data</th><th>Produkt</th><th>Portal</th><th>Sklejka</th><th>Przychód</th><th>Koszty</th><th>Prowizja</th><th>Wysyłka</th><th>Zysk</th><th></th></tr></thead>
+      <tbody id="h-body"></tbody></table>
+    </div>
+  </div>
+
+  <div id="tab-month" class="tc">
+    <div class="mf" id="mf"></div>
+    <div id="m-empty" class="empty"><div class="ic">📅</div>Brak danych.</div>
+    <div id="m-wrap" style="display:none;overflow-x:auto">
+      <table><thead><tr><th>Miesiąc</th><th>Szt.</th><th>Przychód</th><th>Koszty</th><th>Prowizje</th><th>Wysyłka</th><th>Zysk</th><th>Marża</th></tr></thead>
+      <tbody id="m-body"></tbody></table>
+    </div>
+  </div>
+
+  <div id="tab-sum" class="tc">
+    <div id="s-empty" class="empty"><div class="ic">📊</div>Dodaj transakcje.</div>
+    <div id="s-wrap" style="display:none">
+      <div class="sgrid">
+        <div class="sc"><div class="sl">Łączny przychód</div><div class="sv" id="ss-rev"></div></div>
+        <div class="sc acc"><div class="sl">Łączny zysk brutto</div><div class="sv" id="ss-profit"></div></div>
+        <div class="sc"><div class="sl">Koszty materiałów</div><div class="sv" id="ss-cost"></div></div>
+        <div class="sc"><div class="sl">Prowizje</div><div class="sv" id="ss-comm"></div></div>
+        <div class="sc"><div class="sl">Wysyłka</div><div class="sv" id="ss-ship"></div></div>
+        <div class="sc"><div class="sl">Średnia marża</div><div class="sv" id="ss-marg"></div></div>
+      </div>
+      <div class="bars" style="display:block">
+        <div class="br"><span class="bl">Materiały</span><div class="bt"><div class="bf" id="sb-cost" style="background:#ff5e5e"></div></div><span class="bv" id="sbv-cost"></span></div>
+        <div class="br"><span class="bl">Prowizje</span><div class="bt"><div class="bf" id="sb-comm" style="background:#f1c835"></div></div><span class="bv" id="sbv-comm"></span></div>
+        <div class="br"><span class="bl">Wysyłka</span><div class="bt"><div class="bf" id="sb-ship" style="background:#35c8f1"></div></div><span class="bv" id="sbv-ship"></span></div>
+        <div class="br"><span class="bl" style="color:var(--ac)">Zysk</span><div class="bt"><div class="bf" id="sb-profit" style="background:#c8f135"></div></div><span class="bv" id="sbv-profit" style="color:var(--ac)"></span></div>
+      </div>
+      <button class="btn btn-g" onclick="exportCSV()" style="margin-top:8px;font-size:11px">⬇ Eksportuj CSV</button>
+    </div>
+  </div>
+
+  <div id="tab-ply" class="tc">
+    <p style="font-size:10px;color:var(--mu);margin-bottom:10px">Kliknij grubość → zmień cenę → Zapisz</p>
+    <table><thead><tr><th>Grubość</th><th>Cena/cm²</th><th>20×15cm</th><th>30×20cm</th></tr></thead>
+    <tbody id="pt-body"></tbody></table>
+  </div>
+</div>
+</div><!-- /PRAWA -->
+</div><!-- /WRAP -->
+
+<!-- MOBILE NAV -->
+<div class="mob-nav">
+  <button class="mob-tab active" onclick="window.location.href='kalkulator.html'"><span class="mi">⚙️</span>Kalkulator</button>
+  <button class="mob-tab" onclick="window.location.href='kpir.html'"><span class="mi">📒</span>KPiR</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════
+function lsG(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function lsS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+const DEF_PLY={3:.0037,4:.0049,5:.0062,6:.0075,7:.0088,8:.0100,9:.0115,10:.0130};
+let PP      = lsG('ls_pp',{...DEF_PLY});
+let entries = lsG('ls_ke',[]);
+let selMM=3, plyCost=0, aMonth='all';
+
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('date').value=today;
+
+const fz=v=>v.toLocaleString('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:2})+' zł';
+const f4=v=>v.toFixed(4).replace('.',',');
+const fp=v=>v.toFixed(1)+'%';
+
+function ind(msg,ok=true){const el=document.getElementById('save-ind');el.textContent=ok?'● zapisano':'● błąd';el.className='nav-save'+(ok?' ok':'');}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},2000);}
+function sv(id,v){document.getElementById(id).value=v;liveCalc();}
+
+// ═══ SKLEJKA ═══
+function buildBtns(){
+  document.getElementById('tbrow').innerHTML=Object.keys(PP).map(mm=>
+    `<button class="tb${parseInt(mm)===selMM?' active':''}" onclick="selMM=${mm};buildBtns();document.getElementById('ep').value=PP[${mm}];document.getElementById('ptip').textContent='Cena ${mm}mm: '+f4(PP[${mm}])+' zł/cm²';calcPly()">${mm}mm</button>`
+  ).join('');
+}
+function savePly(){
+  const v=parseFloat(document.getElementById('ep').value);
+  if(isNaN(v)||v<=0){alert('Wpisz poprawną cenę.');return;}
+  PP[selMM]=v; lsS('ls_pp',PP); ind('zapisano');
+  document.getElementById('ptip').textContent=`✓ Zapisano ${selMM}mm = ${f4(v)} zł/cm²`;
+  const b=document.getElementById('svb');b.classList.add('ok');b.textContent='✓';
+  setTimeout(()=>{b.classList.remove('ok');b.textContent='Zapisz';},2000);
+  renderPly();
+}
+function calcPly(){
+  const w=parseFloat(document.getElementById('pw').value)||0;
+  const h=parseFloat(document.getElementById('ph').value)||0;
+  const q=parseInt(document.getElementById('pq').value)||1;
+  const p=PP[selMM]||0;
+  if(!w||!h){document.getElementById('plyr').style.display='none';plyCost=0;return;}
+  const area=w*h; plyCost=area*p*q;
+  document.getElementById('plyr').style.display='flex';
+  document.getElementById('pval').textContent=fz(plyCost);
+  document.getElementById('pdet').textContent=`${w}×${h}cm=${area.toFixed(1)}cm² × ${f4(p)}zł × ${q}szt.`;
+}
+function applyPly(){
+  if(!plyCost){alert('Wpisz wymiary sklejki.');return;}
+  document.getElementById('cost').value=plyCost.toFixed(2);liveCalc();
+  const el=document.getElementById('cost');el.style.borderColor='var(--wo)';
+  setTimeout(()=>el.style.borderColor='',1400);
+}
+function renderPly(){
+  document.getElementById('pt-body').innerHTML=Object.entries(PP).map(([mm,p])=>{
+    const hi=parseInt(mm)===selMM?'style="color:var(--wo);font-weight:700"':'';
+    return`<tr ${hi}><td><span class="tag t2">${mm}mm</span></td><td>${f4(p)} zł</td><td>${fz(20*15*p)}</td><td>${fz(30*20*p)}</td></tr>`;
+  }).join('');
+}
+
+// ═══ KALKULATOR LIVE ═══
+function liveCalc(){
+  const price=parseFloat(document.getElementById('price').value)||0;
+  const cost =parseFloat(document.getElementById('cost').value)||0;
+  const comm =parseFloat(document.getElementById('comm').value)||0;
+  const ship =parseFloat(document.getElementById('ship').value)||0;
+  const extra=parseFloat(document.getElementById('extra').value)||0;
+  if(!price){
+    ['r-rev','r-cost','r-comm','r-ship','r-extra','r-profit','r-margin'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('bars').style.display='none';return;
+  }
+  const commAmt=price*(comm/100);
+  const profit=price-cost-commAmt-ship-extra;
+  const margin=(profit/price)*100;
+  document.getElementById('r-rev').textContent=fz(price);
+  document.getElementById('r-cost').textContent='− '+fz(cost);
+  document.getElementById('r-comm').textContent=`− ${fz(commAmt)} (${comm}%)`;
+  document.getElementById('r-ship').textContent='− '+fz(ship);
+  document.getElementById('r-extra').textContent='− '+fz(extra);
+  document.getElementById('r-profit').textContent=fz(profit);
+  document.getElementById('r-margin').textContent=fp(margin);
+  document.getElementById('r-profit').style.color=profit>=0?'var(--ac)':'var(--re)';
+  document.getElementById('bars').style.display='block';
+  const bar=(id,vid,val)=>{const w=Math.max(0,Math.min(100,(val/price)*100));document.getElementById(id).style.width=w+'%';document.getElementById(vid).textContent=fp(w);};
+  bar('b-cost','bv-cost',cost);bar('b-comm','bv-comm',commAmt);
+  bar('b-ship','bv-ship',ship);bar('b-extra','bv-extra',extra);
+  bar('b-profit','bv-profit',Math.max(0,profit));
+}
+function calcE(e){
+  const commAmt=e.price*(e.commission/100);
+  const profit=e.price-e.cost-commAmt-(e.shipCost||0)-(e.extra||0);
+  const margin=e.price>0?(profit/e.price)*100:0;
+  return{commAmt,profit,margin};
+}
+function addEntry(){
+  const price=parseFloat(document.getElementById('price').value);
+  if(!price||price<=0){alert('Wpisz cenę sprzedaży.');return;}
+  entries.unshift({
+    id:Date.now(),name:document.getElementById('name').value||'Bez nazwy',
+    price,cost:parseFloat(document.getElementById('cost').value)||0,
+    commission:parseFloat(document.getElementById('comm').value)||0,
+    shipCost:parseFloat(document.getElementById('ship').value)||0,
+    extra:parseFloat(document.getElementById('extra').value)||0,
+    portal:document.getElementById('portal').value||'—',
+    date:document.getElementById('date').value||today,
+    plyMM:selMM,plyW:parseFloat(document.getElementById('pw').value)||0,
+    plyH:parseFloat(document.getElementById('ph').value)||0,
+  });
+  lsS('ls_ke',entries);ind();renderAll();clearForm();toast('✔ Transakcja zapisana');
+}
+function sendToKpir(){
+  const price=parseFloat(document.getElementById('price').value);
+  if(!price||price<=0){alert('Wpisz cenę sprzedaży.');return;}
+  let bw=lsG('ls_bw',[]);
+  const ile=bw.filter(w=>w.typ==='P').length+1;
+  const rok=(document.getElementById('date').value||today).substring(0,4);
+  bw.push({id:Date.now()+1,typ:'P',
+    data:document.getElementById('date').value||today,
+    nr:`P/${rok}/${String(ile).padStart(3,'0')}`,
+    opis:`${document.getElementById('name').value||'Sprzedaż'} (${document.getElementById('portal').value||'sklep'})`,
+    kwota:price,kat:'Sprzedaż produktów',zrodlo:document.getElementById('portal').value||'Kalkulator',
+    platnosc:'',uwagi:'Z Kalkulatora'});
+  lsS('ls_bw',bw);toast('📒 Dodano do KPiR!');
+}
+function delEntry(id){if(!confirm('Usunąć?'))return;entries=entries.filter(e=>e.id!==id);lsS('ls_ke',entries);renderAll();}
+function clearForm(){
+  ['name','price','cost','extra','pw','ph'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pq').value='1';document.getElementById('comm').value='0';
+  document.getElementById('ship').value='0';document.getElementById('date').value=today;
+  plyCost=0;document.getElementById('plyr').style.display='none';liveCalc();
+}
+function showTab(n,el){
+  document.querySelectorAll('.tc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');el.classList.add('active');
+}
+
+// ═══ RENDER ═══
+function renderHist(){
+  const body=document.getElementById('h-body'),wrap=document.getElementById('h-wrap'),emp=document.getElementById('h-empty');
+  if(!entries.length){emp.style.display='block';wrap.style.display='none';return;}
+  emp.style.display='none';wrap.style.display='block';
+  body.innerHTML=entries.map(e=>{
+    const{commAmt,profit}=calcE(e);const cls=profit>=0?'pp':'pn';
+    const pi=(e.plyW&&e.plyH)?`<span class="tag t2">${e.plyW}×${e.plyH}cm ${e.plyMM}mm</span>`:'—';
+    return`<tr><td>${e.date}</td><td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</td>
+    <td><span class="tag t1">${e.portal}</span></td><td>${pi}</td>
+    <td>${fz(e.price)}</td><td>${fz(e.cost+(e.extra||0))}</td>
+    <td>${fz(commAmt)}</td><td>${fz(e.shipCost||0)}</td>
+    <td class="${cls}">${fz(profit)}</td>
+    <td><button class="delbtn" onclick="delEntry(${e.id})">✕</button></td></tr>`;
+  }).join('');
+}
+function renderMonth(){
+  const months={};
+  entries.forEach(e=>{const m=e.date.substring(0,7);if(!months[m])months[m]=[];months[m].push(e);});
+  const keys=Object.keys(months).sort().reverse();
+  const mf=document.getElementById('mf'),body=document.getElementById('m-body'),wrap=document.getElementById('m-wrap'),emp=document.getElementById('m-empty');
+  if(!keys.length){emp.style.display='block';wrap.style.display='none';mf.innerHTML='';return;}
+  emp.style.display='none';wrap.style.display='block';
+  mf.innerHTML=`<button class="mb ${aMonth==='all'?'active':''}" onclick="aMonth='all';renderAll()">Wszystkie</button>`+
+    keys.map(k=>{const[y,m]=k.split('-');const l=new Date(y,m-1).toLocaleDateString('pl-PL',{month:'short',year:'2-digit'});
+      return`<button class="mb ${aMonth===k?'active':''}" onclick="aMonth='${k}';renderAll()">${l}</button>`;}).join('');
+  const filtered=aMonth==='all'?keys:keys.filter(k=>k===aMonth);
+  body.innerHTML=filtered.map(k=>{
+    const arr=months[k];let rev=0,cost=0,comm=0,ship=0,extra=0,profit=0;
+    arr.forEach(e=>{const r=calcE(e);rev+=e.price;cost+=e.cost;extra+=e.extra||0;comm+=r.commAmt;ship+=e.shipCost||0;profit+=r.profit;});
+    const margin=rev>0?(profit/rev)*100:0;
+    const[y,m]=k.split('-');const l=new Date(y,m-1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
+    const cls=profit>=0?'pp':'pn';
+    return`<tr><td style="font-weight:700">${l}</td><td>${arr.length}</td><td>${fz(rev)}</td><td>${fz(cost+extra)}</td><td>${fz(comm)}</td><td>${fz(ship)}</td><td class="${cls}">${fz(profit)}</td><td class="${cls}">${fp(margin)}</td></tr>`;
+  }).join('');
+}
+function renderSum(){
+  const emp=document.getElementById('s-empty'),wrap=document.getElementById('s-wrap');
+  if(!entries.length){emp.style.display='block';wrap.style.display='none';return;}
+  emp.style.display='none';wrap.style.display='block';
+  let rev=0,cost=0,comm=0,ship=0,extra=0,profit=0;
+  entries.forEach(e=>{const r=calcE(e);rev+=e.price;cost+=e.cost;extra+=e.extra||0;comm+=r.commAmt;ship+=e.shipCost||0;profit+=r.profit;});
+  const margin=rev>0?(profit/rev)*100:0;
+  document.getElementById('ss-rev').textContent=fz(rev);
+  document.getElementById('ss-profit').textContent=fz(profit);document.getElementById('ss-profit').style.color=profit>=0?'var(--ac)':'var(--re)';
+  document.getElementById('ss-cost').textContent=fz(cost);
+  document.getElementById('ss-comm').textContent=fz(comm);
+  document.getElementById('ss-ship').textContent=fz(ship);
+  document.getElementById('ss-marg').textContent=fp(margin);
+  const bar=(id,vid,val)=>{const w=rev>0?Math.max(0,Math.min(100,(val/rev)*100)):0;document.getElementById(id).style.width=w+'%';document.getElementById(vid).textContent=fp(w);};
+  bar('sb-cost','sbv-cost',cost+extra);bar('sb-comm','sbv-comm',comm);bar('sb-ship','sbv-ship',ship);bar('sb-profit','sbv-profit',Math.max(0,profit));
+}
+function renderAll(){renderHist();renderMonth();renderSum();renderPly();}
+function exportCSV(){
+  const hdr=['Data','Produkt','Portal','Sklejka','Wymiary','Przychód','Koszt mat.','Inne','Prowizja%','Prowizja zł','Wysyłka','Zysk','Marża%'];
+  const rows=entries.map(e=>{const{commAmt,profit,margin}=calcE(e);const dim=(e.plyW&&e.plyH)?`${e.plyW}x${e.plyH}`:'';
+    return[e.date,e.name,e.portal,e.plyMM||'',dim,e.price,e.cost,e.extra||0,e.commission,commAmt.toFixed(2),e.shipCost||0,profit.toFixed(2),margin.toFixed(1)];});
+  const csv=[hdr,...rows].map(r=>r.join(';')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download='kalkulator.csv';a.click();
+}
+
+// BIND
+['price','cost','comm','ship','extra'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',liveCalc);el.addEventListener('change',liveCalc);
+});
+['pw','ph','pq'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',calcPly);el.addEventListener('change',calcPly);
+});
+
+// INIT
+buildBtns();
+document.getElementById('ep').value=PP[selMM];
+document.getElementById('ptip').textContent=`Cena ${selMM}mm: ${f4(PP[selMM])} zł/cm²`;
+renderAll();
+</script>
+</body>
+</html>
