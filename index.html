@@ -1111,7 +1111,6 @@
                      <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 mb-8">
                         <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Dodaj linki do zdjęć (Każdy w nowej linii)</label>
                         <div id="custom-orders-input-container" class="space-y-2">
-                             <input class="calc-input gallery-input" placeholder="Link do zdjęcia" oninput="window.addGalleryInput(this)">
                         </div>
                         <button onclick="saveCustomOrders()" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition mt-4">Zapisz Galerię</button>
                      </div>
@@ -2112,6 +2111,44 @@
 
         window.toggleMobileMenu = () => { document.getElementById('mobile-menu').classList.toggle('hidden'); };
 
+        // --- UPLOAD ZDJĘĆ Z DYSKU (ImgBB) ---
+        window.uploadImageToElement = async (targetInput, btnEl) => {
+            if (!siteData.imgbbKey) {
+                showToast('Brak klucza ImgBB! Wejdź w Edycja Treści → Klucz API ImgBB i zapisz go.', 'error');
+                window.switchAdminView('content'); return;
+            }
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file'; fileInput.accept = 'image/*';
+            fileInput.onchange = async () => {
+                const file = fileInput.files[0]; if (!file) return;
+                const origHTML = btnEl.innerHTML;
+                btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btnEl.disabled = true;
+                try {
+                    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
+                    const fd = new FormData(); fd.append('image', b64);
+                    const resp = await fetch('https://api.imgbb.com/1/upload?key=' + siteData.imgbbKey, { method: 'POST', body: fd });
+                    const data = await resp.json();
+                    if (data.success) { targetInput.value = data.data.url; targetInput.dispatchEvent(new Event('input')); showToast('Zdjęcie przesłane!'); }
+                    else { throw new Error(data.error?.message || 'Błąd ImgBB'); }
+                } catch(e) { showToast('Błąd przesyłania: ' + e.message, 'error'); }
+                btnEl.innerHTML = origHTML; btnEl.disabled = false;
+            };
+            fileInput.click();
+        };
+
+        window.appendGalleryRow = (container, value = '') => {
+            const row = document.createElement('div'); row.className = 'flex gap-2 items-center';
+            const inp = document.createElement('input');
+            inp.className = 'calc-input flex-1 gallery-input'; inp.placeholder = 'Link do zdjęcia'; inp.value = value;
+            inp.oninput = function() { window.addGalleryInput(this); };
+            const btn = document.createElement('button'); btn.type = 'button';
+            btn.className = 'shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition'; btn.title = 'Prześlij z dysku';
+            btn.innerHTML = '<i class="fa-solid fa-upload text-sm"></i>';
+            btn.onclick = () => window.uploadImageToElement(inp, btn);
+            row.appendChild(inp); row.appendChild(btn); container.appendChild(row);
+            return inp;
+        };
+
         const ADMIN_HASH = '9ed9315a7d8a5129f4e0dd1635ecc7bfe186a530446f1f2a104aeb155f637ed2';
         const ADMIN_SALT = 'xeomsc2025';
         window.handleLogin = async () => {
@@ -2605,7 +2642,10 @@
                 <h3 class="text-3xl font-bold mb-6">Karuzela Hero</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-stone-500">Dodaj nowy slajd</h4>
-                    <input id="new-hero-url" class="calc-input" placeholder="Link do zdjęcia lub wideo">
+                    <div class="flex gap-2 items-center">
+                        <input id="new-hero-url" class="calc-input flex-1" placeholder="Link do zdjęcia lub wideo (URL)">
+                        <button type="button" onclick="window.uploadImageToElement(document.getElementById('new-hero-url'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij zdjęcie z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                    </div>
                     <select id="new-hero-type" class="calc-input"><option value="image">Zdjęcie</option><option value="video">Wideo</option></select>
                     <button id="add-hero-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Dodaj</button>
                 </div>
@@ -2641,7 +2681,10 @@
                     <input type="hidden" id="edit-cat-id">
                     <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii">
                     <textarea id="cat-d" class="calc-input h-20 resize-none" placeholder="Krótki opis kategorii (opcjonalny)"></textarea>
-                    <input id="cat-i" class="calc-input" placeholder="Link do zdjęcia">
+                    <div class="flex gap-2 items-center">
+                        <input id="cat-i" class="calc-input flex-1" placeholder="Link do zdjęcia (URL)">
+                        <button type="button" onclick="window.uploadImageToElement(document.getElementById('cat-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                    </div>
                     <div class="flex gap-2">
                         <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
                         <button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
@@ -2805,7 +2848,10 @@
                     <select id="new-sub-cat-parent" class="calc-input text-white font-bold"><option value="">-- Wybierz Kategorię Główną --</option>${categoryOptions}</select>
                     <input id="sub-t" class="calc-input" placeholder="Nazwa Podkategorii">
                     <textarea id="sub-d" class="calc-input h-20 resize-none" placeholder="Krótki opis podkategorii (opcjonalny)"></textarea>
-                    <input id="sub-i" class="calc-input" placeholder="Link do zdjęcia podkategorii">
+                    <div class="flex gap-2 items-center">
+                        <input id="sub-i" class="calc-input flex-1" placeholder="Link do zdjęcia podkategorii (URL)">
+                        <button type="button" onclick="window.uploadImageToElement(document.getElementById('sub-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                    </div>
                     
                     <div class="flex gap-2">
                         <button id="add-sub-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition shadow-lg">Utwórz Podkategorię</button>
@@ -2910,14 +2956,18 @@
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
                     
                     <div>
-                        <input id="new-p-i" class="calc-input" placeholder="Miniatura (Główne zdjęcie)">
+                        <div class="flex gap-2 items-center">
+                            <input id="new-p-i" class="calc-input flex-1" placeholder="Miniatura — URL lub prześlij z dysku →">
+                            <button type="button" onclick="window.uploadImageToElement(document.getElementById('new-p-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                        </div>
                         <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
                     </div>
 
-                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2"><input class="calc-input gallery-input" placeholder="Link do zdjęcia" oninput="addGalleryInput(this)"></div></div>
+                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2"></div></div>
                     <button id="btn-add-prod" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-4">Dodaj Produkt</button>
                 </div>`;
-            
+            window.appendGalleryRow(document.getElementById('new-gallery-container'));
+
             document.getElementById('btn-add-prod').onclick = () => {
                 const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
                 const t = document.getElementById('new-p-t').value; 
@@ -2967,8 +3017,11 @@
         };
 
         window.addGalleryInput = (el) => {
-            if(el.value.trim() !== '' && el === el.parentElement.lastElementChild) {
-                const newInput = document.createElement('input'); newInput.className = "calc-input gallery-input animate-fade-in"; newInput.placeholder = "Link do zdjęcia"; newInput.oninput = function() { window.addGalleryInput(this); }; el.parentElement.appendChild(newInput);
+            const container = el.closest('.space-y-2');
+            if (!container) return;
+            const allInputs = container.querySelectorAll('.gallery-input');
+            if (el.value.trim() !== '' && el === allInputs[allInputs.length - 1]) {
+                window.appendGalleryRow(container);
             }
         };
 
@@ -2995,8 +3048,11 @@
                     <textarea id="edit-p-desc" class="calc-input h-24"></textarea>
                     
                     <div>
-                         <input id="edit-p-i" class="calc-input">
-                         <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
+                        <div class="flex gap-2 items-center">
+                            <input id="edit-p-i" class="calc-input flex-1">
+                            <button type="button" onclick="window.uploadImageToElement(document.getElementById('edit-p-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                        </div>
+                        <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
                     </div>
 
                     <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label><div id="edit-gallery-container" class="space-y-2"></div></div>
@@ -3070,8 +3126,8 @@
             document.getElementById('edit-p-t').value = product.title; document.getElementById('edit-p-code').value = product.code || ''; document.getElementById('edit-p-price').value = product.price || ''; document.getElementById('edit-p-desc').value = product.desc || ''; document.getElementById('edit-p-i').value = product.image;
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
             const currentGallery = siteData.galleries[prodId] ? siteData.galleries[prodId].images : [];
-            currentGallery.forEach(img => { const inp = document.createElement('input'); inp.className = "calc-input gallery-input"; inp.value = img.src; inp.oninput = function() { window.addGalleryInput(this); }; galContainer.appendChild(inp); });
-            const emptyInp = document.createElement('input'); emptyInp.className = "calc-input gallery-input"; emptyInp.placeholder = "Link do zdjęcia"; emptyInp.oninput = function() { window.addGalleryInput(this); }; galContainer.appendChild(emptyInp);
+            currentGallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
+            window.appendGalleryRow(galContainer);
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
@@ -3101,12 +3157,20 @@
             if (container) {
                 container.innerHTML = orders.map((url, i) => `<div class="relative group aspect-square rounded-xl overflow-hidden"><img src="${url}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"><button onclick="deleteCustomOrder(${i})" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">USUŃ</button></div></div>`).join('');
             }
+            const inputContainer = document.getElementById('custom-orders-input-container');
+            if (inputContainer && !inputContainer.querySelector('.gallery-input')) {
+                window.appendGalleryRow(inputContainer);
+            }
         }
         
         window.saveCustomOrders = () => {
             const inputs = document.querySelectorAll('#custom-orders-input-container .gallery-input'); let added = false;
-            inputs.forEach(inp => { if(inp.value.trim()) { if(!siteData.customOrders) siteData.customOrders = []; siteData.customOrders.push(inp.value.trim()); inp.value = ''; added = true; } });
-            if(added) { saveData(); renderCustomOrdersAdmin(); renderMain(); showToast('Dodano zdjęcia!'); }
+            inputs.forEach(inp => { if(inp.value.trim()) { if(!siteData.customOrders) siteData.customOrders = []; siteData.customOrders.push(inp.value.trim()); added = true; } });
+            if(added) {
+                const ic = document.getElementById('custom-orders-input-container');
+                if(ic) { ic.innerHTML = ''; window.appendGalleryRow(ic); }
+                saveData(); renderCustomOrdersAdmin(); renderMain(); showToast('Dodano zdjęcia!');
+            }
         };
 
         window.deleteCustomOrder = (index) => { window.openConfirm('Usunąć to zdjęcie?', () => { siteData.customOrders.splice(index, 1); saveData(); renderCustomOrdersAdmin(); renderMain(); }); };
