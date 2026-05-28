@@ -3057,132 +3057,188 @@
             }
         };
 
+        // Paleta kolorów kategorii
+        const _PL_COLORS = [
+            { bg:'rgba(59,130,246,.15)',  text:'#93c5fd', border:'rgba(59,130,246,.35)' },
+            { bg:'rgba(16,185,129,.15)',  text:'#6ee7b7', border:'rgba(16,185,129,.35)' },
+            { bg:'rgba(245,158,11,.15)', text:'#fcd34d', border:'rgba(245,158,11,.35)' },
+            { bg:'rgba(139,92,246,.15)', text:'#c4b5fd', border:'rgba(139,92,246,.35)' },
+            { bg:'rgba(239,68,68,.15)',  text:'#fca5a5', border:'rgba(239,68,68,.35)'  },
+            { bg:'rgba(6,182,212,.15)',  text:'#67e8f9', border:'rgba(6,182,212,.35)'  },
+        ];
+
+        window._plBuild = () => {
+            const cats = siteData.categories || {};
+            const catKeys = Object.keys(cats).sort((a,b) => (cats[a].order||0)-(cats[b].order||0));
+            const colorMap = {};
+            catKeys.forEach((k,i) => { colorMap[k] = _PL_COLORS[i % _PL_COLORS.length]; });
+            const all = [];
+            catKeys.forEach(ck => {
+                const cat = cats[ck];
+                Object.keys(cat.subs||{}).forEach(sk => {
+                    (cat.subs[sk].products||[]).forEach((p,idx) => {
+                        all.push({ p, ck, sk, idx, catTitle: cat.title, subTitle: cat.subs[sk].title, color: colorMap[ck] });
+                    });
+                });
+            });
+            window._plAll = all; window._plColorMap = colorMap; window._plCats = cats; window._plCatKeys = catKeys;
+            return { cats, catKeys, all, colorMap };
+        };
+
+        window._plRows = (products) => {
+            if(!products.length) return '<p class="text-stone-500 italic py-10 text-center">Brak produktów.</p>';
+            return products.map(({p, ck, sk, idx, catTitle, subTitle, color}) => `
+                <div class="flex items-center gap-3 p-3 rounded-2xl bg-stone-800/60 border border-white/5 hover:border-white/15 transition group">
+                    <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-stone-700 flex items-center justify-center">
+                        ${p.image ? `<img src="${escapeHTML(p.image)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-image text-stone-500\\'></i>'">` : '<i class="fa-solid fa-image text-stone-500"></i>'}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="font-semibold text-white text-sm">${escapeHTML(p.title)}</span>
+                            ${p.isHidden ? '<span class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold shrink-0">UKRYTY</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[11px] px-2 py-0.5 rounded-full font-bold border shrink-0" style="background:${color.bg};color:${color.text};border-color:${color.border}">${escapeHTML(catTitle)}</span>
+                            <span class="text-[11px] text-stone-400 shrink-0">› ${escapeHTML(subTitle)}</span>
+                            ${p.code ? `<span class="text-[11px] text-stone-500 font-mono shrink-0">${escapeHTML(p.code)}</span>` : ''}
+                            ${p.price && p.price !== 'Do ustalenia' ? `<span class="text-[11px] text-emerald-400 font-semibold shrink-0">${escapeHTML(p.price)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex gap-1.5 shrink-0">
+                        <button onclick="window.plToggle('${ck}','${sk}',${idx})" title="${p.isHidden?'Pokaż':'Ukryj'}" class="w-8 h-8 rounded-lg flex items-center justify-center transition ${p.isHidden ? 'bg-green-600/20 hover:bg-green-600/40 text-green-400' : 'bg-stone-600/40 hover:bg-stone-500/60 text-stone-400'}"><i class="fa-regular ${p.isHidden?'fa-eye':'fa-eye-slash'} text-xs"></i></button>
+                        <button onclick="window.plEdit('${ck}','${sk}',${idx})" title="Edytuj" class="w-8 h-8 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="window.plDel('${ck}','${sk}',${idx})" title="Usuń" class="w-8 h-8 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                </div>`).join('');
+        };
+
         window.renderProductListView = () => {
             const container = document.getElementById('view-product-list');
-            const cats = siteData.categories || {};
-            const categoryOptions = Object.keys(cats).map(k => `<option value="${k}">${cats[k].title}</option>`).join('');
+            const { cats, catKeys, all, colorMap } = window._plBuild();
+            window._plActiveCat = null; window._plActiveSub = null;
+
+            const pills = `
+                <button id="pill-all" onclick="window.plFilter(null,null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border border-white/20 bg-white/10 text-white transition" style="outline:2px solid white">Wszystkie <span class="opacity-60">(${all.length})</span></button>
+                ${catKeys.filter(ck=>!cats[ck].isHidden).map(ck => {
+                    const c = colorMap[ck];
+                    const cnt = Object.values(cats[ck].subs||{}).reduce((s,sub)=>s+(sub.products?.length||0),0);
+                    return `<button data-pcat="${ck}" onclick="window.plFilter('${ck}',null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border transition" style="background:${c.bg};color:${c.text};border-color:${c.border}">${escapeHTML(cats[ck].title)} <span class="opacity-60">(${cnt})</span></button>`;
+                }).join('')}`;
+
             container.innerHTML = `
-                <h3 class="text-3xl font-bold mb-6">Lista Produktów</h3>
-                <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                      <select id="list-cat-select" class="calc-input" onchange="window.onSelectListCategory()"><option value="">-- Wybierz Kategorię --</option>${categoryOptions}</select>
-                      <select id="list-sub-select" class="calc-input hidden" onchange="window.onSelectListSubcategory()"><option value="">-- Wybierz Podkategorię --</option></select>
-                      <select id="list-prod-select" class="calc-input hidden" onchange="window.onSelectListProduct()"><option value="">-- Wybierz Produkt --</option></select>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-3xl font-bold">Lista Produktów</h3>
+                    <span class="text-stone-500 text-sm">${all.length} produktów łącznie</span>
                 </div>
-                <div id="list-actions" class="hidden flex gap-2 mb-6">
-                    <button id="btn-toggle-hide" onclick="window.toggleHideProduct()" class="bg-stone-600 hover:bg-stone-500 px-6 py-2 rounded-lg font-bold transition">Ukryj</button>
-                    <button onclick="window.editProductFromList()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold transition">Edytuj</button>
-                    <button onclick="window.deleteProductFromList()" class="bg-red-600 hover:bg-red-500 px-6 py-2 rounded-lg font-bold transition">Usuń</button>
+                <div class="flex flex-wrap gap-2 mb-3" id="pl-pills">${pills}</div>
+                <div id="pl-sub-bar" class="hidden mb-4">
+                    <select id="pl-sub-sel" class="calc-input" onchange="window.plFilter(window._plActiveCat, this.value||null)">
+                        <option value="">Wszystkie podkategorie</option>
+                    </select>
                 </div>
-                <div id="list-edit-form" class="hidden bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
+                <div id="pl-rows" class="space-y-2 mb-8">${window._plRows(all)}</div>
+                <div id="list-edit-form" class="hidden mt-4 bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
                     <h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4>
-                    <input id="edit-p-t" class="calc-input">
-                    <div class="grid grid-cols-2 gap-4"><input id="edit-p-code" class="calc-input"><input id="edit-p-price" class="calc-input"></div>
-                    <textarea id="edit-p-desc" class="calc-input h-24"></textarea>
-                    
+                    <input id="edit-p-t" class="calc-input" placeholder="Nazwa produktu">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="edit-p-code" class="calc-input" placeholder="Kod produktu">
+                        <input id="edit-p-price" class="calc-input" placeholder="Cena">
+                    </div>
+                    <textarea id="edit-p-desc" class="calc-input h-24" placeholder="Opis produktu"></textarea>
                     <div>
                         <div class="flex gap-2 items-center">
-                            <input id="edit-p-i" class="calc-input flex-1">
-                            <button type="button" onclick="window.uploadImageToElement(document.getElementById('edit-p-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                            <input id="edit-p-i" class="calc-input flex-1" placeholder="URL zdjęcia głównego">
+                            <button type="button" onclick="window.uploadImageToElement(document.getElementById('edit-p-i'),this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
                         </div>
-                        <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
+                        <p class="text-[10px] text-stone-500 mt-1 italic">Jeśli puste – użyte zostanie pierwsze zdjęcie galerii.</p>
                     </div>
-
-                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label><div id="edit-gallery-container" class="space-y-2"></div></div>
-                    <button onclick="window.saveEditedProduct()" class="bg-green-600 hover:bg-green-500 w-full py-4 rounded-xl font-bold transition">Zapisz Zmiany</button>
+                    <div class="pt-4 border-t border-white/5">
+                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label>
+                        <div id="edit-gallery-container" class="space-y-2"></div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="window.plSaveEdit()" class="bg-green-600 hover:bg-green-500 flex-1 py-3 rounded-xl font-bold transition">Zapisz Zmiany</button>
+                        <button onclick="document.getElementById('list-edit-form').classList.add('hidden')" class="bg-stone-600 hover:bg-stone-500 px-6 py-3 rounded-xl font-bold transition">Anuluj</button>
+                    </div>
                 </div>`;
         };
 
-        window.onSelectListCategory = () => {
-            const catId = document.getElementById('list-cat-select').value; window.selectedListCatId = catId; window.selectedListSubId = null;
-            const subSelect = document.getElementById('list-sub-select'); const prodSelect = document.getElementById('list-prod-select');
-            subSelect.classList.add('hidden'); prodSelect.classList.add('hidden'); document.getElementById('list-actions').classList.add('hidden'); document.getElementById('list-edit-form').classList.add('hidden');
-            if(catId && siteData.categories[catId].subs) {
-                subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
-                const subs = siteData.categories[catId].subs;
-                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
-                Object.keys(subs)
-                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
-                    .forEach(sid => { 
-                        const opt = document.createElement('option'); 
-                        opt.value = sid; 
-                        // DODANO LICZNIK PRODUKTÓW
-                        const count = subs[sid].products ? subs[sid].products.length : 0;
-                        opt.text = `${subs[sid].title} (${count})`; 
-                        subSelect.appendChild(opt); 
-                    });
-                subSelect.classList.remove('hidden');
-            }
+        window.plFilter = (catId, subId) => {
+            window._plActiveCat = catId; window._plActiveSub = subId;
+            let filtered = window._plAll || [];
+            // Aktualizuj styl przycisków
+            document.querySelectorAll('.prod-pill').forEach(el => { el.style.outline = 'none'; });
+            const ap = catId ? document.querySelector(`[data-pcat="${catId}"]`) : document.getElementById('pill-all');
+            if(ap) ap.style.outline = '2px solid white';
+            // Filtr podkategorii
+            const subBar = document.getElementById('pl-sub-bar');
+            const subSel = document.getElementById('pl-sub-sel');
+            if(catId && subBar && subSel) {
+                filtered = filtered.filter(x => x.ck === catId);
+                const subs = siteData.categories[catId]?.subs || {};
+                subSel.innerHTML = '<option value="">Wszystkie podkategorie</option>' +
+                    Object.keys(subs).sort((a,b) => subs[a].title.localeCompare(subs[b].title,'pl'))
+                    .map(sk => `<option value="${sk}"${sk===subId?' selected':''}>${escapeHTML(subs[sk].title)} (${subs[sk].products?.length||0})</option>`).join('');
+                subBar.classList.remove('hidden');
+                if(subId) filtered = filtered.filter(x => x.sk === subId);
+            } else if(subBar) { subBar.classList.add('hidden'); }
+            const rows = document.getElementById('pl-rows');
+            if(rows) rows.innerHTML = window._plRows(filtered);
         };
 
-        window.onSelectListSubcategory = () => {
-            const catId = window.selectedListCatId; const subId = document.getElementById('list-sub-select').value; window.selectedListSubId = subId;
-            const prodSelect = document.getElementById('list-prod-select'); prodSelect.classList.add('hidden'); document.getElementById('list-actions').classList.add('hidden'); document.getElementById('list-edit-form').classList.add('hidden');
-            if(subId && siteData.categories[catId].subs[subId].products) {
-                prodSelect.innerHTML = '<option value="">-- Wybierz Produkt --</option>';
-                const products = siteData.categories[catId].subs[subId].products;
-                products.forEach((p, index) => { const opt = document.createElement('option'); opt.value = index; opt.text = `${p.title} ${p.isHidden ? '(UKRYTY)' : ''}`; prodSelect.appendChild(opt); });
-                prodSelect.classList.remove('hidden');
-            }
+        window.plToggle = (ck, sk, idx) => {
+            const p = siteData.categories[ck].subs[sk].products[idx];
+            p.isHidden = !p.isHidden; saveData();
+            window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
         };
 
-        window.onSelectListProduct = () => {
-            const index = document.getElementById('list-prod-select').value; window.selectedListProdIndex = index;
-            const actions = document.getElementById('list-actions'); const editForm = document.getElementById('list-edit-form');
-            actions.classList.add('hidden'); editForm.classList.add('hidden');
-            if (index === "") return;
-            const product = siteData.categories[window.selectedListCatId].subs[window.selectedListSubId].products[index];
-            const btnHide = document.getElementById('btn-toggle-hide');
-            if(product.isHidden) { btnHide.innerHTML = '<i class="fa-regular fa-eye"></i> Pokaż'; btnHide.classList.replace('bg-stone-600', 'bg-green-600'); } 
-            else { btnHide.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Ukryj'; btnHide.classList.replace('bg-green-600', 'bg-stone-600'); }
-            actions.classList.remove('hidden');
-        };
-
-        window.toggleHideProduct = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index];
-            product.isHidden = !product.isHidden; saveData();
-            const prodSelect = document.getElementById('list-prod-select'); prodSelect.options[prodSelect.selectedIndex].text = `${product.title} ${product.isHidden ? '(UKRYTY)' : ''}`; window.onSelectListProduct();
-        };
-
-        window.deleteProductFromList = () => {
-            window.openConfirm("Czy na pewno chcesz usunąć ten produkt?", () => {
-                const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-                siteData.categories[catId].subs[subId].products.splice(index, 1);
-                saveData(); window.onSelectListSubcategory(); 
-            });
-        };
-
-        window.editProductFromList = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index]; const form = document.getElementById('list-edit-form'); const prodId = product.id;
-            document.getElementById('edit-p-t').value = product.title; document.getElementById('edit-p-code').value = product.code || ''; document.getElementById('edit-p-price').value = product.price || ''; document.getElementById('edit-p-desc').value = product.desc || ''; document.getElementById('edit-p-i').value = product.image;
+        window.plEdit = (ck, sk, idx) => {
+            window._plEditCk = ck; window._plEditSk = sk; window._plEditIdx = idx;
+            const p = siteData.categories[ck].subs[sk].products[idx];
+            const form = document.getElementById('list-edit-form');
+            document.getElementById('edit-p-t').value = p.title || '';
+            document.getElementById('edit-p-code').value = p.code || '';
+            document.getElementById('edit-p-price').value = p.price || '';
+            document.getElementById('edit-p-desc').value = p.desc || '';
+            document.getElementById('edit-p-i').value = p.image || '';
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
-            const currentGallery = siteData.galleries[prodId] ? siteData.galleries[prodId].images : [];
-            currentGallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
+            const gallery = siteData.galleries?.[p.id]?.images || [];
+            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
             window.appendGalleryRow(galContainer);
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
-        window.saveEditedProduct = () => {
-            const catId = window.selectedListCatId; const subId = window.selectedListSubId; const index = window.selectedListProdIndex;
-            const product = siteData.categories[catId].subs[subId].products[index]; const prodId = product.id;
-            product.title = document.getElementById('edit-p-t').value; product.code = document.getElementById('edit-p-code').value; product.price = document.getElementById('edit-p-price').value; product.desc = document.getElementById('edit-p-desc').value; 
-            
-            let img = document.getElementById('edit-p-i').value.trim(); // Trim added
-
-            const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
-            const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
-            
-            // --- AUTO-MINIATURA FIX W EDYCJI ---
-            if (!img && galleryImages.length > 0) {
-                img = galleryImages[0].src;
-            }
-            product.image = img;
-
-            siteData.galleries[prodId] = { images: galleryImages };
-            saveData(); showToast("Zapisano zmiany!"); document.getElementById('list-edit-form').classList.add('hidden');
-            const prodSelect = document.getElementById('list-prod-select'); prodSelect.options[prodSelect.selectedIndex].text = `${product.title} ${product.isHidden ? '(UKRYTY)' : ''}`;
+        window.plDel = (ck, sk, idx) => {
+            window.openConfirm("Usunąć ten produkt?", () => {
+                siteData.categories[ck].subs[sk].products.splice(idx, 1);
+                saveData(); window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
+            });
         };
+
+        window.plSaveEdit = () => {
+            const ck = window._plEditCk; const sk = window._plEditSk; const idx = window._plEditIdx;
+            if(ck === undefined) return;
+            const p = siteData.categories[ck].subs[sk].products[idx];
+            p.title = document.getElementById('edit-p-t').value;
+            p.code = document.getElementById('edit-p-code').value;
+            p.price = document.getElementById('edit-p-price').value;
+            p.desc = document.getElementById('edit-p-desc').value;
+            let img = document.getElementById('edit-p-i').value.trim();
+            const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
+            const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryImages.push({ src: inp.value.trim() }); });
+            if(!img && galleryImages.length > 0) img = galleryImages[0].src;
+            p.image = img;
+            siteData.galleries[p.id] = { images: galleryImages };
+            saveData(); showToast("Zapisano zmiany!");
+            document.getElementById('list-edit-form').classList.add('hidden');
+            window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
+        };
+
+        // Zachowane dla kompatybilności wstecznej
+        window.saveEditedProduct = window.plSaveEdit;
+        window.editProductFromList = () => {};
+        window.deleteProductFromList = () => {};
+        window.toggleHideProduct = () => {};
 
         function renderCustomOrdersAdmin() {
             const container = document.getElementById('admin-custom-orders-list'); const orders = siteData.customOrders || [];
