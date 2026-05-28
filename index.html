@@ -1754,8 +1754,16 @@
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
                 // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
+                const catHasProducts = (c) => {
+                    const subs = c.subs || {};
+                    return Object.values(subs).some(sub => {
+                        const prods = sub.products;
+                        return Array.isArray(prods) ? prods.length > 0 : (prods && Object.keys(prods).length > 0);
+                    });
+                };
+                const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
-                    .filter(([, c]) => !c.isHidden)
+                    .filter(([, c]) => !c.isHidden && (isAdmin || catHasProducts(c)))
                     .sort(([, a], [, b]) => {
                         const orderA = a.order !== undefined ? a.order : 9999;
                         const orderB = b.order !== undefined ? b.order : 9999;
