@@ -1602,7 +1602,10 @@
             if (!container || !siteData.heroItems) return;
             container.innerHTML = siteData.heroItems.map((it, idx) => `
                 <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-                    ${it.type === 'image' ? `<img src="${it.url}" class="w-full h-full object-contain object-center">` : `<video src="${it.url}" class="w-full h-full object-contain object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
+                    ${it.type === 'image'
+                        ? `<img src="${it.url}" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60">
+                           <img src="${it.url}" class="absolute inset-0 w-full h-full object-contain object-center">`
+                        : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
                 </div>`).join('');
             
             let cur = 0; const slides = document.querySelectorAll('.hero-slide');
