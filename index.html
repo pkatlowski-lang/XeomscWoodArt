@@ -16,9 +16,12 @@
     <meta property="og:title" content="Xeomsc Laser Studio – Precyzyjne Wyroby z Drewna">
     <meta property="og:description" content="Unikalne wyroby z drewna i sklejki – napisy, pudełka, dekoracje, gadżety reklamowe. Realizujemy zamówienia z całej Polski.">
     <meta property="og:site_name" content="Xeomsc Laser Studio">
+    <meta property="og:image" content="">
+    <meta property="og:url" content="">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Xeomsc Laser Studio">
     <meta name="twitter:description" content="Precyzyjne wyroby z drewna i sklejki wycinane laserem. Napisy, pudełka, dekoracje.">
+    <meta name="twitter:image" content="">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1647,6 +1650,104 @@
             });
         }
 
+        // ================================================================
+        // SEO ENGINE – dynamiczne meta tagi, JSON-LD, hash routing
+        // ================================================================
+        const _SEO_SITE  = 'Xeomsc Laser Studio';
+        const _SEO_BASE_DESC = 'Xeomsc Laser Studio – precyzyjne wyroby z drewna i sklejki wycinane laserem diodowym. Napisy, litery, tabliczki, pudełka, dekoracje i gadżety firmowe. Zamówienia z całej Polski.';
+        const _SEO_BASE_KW   = 'wyroby z drewna, cięcie laserowe sklejka, laser diodowy, napisy drewniane, personalizowane prezenty drewniane, wyroby laserowe Polska';
+
+        const _SEO_CATS = {
+            'c1779049201392': { kw: 'tabliczka drewniana na drzwi, dekoracja ścienna z drewna, tabliczki laserowe sklejka, tabliczki personalizowane, ozdoba drewniana na ścianę' },
+            'c1779049189874': { kw: 'drewniane litery dekoracyjne, napis imienny drewniany, cyfry drewniane dekoracja, litery na ścianę sklejka, napisy weselne drewno, litery skryptowe laser' },
+            'c1779049220331': { kw: 'dekoracje świąteczne z drewna, ozdoby bożonarodzeniowe sklejka, drewniany stroik laser, świąteczne wyroby laserowe, ozdoby na choinkę drewniane' },
+            'c1779049213180': { kw: 'drewniane pudełko na prezent, szkatułka drewniana personalizowana, pudełko laser sklejka, drewniane opakowanie na biżuterię, kasetka z drewna zamówienie' },
+            'c1779049237463': { kw: 'personalizowane wyroby drewniane na zamówienie, grawerowanie własny projekt, indywidualne wyroby laserowe, laser diodowy zamówienie, własny wzór z drewna' },
+            'c1779049228711': { kw: 'gadżety firmowe z drewna, grawerowanie logo firmy laser, upominki firmowe drewniane, reklama laserowa sklejka, nagrody trofea drewniane, gadżety reklamowe laser' }
+        };
+
+        function _seoEl(selector, attrKey, attrVal) {
+            let el = document.querySelector(selector);
+            if (!el) {
+                el = document.createElement('meta');
+                const m = selector.match(/\[([^=]+)="([^"]+)"\]/);
+                if (m) el.setAttribute(m[1], m[2]);
+                document.head.appendChild(el);
+            }
+            el.setAttribute(attrKey, attrVal);
+        }
+
+        function _seoBreadcrumb(items) {
+            return {
+                '@type': 'BreadcrumbList',
+                'itemListElement': items.map((it, i) => ({
+                    '@type': 'ListItem', 'position': i + 1,
+                    'name': it.name,
+                    'item': window.location.origin + window.location.pathname + (it.hash ? '#' + it.hash : '')
+                }))
+            };
+        }
+
+        window.updateSEO = ({ title, desc, kw, image, breadcrumbs, product } = {}) => {
+            const fullTitle = title ? `${title} – ${_SEO_SITE}` : `${_SEO_SITE} – Wyroby z Drewna i Sklejki`;
+            const metaDesc  = (desc || _SEO_BASE_DESC).slice(0, 160);
+            const metaKw    = [kw, _SEO_BASE_KW].filter(Boolean).join(', ');
+            const metaImg   = image || '';
+
+            document.title = fullTitle;
+            _seoEl('meta[name="description"]',           'content', metaDesc);
+            _seoEl('meta[name="keywords"]',              'content', metaKw);
+            _seoEl('meta[property="og:title"]',          'content', fullTitle);
+            _seoEl('meta[property="og:description"]',    'content', metaDesc);
+            _seoEl('meta[property="og:image"]',          'content', metaImg);
+            _seoEl('meta[property="og:url"]',            'content', window.location.href);
+            _seoEl('meta[name="twitter:title"]',         'content', fullTitle);
+            _seoEl('meta[name="twitter:description"]',   'content', metaDesc);
+            _seoEl('meta[name="twitter:image"]',         'content', metaImg);
+
+            let canon = document.querySelector('link[rel="canonical"]');
+            if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon); }
+            canon.href = window.location.href;
+
+            let ld = document.getElementById('jsonld-main');
+            if (!ld) { ld = document.createElement('script'); ld.type = 'application/ld+json'; ld.id = 'jsonld-main'; document.head.appendChild(ld); }
+
+            const bc = breadcrumbs ? _seoBreadcrumb(breadcrumbs) : null;
+
+            if (product) {
+                const priceVal = (product.price && product.price !== 'Do ustalenia') ? String(product.price).replace(/[^\d.,]/g,'') : null;
+                ld.textContent = JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    'name': product.title,
+                    'description': product.desc || metaDesc,
+                    'image': product.image || undefined,
+                    'sku': product.code || undefined,
+                    'brand': { '@type': 'Brand', 'name': _SEO_SITE },
+                    'offers': {
+                        '@type': 'Offer',
+                        'priceCurrency': 'PLN',
+                        'price': priceVal || undefined,
+                        'priceValidUntil': new Date(Date.now() + 365*24*3600*1000).toISOString().split('T')[0],
+                        'availability': 'https://schema.org/InStock',
+                        'seller': { '@type': 'Organization', 'name': _SEO_SITE }
+                    },
+                    'breadcrumb': bc || undefined
+                });
+            } else {
+                ld.textContent = JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@graph': [
+                        { '@type': 'Organization', 'name': _SEO_SITE, 'description': _SEO_BASE_DESC, 'url': window.location.origin },
+                        bc || null
+                    ].filter(Boolean)
+                });
+            }
+        };
+
+        // Inicjalizacja SEO dla strony głównej
+        window.updateSEO({});
+
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (grid) {
@@ -1713,9 +1814,21 @@
             selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
 
             const cat = siteData.categories[id]; if(!cat) return;
-            
+
             // Zapisz aktywną kategorię
             window.activeMainCatId = id;
+
+            // SEO
+            const _cs = _SEO_CATS[id] || {};
+            const _catImg = cat.image || _productImgsFromCat(cat)[0] || '';
+            window.updateSEO({
+                title: cat.title,
+                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. Precyzyjne cięcie laserowe, personalizacja. ${_SEO_SITE}.`).slice(0,160),
+                kw: _cs.kw,
+                image: _catImg,
+                breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
+            });
+            history.replaceState(null, '', '#kat/' + id);
 
             const container = document.getElementById('sub-categories-container');
             const title = document.getElementById('selected-cat-title');
@@ -1826,6 +1939,22 @@
             window.currentCatId = catId;
             window.currentSubId = subId;
 
+            // SEO
+            const _cs2 = _SEO_CATS[catId] || {};
+            const _subImg = sub.image || _productImgsFromSub(sub)[0] || cat.image || '';
+            window.updateSEO({
+                title: `${sub.title} – ${cat.title}`,
+                desc: (sub.desc || `${sub.title} – ${cat.title}. Drewniane wyroby laserowe z naturalnej sklejki brzozowej. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs2.kw, sub.title, cat.title].filter(Boolean).join(', '),
+                image: _subImg,
+                breadcrumbs: [
+                    { name: 'Strona główna', hash: '' },
+                    { name: cat.title, hash: 'kat/' + catId },
+                    { name: sub.title }
+                ]
+            });
+            history.replaceState(null, '', '#sub/' + catId + '/' + subId);
+
             if(grid) {
                 grid.innerHTML = '';
                 const products = sub.products || [];
@@ -1901,8 +2030,27 @@
                 });
             } else { thumbsContainer.innerHTML = '<span class="text-xs text-stone-400">Brak dodatkowych zdjęć.</span>'; }
             document.getElementById('subcategory-view').classList.add('hidden');
-            document.getElementById('gallery-view').classList.remove('hidden'); 
+            document.getElementById('gallery-view').classList.remove('hidden');
             window.scrollTo(0,0);
+
+            // SEO – Product schema
+            const _catSeo = siteData.categories[catId];
+            const _subSeo = _catSeo?.subs?.[subId];
+            const _cs3 = _SEO_CATS[catId] || {};
+            window.updateSEO({
+                title: product.title,
+                desc: (product.desc || `${product.title}. Wyrób z naturalnej sklejki brzozowej, wycinany laserem diodowym. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs3.kw, product.title, _catSeo?.title, _subSeo?.title].filter(Boolean).join(', '),
+                image: product.image || '',
+                product,
+                breadcrumbs: [
+                    { name: 'Strona główna', hash: '' },
+                    { name: _catSeo?.title || '', hash: 'kat/' + catId },
+                    { name: _subSeo?.title || '', hash: 'sub/' + catId + '/' + subId },
+                    { name: product.title }
+                ]
+            });
+            history.replaceState(null, '', '#prod/' + catId + '/' + subId + '/' + prodIndex);
         };
 
         window.updateMainImage = (index) => {
@@ -3481,6 +3629,22 @@
 
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero(); renderMain(); renderTexts(); start();
+
+        // Przywróć widok z URL hash (np. po udostępnieniu linku)
+        (function restoreFromHash() {
+            const h = window.location.hash.replace('#','');
+            if (!h || h === 'admin') return;
+            const parts = h.split('/');
+            try {
+                if (parts[0] === 'prod' && parts[1] && parts[2] && parts[3] !== undefined) {
+                    window.openGallery(parts[1], parts[2], parseInt(parts[3]));
+                } else if (parts[0] === 'sub' && parts[1] && parts[2]) {
+                    window.openSubcategoryView(parts[1], parts[2]);
+                } else if (parts[0] === 'kat' && parts[1]) {
+                    window.selectMainCategory(parts[1]);
+                }
+            } catch(e) { console.warn('SEO hash restore error', e); }
+        })();
     </script>
 </body>
 </html>
