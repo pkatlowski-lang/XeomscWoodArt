@@ -1110,14 +1110,32 @@
                  <div id="view-products" class="admin-view hidden space-y-8"></div>
                  <div id="view-product-list" class="admin-view hidden space-y-8"></div>
                  <div id="view-custom-orders" class="admin-view hidden space-y-8">
-                     <h3 class="text-3xl font-bold mb-6">Galeria Zleceń (Strona Główna)</h3>
-                     <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 mb-8">
-                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Dodaj linki do zdjęć (Każdy w nowej linii)</label>
-                        <div id="custom-orders-input-container" class="space-y-2">
-                        </div>
-                        <button onclick="saveCustomOrders()" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition mt-4">Zapisz Galerię</button>
+                     <h3 class="text-3xl font-bold mb-6">Galeria Zrealizowanych Zleceń</h3>
+
+                     <!-- UPLOAD Z DYSKU -->
+                     <div class="bg-stone-800 p-6 rounded-3xl border border-white/5">
+                         <label class="block text-xs font-bold text-stone-500 uppercase mb-4">Dodaj zdjęcia z dysku</label>
+                         <div id="orders-drop-zone" onclick="document.getElementById('orders-file-input').click()" class="border-2 border-dashed border-wood-600/50 hover:border-wood-500 rounded-2xl p-10 text-center cursor-pointer transition group">
+                             <i class="fa-solid fa-cloud-arrow-up text-4xl text-wood-500 mb-3 block group-hover:scale-110 transition"></i>
+                             <p class="text-white font-semibold text-lg">Kliknij lub przeciągnij zdjęcia tutaj</p>
+                             <p class="text-stone-400 text-sm mt-1">Możesz wybrać wiele plików naraz (JPG, PNG, WEBP)</p>
+                             <input id="orders-file-input" type="file" accept="image/*" multiple class="hidden">
+                         </div>
+                         <div id="orders-upload-progress" class="hidden mt-4 space-y-2"></div>
                      </div>
-                     <div id="admin-custom-orders-list" class="grid grid-cols-4 gap-4"></div>
+
+                     <!-- LUB PRZEZ LINK -->
+                     <div class="bg-stone-800 p-6 rounded-3xl border border-white/5">
+                         <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Lub wklej link do zdjęcia</label>
+                         <div id="custom-orders-input-container" class="space-y-2"></div>
+                         <button onclick="saveCustomOrders()" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition mt-4">Zapisz link</button>
+                     </div>
+
+                     <!-- LISTA ZDJĘĆ -->
+                     <div>
+                         <label class="block text-xs font-bold text-stone-500 uppercase mb-4">Dodane zdjęcia (<span id="orders-count">0</span>)</label>
+                         <div id="admin-custom-orders-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                     </div>
                  </div>
                  
                  <!-- KALKULATOR WYCENY — NOWY DESIGN -->
@@ -3400,16 +3418,68 @@
         window.toggleHideProduct = () => {};
 
         function renderCustomOrdersAdmin() {
-            const container = document.getElementById('admin-custom-orders-list'); const orders = siteData.customOrders || [];
+            const container = document.getElementById('admin-custom-orders-list');
+            const orders = siteData.customOrders || [];
+            const countEl = document.getElementById('orders-count');
+            if (countEl) countEl.textContent = orders.length;
             if (container) {
-                container.innerHTML = orders.map((url, i) => `<div class="relative group aspect-square rounded-xl overflow-hidden"><img src="${url}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"><button onclick="deleteCustomOrder(${i})" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">USUŃ</button></div></div>`).join('');
+                container.innerHTML = orders.map((url, i) => `
+                    <div class="relative group aspect-square rounded-xl overflow-hidden bg-stone-700">
+                        <img src="${url}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                            <button onclick="deleteCustomOrder(${i})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition"><i class="fa-solid fa-trash mr-1"></i>Usuń</button>
+                        </div>
+                    </div>`).join('');
             }
             const inputContainer = document.getElementById('custom-orders-input-container');
             if (inputContainer && !inputContainer.querySelector('.gallery-input')) {
                 window.appendGalleryRow(inputContainer);
             }
+            // Bind multi-file upload
+            const fileInput = document.getElementById('orders-file-input');
+            if (fileInput && !fileInput._bound) {
+                fileInput._bound = true;
+                fileInput.addEventListener('change', () => window.uploadOrderFiles(fileInput.files));
+            }
+            // Drag & drop
+            const dropZone = document.getElementById('orders-drop-zone');
+            if (dropZone && !dropZone._bound) {
+                dropZone._bound = true;
+                dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-wood-400'); });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-wood-400'));
+                dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('border-wood-400'); window.uploadOrderFiles(e.dataTransfer.files); });
+            }
         }
-        
+
+        window.uploadOrderFiles = async (files) => {
+            if (!files || files.length === 0) return;
+            if (!siteData.imgbbKey) { showToast('Brak klucza ImgBB! Wejdź w Edycja Treści i zapisz klucz API.', 'error'); return; }
+            const progressEl = document.getElementById('orders-upload-progress');
+            progressEl.classList.remove('hidden');
+            progressEl.innerHTML = `<p class="text-stone-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Uploaduję ${files.length} zdjęcie(a)...</p>`;
+            let uploaded = 0; let failed = 0;
+            for (const file of Array.from(files)) {
+                try {
+                    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
+                    const fd = new FormData(); fd.append('image', b64);
+                    const resp = await fetch('https://api.imgbb.com/1/upload?key=' + siteData.imgbbKey, { method: 'POST', body: fd });
+                    const data = await resp.json();
+                    if (data.success) {
+                        if (!siteData.customOrders) siteData.customOrders = [];
+                        siteData.customOrders.push(data.data.url);
+                        uploaded++;
+                        progressEl.innerHTML = `<p class="text-stone-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Uploaduję... (${uploaded}/${files.length})</p>`;
+                    } else { failed++; }
+                } catch(e) { failed++; }
+            }
+            await saveData();
+            renderCustomOrdersAdmin();
+            renderMain();
+            progressEl.classList.add('hidden');
+            document.getElementById('orders-file-input').value = '';
+            showToast(uploaded > 0 ? `Dodano ${uploaded} zdjęcie(a)!` : 'Błąd uploadu!', uploaded > 0 ? 'success' : 'error');
+        };
+
         window.saveCustomOrders = () => {
             const inputs = document.querySelectorAll('#custom-orders-input-container .gallery-input'); let added = false;
             inputs.forEach(inp => { if(inp.value.trim()) { if(!siteData.customOrders) siteData.customOrders = []; siteData.customOrders.push(inp.value.trim()); added = true; } });
