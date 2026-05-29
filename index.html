@@ -1606,28 +1606,31 @@
         window.enableDragScroll = (elementId) => {
             const slider = document.getElementById(elementId);
             if(!slider) return;
-            
+
             let isDown = false;
+            let isDragging = false;
             let startX;
             let scrollLeft;
+            const DRAG_THRESHOLD = 6; // px ruchu zanim uznamy za drag
 
             slider.addEventListener('mousedown', (e) => {
                 isDown = true;
+                isDragging = false;
                 slider.classList.add('cursor-grabbing');
                 slider.classList.remove('cursor-grab');
-                // Wyłącz snap podczas przeciągania dla płynności
                 slider.style.scrollSnapType = 'none';
                 startX = e.pageX - slider.offsetLeft;
                 scrollLeft = slider.scrollLeft;
-                window.stopAutoScroll(); // Zatrzymaj auto-scroll podczas interakcji
+                window.stopAutoScroll();
             });
 
             slider.addEventListener('mouseleave', () => {
                 isDown = false;
+                isDragging = false;
                 slider.classList.remove('cursor-grabbing');
                 slider.classList.add('cursor-grab');
-                slider.style.scrollSnapType = 'x mandatory'; // Przywróć snap
-                window.startAutoScroll(); // Wznów auto-scroll
+                slider.style.scrollSnapType = 'x mandatory';
+                window.startAutoScroll();
             });
 
             slider.addEventListener('mouseup', () => {
@@ -1636,13 +1639,26 @@
                 slider.classList.add('cursor-grab');
                 slider.style.scrollSnapType = 'x mandatory';
                 window.startAutoScroll();
+                // isDragging resetujemy w click handler
             });
+
+            // Blokuj click jeśli był drag (nie zwykłe kliknięcie)
+            slider.addEventListener('click', (e) => {
+                if (isDragging) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    isDragging = false;
+                }
+            }, true); // capture — wyprzedza onclick na dzieciach
 
             slider.addEventListener('mousemove', (e) => {
                 if(!isDown) return;
-                e.preventDefault();
                 const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2; // Szybkość przewijania
+                const walk = (x - startX) * 2;
+                if (Math.abs(x - startX) > DRAG_THRESHOLD) {
+                    isDragging = true;
+                    e.preventDefault();
+                }
                 slider.scrollLeft = scrollLeft - walk;
             });
         };
