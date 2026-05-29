@@ -577,10 +577,10 @@
         <!-- Nasze Produkty -->
         <section id="portfolio" class="py-24 bg-slate-950">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-white">Nasze Produkty</h2>
+                <h2 class="text-4xl font-bold mb-4 text-white">Co możemy dla Ciebie zrobić?</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 
-                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-4">Krok 1: Wybierz Kategorię</p>
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-4">Wybierz kategorię produktów</p>
                 <div class="relative group mb-12" onmouseenter="window.stopAutoScroll()" onmouseleave="window.startAutoScroll()">
                     <button onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wood-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-wood-700 -ml-4 flex items-center justify-center">
                         <i class="fa-solid fa-chevron-left"></i>
@@ -593,7 +593,7 @@
                 </div>
 
                 <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
-                    <p class="text-sky-400 text-sm font-bold uppercase tracking-widest mb-4">Krok 2: Wybierz Podkategorię</p>
+                    <p class="text-sky-400 text-sm font-bold uppercase tracking-widest mb-4">Wybierz rodzaj produktu</p>
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                         <h3 id="selected-cat-title" class="text-3xl font-bold text-white"></h3>
                         <p id="selected-cat-desc" class="text-slate-400 text-sm mt-1 hidden"></p>
@@ -625,7 +625,7 @@
         <!-- Zlecenia -->
         <section id="custom-orders" class="py-24 bg-slate-900">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-white">Zrealizowane Zlecenia na zamówienie</h2>
+                <h2 class="text-4xl font-bold mb-4 text-white">Projekty zrealizowane dla klientów</h2>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-12 opacity-80"></div>
                 
                 <div class="relative group">
@@ -641,7 +641,7 @@
 
                 <div class="mt-8">
                     <button onclick="openCustomOrdersGallery()" class="px-8 py-3 bg-stone-100 text-stone-600 rounded-full hover:bg-stone-200 hover:text-wood-600 transition font-bold shadow-sm inline-flex items-center gap-2">
-                        <i class="fa-solid fa-grid-2"></i> Zobacz pełną galerię zleceń
+                        <i class="fa-solid fa-grid-2"></i> Zobacz wszystkie realizacje
                     </button>
                 </div>
             </div>
@@ -650,7 +650,7 @@
         <!-- Kontakt -->
         <section id="contact" class="py-24 bg-slate-950">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                 <h2 class="text-4xl font-bold mb-6 text-white">Kontakt i Wycena</h2>
+                 <h2 class="text-4xl font-bold mb-6 text-white">Zapytaj o wycenę — odpiszę dziś</h2>
                  <p id="contact-desc" class="mb-16 text-slate-400 text-lg max-w-2xl mx-auto">Masz pomysł na projekt? Napisz lub zadzwoń — wycenę przygotuję tego samego dnia. Realizuję zamówienia z całej Polski, wysyłka kurierem.</p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div onclick="openGeneralContactModal()" class="flex flex-col items-center justify-center p-10 bg-slate-800/60 rounded-[2.5rem] border border-white/5 hover:border-sky-500/50 hover:bg-sky-500/5 cursor-pointer transition group shadow-sm transform hover:-translate-y-1">
@@ -1514,10 +1514,10 @@
                 laserRate: 0.50       // Cena za minutę
             },
             textContent: {
-                hero: { main: "Precyzja Lasera,<br>Piękno", accent: "Drewna", desc: "Witaj w Xeomsc Laser. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
+                hero: { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo", desc: "Zamieniamy Twój pomysł w wyjątkowy produkt z drewna. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
                 about: {
                     title: "Dlaczego klienci nas wybierają?",
-                    subtitle: "Każde zlecenie traktujemy indywidualnie — od pierwszego szkicu po gotowy produkt."
+                    subtitle: "Setki zadowolonych klientów i produkty, które zostają w pamięci na lata."
                 },
                 aboutCards: [
                     { icon: "fa-solid fa-fingerprint", title: "Tylko Twój projekt", desc: "Każdy produkt tworzymy od zera według Twoich potrzeb. Żadnych gotowych wzorów — wyłącznie unikalne projekty na zamówienie." },
@@ -1527,7 +1527,7 @@
                     { icon: "fa-solid fa-building", title: "Dla firm i eventów", desc: "Gadżety reklamowe, grawery na firmowe upominki, dekoracje eventowe. Realizujemy duże serie z jednakową precyzją." },
                     { icon: "fa-solid fa-shield-halved", title: "Jakość gwarantowana", desc: "Używamy tylko sprawdzonych materiałów. Każdy produkt przechodzi kontrolę przed wysyłką — poprawiamy to, co nie spełnia standardów." }
                 ],
-                contact: { email: "katlowskii@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz lub zadzwoń — wycenę przygotuję tego samego dnia. Realizuję zamówienia z całej Polski, wysyłka kurierem." },
+                contact: { email: "katlowskii@gmail.com", phone: "+48 123 456 789", desc: "Opisz co chcesz — wyślę wycenę jeszcze dziś. Bez zobowiązań, bez czekania. Realizuję zamówienia dla klientów z całej Polski." },
                 // DOKUMENTY PRAWNE (Teksty domyślne)
                 legal: {
                     privacy: "Tu wpisz treść Polityki Prywatności...\n\n1. Administrator Danych\nAdministratorem danych jest Xeomsc Laser.\n\n2. Cele przetwarzania\nDane przetwarzane są w celu realizacji zamówień i kontaktu z klientem.",
