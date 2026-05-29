@@ -1682,6 +1682,9 @@
             const originals = Array.from(el.children);
             if (originals.length === 0) return;
 
+            // Jeśli tylko 1 element — nie duplikuj, zwykły widok
+            if (originals.length === 1) return;
+
             // Prepend + append klony (3× zawartość: klon | oryginały | klon)
             [...originals].reverse().forEach(child => {
                 const clone = child.cloneNode(true);
@@ -1695,6 +1698,13 @@
             });
 
             requestAnimationFrame(() => {
+                // Jeśli elementy mieszczą się bez scrollowania — usuń klony i nie aktywuj
+                const contentW = originals.reduce((s, c) => s + c.offsetWidth + parseInt(getComputedStyle(c).marginRight||0) + parseInt(getComputedStyle(c).marginLeft||0), 0);
+                if (contentW <= el.clientWidth) {
+                    el.querySelectorAll('[data-ic-clone]').forEach(c => c.remove());
+                    return;
+                }
+
                 const setW = el.scrollWidth / 3;
                 el.dataset.icSetW = setW;
                 // Start na środkowym zestawie (oryginały)
