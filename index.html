@@ -1983,21 +1983,21 @@
         // Inicjalizacja SEO dla strony głównej
         window.updateSEO({});
 
+        // Globalna funkcja — używana w renderMain, openAllProductsPage i in.
+        window.catHasProducts = (c) => {
+            const direct = c.products || [];
+            if (direct.length > 0) return direct.some(p => !p.isHidden);
+            return Object.values(c.subs || {}).some(sub =>
+                (sub.products || []).some(p => !p.isHidden)
+            );
+        };
+
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (grid) {
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
-                // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
-                const catHasProducts = (c) => {
-                    // Nowa struktura: products bezpośrednio w kategorii
-                    const direct = c.products || [];
-                    if (direct.length > 0) return direct.some(p => !p.isHidden);
-                    // Stara struktura (cache localStorage): products w subs
-                    return Object.values(c.subs || {}).some(sub =>
-                        (sub.products || []).some(p => !p.isHidden)
-                    );
-                };
+                const catHasProducts = window.catHasProducts; // użyj globalnej
                 const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
                     .filter(([, c]) => !c.isHidden && (isAdmin || catHasProducts(c)))
@@ -2169,7 +2169,7 @@
             const cats = siteData.categories || {};
             const isAdm = document.body.classList.contains('is-admin');
             const sortedCats = Object.entries(cats)
-                .filter(([, c]) => !c.isHidden && (isAdm || catHasProducts(c)))
+                .filter(([, c]) => !c.isHidden && (isAdm || window.catHasProducts(c)))
                 .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0) || a.title.localeCompare(b.title, 'pl'));
 
             const grid  = document.getElementById('subcategories-full-grid');
