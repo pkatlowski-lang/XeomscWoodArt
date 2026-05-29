@@ -2398,6 +2398,20 @@
             btnUpload.innerHTML = '<i class="fa-solid fa-upload text-sm"></i>';
             btnUpload.onclick = () => window.uploadImageToElement(inp, btnUpload);
             row.appendChild(btnUpload);
+
+            // Usuń zdjęcie
+            const btnDel = document.createElement('button'); btnDel.type = 'button';
+            btnDel.className = 'shrink-0 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl w-10 h-10 flex items-center justify-center transition'; btnDel.title = 'Usuń to zdjęcie';
+            btnDel.innerHTML = '<i class="fa-solid fa-trash text-sm"></i>';
+            btnDel.onclick = () => {
+                row.remove();
+                if (isReorderable) window._refreshGalleryBadges(container);
+                // Jeśli brak pustego wiersza – dodaj nowy
+                const hasEmpty = Array.from(container.querySelectorAll('.gallery-input')).some(i => !i.value.trim());
+                if (!hasEmpty) window.appendGalleryRow(container);
+            };
+            row.appendChild(btnDel);
+
             container.appendChild(row);
 
             if (isReorderable) window._refreshGalleryBadges(container);
