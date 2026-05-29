@@ -557,9 +557,16 @@
         <!-- Oferta -->
         <section id="about" class="py-24 bg-slate-900">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold mb-4 text-white">Co oferujemy?</h2>
-                <div class="w-24 h-1.5 bg-sky-500 mx-auto rounded-full mb-16 opacity-80"></div>
-                <div id="about-grid" class="grid grid-cols-1 md:grid-cols-3 gap-10"></div>
+                <p class="text-wood-400 font-bold uppercase tracking-widest text-sm mb-3">Xeomsc Laser Studio</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">Dlaczego klienci nas wybierają?</h2>
+                <p class="text-slate-400 text-lg mb-4 max-w-2xl mx-auto">Każde zlecenie traktujemy indywidualnie — od pierwszego szkicu po gotowy produkt.</p>
+                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
+                <div id="about-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                <div class="mt-14">
+                    <a href="#contact" onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'})" class="inline-flex items-center gap-3 bg-wood-600 hover:bg-wood-500 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-wood-600/30 hover:-translate-y-0.5 text-lg cursor-pointer">
+                        <i class="fa-solid fa-message"></i> Zapytaj o wycenę — to nic nie kosztuje
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -999,10 +1006,10 @@
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Linia 1)</label><input id="edit-hero-main" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Akcent)</label><input id="edit-hero-accent" class="calc-input text-wood-500"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis Hero</label><textarea id="edit-hero-desc" class="calc-input h-24"></textarea></div>
-                        <!-- EDYCJA 3 KART OFERTY -->
+                        <!-- EDYCJA 6 KART OFERTY -->
                         <div class="border-t border-white/5 pt-6">
-                            <h4 class="text-xl font-bold mb-1 text-wood-500">3 Karty Oferty</h4>
-                            <p class="text-stone-500 text-xs mb-5">Sekcja "Co oferujemy?" na stronie głównej</p>
+                            <h4 class="text-xl font-bold mb-1 text-wood-500">6 Kart Oferty</h4>
+                            <p class="text-stone-500 text-xs mb-5">Sekcja "Dlaczego klienci nas wybierają?" na stronie głównej</p>
                             <div class="space-y-5" id="about-cards-editor">
 
                                 <!-- Karta 1 -->
@@ -1011,11 +1018,11 @@
                                     <div class="space-y-3">
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
-                                            <input id="edit-card1-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-scissors">
+                                            <input id="edit-card1-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-fingerprint">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
-                                            <input id="edit-card1-title" class="calc-input" placeholder="np. Precyzyjne Cięcie">
+                                            <input id="edit-card1-title" class="calc-input" placeholder="np. Tylko Twój projekt">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
@@ -1030,11 +1037,11 @@
                                     <div class="space-y-3">
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
-                                            <input id="edit-card2-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-gift">
+                                            <input id="edit-card2-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-bolt">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
-                                            <input id="edit-card2-title" class="calc-input" placeholder="np. Unikalne Prezenty">
+                                            <input id="edit-card2-title" class="calc-input" placeholder="np. Realizacja w 24–48h">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
@@ -1049,15 +1056,72 @@
                                     <div class="space-y-3">
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
-                                            <input id="edit-card3-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-building">
+                                            <input id="edit-card3-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-crosshairs">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
-                                            <input id="edit-card3-title" class="calc-input" placeholder="np. Gadżety dla Firm">
+                                            <input id="edit-card3-title" class="calc-input" placeholder="np. Precyzja lasera CNC">
                                         </div>
                                         <div>
                                             <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
                                             <textarea id="edit-card3-desc" class="calc-input h-20 resize-none" placeholder="Opis karty..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Karta 4 -->
+                                <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+                                    <p class="text-[11px] text-wood-400 font-bold uppercase tracking-widest mb-4"><i class="fa-solid fa-4 mr-2"></i>Karta czwarta</p>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
+                                            <input id="edit-card4-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-heart">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
+                                            <input id="edit-card4-title" class="calc-input" placeholder="np. Prezent z duszą">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
+                                            <textarea id="edit-card4-desc" class="calc-input h-20 resize-none" placeholder="Opis karty..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Karta 5 -->
+                                <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+                                    <p class="text-[11px] text-wood-400 font-bold uppercase tracking-widest mb-4"><i class="fa-solid fa-5 mr-2"></i>Karta piąta</p>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
+                                            <input id="edit-card5-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-building">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
+                                            <input id="edit-card5-title" class="calc-input" placeholder="np. Dla firm i eventów">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
+                                            <textarea id="edit-card5-desc" class="calc-input h-20 resize-none" placeholder="Opis karty..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Karta 6 -->
+                                <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+                                    <p class="text-[11px] text-wood-400 font-bold uppercase tracking-widest mb-4"><i class="fa-solid fa-6 mr-2"></i>Karta szósta</p>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Ikona (Font Awesome class)</label>
+                                            <input id="edit-card6-icon" class="calc-input font-mono text-sm" placeholder="np. fa-solid fa-shield-halved">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł</label>
+                                            <input id="edit-card6-title" class="calc-input" placeholder="np. Jakość gwarantowana">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Opis</label>
+                                            <textarea id="edit-card6-desc" class="calc-input h-20 resize-none" placeholder="Opis karty..."></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1424,9 +1488,12 @@
             textContent: {
                 hero: { main: "Precyzja Lasera,<br>Piękno", accent: "Drewna", desc: "Witaj w Xeomsc Laser Studio. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
                 aboutCards: [
-                    { icon: "fa-solid fa-wand-magic-sparkles", title: "Grawerowanie", desc: "Niezwykle precyzyjne nanoszenie detali, logotypów i grafik na drewno, szkło, skórę i inne materiały." },
-                    { icon: "fa-solid fa-scissors", title: "Precyzyjne Cięcie", desc: "Wycinanie skomplikowanych kształtów, liter przestrzennych, topperów i elementów dekoracyjnych ze sklejki." },
-                    { icon: "fa-solid fa-gift", title: "Unikalne Prezenty", desc: "Personalizowane pamiątki na każdą okazję: śluby, chrzciny, jubileusze. Tworzone z myślą o Tobie." }
+                    { icon: "fa-solid fa-fingerprint", title: "Tylko Twój projekt", desc: "Każdy produkt tworzymy od zera według Twoich potrzeb. Żadnych gotowych wzorów — wyłącznie unikalne projekty na zamówienie." },
+                    { icon: "fa-solid fa-bolt", title: "Realizacja w 24–48h", desc: "Szybka wycena, sprawna realizacja i wysyłka kurierem do całej Polski. Twoje zamówienie nie czeka w kolejce." },
+                    { icon: "fa-solid fa-crosshairs", title: "Precyzja lasera CNC", desc: "Technologia laserowa gwarantuje idealne odwzorowanie każdego detalu — napis, logotyp, wzór — bez błędów." },
+                    { icon: "fa-solid fa-heart", title: "Prezent z duszą", desc: "Personalizowane drewniane upominki na śluby, urodziny, chrzciny i jubileusze. Takie, które zapamiętuje się na lata." },
+                    { icon: "fa-solid fa-building", title: "Dla firm i eventów", desc: "Gadżety reklamowe, grawery na firmowe upominki, dekoracje eventowe. Realizujemy duże serie z jednakową precyzją." },
+                    { icon: "fa-solid fa-shield-halved", title: "Jakość gwarantowana", desc: "Używamy tylko sprawdzonych materiałów. Każdy produkt przechodzi kontrolę przed wysyłką — poprawiamy to, co nie spełnia standardów." }
                 ],
                 contact: { email: "pkatlowski@gmail.com", phone: "+48 123 456 789", desc: "Masz pomysł na projekt? Napisz lub zadzwoń — wycenę przygotuję tego samego dnia. Realizuję zamówienia z całej Polski, wysyłka kurierem." },
                 // DOKUMENTY PRAWNE (Teksty domyślne)
@@ -1630,10 +1697,13 @@
             const grid = document.getElementById('about-grid');
             if(grid && t.aboutCards) {
                 grid.innerHTML = t.aboutCards.map(c => `
-                    <div class="p-10 bg-slate-800/60 rounded-[2.5rem] border border-white/5 hover:border-sky-500/30 hover:shadow-2xl hover:shadow-sky-500/5 hover:-translate-y-2 transition-all duration-300 group">
-                        <div class="w-20 h-20 bg-sky-500/10 text-sky-400 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-sky-500 group-hover:text-white transition-colors shadow-sm ring-1 ring-sky-500/20"><i class="${escapeHTML(c.icon)} text-3xl"></i></div>
-                        <h3 class="font-bold text-2xl mb-4 text-white">${escapeHTML(c.title)}</h3>
-                        <p class="text-slate-400 leading-relaxed">${escapeHTML(c.desc)}</p>
+                    <div class="relative p-8 bg-slate-800/50 rounded-3xl border border-white/5 hover:border-wood-600/40 hover:bg-slate-800/80 hover:shadow-2xl hover:shadow-wood-600/10 hover:-translate-y-1.5 transition-all duration-300 group text-left overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-wood-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
+                        <div class="relative">
+                            <div class="w-14 h-14 bg-wood-600/15 text-wood-400 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-wood-600 group-hover:text-white transition-all duration-300 shadow-sm ring-1 ring-wood-600/25"><i class="${escapeHTML(c.icon)} text-xl"></i></div>
+                            <h3 class="font-bold text-xl mb-3 text-white group-hover:text-wood-300 transition-colors">${escapeHTML(c.title)}</h3>
+                            <p class="text-slate-400 leading-relaxed text-sm">${escapeHTML(c.desc)}</p>
+                        </div>
                     </div>`).join('');
             }
         }
@@ -2533,21 +2603,13 @@
 
                 // Załaduj karty oferty
                 const cards = t.aboutCards || initialData.textContent.aboutCards;
-                if(cards[0]) {
-                    document.getElementById('edit-card1-icon').value  = cards[0].icon  || '';
-                    document.getElementById('edit-card1-title').value = cards[0].title || '';
-                    document.getElementById('edit-card1-desc').value  = cards[0].desc  || '';
-                }
-                if(cards[1]) {
-                    document.getElementById('edit-card2-icon').value  = cards[1].icon  || '';
-                    document.getElementById('edit-card2-title').value = cards[1].title || '';
-                    document.getElementById('edit-card2-desc').value  = cards[1].desc  || '';
-                }
-                if(cards[2]) {
-                    document.getElementById('edit-card3-icon').value  = cards[2].icon  || '';
-                    document.getElementById('edit-card3-title').value = cards[2].title || '';
-                    document.getElementById('edit-card3-desc').value  = cards[2].desc  || '';
-                }
+                [1,2,3,4,5,6].forEach((n, i) => {
+                    const c = cards[i];
+                    if (!c) return;
+                    document.getElementById(`edit-card${n}-icon`).value  = c.icon  || '';
+                    document.getElementById(`edit-card${n}-title`).value = c.title || '';
+                    document.getElementById(`edit-card${n}-desc`).value  = c.desc  || '';
+                });
             }
             // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
             else if (id === 'calculator') {
@@ -2777,23 +2839,11 @@
             siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
 
             // Zapisz karty oferty
-            siteData.textContent.aboutCards = [
-                {
-                    icon:  document.getElementById('edit-card1-icon').value.trim()  || 'fa-solid fa-scissors',
-                    title: document.getElementById('edit-card1-title').value.trim() || '',
-                    desc:  document.getElementById('edit-card1-desc').value.trim()  || ''
-                },
-                {
-                    icon:  document.getElementById('edit-card2-icon').value.trim()  || 'fa-solid fa-gift',
-                    title: document.getElementById('edit-card2-title').value.trim() || '',
-                    desc:  document.getElementById('edit-card2-desc').value.trim()  || ''
-                },
-                {
-                    icon:  document.getElementById('edit-card3-icon').value.trim()  || 'fa-solid fa-building',
-                    title: document.getElementById('edit-card3-title').value.trim() || '',
-                    desc:  document.getElementById('edit-card3-desc').value.trim()  || ''
-                }
-            ];
+            siteData.textContent.aboutCards = [1,2,3,4,5,6].map(n => ({
+                icon:  document.getElementById(`edit-card${n}-icon`).value.trim()  || 'fa-solid fa-star',
+                title: document.getElementById(`edit-card${n}-title`).value.trim() || '',
+                desc:  document.getElementById(`edit-card${n}-desc`).value.trim()  || ''
+            }));
 
             await saveData(); renderTexts(); showToast("Zapisano zmiany!");
         };
