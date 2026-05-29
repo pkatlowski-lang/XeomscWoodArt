@@ -2024,7 +2024,7 @@
                 image: _catImg,
                 breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
             });
-            if (!window._poppingState) history.pushState(null, '', '#kat/' + id);
+            window._setHash('kat/' + id);
 
             const container = document.getElementById('sub-categories-container');
             const title = document.getElementById('selected-cat-title');
@@ -2107,7 +2107,7 @@
             document.getElementById('subcategory-view').classList.add('hidden'); // Ważne: ukryj listę produktów
             document.getElementById('gallery-view').classList.add('hidden');
             container.classList.remove('hidden');
-            if (!window._poppingState) history.pushState(null, '', '#full-sub/' + catId);
+            window._setHash('full-sub/' + catId);
             window.scrollTo(0,0);
         };
 
@@ -2145,7 +2145,7 @@
             document.getElementById('custom-orders-full-view').classList.add('hidden');
             document.getElementById('legal-view').classList.add('hidden');
             document.getElementById('subcategories-full-view').classList.remove('hidden');
-            if (!window._poppingState) history.pushState(null, '', '#products');
+            window._setHash('products');
             window.scrollTo(0, 0);
         };
 
@@ -2168,7 +2168,7 @@
                  grid.innerHTML = orders.map((url, i) => `<div class="aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition group bg-stone-100 flex items-center justify-center" onclick="openLightbox(${i})"><img src="${url}" class="w-full h-full object-contain group-hover:scale-105 transition duration-500"></div>`).join('');
                  document.getElementById('main-content').classList.add('hidden');
                  document.getElementById('custom-orders-full-view').classList.remove('hidden');
-                 if (!window._poppingState) history.pushState(null, '', '#orders');
+                 window._setHash('orders');
                  window.scrollTo(0,0);
              }
         };
@@ -2200,7 +2200,7 @@
                     { name: sub.title }
                 ]
             });
-            if (!window._poppingState) history.pushState(null, '', '#sub/' + catId + '/' + subId);
+            window._setHash('sub/' + catId + '/' + subId);
 
             if(grid) {
                 grid.innerHTML = '';
@@ -2309,7 +2309,7 @@
                     { name: product.title }
                 ]
             });
-            if (!window._poppingState) history.pushState(null, '', '#prod/' + catId + '/' + subId + '/' + prodIndex);
+            window._setHash('prod/' + catId + '/' + subId + '/' + prodIndex);
         };
 
         window.updateMainImage = (index) => {
@@ -2443,7 +2443,7 @@
             document.getElementById('main-content').classList.remove('hidden');
             document.getElementById('sub-categories-container').classList.add('hidden');
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-            if (!window._poppingState) history.pushState(null, '', window.location.pathname);
+            window._setHash('');
             window.scrollTo(0,0);
         };
 
@@ -4207,45 +4207,58 @@
         siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero(); renderMain(); renderTexts(); start();
 
-        // Inicjalne state (żeby był punkt powrotu do strony głównej)
-        if (!window.location.hash || window.location.hash === '#') {
-            history.replaceState(null, '', window.location.pathname);
+        // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
+        // Funkcja zmiany hasha BEZ wywoływania nawigacji (używana przez widoki)
+        window._setHash = (hash) => {
+            if (window._handlingHash) return;
+            if (window.location.hash !== '#' + hash) {
+                history.pushState(null, '', hash ? '#' + hash : window.location.pathname);
+            }
+        };
+
+        // Obsługa zmiany hasha (wstecz/dalej/bezpośredni link)
+        function _handleHash(hash) {
+            if (hash === 'admin') return;
+            window._handlingHash = true;
+            try {
+                const parts = hash.split('/');
+                if (!hash || hash === '') {
+                    window.goHome();
+                } else if (parts[0]==='prod' && parts[1] && parts[2] && parts[3]!==undefined) {
+                    window.openGallery(parts[1], parts[2], parseInt(parts[3]));
+                } else if (parts[0]==='sub' && parts[1] && parts[2]) {
+                    window.openSubcategoryView(parts[1], parts[2]);
+                } else if (parts[0]==='kat' && parts[1]) {
+                    window.selectMainCategory(parts[1]);
+                } else if (parts[0]==='full-sub' && parts[1]) {
+                    window.openFullSubcategoryList(parts[1]);
+                } else if (parts[0]==='products') {
+                    window.openAllProductsPage();
+                } else if (parts[0]==='orders') {
+                    window.openCustomOrdersGallery();
+                } else {
+                    window.goHome();
+                }
+            } catch(e) { console.warn('hash nav error', e); window.goHome(); }
+            setTimeout(() => { window._handlingHash = false; }, 30);
         }
 
-        // ===== OBSŁUGA PRZYCISKU WSTECZ / DALEJ =====
-        window._poppingState = false;
+        // Słuchaj zmian hasha (wstecz, dalej, edycja URL)
         window.addEventListener('popstate', () => {
-            window._poppingState = true;
-            const h = window.location.hash.replace('#', '');
-            try {
-                if (!h) {
-                    window.goHome();
-                } else {
-                    const parts = h.split('/');
-                    if      (parts[0]==='prod'     && parts[1] && parts[2] && parts[3]!==undefined) window.openGallery(parts[1], parts[2], parseInt(parts[3]));
-                    else if (parts[0]==='sub'      && parts[1] && parts[2]) window.openSubcategoryView(parts[1], parts[2]);
-                    else if (parts[0]==='kat'      && parts[1]) window.selectMainCategory(parts[1]);
-                    else if (parts[0]==='full-sub' && parts[1]) window.openFullSubcategoryList(parts[1]);
-                    else if (parts[0]==='products') window.openAllProductsPage();
-                    else if (parts[0]==='orders')   window.openCustomOrdersGallery();
-                    else window.goHome();
-                }
-            } catch(e) { console.warn('popstate error', e); window.goHome(); }
-            setTimeout(() => { window._poppingState = false; }, 50);
+            _handleHash(window.location.hash.replace('#', ''));
         });
 
-        // Przywróć widok z URL hash (np. po udostępnieniu linku lub odświeżeniu)
-        (function restoreFromHash() {
-            const h = window.location.hash.replace('#','');
-            if (!h || h === 'admin') return;
-            const parts = h.split('/');
-            try {
-                if      (parts[0]==='prod'     && parts[1] && parts[2] && parts[3]!==undefined) window.openGallery(parts[1], parts[2], parseInt(parts[3]));
-                else if (parts[0]==='sub'      && parts[1] && parts[2]) window.openSubcategoryView(parts[1], parts[2]);
-                else if (parts[0]==='kat'      && parts[1]) window.selectMainCategory(parts[1]);
-                else if (parts[0]==='products') window.openAllProductsPage();
-                else if (parts[0]==='orders')   window.openCustomOrdersGallery();
-            } catch(e) { console.warn('SEO hash restore error', e); }
+        // Przywróć widok jeśli strona załadowana z hashem (link, odświeżenie)
+        (function() {
+            const h = window.location.hash.replace('#', '');
+            if (h && h !== 'admin') {
+                window._handlingHash = true;
+                _handleHash(h);
+                setTimeout(() => { window._handlingHash = false; }, 30);
+            } else {
+                // Ustaw bazowy stan historii dla "strona główna"
+                history.replaceState(null, '', window.location.pathname);
+            }
         })();
     </script>
 </body>
