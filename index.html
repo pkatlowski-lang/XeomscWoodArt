@@ -2346,16 +2346,78 @@
         };
 
         window.appendGalleryRow = (container, value = '') => {
-            const row = document.createElement('div'); row.className = 'flex gap-2 items-center';
+            const isReorderable = container.dataset.galleryMode === 'reorderable';
+            const row = document.createElement('div');
+            row.className = 'gallery-row flex gap-2 items-center' + (isReorderable ? ' bg-stone-700/30 rounded-xl p-1.5' : '');
+
+            // Miniatura podglądu
+            const thumb = document.createElement('img');
+            thumb.className = 'gallery-thumb w-12 h-12 rounded-lg object-cover shrink-0 bg-stone-600';
+            if (value) { thumb.src = value; } else { thumb.classList.add('hidden'); }
+            thumb.onerror = function() { this.classList.add('hidden'); };
+            thumb.onload  = function() { this.classList.remove('hidden'); };
+
+            // Input URL
             const inp = document.createElement('input');
             inp.className = 'calc-input flex-1 gallery-input'; inp.placeholder = 'Link do zdjęcia'; inp.value = value;
-            inp.oninput = function() { window.addGalleryInput(this); };
-            const btn = document.createElement('button'); btn.type = 'button';
-            btn.className = 'shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition'; btn.title = 'Prześlij z dysku';
-            btn.innerHTML = '<i class="fa-solid fa-upload text-sm"></i>';
-            btn.onclick = () => window.uploadImageToElement(inp, btn);
-            row.appendChild(inp); row.appendChild(btn); container.appendChild(row);
+            inp.oninput = function() {
+                window.addGalleryInput(this);
+                if (this.value.trim()) { thumb.src = this.value.trim(); thumb.classList.remove('hidden'); }
+                else { thumb.classList.add('hidden'); }
+                if (isReorderable) window._refreshGalleryBadges(container);
+            };
+
+            row.appendChild(thumb);
+            row.appendChild(inp);
+
+            if (isReorderable) {
+                // Przesuń w górę
+                const btnUp = document.createElement('button'); btnUp.type = 'button';
+                btnUp.className = 'shrink-0 bg-stone-600 hover:bg-stone-500 text-stone-300 hover:text-white rounded-lg w-8 h-8 flex items-center justify-center transition text-xs';
+                btnUp.title = 'Przesuń w górę (zmień kolejność)';
+                btnUp.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+                btnUp.onclick = () => {
+                    const prev = row.previousElementSibling;
+                    if (prev && prev.classList.contains('gallery-row')) { container.insertBefore(row, prev); window._refreshGalleryBadges(container); }
+                };
+                // Przesuń w dół
+                const btnDown = document.createElement('button'); btnDown.type = 'button';
+                btnDown.className = 'shrink-0 bg-stone-600 hover:bg-stone-500 text-stone-300 hover:text-white rounded-lg w-8 h-8 flex items-center justify-center transition text-xs';
+                btnDown.title = 'Przesuń w dół';
+                btnDown.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+                btnDown.onclick = () => {
+                    const next = row.nextElementSibling;
+                    if (next && next.classList.contains('gallery-row')) { container.insertBefore(next, row); window._refreshGalleryBadges(container); }
+                };
+                row.appendChild(btnUp); row.appendChild(btnDown);
+            }
+
+            // Upload z dysku
+            const btnUpload = document.createElement('button'); btnUpload.type = 'button';
+            btnUpload.className = 'shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition'; btnUpload.title = 'Prześlij z dysku';
+            btnUpload.innerHTML = '<i class="fa-solid fa-upload text-sm"></i>';
+            btnUpload.onclick = () => window.uploadImageToElement(inp, btnUpload);
+            row.appendChild(btnUpload);
+            container.appendChild(row);
+
+            if (isReorderable) window._refreshGalleryBadges(container);
             return inp;
+        };
+
+        window._refreshGalleryBadges = (container) => {
+            const rows = Array.from(container.querySelectorAll(':scope > .gallery-row'));
+            rows.forEach((r, i) => {
+                let badge = r.querySelector('.gallery-main-badge');
+                const hasValue = r.querySelector('.gallery-input')?.value.trim();
+                if (i === 0 && hasValue) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'gallery-main-badge shrink-0 text-[9px] font-bold bg-wood-600 text-white px-1.5 py-0.5 rounded-md whitespace-nowrap';
+                        badge.textContent = '★ GŁÓWNE';
+                        r.insertBefore(badge, r.firstChild);
+                    }
+                } else { if (badge) badge.remove(); }
+            });
         };
 
         const ADMIN_HASH = '9ed9315a7d8a5129f4e0dd1635ecc7bfe186a530446f1f2a104aeb155f637ed2';
@@ -3172,7 +3234,7 @@
                         <p class="text-[10px] text-stone-500 mt-1 italic">(Jeśli zostawisz puste, zostanie użyte pierwsze zdjęcie z galerii poniżej)</p>
                     </div>
 
-                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2"></div></div>
+                    <div class="pt-4 border-t border-white/5"><label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia do galerii</label><div id="new-gallery-container" class="space-y-2" data-gallery-mode="reorderable"></div></div>
                     <button id="btn-add-prod" class="bg-wood-600 hover:bg-wood-500 w-full py-4 rounded-xl font-bold transition mt-4">Dodaj Produkt</button>
                 </div>`;
             window.appendGalleryRow(document.getElementById('new-gallery-container'));
@@ -3323,15 +3385,17 @@
                     </div>
                     <textarea id="edit-p-desc" class="calc-input h-24" placeholder="Opis produktu"></textarea>
                     <div>
+                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcie Główne (okładka)</label>
                         <div class="flex gap-2 items-center">
-                            <input id="edit-p-i" class="calc-input flex-1" placeholder="URL zdjęcia głównego">
+                            <img id="edit-p-main-thumb" class="w-14 h-14 rounded-xl object-cover shrink-0 bg-stone-700 hidden" onerror="this.classList.add('hidden')">
+                            <input id="edit-p-i" class="calc-input flex-1" placeholder="URL zdjęcia głównego" oninput="var t=document.getElementById('edit-p-main-thumb');if(this.value.trim()){t.src=this.value.trim();t.classList.remove('hidden');}else{t.classList.add('hidden');}">
                             <button type="button" onclick="window.uploadImageToElement(document.getElementById('edit-p-i'),this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
                         </div>
                         <p class="text-[10px] text-stone-500 mt-1 italic">Jeśli puste – użyte zostanie pierwsze zdjęcie galerii.</p>
                     </div>
                     <div class="pt-4 border-t border-white/5">
-                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii</label>
-                        <div id="edit-gallery-container" class="space-y-2"></div>
+                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcia galerii <span class="normal-case text-wood-400 font-normal">— pierwsze zdjęcie = okładka produktu</span></label>
+                        <div id="edit-gallery-container" class="space-y-2" data-gallery-mode="reorderable"></div>
                     </div>
                     <div class="flex gap-3">
                         <button onclick="window.plSaveEdit()" class="bg-green-600 hover:bg-green-500 flex-1 py-3 rounded-xl font-bold transition">Zapisz Zmiany</button>
@@ -3378,6 +3442,8 @@
             document.getElementById('edit-p-price').value = p.price || '';
             document.getElementById('edit-p-desc').value = p.desc || '';
             document.getElementById('edit-p-i').value = p.image || '';
+            const mainThumb = document.getElementById('edit-p-main-thumb');
+            if (p.image) { mainThumb.src = p.image; mainThumb.classList.remove('hidden'); } else { mainThumb.classList.add('hidden'); }
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
             const gallery = siteData.galleries?.[p.id]?.images || [];
             gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
