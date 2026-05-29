@@ -92,10 +92,53 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #38bdf8 80%, #818cf8 100%);
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(56,189,248,0.4));
+            filter: drop-shadow(0 0 24px rgba(56,189,248,0.5));
+            animation: shimmerText 4s linear infinite;
+        }
+        @keyframes shimmerText {
+            0%   { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        /* Hero entrance animations */
+        .hero-badge-enter {
+            animation: heroBadgeIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .hero-title-enter {
+            animation: heroTitleIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+        }
+        .hero-desc-enter {
+            animation: heroDescIn 0.8s ease-out 0.55s both;
+        }
+        .hero-btn-enter {
+            animation: heroBtnIn 0.8s cubic-bezier(0.22,1,0.36,1) 0.75s both;
+        }
+        @keyframes heroBadgeIn {
+            from { opacity:0; transform:translateY(-16px) scale(0.9); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        @keyframes heroTitleIn {
+            from { opacity:0; transform:translateY(32px) skewY(2deg); }
+            to   { opacity:1; transform:translateY(0) skewY(0); }
+        }
+        @keyframes heroDescIn {
+            from { opacity:0; transform:translateX(-20px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+        @keyframes heroBtnIn {
+            from { opacity:0; transform:translateY(20px) scale(0.95); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        /* Hero image ken-burns */
+        .hero-slide img.hero-ken-burns {
+            animation: kenBurns 12s ease-in-out infinite alternate;
+        }
+        @keyframes kenBurns {
+            from { transform: scale(1.08) translate(-1%, -1%); }
+            to   { transform: scale(1.0)  translate(1%, 1%); }
         }
         
         .white-outline-text {
@@ -539,17 +582,17 @@
             
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
-                    <span class="inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
-                        Pracownia Laserowa
+                    <span class="hero-badge-enter inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
+                        ✦ Pracownia Laserowa
                     </span>
-                    <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
-                        <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span> 
+                    <h1 class="hero-title-enter text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
+                        <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span>
                         <span id="hero-title-accent" class="gradient-text white-outline-text">Sklejki</span>.
                     </h1>
-                    <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
+                    <p id="hero-desc" class="hero-desc-enter text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
                         Witaj w Xeomsc Laser. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.
                     </p>
-                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <div class="hero-btn-enter flex flex-wrap gap-4 justify-center md:justify-start">
                         <a href="#products" onclick="openAllProductsPage(); return false;" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
                             Zobacz nasze prace
                         </a>
@@ -997,7 +1040,7 @@
                     <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-5 text-center text-xs"></i> Karuzela Hero</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Katalog Produktów</p>
                     <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-layer-group w-5 text-center text-xs"></i> Kategorie</button>
-                    <button onclick="switchAdminView('subcategories')" id="btn-subcategories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-tree w-5 text-center text-xs"></i> Podkategorie</button>
+                    
                     <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-plus-circle w-5 text-center text-xs"></i> Dodaj Produkty</button>
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-5 text-center text-xs"></i> Lista Produktów</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Narzędzia</p>
@@ -1795,7 +1838,7 @@
                 <div class="hero-slide ${idx === 0 ? 'active' : ''}">
                     ${it.type === 'image'
                         ? `<img src="${it.url}" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60">
-                           <img src="${it.url}" class="absolute inset-0 w-full h-full object-contain object-center">`
+                           <img src="${it.url}" class="absolute inset-0 w-full h-full object-contain object-center hero-ken-burns">`
                         : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
                 </div>`).join('');
             
@@ -1808,11 +1851,7 @@
         }
 
         function _productImgsFromCat(cat) {
-            const out = [];
-            Object.values(cat.subs || {}).forEach(sub => {
-                (sub.products || []).forEach(p => { if(p.image && !p.isHidden) out.push(p.image); });
-            });
-            return out;
+            return (cat.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
         }
         function _productImgsFromSub(sub) {
             return (sub.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
@@ -1943,11 +1982,8 @@
                 const cats = siteData.categories || {};
                 // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
                 const catHasProducts = (c) => {
-                    const subs = c.subs || {};
-                    return Object.values(subs).some(sub => {
-                        const prods = sub.products;
-                        return Array.isArray(prods) ? prods.length > 0 : (prods && Object.keys(prods).length > 0);
-                    });
+                    const prods = c.products || [];
+                    return prods.some(p => !p.isHidden);
                 };
                 const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
@@ -1996,10 +2032,7 @@
                 window.makeInfiniteCarousel('custom-orders-carousel');
             }
             
-            // FIX: ODŚWIEŻ WIDOK PODKATEGORII JEŚLI JEST OTWARTY
-            if(window.activeMainCatId && siteData.categories[window.activeMainCatId]) {
-                window.selectMainCategory(window.activeMainCatId, true); // true = preventScroll
-            }
+
 
             window.startAutoScroll();
         }
@@ -2128,11 +2161,12 @@
             grid.innerHTML = sortedCats.map(([catId, cat]) => {
                 const imgs = _productImgsFromCat(cat);
                 const subCount = Object.keys(cat.subs || {}).length;
-                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openFullSubcategoryList('${catId}', true)">
+                const prodCount = (cat.products || []).filter(p => !p.isHidden).length;
+                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openCategoryProducts('${catId}')">
                     <div class="h-64 overflow-hidden relative">${_slideshowImg(cat.image ? [cat.image] : imgs, '')}</div>
                     <div class="p-6">
                         <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(cat.title)}</h3>
-                        <p class="text-stone-500 mt-2">${subCount} ${subCount === 1 ? 'podkategoria' : 'podkategorii'}</p>
+                        <p class="text-stone-500 mt-2">${prodCount} ${prodCount === 1 ? 'produkt' : prodCount < 5 ? 'produkty' : 'produktów'}</p>
                     </div></div>`;
             }).join('') || '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak kategorii.</p></div>';
 
@@ -2173,70 +2207,68 @@
              }
         };
 
-        window.openCategoryView = (id) => { window.selectMainCategory(id); };
+        window.openCategoryView = (id) => { window.openCategoryProducts(id); };
 
-        window.openSubcategoryView = (catId, subId) => {
+        // Otwiera listę produktów kategorii bezpośrednio (bez podkategorii)
+        window.openCategoryProducts = (catId) => {
             const cat = siteData.categories[catId];
-            if(!cat || !cat.subs || !cat.subs[subId]) return;
-            const sub = cat.subs[subId];
-            document.getElementById('subcategory-title').textContent = sub.title;
-            const grid = document.getElementById('subcategory-grid');
-            
-            // Przechowywanie ID dla przycisku powrotu w widoku produktu
+            if(!cat) return;
             window.currentCatId = catId;
-            window.currentSubId = subId;
 
-            // SEO
+            document.getElementById('subcategory-title').textContent = cat.title;
+            const grid = document.getElementById('subcategory-grid');
+
             const _cs2 = _SEO_CATS[catId] || {};
-            const _subImg = sub.image || _productImgsFromSub(sub)[0] || cat.image || '';
             window.updateSEO({
-                title: `${sub.title} – ${cat.title}`,
-                desc: (sub.desc || `${sub.title} – ${cat.title}. Drewniane wyroby laserowe z naturalnej sklejki brzozowej. ${_SEO_SITE}.`).slice(0,160),
-                kw: [_cs2.kw, sub.title, cat.title].filter(Boolean).join(', '),
-                image: _subImg,
+                title: cat.title,
+                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs2.kw, cat.title].filter(Boolean).join(', '),
+                image: cat.image || _productImgsFromCat(cat)[0] || '',
                 breadcrumbs: [
                     { name: 'Strona główna', hash: '' },
-                    { name: cat.title, hash: 'kat/' + catId },
-                    { name: sub.title }
+                    { name: cat.title }
                 ]
             });
-            window._setHash('sub/' + catId + '/' + subId);
+            window._setHash('kat/' + catId);
 
             if(grid) {
-                grid.innerHTML = '';
-                const products = sub.products || [];
-                if (products.length > 0) {
+                const products = cat.products || [];
+                const visible = products.filter(p => !p.isHidden);
+                if (visible.length > 0) {
                     grid.innerHTML = products.map((prod, index) => {
-                        if (prod.isHidden) return ''; 
-                        return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${catId}', '${subId}', ${index})" style="animation-delay: ${index * 50}ms">
-                            <div class="h-64 overflow-hidden relative"><img src="${prod.image || 'https://via.placeholder.com/300'}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia';this.onerror=null;" alt="${escapeHTML(prod.title || prod.name || "")}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
-                            <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(prod.title || prod.name || "")}\</h3><div class="flex justify-between items-center mt-2"><p class="text-wood-600 font-bold text-lg">${prod.price ? escapeHTML(String(prod.price)) + ' PLN' : 'Wycena indywidualna'}</p></div></div></div>`;
+                        if (prod.isHidden) return '';
+                        return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${catId}', ${index})" style="animation-delay: ${index * 50}ms">
+                            <div class="h-64 overflow-hidden relative"><img src="${prod.image || 'https://via.placeholder.com/300'}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia';this.onerror=null;" alt="${escapeHTML(prod.title || prod.name || '')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                            <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(prod.title || prod.name || '')}</h3><div class="flex justify-between items-center mt-2"><p class="text-wood-600 font-bold text-lg">${prod.price && prod.price !== 'Wycena indywidualna' ? escapeHTML(String(prod.price)) + ' PLN' : 'Wycena indywidualna'}</p></div></div></div>`;
                     }).join('');
-                } else { grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>'; }
+                } else {
+                    grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>';
+                }
             }
-            
-            // FIX: Ukrywanie innych widoków przy powrocie
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('subcategories-full-view').classList.add('hidden'); 
-            document.getElementById('gallery-view').classList.add('hidden'); // Ważne: ukryj widok produktu
+
+            ['main-content','subcategories-full-view','gallery-view','custom-orders-full-view','legal-view'].forEach(id => {
+                const el = document.getElementById(id); if(el) el.classList.add('hidden');
+            });
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
-        
-        // Funkcja powrotu z listy produktów (subcategory-view) do listy podkategorii (full-view)
+
+        // Backward compat — stara sygnatura z subId (ignorujemy subId)
+        window.openSubcategoryView = (catId, subId) => window.openCategoryProducts(catId);
+
+        // Powrót z listy produktów → strona główna
         window.goBackToSubcategoryList = () => {
-             if(window.currentCatId) {
-                 window.openFullSubcategoryList(window.currentCatId);
-             } else {
-                 window.goHome();
-             }
+            window.goHome();
         };
 
-        window.openGallery = (catId, subId, prodIndex) => {
+        window.openGallery = (catId, prodIndexOrSubId, prodIndexIfOld) => {
+            // Obsługa starej sygnatury (catId, subId, prodIndex) — backward compat
+            const prodIndex = (prodIndexIfOld !== undefined) ? prodIndexIfOld : prodIndexOrSubId;
             const cat = siteData.categories[catId];
-            if(!cat || !cat.subs || !cat.subs[subId]) return;
-            const sub = cat.subs[subId]; const product = sub.products[prodIndex]; if (!product) return;
-            // Ukryj wszystkie widoki — może być wywołane z wyszukiwarki lub karuzeli
+            if(!cat) return;
+            const products = cat.products || [];
+            const product = products[prodIndex]; if (!product) return;
+            // Ukryj wszystkie widoki
             ['main-content','subcategory-view','subcategories-full-view','custom-orders-full-view','legal-view'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.classList.add('hidden');
             });
@@ -2253,8 +2285,8 @@
             // Przekazujemy zdjęcie do funkcji modala
             askBtn.onclick = () => window.openContactModal(codeToPass, imageToPass);
             
-            // ZMIANA: Przycisk powrotu cofa do podkategorii
-            document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
+            // Przycisk powrotu cofa do listy produktów kategorii
+            document.getElementById('back-to-sub-btn').onclick = () => window.openCategoryProducts(catId);
             
             const galleryData = siteData.galleries?.[product.id] || { images: [] };
             let _galImgs = galleryData.images;
@@ -2294,22 +2326,20 @@
 
             // SEO – Product schema
             const _catSeo = siteData.categories[catId];
-            const _subSeo = _catSeo?.subs?.[subId];
             const _cs3 = _SEO_CATS[catId] || {};
             window.updateSEO({
                 title: product.title || product.name || '',
-                desc: (product.desc || `${product.title}. Wyrób z naturalnej sklejki brzozowej, wycinany laserem diodowym. ${_SEO_SITE}.`).slice(0,160),
-                kw: [_cs3.kw, product.title, _catSeo?.title, _subSeo?.title].filter(Boolean).join(', '),
+                desc: (product.desc || `${product.title || product.name}. Wyrób z naturalnej sklejki brzozowej, wycinany laserem diodowym. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs3.kw, product.title, _catSeo?.title].filter(Boolean).join(', '),
                 image: product.image || '',
                 product,
                 breadcrumbs: [
                     { name: 'Strona główna', hash: '' },
                     { name: _catSeo?.title || '', hash: 'kat/' + catId },
-                    { name: _subSeo?.title || '', hash: 'sub/' + catId + '/' + subId },
-                    { name: product.title }
+                    { name: product.title || product.name || '' }
                 ]
             });
-            window._setHash('prod/' + catId + '/' + subId + '/' + prodIndex);
+            window._setHash('prod/' + catId + '/' + prodIndex);
         };
 
         window.updateMainImage = (index) => {
@@ -2486,17 +2516,15 @@
             const found = [];
             const cats = siteData.categories || {};
             Object.entries(cats).forEach(([catId, cat]) => {
-                Object.entries(cat.subs || {}).forEach(([subId, sub]) => {
-                    (sub.products || []).forEach((prod, idx) => {
-                        if (prod.isHidden) return;
-                        if (
-                            ((prod.title || prod.name || '').toLowerCase()).includes(q) ||
-                            (prod.code || '').toLowerCase().includes(q) ||
-                            (prod.desc || '').toLowerCase().includes(q)
-                        ) {
-                            found.push({ catId, subId, idx, prod, catTitle: cat.title, subTitle: sub.title });
-                        }
-                    });
+                (cat.products || []).forEach((prod, idx) => {
+                    if (prod.isHidden) return;
+                    if (
+                        ((prod.title || prod.name || '').toLowerCase()).includes(q) ||
+                        (prod.code || '').toLowerCase().includes(q) ||
+                        (prod.desc || '').toLowerCase().includes(q)
+                    ) {
+                        found.push({ catId, subId: null, idx, prod, catTitle: cat.title, subTitle: '' });
+                    }
                 });
             });
 
@@ -2507,7 +2535,8 @@
 
             results.innerHTML = found.map(({ catId, subId, idx, prod, catTitle, subTitle }) => `
                 <div class="flex items-center gap-4 p-4 bg-slate-900/70 rounded-2xl border border-white/5 hover:border-sky-500/30 hover:bg-sky-500/5 cursor-pointer transition group"
-                     onclick="window.closeSearch(); window.openGallery('${catId}', '${subId}', ${idx})">
+                     onclick="window.closeSearch(); window.openGallery('${catId}', ${idx})"
+>
                     <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center">
                         ${prod.image ? `<img src="${escapeHTML(prod.image)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">` : '<i class="fa-solid fa-image text-slate-600"></i>'}
                     </div>
@@ -3634,8 +3663,7 @@
                 <h3 class="text-3xl font-bold mb-6">Dodaj Nowe Produkty</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Nowy Produkt</h4>
-                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria Główna</label><select id="new-p-cat" class="calc-input text-white font-bold" onchange="updateSubSelectForAdd()"><option value="">-- Wybierz --</option>${categoryOptions}</select></div>
-                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Podkategoria</label><select id="new-p-sub" class="calc-input text-white font-bold" disabled><option value="">-- Najpierw wybierz kategorię --</option></select></div>
+                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria</label><select id="new-p-cat" class="calc-input text-white font-bold"><option value="">-- Wybierz kategorię --</option>${categoryOptions}</select></div>
                     <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
@@ -3654,52 +3682,27 @@
             window.appendGalleryRow(document.getElementById('new-gallery-container'));
 
             document.getElementById('btn-add-prod').onclick = () => {
-                const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
-                const t = document.getElementById('new-p-t').value; 
-                let img = document.getElementById('new-p-i').value.trim(); // Trim added
-                
-                const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value;
+                const cid = document.getElementById('new-p-cat').value;
+                const t = document.getElementById('new-p-t').value;
+                let img = document.getElementById('new-p-i').value.trim();
+                const code = document.getElementById('new-p-code').value;
+                const price = document.getElementById('new-p-price').value;
                 const desc = document.getElementById('new-p-desc').value;
-                
-                if(cid && sid && t) {
+                if(cid && t) {
                     const prodId = 'p' + Date.now();
                     const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
-                    const galleryImages = []; 
-                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
-                    
-                    // --- AUTO-MINIATURA FIX ---
-                    // Jeśli nie podano miniatury, weź pierwsze zdjęcie z galerii
-                    if (!img && galleryImages.length > 0) {
-                        img = galleryImages[0].src;
-                    }
-
-                    if(!siteData.categories[cid].subs[sid].products) siteData.categories[cid].subs[sid].products = [];
-                    siteData.categories[cid].subs[sid].products.push({ id: prodId, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
-                    siteData.galleries[prodId] = { images: galleryImages };
+                    const galleryUrls = [];
+                    galleryInputs.forEach(inp => { if(inp.value.trim()) galleryUrls.push(inp.value.trim()); });
+                    if (!img && galleryUrls.length > 0) img = galleryUrls[0];
+                    if(!siteData.categories[cid].products) siteData.categories[cid].products = [];
+                    siteData.categories[cid].products.push({ id: prodId, title: t, name: t, image: img, gallery: galleryUrls, code, price, desc, isHidden: false });
+                    siteData.galleries[prodId] = { images: galleryUrls.map(u=>({src:u})) };
                     saveData(); showToast("Produkt dodany!"); renderAddProductView();
-                } else { showToast("Wybierz kategorię, podkategorię i podaj nazwę produktu."); }
+                } else { showToast("Wybierz kategorię i podaj nazwę produktu."); }
             };
         }
 
-        window.updateSubSelectForAdd = () => {
-            const cid = document.getElementById('new-p-cat').value; const subSelect = document.getElementById('new-p-sub');
-            subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
-            if(cid && siteData.categories[cid].subs) {
-                const subs = siteData.categories[cid].subs;
-                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
-                Object.keys(subs)
-                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
-                    .forEach(sid => { 
-                        const opt = document.createElement('option'); 
-                        opt.value = sid; 
-                        // DODANO LICZNIK PRODUKTÓW
-                        const count = subs[sid].products ? subs[sid].products.length : 0;
-                        opt.text = `${subs[sid].title} (${count})`; 
-                        subSelect.appendChild(opt); 
-                    });
-                subSelect.disabled = false;
-            } else { subSelect.disabled = true; }
-        };
+
 
         window.addGalleryInput = (el) => {
             const container = el.closest('.space-y-2');
@@ -3728,10 +3731,8 @@
             const all = [];
             catKeys.forEach(ck => {
                 const cat = cats[ck];
-                Object.keys(cat.subs||{}).forEach(sk => {
-                    (cat.subs[sk].products||[]).forEach((p,idx) => {
-                        all.push({ p, ck, sk, idx, catTitle: cat.title, subTitle: cat.subs[sk].title, color: colorMap[ck] });
-                    });
+                (cat.products||[]).forEach((p,idx) => {
+                    all.push({ p, ck, sk: null, idx, catTitle: cat.title, subTitle: '', color: colorMap[ck] });
                 });
             });
             window._plAll = all; window._plColorMap = colorMap; window._plCats = cats; window._plCatKeys = catKeys;
@@ -3752,7 +3753,7 @@
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[11px] px-2 py-0.5 rounded-full font-bold border shrink-0" style="background:${color.bg};color:${color.text};border-color:${color.border}">${escapeHTML(catTitle)}</span>
-                            <span class="text-[11px] text-stone-400 shrink-0">› ${escapeHTML(subTitle)}</span>
+
                             ${p.code ? `<span class="text-[11px] text-stone-500 font-mono shrink-0">${escapeHTML(p.code)}</span>` : ''}
                             ${p.price && p.price !== 'Do ustalenia' ? `<span class="text-[11px] text-emerald-400 font-semibold shrink-0">${escapeHTML(p.price)}</span>` : ''}
                         </div>
@@ -3774,7 +3775,7 @@
                 <button id="pill-all" onclick="window.plFilter(null,null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border border-white/20 bg-white/10 text-white transition" style="outline:2px solid white">Wszystkie <span class="opacity-60">(${all.length})</span></button>
                 ${catKeys.filter(ck=>!cats[ck].isHidden).map(ck => {
                     const c = colorMap[ck];
-                    const cnt = Object.values(cats[ck].subs||{}).reduce((s,sub)=>s+(sub.products?.length||0),0);
+                    const cnt = (cats[ck].products||[]).length;
                     return `<button data-pcat="${ck}" onclick="window.plFilter('${ck}',null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border transition" style="background:${c.bg};color:${c.text};border-color:${c.border}">${escapeHTML(cats[ck].title)} <span class="opacity-60">(${cnt})</span></button>`;
                 }).join('')}`;
 
@@ -3828,28 +3829,24 @@
             // Filtr podkategorii
             const subBar = document.getElementById('pl-sub-bar');
             const subSel = document.getElementById('pl-sub-sel');
-            if(catId && subBar && subSel) {
+            if(catId) {
                 filtered = filtered.filter(x => x.ck === catId);
-                const subs = siteData.categories[catId]?.subs || {};
-                subSel.innerHTML = '<option value="">Wszystkie podkategorie</option>' +
-                    Object.keys(subs).sort((a,b) => subs[a].title.localeCompare(subs[b].title,'pl'))
-                    .map(sk => `<option value="${sk}"${sk===subId?' selected':''}>${escapeHTML(subs[sk].title)} (${subs[sk].products?.length||0})</option>`).join('');
-                subBar.classList.remove('hidden');
-                if(subId) filtered = filtered.filter(x => x.sk === subId);
-            } else if(subBar) { subBar.classList.add('hidden'); }
+            }
+            if(subBar) { subBar.classList.add('hidden'); }
             const rows = document.getElementById('pl-rows');
             if(rows) rows.innerHTML = window._plRows(filtered);
         };
 
         window.plToggle = (ck, sk, idx) => {
-            const p = siteData.categories[ck].subs[sk].products[idx];
+            const p = (siteData.categories[ck].products||[])[idx];
+            if(!p) return;
             p.isHidden = !p.isHidden; saveData();
             window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
         };
 
         window.plEdit = (ck, sk, idx) => {
             window._plEditCk = ck; window._plEditSk = sk; window._plEditIdx = idx;
-            const p = siteData.categories[ck].subs[sk].products[idx];
+            const p = (siteData.categories[ck].products||[])[idx]; if(!p) return;
             const form = document.getElementById('list-edit-form');
             document.getElementById('edit-p-t').value = p.title || '';
             document.getElementById('edit-p-code').value = p.code || '';
@@ -3859,23 +3856,23 @@
             const mainThumb = document.getElementById('edit-p-main-thumb');
             if (p.image) { mainThumb.src = p.image; mainThumb.classList.remove('hidden'); } else { mainThumb.classList.add('hidden'); }
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
-            const gallery = siteData.galleries?.[p.id]?.images || [];
-            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
+            const gallery = p.gallery ? p.gallery.map(u=>({src:u})) : (siteData.galleries?.[p.id]?.images || []);
+            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src || img); });
             window.appendGalleryRow(galContainer);
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
         window.plDel = (ck, sk, idx) => {
             window.openConfirm("Usunąć ten produkt?", () => {
-                siteData.categories[ck].subs[sk].products.splice(idx, 1);
+                (siteData.categories[ck].products||[]).splice(idx, 1);
                 saveData(); window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
             });
         };
 
         window.plSaveEdit = () => {
-            const ck = window._plEditCk; const sk = window._plEditSk; const idx = window._plEditIdx;
+            const ck = window._plEditCk; const idx = window._plEditIdx;
             if(ck === undefined) return;
-            const p = siteData.categories[ck].subs[sk].products[idx];
+            const p = (siteData.categories[ck].products||[])[idx]; if(!p) return;
             p.title = document.getElementById('edit-p-t').value;
             p.code = document.getElementById('edit-p-code').value;
             p.price = document.getElementById('edit-p-price').value;
@@ -3885,6 +3882,8 @@
             const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryImages.push({ src: inp.value.trim() }); });
             if(!img && galleryImages.length > 0) img = galleryImages[0].src;
             p.image = img;
+            p.gallery = galleryImages.map(i=>i.src||i);
+            if(!p.image && p.gallery.length>0) p.image = p.gallery[0];
             siteData.galleries[p.id] = { images: galleryImages };
             saveData(); showToast("Zapisano zmiany!");
             document.getElementById('list-edit-form').classList.add('hidden');
@@ -4224,14 +4223,16 @@
                 const parts = hash.split('/');
                 if (!hash || hash === '') {
                     window.goHome();
-                } else if (parts[0]==='prod' && parts[1] && parts[2] && parts[3]!==undefined) {
-                    window.openGallery(parts[1], parts[2], parseInt(parts[3]));
-                } else if (parts[0]==='sub' && parts[1] && parts[2]) {
-                    window.openSubcategoryView(parts[1], parts[2]);
+                } else if (parts[0]==='prod' && parts[1]) {
+                    // Nowy: #prod/catId/idx | Stary: #prod/catId/subId/idx
+                    const idx = parts.length >= 4 ? parseInt(parts[3]) : parseInt(parts[2]);
+                    window.openGallery(parts[1], idx);
                 } else if (parts[0]==='kat' && parts[1]) {
-                    window.selectMainCategory(parts[1]);
+                    window.openCategoryProducts(parts[1]);
+                } else if (parts[0]==='sub' && parts[1]) {
+                    window.openCategoryProducts(parts[1]);
                 } else if (parts[0]==='full-sub' && parts[1]) {
-                    window.openFullSubcategoryList(parts[1]);
+                    window.openCategoryProducts(parts[1]);
                 } else if (parts[0]==='products') {
                     window.openAllProductsPage();
                 } else if (parts[0]==='orders') {
