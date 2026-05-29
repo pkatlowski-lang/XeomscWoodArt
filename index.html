@@ -2024,7 +2024,7 @@
                 image: _catImg,
                 breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
             });
-            history.pushState(null, '', '#kat/' + id);
+            if (!window._poppingState) history.pushState(null, '', '#kat/' + id);
 
             const container = document.getElementById('sub-categories-container');
             const title = document.getElementById('selected-cat-title');
@@ -2200,7 +2200,7 @@
                     { name: sub.title }
                 ]
             });
-            history.pushState(null, '', '#sub/' + catId + '/' + subId);
+            if (!window._poppingState) history.pushState(null, '', '#sub/' + catId + '/' + subId);
 
             if(grid) {
                 grid.innerHTML = '';
@@ -2309,7 +2309,7 @@
                     { name: product.title }
                 ]
             });
-            history.pushState(null, '', '#prod/' + catId + '/' + subId + '/' + prodIndex);
+            if (!window._poppingState) history.pushState(null, '', '#prod/' + catId + '/' + subId + '/' + prodIndex);
         };
 
         window.updateMainImage = (index) => {
