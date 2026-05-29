@@ -2252,7 +2252,11 @@
             window._setHash('kat/' + catId);
 
             if(grid) {
-                const products = cat.products || [];
+                // Obsługa obu formatów: nowy (products[]) i stary cache (subs)
+                let products = cat.products || [];
+                if (products.length === 0 && cat.subs) {
+                    Object.values(cat.subs).forEach(sub => { products = products.concat(sub.products || []); });
+                }
                 const visible = products.filter(p => !p.isHidden);
                 if (visible.length > 0) {
                     grid.innerHTML = products.map((prod, index) => {
@@ -2286,7 +2290,10 @@
             const prodIndex = (prodIndexIfOld !== undefined) ? prodIndexIfOld : prodIndexOrSubId;
             const cat = siteData.categories[catId];
             if(!cat) return;
-            const products = cat.products || [];
+            let products = cat.products || [];
+            if (products.length === 0 && cat.subs) {
+                Object.values(cat.subs).forEach(sub => { products = products.concat(sub.products || []); });
+            }
             const product = products[prodIndex]; if (!product) return;
             // Ukryj wszystkie widoki
             ['main-content','subcategory-view','subcategories-full-view','custom-orders-full-view','legal-view'].forEach(id => {
@@ -4223,17 +4230,7 @@
             } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
         }
 
-        // Wczytaj cache — wyczyść jeśli ma stary format z subs
-        const _raw = localStorage.getItem('xeomsc_cached_data');
-        if (_raw) {
-            try {
-                const _c = JSON.parse(_raw);
-                const _cats = _c.categories || {};
-                const _hasOldSubs = Object.values(_cats).some(c => c.subs && Object.keys(c.subs).length > 0 && !c.products);
-                if (_hasOldSubs) { localStorage.removeItem('xeomsc_cached_data'); siteData = initialData; }
-                else { siteData = _c; }
-            } catch(e) { siteData = initialData; }
-        } else { siteData = initialData; }
+        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
         renderHero(); renderMain(); renderTexts(); start();
 
         // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
