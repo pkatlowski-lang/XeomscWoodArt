@@ -23,6 +23,9 @@
     <meta name="twitter:description" content="Precyzyjne wyroby z drewna i sklejki wycinane laserem. Napisy, pudełka, dekoracje.">
     <meta name="twitter:image" content="">
     
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -1173,7 +1176,21 @@
                             </div>
                         </div>
 
-                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Klucz API ImgBB (Opcjonalny - Hosting Zdjęć)</label><input id="edit-imgbb-key" type="password" class="calc-input" placeholder="Wklej API Key jeśli używasz"></div>
+                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Klucz API ImgBB (Hosting Zdjęć)</label><input id="edit-imgbb-key" type="password" class="calc-input" placeholder="Wklej API Key jeśli używasz"></div>
+
+                        <!-- EMAILJS -->
+                        <div class="border-t border-white/5 pt-6">
+                            <h4 class="text-xl font-bold mb-1 text-wood-500">📧 Powiadomienia Email (EmailJS)</h4>
+                            <p class="text-stone-500 text-xs mb-5">Gdy klient wyśle wiadomość — dostaniesz email. Wymagane konto na <a href="https://emailjs.com" target="_blank" class="text-sky-400 underline">emailjs.com</a> (darmowe do 200 emaili/mies.)</p>
+                            <div class="space-y-3 bg-black/20 p-5 rounded-xl border border-white/5">
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Twój email (na który przychodzą powiadomienia)</label><input id="edit-ejs-to-email" class="calc-input" placeholder="np. kontakt@xeomsc.pl"></div>
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">EmailJS — Public Key</label><input id="edit-ejs-public-key" type="password" class="calc-input" placeholder="Skopiuj z EmailJS → Account → API Keys"></div>
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">EmailJS — Service ID</label><input id="edit-ejs-service-id" class="calc-input" placeholder="np. service_xxxxxxx"></div>
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">EmailJS — Template ID</label><input id="edit-ejs-template-id" class="calc-input" placeholder="np. template_xxxxxxx"></div>
+                                <p class="text-[11px] text-stone-600 pt-1"><i class="fa-solid fa-circle-info mr-1"></i>Nie wiesz jak ustawić? <a href="https://www.emailjs.com/docs/tutorial/overview/" target="_blank" class="text-sky-500 underline">Instrukcja EmailJS</a> — zajmuje ok. 10 minut.</p>
+                            </div>
+                        </div>
+
                         <button onclick="saveContentSettings()" class="bg-wood-600 hover:bg-wood-500 px-8 py-3 rounded-xl font-bold transition">Zapisz Zmiany</button>
                     </div>
                  </div>
@@ -1489,6 +1506,7 @@
             customOrders: [],
             savedCalculations: [], // NOWA TABLICA NA ZAPISANE WYCENY
             imgbbKey: "",
+            emailjsConfig: { serviceId: "", templateId: "", publicKey: "", toEmail: "" },
             // USTAWIENIA KALKULATORA
             calcSettings: {
                 materialRate: 0.0038, // Cena za cm2 (bazowa dla 3mm)
@@ -2667,6 +2685,13 @@
                 
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
 
+                // Załaduj EmailJS config
+                const ejs = siteData.emailjsConfig || {};
+                document.getElementById('edit-ejs-to-email').value    = ejs.toEmail    || '';
+                document.getElementById('edit-ejs-public-key').value  = ejs.publicKey  || '';
+                document.getElementById('edit-ejs-service-id').value  = ejs.serviceId  || '';
+                document.getElementById('edit-ejs-template-id').value = ejs.templateId || '';
+
                 // Załaduj tytuł i podtytuł sekcji oferty
                 const ab = t.about || initialData.textContent.about;
                 document.getElementById('edit-about-title').value    = ab?.title    || initialData.textContent.about.title;
@@ -2913,6 +2938,14 @@
             siteData.textContent.footer.copyright = document.getElementById('edit-footer-copyright').value;
             
             siteData.imgbbKey = document.getElementById('edit-imgbb-key').value.trim();
+
+            // Zapisz EmailJS config
+            siteData.emailjsConfig = {
+                toEmail:    document.getElementById('edit-ejs-to-email').value.trim(),
+                publicKey:  document.getElementById('edit-ejs-public-key').value.trim(),
+                serviceId:  document.getElementById('edit-ejs-service-id').value.trim(),
+                templateId: document.getElementById('edit-ejs-template-id').value.trim()
+            };
 
             // Zapisz karty oferty
             siteData.textContent.aboutCards = [1,2,3,4,5,6].map(n => ({
@@ -3946,21 +3979,40 @@
 
                 if(isOnline) {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
-                        name: name, 
-                        email: email, 
-                        message: msg, 
+                        name: name,
+                        email: email,
+                        message: msg,
                         attachment: attachmentData,
-                        date: new Date().toISOString(), 
-                        status: 'new', // Domyślny status
+                        date: new Date().toISOString(),
+                        status: 'new',
                         read: false
                     });
+
+                    // Powiadomienie email przez EmailJS (jeśli skonfigurowane)
+                    const ejsCfg = siteData.emailjsConfig || {};
+                    if(ejsCfg.publicKey && ejsCfg.serviceId && ejsCfg.templateId) {
+                        try {
+                            emailjs.init({ publicKey: ejsCfg.publicKey });
+                            await emailjs.send(ejsCfg.serviceId, ejsCfg.templateId, {
+                                to_email:    ejsCfg.toEmail || '',
+                                from_name:   name,
+                                from_email:  email,
+                                message:     msg,
+                                reply_to:    email,
+                                sent_at:     new Date().toLocaleString('pl-PL')
+                            });
+                        } catch(ejsErr) {
+                            console.warn('EmailJS: nie wysłano powiadomienia:', ejsErr);
+                        }
+                    }
+
                     localStorage.setItem('xeomsc_last_contact', String(Date.now()));
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Wysłano!';
                     setTimeout(() => {
                         btn.innerHTML = originalText;
                         closeContactModal();
                         showToast("Wiadomość wysłana!");
-                        document.getElementById('contact-file-input').value = ""; // Reset inputu
+                        document.getElementById('contact-file-input').value = "";
                     }, 1500);
                 } else {
                     showToast("Brak połączenia. Nie można wysłać wiadomości.", 'error');
