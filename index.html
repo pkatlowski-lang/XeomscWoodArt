@@ -206,7 +206,7 @@
         }
         .msg-body-wrapper.open {
             opacity: 1;
-            max-height: 2000px;
+            max-height: 3000px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -2895,37 +2895,114 @@
             await saveData(); renderTexts(); showToast("Zapisano zmiany!");
         };
 
+        // Powiadomienia przeglądarki — żądanie uprawnień
+        window._knownMsgIds = new Set();
+        window._notifReady  = false;
+        window.requestAdminNotifications = async () => {
+            if (!('Notification' in window) || window._notifReady) return;
+            if (Notification.permission === 'default') await Notification.requestPermission();
+            window._notifReady = true;
+        };
+        window.fireNewMsgNotification = (name, preview) => {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            const n = new Notification('📬 Nowa wiadomość – Xeomsc', {
+                body: `Od: ${name}\n${preview}`,
+                icon: 'https://i.ibb.co/G4yC20JD/2add72180546.png'
+            });
+            n.onclick = () => { window.focus(); n.close(); };
+            // Dźwięk powiadomienia (Web Audio API)
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator(); const g = ctx.createGain();
+                o.connect(g); g.connect(ctx.destination);
+                o.frequency.setValueAtTime(880, ctx.currentTime);
+                o.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+                g.gain.setValueAtTime(0.3, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+                o.start(); o.stop(ctx.currentTime + 0.4);
+            } catch(e) {}
+        };
+        // Funkcja pobierania załącznika (obsługuje base64 i URL)
+        window.downloadAttachment = (encodedUrl, filename) => {
+            const url = encodedUrl;
+            if (url.startsWith('data:')) {
+                const a = document.createElement('a');
+                a.href = url; a.download = filename; a.click();
+            } else {
+                fetch(url).then(r => r.blob()).then(blob => {
+                    const bu = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = bu; a.download = filename; a.click();
+                    setTimeout(() => URL.revokeObjectURL(bu), 2000);
+                }).catch(() => window.open(url, '_blank'));
+            }
+        };
+        // Formularz odpowiedzi
+        window.toggleReplyForm = (id) => {
+            const f = document.getElementById(`reply-form-${id}`);
+            if (f) { f.classList.toggle('hidden'); f.querySelector('textarea')?.focus(); }
+        };
+        window.sendReplyEmail = (msgId, rawEmail, rawName) => {
+            const body = document.getElementById(`reply-body-${msgId}`)?.value?.trim();
+            if (!body) { showToast('Wpisz treść odpowiedzi!', 'error'); return; }
+            const subject = encodeURIComponent('Odpowiedź od Xeomsc Laser Studio');
+            const bodyEnc = encodeURIComponent(`Witaj ${rawName},\n\n${body}\n\n---\nXeomsc Laser Studio`);
+            window.open(`mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`, '_self');
+            window.updateMessageStatus(msgId, 'replied');
+            setTimeout(() => {
+                const f = document.getElementById(`reply-form-${msgId}`);
+                if (f) f.classList.add('hidden');
+            }, 600);
+        };
+
         function startMessageListener() {
              const list = document.getElementById('messages-list');
              const countBadge = document.getElementById('msg-count-bar');
              if(!isOnline) return;
-             
+
+             // Żądaj uprawnień do powiadomień
+             window.requestAdminNotifications();
+
              const msgCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
              if (messageUnsubscribe) messageUnsubscribe();
-             
+
              messageUnsubscribe = onSnapshot(msgCollection, (snap) => {
                  let html = '';
                  let msgs = [];
                  snap.forEach(doc => { msgs.push({ id: doc.id, ...doc.data() }); });
-                 msgs.sort((a,b) => new Date(b.date) - new Date(a.date)); 
-                 
+                 msgs.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                 // Wykryj nowe wiadomości i wyślij powiadomienie
+                 const firstRun = window._knownMsgIds.size === 0;
+                 msgs.forEach(m => {
+                     if (!window._knownMsgIds.has(m.id)) {
+                         window._knownMsgIds.add(m.id);
+                         if (!firstRun && (m.status === 'new' || !m.read)) {
+                             window.fireNewMsgNotification(m.name || 'Klient', (m.message || '').substring(0, 80));
+                             showToast(`📬 Nowa wiadomość od ${m.name}`);
+                         }
+                     }
+                 });
+
                  const unread = msgs.filter(m => (m.status === 'new' || (!m.read && !m.status))).length;
-                 if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); } 
+                 if(unread > 0) { countBadge.textContent = unread; countBadge.classList.remove('hidden'); }
                  else { countBadge.classList.add('hidden'); }
 
-                 if(msgs.length === 0) { html = '<p class="text-stone-500 text-center py-10">Brak wiadomości.</p>'; } 
+                 if(msgs.length === 0) { html = '<p class="text-stone-500 text-center py-10">Brak wiadomości.</p>'; }
                  else {
                      html = msgs.map(m => {
                          const isUnread = (m.status === 'new' || (!m.read && !m.status));
                          const statusKey = m.status || (m.read ? 'read' : 'new');
                          const statusData = STATUS_MAP[statusKey] || STATUS_MAP['new'];
                          const unreadClass = isUnread ? 'message-unread-header' : '';
-                         const isOpen = window.openMessageIds.has(m.id); 
+                         const isOpen = window.openMessageIds.has(m.id);
 
                          const safeName       = escapeHTML(m.name);
                          const safeEmail      = escapeHTML(m.email);
                          const safeMessage    = escapeHTML(m.message);
-                         const safeAttachment = m.attachment ? escapeHTML(m.attachment) : '';
+                         const hasAttachment  = !!m.attachment;
+                         // Przechowujemy załącznik w window żeby nie wbudowywać base64 w HTML
+                         if (hasAttachment) window[`_att_${m.id}`] = m.attachment;
 
                          return `
                          <div class="message-row-wrapper">
@@ -2947,32 +3024,48 @@
                                          <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${safeMessage}</p>
                                      </div>
 
-                                     ${safeAttachment ? `
+                                     ${hasAttachment ? `
                                      <div>
-                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik:</p>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik klienta:</p>
                                          <div class="flex flex-wrap items-end gap-4">
-                                             <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox('${safeAttachment}')">
-                                                 <img src="${safeAttachment}" class="w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20" loading="lazy" alt="Załącznik">
+                                             <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(window['_att_${m.id}'])">
+                                                 <img src="${m.attachment && m.attachment.startsWith('data:') ? m.attachment.substring(0,50)+'...' : ''}" data-attid="${m.id}" class="msg-att-img w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20" loading="lazy" alt="Załącznik">
                                                  <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
                                                      <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
                                                  </div>
                                              </div>
-                                             <a href="${safeAttachment}" download="zalacznik_xeomsc_${m.id}.png" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
-                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz oryginał
-                                             </a>
+                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}.jpg')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz zdjęcie
+                                             </button>
                                          </div>
                                      </div>` : ''}
 
-                                     <div class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-4">
-                                         <div class="flex items-center gap-2">
-                                             <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
-                                             <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
-                                                 ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
-                                             </select>
+                                     <div class="pt-4 border-t border-white/5 space-y-4">
+                                         <div class="flex flex-wrap items-center gap-4">
+                                             <div class="flex items-center gap-2">
+                                                 <label class="text-xs font-bold text-stone-500 uppercase">Zmień status:</label>
+                                                 <select onchange="window.updateMessageStatus('${m.id}', this.value)" class="bg-black/40 border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-wood-500">
+                                                     ${Object.keys(STATUS_MAP).map(k => `<option value="${k}" ${statusKey === k ? 'selected' : ''}>${STATUS_MAP[k].label}</option>`).join('')}
+                                                 </select>
+                                             </div>
+                                             <button onclick="window.toggleReplyForm('${m.id}')" class="ml-auto text-xs font-bold text-wood-400 hover:text-wood-300 flex items-center gap-2 px-4 py-2 bg-wood-500/10 rounded-lg hover:bg-wood-500/20 transition">
+                                                 <i class="fa-solid fa-reply"></i> Odpowiedz
+                                             </button>
                                          </div>
-                                         <a href="mailto:${safeEmail}" class="text-xs font-bold text-wood-500 hover:text-wood-400 ml-auto flex items-center gap-2 px-4 py-2 bg-wood-500/10 rounded-lg hover:bg-wood-500/20 transition">
-                                             <i class="fa-solid fa-reply"></i> Odpowiedz
-                                         </a>
+                                         <!-- Formularz odpowiedzi -->
+                                         <div id="reply-form-${m.id}" class="hidden bg-black/30 rounded-2xl p-5 border border-wood-600/20 space-y-3">
+                                             <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do: <span class="text-wood-400">${safeName}</span> &lt;${safeEmail}&gt;</p>
+                                             <textarea id="reply-body-${m.id}" class="calc-input h-36 resize-none text-sm leading-relaxed" placeholder="Wpisz treść odpowiedzi..."></textarea>
+                                             <div class="flex gap-3">
+                                                 <button onclick="window.sendReplyEmail('${m.id}', '${m.email}', '${m.name}')" class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
+                                                     <i class="fa-solid fa-paper-plane"></i> Wyślij mailem
+                                                 </button>
+                                                 <button onclick="window.toggleReplyForm('${m.id}')" class="px-4 py-2.5 rounded-xl text-stone-400 hover:text-white text-sm transition hover:bg-white/5">
+                                                     Anuluj
+                                                 </button>
+                                             </div>
+                                             <p class="text-[11px] text-stone-600"><i class="fa-solid fa-circle-info mr-1"></i>Otworzy Twój klient pocztowy z uzupełnioną wiadomością.</p>
+                                         </div>
                                      </div>
                                  </div>
                              </div>
@@ -2980,7 +3073,14 @@
                       `;
                       }).join('');
                  }
-                 if(list) list.innerHTML = html;
+                 if(list) {
+                     list.innerHTML = html;
+                     // Załaduj miniatury załączników z window[_att_id]
+                     list.querySelectorAll('.msg-att-img[data-attid]').forEach(img => {
+                         const att = window[`_att_${img.dataset.attid}`];
+                         if (att) img.src = att;
+                     });
+                 }
              }, (error) => {
                  console.error("Błąd pobierania wiadomości:", error);
                  if(list) list.innerHTML = '<p class="text-red-500 text-center py-10">Błąd połączenia z bazą wiadomości.</p>';
