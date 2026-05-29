@@ -1851,7 +1851,15 @@
         }
 
         function _productImgsFromCat(cat) {
-            return (cat.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
+            // Nowa struktura
+            const direct = (cat.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
+            if (direct.length > 0) return direct;
+            // Stara struktura (cache)
+            const out = [];
+            Object.values(cat.subs || {}).forEach(sub => {
+                (sub.products || []).forEach(p => { if(p.image && !p.isHidden) out.push(p.image); });
+            });
+            return out;
         }
         function _productImgsFromSub(sub) {
             return (sub.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
@@ -1982,8 +1990,13 @@
                 const cats = siteData.categories || {};
                 // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
                 const catHasProducts = (c) => {
-                    const prods = c.products || [];
-                    return prods.some(p => !p.isHidden);
+                    // Nowa struktura: products bezpośrednio w kategorii
+                    const direct = c.products || [];
+                    if (direct.length > 0) return direct.some(p => !p.isHidden);
+                    // Stara struktura (cache localStorage): products w subs
+                    return Object.values(c.subs || {}).some(sub =>
+                        (sub.products || []).some(p => !p.isHidden)
+                    );
                 };
                 const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
@@ -4203,7 +4216,17 @@
             } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
         }
 
-        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        // Wczytaj cache — wyczyść jeśli ma stary format z subs
+        const _raw = localStorage.getItem('xeomsc_cached_data');
+        if (_raw) {
+            try {
+                const _c = JSON.parse(_raw);
+                const _cats = _c.categories || {};
+                const _hasOldSubs = Object.values(_cats).some(c => c.subs && Object.keys(c.subs).length > 0 && !c.products);
+                if (_hasOldSubs) { localStorage.removeItem('xeomsc_cached_data'); siteData = initialData; }
+                else { siteData = _c; }
+            } catch(e) { siteData = initialData; }
+        } else { siteData = initialData; }
         renderHero(); renderMain(); renderTexts(); start();
 
         // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
