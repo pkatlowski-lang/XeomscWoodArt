@@ -1532,49 +1532,19 @@
             });
         };
 
+        const _icScroll = (el, left) => { try { el.scrollTo({ left, behavior: 'instant' }); } catch(e) { el.scrollLeft = left; } };
+
         window.scrollCategories = (direction) => {
             const container = document.getElementById('main-categories-grid'); if(!container) return;
-            const scrollAmount = window.innerWidth < 768 ? 320 : 420;
-            
-            // Logika pętli (360 stopni)
-            // Jeśli idziemy w prawo i jesteśmy przy końcu -> skocz na początek
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' }); 
-            } 
-            // Jeśli idziemy w lewo i jesteśmy na początku -> skocz na koniec
-            else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' }); 
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            container.scrollBy({ left: direction * (window.innerWidth < 768 ? 320 : 420), behavior: 'smooth' });
         };
-
-        // Nowa funkcja do przewijania podkategorii (z logiką 360)
         window.scrollSubCategories = (direction) => {
             const container = document.getElementById('sub-categories-grid'); if(!container) return;
-            const scrollAmount = window.innerWidth < 768 ? 280 : 320;
-
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
-            } else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            container.scrollBy({ left: direction * (window.innerWidth < 768 ? 280 : 320), behavior: 'smooth' });
         };
-
         window.scrollCustomOrders = (direction) => {
             const container = document.getElementById('custom-orders-carousel'); if(!container) return;
-            const scrollAmount = window.innerWidth < 768 ? 300 : 400;
-
-            // Logika pętli (360 stopni)
-            if (direction === 1 && Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
-            } else if (direction === -1 && container.scrollLeft <= 0) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
+            container.scrollBy({ left: direction * (window.innerWidth < 768 ? 300 : 400), behavior: 'smooth' });
         };
         
         window.startAutoScroll = () => {
@@ -1588,52 +1558,50 @@
         window.makeInfiniteCarousel = (containerId) => {
             const el = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
             if (!el) return;
+
             // Czyść poprzednią instancję
             if (el._icHandler) { el.removeEventListener('scroll', el._icHandler); el._icHandler = null; }
             el.querySelectorAll('[data-ic-clone]').forEach(c => c.remove());
+            delete el.dataset.icSetW;
 
             const originals = Array.from(el.children);
             if (originals.length === 0) return;
 
-            // Prepend + append klonom (3× zawartość łącznie)
+            // Prepend + append klony (3× zawartość: klon | oryginały | klon)
             [...originals].reverse().forEach(child => {
                 const clone = child.cloneNode(true);
-                clone.dataset.icClone = '1';
+                clone.setAttribute('data-ic-clone', '1');
                 el.insertBefore(clone, el.firstChild);
             });
             originals.forEach(child => {
                 const clone = child.cloneNode(true);
-                clone.dataset.icClone = '1';
+                clone.setAttribute('data-ic-clone', '1');
                 el.appendChild(clone);
             });
 
-            // Ustaw startową pozycję na środkowy zestaw (oryginały)
-            const jumpToMiddle = (smooth) => {
-                const sw = Math.round(el.scrollWidth / 3);
-                el.dataset.icSetW = sw;
-                if (!smooth) {
-                    el.style.scrollBehavior = 'auto';
-                    el.scrollLeft = sw;
-                    requestAnimationFrame(() => { el.style.scrollBehavior = ''; });
-                }
-            };
-            requestAnimationFrame(() => jumpToMiddle(false));
+            requestAnimationFrame(() => {
+                const setW = el.scrollWidth / 3;
+                el.dataset.icSetW = setW;
+                // Start na środkowym zestawie (oryginały)
+                _icScroll(el, setW);
 
-            // Handler wrap-around
-            el._icHandler = () => {
-                const sw = parseInt(el.dataset.icSetW) || 0;
-                if (!sw) return;
-                if (el.scrollLeft < sw * 0.15) {
-                    el.style.scrollBehavior = 'auto';
-                    el.scrollLeft += sw;
-                    requestAnimationFrame(() => { el.style.scrollBehavior = ''; });
-                } else if (el.scrollLeft > sw * 1.85) {
-                    el.style.scrollBehavior = 'auto';
-                    el.scrollLeft -= sw;
-                    requestAnimationFrame(() => { el.style.scrollBehavior = ''; });
-                }
-            };
-            el.addEventListener('scroll', el._icHandler, { passive: true });
+                if (el._icHandler) el.removeEventListener('scroll', el._icHandler);
+                el._icHandler = () => {
+                    if (el._icLock) return;
+                    const sw = parseFloat(el.dataset.icSetW);
+                    if (!sw) return;
+                    if (el.scrollLeft >= 2 * sw) {
+                        el._icLock = true;
+                        _icScroll(el, el.scrollLeft - sw);
+                        requestAnimationFrame(() => requestAnimationFrame(() => { el._icLock = false; }));
+                    } else if (el.scrollLeft < sw) {
+                        el._icLock = true;
+                        _icScroll(el, el.scrollLeft + sw);
+                        requestAnimationFrame(() => requestAnimationFrame(() => { el._icLock = false; }));
+                    }
+                };
+                el.addEventListener('scroll', el._icHandler, { passive: true });
+            });
         };
         
         // ZMIENNA DO ŚLEDZENIA AKTYWNEJ KATEGORII NA STRONIE GŁÓWNEJ
