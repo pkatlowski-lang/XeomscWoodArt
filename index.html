@@ -781,16 +781,32 @@
             <!-- Lewa: Zdjęcia -->
             <div class="space-y-4">
                 <!-- ZMIANA: object-cover na object-contain, aby pokazać całe zdjęcie -->
-                <div class="aspect-square bg-slate-900 rounded-3xl overflow-hidden border border-white/5 shadow-lg cursor-zoom-in relative group flex items-center justify-center" onclick="openLightbox(window.currentImgIndex)">
-                    <img id="main-product-img" src="" class="w-full h-full object-contain transition duration-500">
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass-plus text-white text-4xl opacity-0 group-hover:opacity-100 transition transform scale-75 group-hover:scale-100 drop-shadow-md"></i>
+                <div class="aspect-square bg-slate-900 rounded-3xl overflow-hidden border border-white/5 shadow-lg relative group/main flex items-center justify-center">
+                    <img id="main-product-img" src="" class="w-full h-full object-contain transition duration-500 cursor-zoom-in" onclick="openLightbox(window.currentImgIndex)">
+                    <!-- Strzałka lewa -->
+                    <button onclick="window.prevProductImage()" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-wood-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 opacity-0 group-hover/main:opacity-100 shadow-lg" id="prod-img-prev">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <!-- Strzałka prawa -->
+                    <button onclick="window.nextProductImage()" class="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-wood-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 opacity-0 group-hover/main:opacity-100 shadow-lg" id="prod-img-next">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <!-- Ikona powiększenia -->
+                    <div class="absolute bottom-3 right-3 bg-black/50 text-white px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 opacity-0 group-hover/main:opacity-100 transition pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i> Powiększ
                     </div>
+                    <!-- Licznik zdjęć -->
+                    <div id="prod-img-counter" class="absolute bottom-3 left-3 bg-black/50 text-white px-3 py-1.5 rounded-full text-xs font-bold opacity-0 group-hover/main:opacity-100 transition pointer-events-none"></div>
                 </div>
-                <!-- Miniaturki z przewijaniem -->
-                <div class="relative group">
-                    <div id="product-thumbnails" class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar px-1 snap-x snap-mandatory"></div>
-                    <div class="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none"></div>
+                <!-- Miniaturki z przyciskami nawigacji -->
+                <div class="relative group/thumbs">
+                    <button onclick="window.scrollThumbGallery(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800/90 hover:bg-wood-600 text-white w-8 h-8 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover/thumbs:opacity-100 -ml-2 shrink-0">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <div id="product-thumbnails" class="flex gap-3 overflow-x-auto pb-2 hide-scrollbar px-8 snap-x snap-mandatory scroll-smooth"></div>
+                    <button onclick="window.scrollThumbGallery(1)" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800/90 hover:bg-wood-600 text-white w-8 h-8 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover/thumbs:opacity-100 -mr-2 shrink-0">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
                 </div>
             </div>
 
@@ -2235,7 +2251,14 @@
                     thumb.onclick = () => { window.updateMainImage(i); };
                     thumbsContainer.appendChild(thumb);
                 });
-            } else { thumbsContainer.innerHTML = '<span class="text-xs text-stone-400">Brak dodatkowych zdjęć.</span>'; }
+            } else { thumbsContainer.innerHTML = ''; }
+            // Inicjalizuj licznik i strzałki
+            const counter = document.getElementById('prod-img-counter');
+            if(counter) { counter.textContent = allImages.length > 1 ? `1 / ${allImages.length}` : ''; }
+            const prevBtn = document.getElementById('prod-img-prev');
+            const nextBtn = document.getElementById('prod-img-next');
+            if(prevBtn) prevBtn.style.display = allImages.length > 1 ? '' : 'none';
+            if(nextBtn) nextBtn.style.display = allImages.length > 1 ? '' : 'none';
             document.getElementById('subcategory-view').classList.add('hidden');
             document.getElementById('gallery-view').classList.remove('hidden');
             window.scrollTo(0,0);
@@ -2261,18 +2284,47 @@
         };
 
         window.updateMainImage = (index) => {
+            const images = window.currentLightboxImages;
+            if (!images || !images[index]) return;
             window.currentImgIndex = index;
             const mainImg = document.getElementById('main-product-img');
-            const images = window.currentLightboxImages;
-            if(images[index]) {
-                mainImg.style.opacity = '0.5';
-                setTimeout(() => { mainImg.src = images[index].src; mainImg.style.opacity = '1'; }, 150);
-                const thumbs = document.getElementById('product-thumbnails').children;
-                for(let i=0; i<thumbs.length; i++) {
-                    if(i === index) { thumbs[i].classList.add('thumb-active'); thumbs[i].classList.remove('opacity-60'); } 
-                    else { thumbs[i].classList.remove('thumb-active'); thumbs[i].classList.add('opacity-60'); }
-                }
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => { mainImg.src = images[index].src; mainImg.style.opacity = '1'; }, 150);
+            // Aktualizuj miniatury
+            const thumbs = document.getElementById('product-thumbnails').children;
+            for(let i=0; i<thumbs.length; i++) {
+                if(i === index) { thumbs[i].classList.add('thumb-active'); thumbs[i].classList.remove('opacity-60'); }
+                else { thumbs[i].classList.remove('thumb-active'); thumbs[i].classList.add('opacity-60'); }
             }
+            // Przewiń miniaturę do widoku
+            if(thumbs[index]) thumbs[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // Aktualizuj licznik
+            const counter = document.getElementById('prod-img-counter');
+            if(counter && images.length > 1) { counter.textContent = `${index+1} / ${images.length}`; counter.classList.remove('hidden'); }
+            // Ukryj strzałki jeśli jedno zdjęcie
+            const prev = document.getElementById('prod-img-prev');
+            const next = document.getElementById('prod-img-next');
+            if(prev) prev.style.display = images.length > 1 ? '' : 'none';
+            if(next) next.style.display = images.length > 1 ? '' : 'none';
+        };
+
+        // Nawigacja strzałkami na głównym zdjęciu
+        window.prevProductImage = () => {
+            const images = window.currentLightboxImages;
+            if(!images || images.length <= 1) return;
+            const idx = (window.currentImgIndex - 1 + images.length) % images.length;
+            window.updateMainImage(idx);
+        };
+        window.nextProductImage = () => {
+            const images = window.currentLightboxImages;
+            if(!images || images.length <= 1) return;
+            const idx = (window.currentImgIndex + 1) % images.length;
+            window.updateMainImage(idx);
+        };
+        // Przewijanie paska miniatur
+        window.scrollThumbGallery = (dir) => {
+            const el = document.getElementById('product-thumbnails');
+            if(el) el.scrollBy({ left: dir * 200, behavior: 'smooth' });
         };
 
         window.delHero = (i) => { window.openConfirm("Usunąć ten slajd?", () => { siteData.heroItems.splice(i,1); saveData(); renderHeroAdmin(); renderHero(); }); };
