@@ -558,8 +558,8 @@
         <section id="about" class="py-24 bg-slate-900">
             <div class="max-w-7xl mx-auto px-6 text-center">
                 <p class="text-wood-400 font-bold uppercase tracking-widest text-sm mb-3">Xeomsc Laser Studio</p>
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">Dlaczego klienci nas wybierają?</h2>
-                <p class="text-slate-400 text-lg mb-4 max-w-2xl mx-auto">Każde zlecenie traktujemy indywidualnie — od pierwszego szkicu po gotowy produkt.</p>
+                <h2 id="about-section-title" class="text-4xl md:text-5xl font-bold mb-4 text-white">Dlaczego klienci nas wybierają?</h2>
+                <p id="about-section-subtitle" class="text-slate-400 text-lg mb-4 max-w-2xl mx-auto">Każde zlecenie traktujemy indywidualnie — od pierwszego szkicu po gotowy produkt.</p>
                 <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
                 <div id="about-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
                 <div class="mt-14">
@@ -1006,10 +1006,19 @@
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Linia 1)</label><input id="edit-hero-main" class="calc-input"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Akcent)</label><input id="edit-hero-accent" class="calc-input text-wood-500"></div>
                         <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis Hero</label><textarea id="edit-hero-desc" class="calc-input h-24"></textarea></div>
+                        <!-- EDYCJA SEKCJI "DLACZEGO NAS WYBIERAJĄ" -->
+                        <div class="border-t border-white/5 pt-6">
+                            <h4 class="text-xl font-bold mb-4 text-wood-500">Sekcja Oferty</h4>
+                            <div class="space-y-3 mb-6 bg-black/20 p-5 rounded-xl border border-white/5">
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Tytuł sekcji</label><input id="edit-about-title" class="calc-input" placeholder="np. Dlaczego klienci nas wybierają?"></div>
+                                <div><label class="text-[10px] text-stone-500 font-bold uppercase block mb-1">Podtytuł sekcji</label><input id="edit-about-subtitle" class="calc-input" placeholder="np. Każde zlecenie traktujemy indywidualnie..."></div>
+                            </div>
+                        </div>
+
                         <!-- EDYCJA 6 KART OFERTY -->
                         <div class="border-t border-white/5 pt-6">
                             <h4 class="text-xl font-bold mb-1 text-wood-500">6 Kart Oferty</h4>
-                            <p class="text-stone-500 text-xs mb-5">Sekcja "Dlaczego klienci nas wybierają?" na stronie głównej</p>
+                            <p class="text-stone-500 text-xs mb-5">Treść kart w sekcji oferty</p>
                             <div class="space-y-5" id="about-cards-editor">
 
                                 <!-- Karta 1 -->
@@ -1487,6 +1496,10 @@
             },
             textContent: {
                 hero: { main: "Precyzja Lasera,<br>Piękno", accent: "Drewna", desc: "Witaj w Xeomsc Laser Studio. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
+                about: {
+                    title: "Dlaczego klienci nas wybierają?",
+                    subtitle: "Każde zlecenie traktujemy indywidualnie — od pierwszego szkicu po gotowy produkt."
+                },
                 aboutCards: [
                     { icon: "fa-solid fa-fingerprint", title: "Tylko Twój projekt", desc: "Każdy produkt tworzymy od zera według Twoich potrzeb. Żadnych gotowych wzorów — wyłącznie unikalne projekty na zamówienie." },
                     { icon: "fa-solid fa-bolt", title: "Realizacja w 24–48h", desc: "Szybka wycena, sprawna realizacja i wysyłka kurierem do całej Polski. Twoje zamówienie nie czeka w kolejce." },
@@ -1693,6 +1706,12 @@
             // ZMIEŃ WSZYSTKIE STOPKI
             document.querySelectorAll('[id="footer-slogan"]').forEach(el => el.textContent = t.footer.slogan);
             document.querySelectorAll('[id="footer-copyright"]').forEach(el => el.innerHTML = t.footer.copyright);
+
+            if(!t.about) t.about = initialData.textContent.about;
+            const aboutTitle = document.getElementById('about-section-title');
+            const aboutSubtitle = document.getElementById('about-section-subtitle');
+            if(aboutTitle) aboutTitle.textContent = t.about.title || initialData.textContent.about.title;
+            if(aboutSubtitle) aboutSubtitle.textContent = t.about.subtitle || initialData.textContent.about.subtitle;
 
             const grid = document.getElementById('about-grid');
             if(grid && t.aboutCards) {
@@ -2648,14 +2667,21 @@
                 
                 if(siteData.imgbbKey) document.getElementById('edit-imgbb-key').value = siteData.imgbbKey;
 
-                // Załaduj karty oferty
-                const cards = t.aboutCards || initialData.textContent.aboutCards;
+                // Załaduj tytuł i podtytuł sekcji oferty
+                const ab = t.about || initialData.textContent.about;
+                document.getElementById('edit-about-title').value    = ab?.title    || initialData.textContent.about.title;
+                document.getElementById('edit-about-subtitle').value = ab?.subtitle || initialData.textContent.about.subtitle;
+
+                // Załaduj karty oferty (pad do 6 jeśli mniej)
+                const defaults = initialData.textContent.aboutCards;
+                const rawCards = t.aboutCards && t.aboutCards.length ? t.aboutCards : defaults;
+                const cards = [...rawCards];
+                while (cards.length < 6) cards.push(defaults[cards.length] || { icon: 'fa-solid fa-star', title: '', desc: '' });
                 [1,2,3,4,5,6].forEach((n, i) => {
                     const c = cards[i];
-                    if (!c) return;
-                    document.getElementById(`edit-card${n}-icon`).value  = c.icon  || '';
-                    document.getElementById(`edit-card${n}-title`).value = c.title || '';
-                    document.getElementById(`edit-card${n}-desc`).value  = c.desc  || '';
+                    document.getElementById(`edit-card${n}-icon`).value  = c?.icon  || '';
+                    document.getElementById(`edit-card${n}-title`).value = c?.title || '';
+                    document.getElementById(`edit-card${n}-desc`).value  = c?.desc  || '';
                 });
             }
             // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
@@ -2867,7 +2893,10 @@
             if(!siteData.textContent) siteData.textContent = initialData.textContent;
             if(!siteData.textContent.legal) siteData.textContent.legal = {};
             if(!siteData.textContent.footer) siteData.textContent.footer = {};
+            if(!siteData.textContent.about) siteData.textContent.about = {};
 
+            siteData.textContent.about.title    = document.getElementById('edit-about-title').value.trim()    || initialData.textContent.about.title;
+            siteData.textContent.about.subtitle = document.getElementById('edit-about-subtitle').value.trim() || initialData.textContent.about.subtitle;
             siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
             siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
             siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
