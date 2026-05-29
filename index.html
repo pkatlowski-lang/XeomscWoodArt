@@ -491,7 +491,7 @@
             <div class="hidden md:flex space-x-8 items-center font-medium text-slate-400" id="nav-links">
                 <a href="#home" onclick="goHome()" class="hover:text-sky-400 transition">Start</a>
                 <a href="#about" onclick="goHome()" class="hover:text-sky-400 transition">O ofercie</a>
-                <a href="#portfolio" onclick="goHome()" class="hover:text-sky-400 transition">Nasze Produkty</a>
+                <a href="#products" onclick="openAllProductsPage(); return false;" class="hover:text-sky-400 transition">Nasze Produkty</a>
                 <a href="#custom-orders" onclick="goHome()" class="hover:text-sky-400 transition">Zrealizowane Zlecenia</a>
                 <button onclick="window.openSearch()" class="hover:text-sky-400 transition p-2 rounded-lg hover:bg-sky-500/10" aria-label="Szukaj produktów" title="Szukaj (Ctrl+K)">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -513,7 +513,7 @@
             <div class="flex flex-col p-4 space-y-1 text-slate-300">
                 <a href="#home" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium">Start</a>
                 <a href="#about" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium">O ofercie</a>
-                <a href="#portfolio" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium">Nasze Produkty</a>
+                <a href="#products" onclick="openAllProductsPage(); toggleMobileMenu(); return false;" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium">Nasze Produkty</a>
                 <a href="#custom-orders" onclick="goHome(); toggleMobileMenu();" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium">Zrealizowane Zlecenia</a>
                 <button onclick="toggleMobileMenu(); window.openSearch();" class="px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-sky-400 transition font-medium text-left flex items-center gap-2">
                     <i class="fa-solid fa-magnifying-glass text-sm"></i> Szukaj produktów
@@ -546,7 +546,7 @@
                         Witaj w Xeomsc Laser Studio. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.
                     </p>
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#portfolio" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
+                        <a href="#products" onclick="openAllProductsPage(); return false;" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
                             Zobacz nasze prace
                         </a>
                     </div>
@@ -736,11 +736,11 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-6 pb-20">
-            <button onclick="goHome()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
-                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć do strony głównej
+            <button onclick="window.goBackFromFullView()" class="mb-10 flex items-center gap-3 text-slate-400 hover:text-sky-400 font-bold transition group bg-white/5 px-6 py-3 rounded-full w-fit">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i> Wróć
             </button>
             <h2 id="subcategories-full-title" class="text-5xl font-bold text-white mb-4">Wszystkie kategorie</h2>
-            <p class="text-slate-500 mb-12">Wybierz kategorię, aby zobaczyć dostępne produkty.</p>
+            <p id="subcategories-full-hint" class="text-slate-500 mb-12">Wybierz kategorię, aby zobaczyć dostępne produkty.</p>
             <div id="subcategories-full-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
 
@@ -1987,10 +1987,11 @@
         };
         
         // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
-        window.openFullSubcategoryList = (catId) => {
+        window.openFullSubcategoryList = (catId, fromAllProducts = false) => {
             const cat = siteData.categories[catId];
             if(!cat) return;
-            
+            window._cameFromAllProducts = fromAllProducts;
+
             const container = document.getElementById('subcategories-full-view');
             const title = document.getElementById('subcategories-full-title');
             const grid = document.getElementById('subcategories-full-grid');
@@ -2027,6 +2028,52 @@
             document.getElementById('gallery-view').classList.add('hidden');
             container.classList.remove('hidden');
             window.scrollTo(0,0);
+        };
+
+        // Otwiera pełną stronę WSZYSTKICH kategorii (wywoływana z navbara "Nasze Produkty")
+        window.openAllProductsPage = () => {
+            const cats = siteData.categories || {};
+            const isAdm = document.body.classList.contains('is-admin');
+            const sortedCats = Object.entries(cats)
+                .filter(([, c]) => !c.isHidden && (isAdm || catHasProducts(c)))
+                .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0) || a.title.localeCompare(b.title, 'pl'));
+
+            const grid  = document.getElementById('subcategories-full-grid');
+            const title = document.getElementById('subcategories-full-title');
+            const hint  = document.getElementById('subcategories-full-hint');
+            title.textContent = 'Nasze Produkty';
+            if (hint) hint.textContent = 'Wybierz kategorię, aby zobaczyć dostępne podkategorie i produkty.';
+
+            grid.innerHTML = sortedCats.map(([catId, cat]) => {
+                const imgs = _productImgsFromCat(cat);
+                const subCount = Object.keys(cat.subs || {}).length;
+                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openFullSubcategoryList('${catId}', true)">
+                    <div class="h-64 overflow-hidden relative">${_slideshowImg(cat.image ? [cat.image] : imgs, '')}</div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(cat.title)}</h3>
+                        <p class="text-stone-500 mt-2">${subCount} ${subCount === 1 ? 'podkategoria' : 'podkategorii'}</p>
+                    </div></div>`;
+            }).join('') || '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak kategorii.</p></div>';
+
+            _initSlideshows();
+            window._cameFromAllProducts = false;
+            window.currentCatId = null;
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('subcategory-view').classList.add('hidden');
+            document.getElementById('gallery-view').classList.add('hidden');
+            document.getElementById('custom-orders-full-view').classList.add('hidden');
+            document.getElementById('legal-view').classList.add('hidden');
+            document.getElementById('subcategories-full-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+
+        // Inteligentny powrót z widoku subcategories-full-view
+        window.goBackFromFullView = () => {
+            if (window._cameFromAllProducts) {
+                window.openAllProductsPage();
+            } else {
+                window.goHome();
+            }
         };
 
         window.openCustomOrdersGallery = (lightboxDirect = false, index = 0) => {
