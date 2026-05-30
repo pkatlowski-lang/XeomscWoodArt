@@ -3505,16 +3505,29 @@ xeomsc-laser.pl`);
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Kategorie Główne</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-500">Edytuj kategorię</h4>
+                    <h4 class="text-xs uppercase font-bold text-stone-500" id="cat-form-title">Nowa kategoria</h4>
                     <input type="hidden" id="edit-cat-id">
-                    <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii">
-                    <textarea id="cat-d" class="calc-input h-20 resize-none" placeholder="Krótki opis kategorii (opcjonalny)"></textarea>
-                    <div class="flex gap-2 items-center">
-                        <input id="cat-i" class="calc-input flex-1" placeholder="Link do zdjęcia (URL)">
-                        <button type="button" onclick="window.uploadImageToElement(document.getElementById('cat-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
+                    <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii (np. Tabliczki i Dekoracje)">
+                    <textarea id="cat-d" class="calc-input h-16 resize-none" placeholder="Krótki opis (opcjonalny)"></textarea>
+                    <!-- Zdjęcie kategorii -->
+                    <div>
+                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcie kategorii</label>
+                        <div class="flex gap-3 items-start">
+                            <img id="cat-img-preview" src="" class="w-16 h-16 rounded-xl object-cover bg-stone-700 shrink-0 hidden" onerror="this.classList.add('hidden')">
+                            <div class="flex-1 space-y-2">
+                                <div class="flex gap-2 items-center">
+                                    <input id="cat-i" class="calc-input flex-1 text-sm" placeholder="Wklej URL zdjęcia lub prześlij z dysku →"
+                                        oninput="const p=document.getElementById('cat-img-preview');p.src=this.value;this.value?p.classList.remove('hidden'):p.classList.add('hidden')">
+                                    <button type="button" onclick="window.uploadCatImage()" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl px-4 h-10 flex items-center gap-2 transition text-sm font-bold" title="Prześlij z dysku">
+                                        <i class="fa-solid fa-upload text-sm"></i> Wgraj
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-stone-600">Zalecany format: JPG/PNG, proporcje 4:3 lub 16:9</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex gap-2">
-                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
+                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz kategorię</button>
                         <button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
                     </div>
                 </div>
@@ -3545,12 +3558,18 @@ xeomsc-laser.pl`);
                         const id = 'c' + Date.now(); 
                         // Nowa kategoria trafia na koniec
                         const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
-                        siteData.categories[id] = { title: t, desc: d, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
+                        siteData.categories[id] = { title: t, desc: d, image: i, products: [], isHidden: false, order: maxOrder + 1 };
                     }
                     saveData(); renderCategoriesAdmin(); renderMain();
                 }
             };
             document.getElementById('cancel-cat-btn').onclick = () => { renderCategoriesAdmin(); };
+            // Reset podglądu jeśli input zmieniony ręcznie
+            document.getElementById('cat-i').oninput = function() {
+                const p = document.getElementById('cat-img-preview');
+                if(this.value) { p.src=this.value; p.classList.remove('hidden'); }
+                else { p.classList.add('hidden'); }
+            };
         }
         
         // NOWA FUNKCJA DO ZMIANY KOLEJNOŚCI KATEGORII
@@ -3588,11 +3607,32 @@ xeomsc-laser.pl`);
 
         window.editCat = (id) => {
             const cat = siteData.categories[id];
-            document.getElementById('cat-t').value = cat.title; 
+            document.getElementById('cat-t').value = cat.title || '';
             document.getElementById('cat-d').value = cat.desc || '';
-            document.getElementById('cat-i').value = cat.image;
+            const imgVal = cat.image || '';
+            document.getElementById('cat-i').value = imgVal;
+            // Pokaż podgląd aktualnego zdjęcia
+            const preview = document.getElementById('cat-img-preview');
+            if (imgVal) { preview.src = imgVal; preview.classList.remove('hidden'); }
+            else { preview.classList.add('hidden'); }
             document.getElementById('edit-cat-id').value = id;
-            document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany"; document.getElementById('cancel-cat-btn').classList.remove('hidden');
+            document.getElementById('cat-form-title').textContent = 'Edycja: ' + cat.title;
+            document.getElementById('add-cat-btn').textContent = 'Zapisz Zmiany';
+            document.getElementById('cancel-cat-btn').classList.remove('hidden');
+            document.getElementById('cat-t').focus();
+        };
+
+        // Upload zdjęcia kategorii z dysku
+        window.uploadCatImage = () => {
+            const inp = document.getElementById('cat-i');
+            const btn = document.querySelector('[onclick="window.uploadCatImage()"]');
+            window.uploadImageToElement(inp, btn);
+            // Po upload — pokaż podgląd
+            inp.addEventListener('input', function onImgInput() {
+                const p = document.getElementById('cat-img-preview');
+                if(this.value) { p.src = this.value; p.classList.remove('hidden'); }
+                inp.removeEventListener('input', onImgInput);
+            });
         };
 
         function renderSubcategoriesAdmin() {
