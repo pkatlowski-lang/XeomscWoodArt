@@ -3119,13 +3119,19 @@
             const body = document.getElementById(`reply-body-${msgId}`)?.value?.trim();
             if (!body) { showToast('Wpisz treść odpowiedzi!', 'error'); return; }
             const subject = encodeURIComponent('Odpowiedź od Xeomsc Laser');
-            const bodyEnc = encodeURIComponent(`Witaj ${rawName},\n\n${body}\n\n---\nXeomsc Laser`);
-            window.open(`mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`, '_self');
+            const bodyEnc = encodeURIComponent(`Witaj ${rawName},
+
+${body}
+
+---
+Xeomsc Laser
+xeomsc-laser.pl`);
+            window.location.href = `mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`;
             window.updateMessageStatus(msgId, 'replied');
-            setTimeout(() => {
-                const f = document.getElementById(`reply-form-${msgId}`);
-                if (f) f.classList.add('hidden');
-            }, 600);
+            setTimeout(() => { const f = document.getElementById(`reply-form-${msgId}`); if(f) f.classList.add('hidden'); }, 800);
+        };
+        window.copyEmail = (email) => {
+            navigator.clipboard?.writeText(email).then(() => showToast('📋 Email skopiowany!')).catch(() => showToast('Skopiuj: ' + email));
         };
 
         function startMessageListener() {
@@ -3227,17 +3233,23 @@
                                          </div>
                                          <!-- Formularz odpowiedzi -->
                                          <div id="reply-form-${m.id}" class="hidden bg-black/30 rounded-2xl p-5 border border-wood-600/20 space-y-3">
-                                             <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do: <span class="text-wood-400">${safeName}</span> &lt;${safeEmail}&gt;</p>
+                                             <div class="flex items-center gap-3 flex-wrap">
+                                                 <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do:</p>
+                                                 <a href="mailto:${safeEmail}" class="text-wood-400 font-bold text-sm hover:text-wood-300 transition">${safeName} &lt;${safeEmail}&gt;</a>
+                                                 <button onclick="window.copyEmail('${m.email}')" class="text-[10px] bg-stone-700 hover:bg-stone-600 text-stone-300 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                                     <i class="fa-solid fa-copy"></i> Kopiuj email
+                                                 </button>
+                                             </div>
                                              <textarea id="reply-body-${m.id}" class="calc-input h-36 resize-none text-sm leading-relaxed" placeholder="Wpisz treść odpowiedzi..."></textarea>
-                                             <div class="flex gap-3">
+                                             <div class="flex gap-3 flex-wrap">
                                                  <button onclick="window.sendReplyEmail('${m.id}', ${JSON.stringify(m.email)}, ${JSON.stringify(m.name)})" class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
-                                                     <i class="fa-solid fa-paper-plane"></i> Wyślij mailem
+                                                     <i class="fa-brands fa-microsoft"></i> Otwórz w Outlooku
                                                  </button>
                                                  <button onclick="window.toggleReplyForm('${m.id}')" class="px-4 py-2.5 rounded-xl text-stone-400 hover:text-white text-sm transition hover:bg-white/5">
                                                      Anuluj
                                                  </button>
                                              </div>
-                                             <p class="text-[11px] text-stone-600"><i class="fa-solid fa-circle-info mr-1"></i>Otworzy Twój klient pocztowy z uzupełnioną wiadomością.</p>
+                                             <p class="text-[11px] text-stone-600"><i class="fa-solid fa-circle-info mr-1"></i>Kliknij "Otwórz w Outlooku" — otworzy się z uzupełnioną treścią, kliknij Wyślij w Outlooku.</p>
                                          </div>
                                      </div>
                                  </div>
