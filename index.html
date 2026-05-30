@@ -2057,67 +2057,8 @@
             window.startAutoScroll();
         }
 
-        window.selectMainCategory = (id, preventScroll = false) => {
-            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-            const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
-            selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-
-            const cat = siteData.categories[id]; if(!cat) return;
-
-            // Zapisz aktywną kategorię
-            window.activeMainCatId = id;
-
-            // SEO
-            const _cs = _SEO_CATS[id] || {};
-            const _catImg = cat.image || _productImgsFromCat(cat)[0] || '';
-            window.updateSEO({
-                title: cat.title,
-                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. Precyzyjne cięcie laserowe, personalizacja. ${_SEO_SITE}.`).slice(0,160),
-                kw: _cs.kw,
-                image: _catImg,
-                breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
-            });
-            window._setHash('kat/' + id);
-
-            const container = document.getElementById('sub-categories-container');
-            const title = document.getElementById('selected-cat-title');
-            const grid = document.getElementById('sub-categories-grid');
-            const btnSeeAll = document.getElementById('btn-see-all-subcats');
-
-            title.textContent = cat.title; grid.innerHTML = '';
-            const descEl = document.getElementById('selected-cat-desc');
-            if(cat.desc) { descEl.textContent = cat.desc; descEl.classList.remove('hidden'); } else { descEl.classList.add('hidden'); }
-            
-            // Konfiguracja przycisku "Zobacz wszystkie"
-            btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
-
-            const subs = cat.subs || {}; 
-            
-            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
-            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
-
-            if(subKeys.length > 0) {
-                // Wyświetl wszystkie podkategorie w karuzeli
-                grid.innerHTML = subKeys.map(sid => {
-                    const sub = subs[sid];
-                    return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
-                             <div class="h-48 overflow-hidden relative">${_slideshowImg(sub.image ? [sub.image] : _productImgsFromSub(sub), 'pointer-events-none')}</div>
-                            <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${escapeHTML(sub.title)}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
-                }).join('');
-                _initSlideshows();
-            } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
-
-            // Aktywuj drag dla podkategorii
-            window.enableDragScroll('sub-categories-grid');
-            window.makeInfiniteCarousel('sub-categories-grid');
-
-            container.classList.remove('hidden');
-            
-            // Scrollujemy tylko jeśli to nowa interakcja, a nie odświeżenie danych
-            if (!preventScroll) {
-                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-            }
-        };
+        // selectMainCategory → otwiera produkty kategorii bezpośrednio
+        window.selectMainCategory = (id) => { window.openCategoryProducts(id); };
         
         // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
         window.openFullSubcategoryList = (catId, fromAllProducts = false) => {
