@@ -965,54 +965,134 @@
         </button>
     </div>
 
-    <!-- MODAL FORMULARZA KONTAKTOWEGO -->
-    <div id="contact-modal" class="fixed inset-0 z-[3000] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh] border border-white/10">
-            <div class="bg-sky-600 p-6 text-white flex justify-between items-center shrink-0">
-                <h3 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-regular fa-paper-plane"></i> Formularz zapytania
-                </h3>
-                <button onclick="closeContactModal()" class="text-white/70 hover:text-white transition p-2">
+    <!-- MODAL FORMULARZA WYCENY -->
+    <div id="contact-modal" class="fixed inset-0 z-[3000] bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-3">
+        <div class="bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[95vh] border border-white/10">
+            <!-- Naglowek -->
+            <div class="bg-gradient-to-r from-wood-600 to-sky-600 p-5 text-white flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-calculator"></i> Zapytanie o wycene</h3>
+                    <p class="text-white/70 text-xs mt-0.5">Wypelnij ponizej — odezwiemy sie w ciagu 24h</p>
+                </div>
+                <button onclick="closeContactModal()" class="text-white/70 hover:text-white transition p-2 rounded-lg hover:bg-white/10">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-4 overflow-y-auto">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Twoje Imię</label>
-                    <input type="text" id="contact-name" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. Jan Kowalski">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twój Email</label>
-                    <!-- DODANO AUTOCOMPLETE OFF -->
-                    <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. jan@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                </div>
-                
-                <div id="product-codes-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
-                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Kod Produktu</label>
-                    <div id="product-codes-container" class="space-y-3">
-                        <div class="flex gap-2">
-                            <input type="text" id="code-input-0" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" readonly>
+            <div class="overflow-y-auto flex-1">
+                <div class="p-5 space-y-4">
+                    <!-- Dane kontaktowe -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Imie i Nazwisko</label>
+                            <input type="text" id="contact-name" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="Jan Kowalski">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+                            <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="jan@example.com" autocomplete="off">
                         </div>
                     </div>
-                </div>
-
-                <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
-                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie, max 1MB)</label>
-                    <div class="relative">
-                        <input type="file" id="contact-file-input" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
+                    <!-- Kod produktu -->
+                    <div id="product-codes-section" class="hidden bg-wood-600/10 rounded-xl p-3 border border-wood-600/20">
+                        <label class="block text-[10px] font-bold text-wood-400 uppercase tracking-wider mb-2">Wybrany produkt</label>
+                        <div id="product-codes-container">
+                            <input type="text" id="code-input-0" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-wood-300" readonly>
+                        </div>
                     </div>
-                    <p class="text-[10px] text-stone-400 mt-1">Zdjęcie zostanie wysłane do administratora.</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Treść Wiadomości / Zapytanie</label>
-                    <textarea id="contact-message" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition h-32 resize-none text-white placeholder-slate-600" placeholder="Dzień dobry, chciałbym zapytać o..."></textarea>
+                    <!-- Parametry produktu -->
+                    <div class="border-t border-white/5 pt-4">
+                        <p class="text-[10px] font-bold text-sky-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders"></i> Parametry produktu
+                        </p>
+                        <!-- Wymiary -->
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-ruler-combined text-stone-500 mr-1"></i> Wymiary
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="relative">
+                                    <input type="number" id="cf-width" min="1" max="9999" oninput="window.buildContactMessage()"
+                                        class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 pr-12 text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none transition placeholder-slate-600" placeholder="Szerokosc">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">mm</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" id="cf-height" min="1" max="9999" oninput="window.buildContactMessage()"
+                                        class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 pr-12 text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none transition placeholder-slate-600" placeholder="Wysokosc">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Grubosc -->
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-layer-group text-stone-500 mr-1"></i> Grubosc sklejki
+                            </label>
+                            <div class="flex gap-2 flex-wrap">
+                                <button type="button" data-group="thickness" data-val="3 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">3 mm</button>
+                                <button type="button" data-group="thickness" data-val="4 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">4 mm</button>
+                                <button type="button" data-group="thickness" data-val="6 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">6 mm</button>
+                                <button type="button" data-group="thickness" data-val="inna grubosc" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">Inna</button>
+                            </div>
+                        </div>
+                        <!-- Wykonanie -->
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-cubes text-stone-500 mr-1"></i> Wykonanie
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" data-group="exec" data-val="plaskie (jednowarstwowe)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
+                                    <i class="fa-solid fa-square text-xl"></i>
+                                    <span>Plaskie</span>
+                                    <span class="text-[10px] text-stone-500 font-normal">jednowarstwowe</span>
+                                </button>
+                                <button type="button" data-group="exec" data-val="3D (wielowarstwowe)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
+                                    <i class="fa-solid fa-layer-group text-xl"></i>
+                                    <span>Efekt 3D</span>
+                                    <span class="text-[10px] text-stone-500 font-normal">wielowarstwowe</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Kolor -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-palette text-stone-500 mr-1"></i> Wykonczenie / Kolor
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" data-group="color" data-val="surowe (naturalne drewno)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
+                                    <span class="w-6 h-6 rounded-full bg-amber-200 border-2 border-amber-300 shadow-sm inline-block"></span>
+                                    <span>Surowe</span>
+                                    <span class="text-[10px] text-stone-500 font-normal">naturalne drewno</span>
+                                </button>
+                                <button type="button" data-group="color" data-val="malowane (prosze podac kolor)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
+                                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-red-400 via-sky-400 to-green-400 shadow-sm inline-block"></span>
+                                    <span>Malowane</span>
+                                    <span class="text-[10px] text-stone-500 font-normal">dowolny kolor</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Wiadomosc -->
+                    <div class="border-t border-white/5 pt-4">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                            <i class="fa-solid fa-pen-to-square text-stone-500 mr-1"></i> Tresc zapytania
+                            <span class="text-stone-600 font-normal normal-case ml-1">— uzupelniana auto, mozesz edytowac</span>
+                        </label>
+                        <textarea id="contact-message" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600 resize-none" placeholder="Dzien dobry, chcialbym zapytac o wycene..."></textarea>
+                    </div>
+                    <!-- Zalacznik -->
+                    <div id="contact-upload-section" class="hidden border-t border-white/5 pt-4">
+                        <label class="block text-[10px] font-bold text-wood-400 uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-paperclip mr-1"></i> Zalacz plik / projekt (opcjonalnie, max 1MB)
+                        </label>
+                        <input type="file" id="contact-file-input" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" class="w-full text-sm text-stone-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-wood-600/20 file:text-wood-400 hover:file:bg-wood-600/30 cursor-pointer transition">
+                    </div>
                 </div>
             </div>
-            <div class="p-6 border-t border-white/5 bg-slate-800/50 shrink-0">
-                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-sky-500 text-white py-4 rounded-xl font-bold hover:bg-sky-400 transition shadow-lg shadow-sky-500/20 transform active:scale-95 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> Wyślij zapytanie
+            <!-- Wyslij -->
+            <div class="p-5 border-t border-white/5 bg-slate-800/50 shrink-0">
+                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-gradient-to-r from-wood-600 to-sky-600 hover:from-wood-500 hover:to-sky-500 text-white py-4 rounded-xl font-bold transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-paper-plane"></i> Wyslij zapytanie o wycene
                 </button>
+                <p class="text-center text-[10px] text-stone-600 mt-2"><i class="fa-solid fa-clock mr-1"></i>Odpowiadamy w ciagu 24 godzin</p>
             </div>
         </div>
     </div>
@@ -4026,18 +4106,57 @@ xeomsc-laser.pl`);
              document.getElementById('contact-message').value = code ? `Dzień dobry, interesuje mnie produkt o kodzie ${code}. Proszę o informację o dostępności.` : '';
         };
 
+        // Przełącznik opcji w formularzu (grubosc, wykonanie, kolor)
+        window.toggleCfOption = (btn) => {
+            const group = btn.dataset.group;
+            document.querySelectorAll(`.cf-opt[data-group="${group}"]`).forEach(b => {
+                b.classList.remove('border-sky-500','bg-sky-500/10','text-sky-300');
+                b.classList.add('border-white/10','bg-slate-800','text-slate-300');
+            });
+            btn.classList.add('border-sky-500','bg-sky-500/10','text-sky-300');
+            btn.classList.remove('border-white/10','bg-slate-800','text-slate-300');
+            window.buildContactMessage();
+        };
+
+        // Auto-generowanie treści wiadomości z wybranych parametrów
+        window.buildContactMessage = () => {
+            const w = document.getElementById('cf-width')?.value;
+            const h = document.getElementById('cf-height')?.value;
+            const thick = document.querySelector('.cf-opt[data-group="thickness"].border-sky-500')?.dataset.val || '';
+            const exec  = document.querySelector('.cf-opt[data-group="exec"].border-sky-500')?.dataset.val || '';
+            const color = document.querySelector('.cf-opt[data-group="color"].border-sky-500')?.dataset.val || '';
+            const code  = document.getElementById('code-input-0')?.value;
+
+            let msg = 'Dzien dobry,\n\nchcialbym zapytac o wycene';
+            if (code) msg += ` produktu (kod: ${code})`;
+            msg += '.\n\nParametry:\n';
+            if (w || h) msg += `- Wymiary: ${w||'?'} x ${h||'?'} mm\n`;
+            if (thick)  msg += `- Grubosc: ${thick}\n`;
+            if (exec)   msg += `- Wykonanie: ${exec}\n`;
+            if (color)  msg += `- Wykonczenie: ${color}\n`;
+            msg += '\nProsze o informacje o cenie i terminie realizacji.\n\nPozdrawiam';
+
+            const ta = document.getElementById('contact-message');
+            if (ta && (w || h || thick || exec || color)) ta.value = msg;
+        };
+
         window.openGeneralContactModal = () => {
-             // Resetujemy zdjęcie produktu przy ogólnym kontakcie
              window.currentContactProductImage = null;
-             document.getElementById('contact-modal').classList.remove('hidden'); 
-             document.getElementById('product-codes-section').classList.add('hidden'); 
-             document.getElementById('contact-upload-section').classList.remove('hidden'); 
+             // Reset opcji
+             document.querySelectorAll('.cf-opt').forEach(b => {
+                 b.classList.remove('border-sky-500','bg-sky-500/10','text-sky-300');
+                 b.classList.add('border-white/10','bg-slate-800','text-slate-300');
+             });
+             ['cf-width','cf-height'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+             document.getElementById('contact-modal').classList.remove('hidden');
+             document.getElementById('product-codes-section').classList.add('hidden');
+             document.getElementById('contact-upload-section').classList.remove('hidden');
              document.getElementById('contact-message').value = '';
         };
 
-        window.closeContactModal = () => { 
-            document.getElementById('contact-modal').classList.add('hidden'); 
-            window.currentContactProductImage = null; // Czyścimy po zamknięciu
+        window.closeContactModal = () => {
+            document.getElementById('contact-modal').classList.add('hidden');
+            window.currentContactProductImage = null;
         };
 
         window.submitContactForm = async () => {
