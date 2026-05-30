@@ -4400,7 +4400,9 @@ xeomsc-laser.pl`);
                                     updateDataSourceIndicator('cloud');
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                    renderHero(); renderMain(); renderTexts();
+                                    try { renderHero(); }  catch(e) { console.error('renderHero:', e); }
+                                    try { renderMain(); }  catch(e) { console.error('renderMain:', e); }
+                                    try { renderTexts(); } catch(e) { console.error('renderTexts:', e); }
                                     if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
                                         if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
                                     }
@@ -4439,7 +4441,11 @@ xeomsc-laser.pl`);
             localStorage.removeItem('xeomsc_cached_data');
             siteData = initialData;
         }
-        renderHero(); renderMain(); renderTexts(); start();
+        // KRYTYCZNE: każda funkcja w osobnym try/catch — błąd jednej NIE blokuje start()
+        try { renderHero(); }  catch(e) { console.error('renderHero error:', e); }
+        try { renderMain(); }  catch(e) { console.error('renderMain error:', e); }
+        try { renderTexts(); } catch(e) { console.error('renderTexts error:', e); }
+        try { start(); }       catch(e) { console.error('start error:', e); }
 
         // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
         // Funkcja zmiany hasha BEZ wywoływania nawigacji (używana przez widoki)
