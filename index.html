@@ -4415,7 +4415,30 @@ xeomsc-laser.pl`);
             } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
         }
 
-        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        // Wczytaj cache, ale ZWERYFIKUJ czy nie jest uszkodzony (puste/stare kategorie)
+        try {
+            const _cached = JSON.parse(localStorage.getItem('xeomsc_cached_data'));
+            if (_cached && _cached.categories) {
+                const _cats = Object.values(_cached.categories);
+                // Sprawdź czy jakakolwiek kategoria ma produkty (nowy format) lub subs (stary)
+                const _hasAnyProducts = _cats.some(c =>
+                    (Array.isArray(c.products) && c.products.length > 0) ||
+                    (c.subs && Object.values(c.subs).some(s => (s.products||[]).length > 0))
+                );
+                if (_hasAnyProducts) {
+                    siteData = _cached;
+                } else {
+                    // Cache pusty/uszkodzony — użyj initialData, Firebase i tak nadpisze
+                    localStorage.removeItem('xeomsc_cached_data');
+                    siteData = initialData;
+                }
+            } else {
+                siteData = initialData;
+            }
+        } catch(e) {
+            localStorage.removeItem('xeomsc_cached_data');
+            siteData = initialData;
+        }
         renderHero(); renderMain(); renderTexts(); start();
 
         // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
