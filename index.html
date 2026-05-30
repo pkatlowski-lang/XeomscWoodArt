@@ -3126,7 +3126,12 @@ ${body}
 ---
 Xeomsc Laser
 xeomsc-laser.pl`);
-            window.location.href = `mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`;
+            // Użyj tymczasowego <a> — nie zamyka panelu, niezawodnie otwiera Outlook
+            const a = document.createElement('a');
+            a.href = `mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => a.remove(), 100);
             window.updateMessageStatus(msgId, 'replied');
             setTimeout(() => { const f = document.getElementById(`reply-form-${msgId}`); if(f) f.classList.add('hidden'); }, 800);
         };
@@ -3242,7 +3247,9 @@ xeomsc-laser.pl`);
                                              </div>
                                              <textarea id="reply-body-${m.id}" class="calc-input h-36 resize-none text-sm leading-relaxed" placeholder="Wpisz treść odpowiedzi..."></textarea>
                                              <div class="flex gap-3 flex-wrap">
-                                                 <button onclick="window.sendReplyEmail('${m.id}', ${JSON.stringify(m.email)}, ${JSON.stringify(m.name)})" class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
+                                                 <button data-msgid="${m.id}" data-email="${safeEmail}" data-name="${safeName}"
+                                                     onclick="window.sendReplyEmail(this.dataset.msgid, this.dataset.email, this.dataset.name)"
+                                                     class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
                                                      <i class="fa-brands fa-microsoft"></i> Otwórz w Outlooku
                                                  </button>
                                                  <button onclick="window.toggleReplyForm('${m.id}')" class="px-4 py-2.5 rounded-xl text-stone-400 hover:text-white text-sm transition hover:bg-white/5">
