@@ -991,6 +991,11 @@
                             <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="jan@example.com" autocomplete="off">
                         </div>
                     </div>
+                    <!-- Temat -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5"><i class="fa-solid fa-tag text-stone-500 mr-1"></i> Temat zapytania</label>
+                        <input type="text" id="contact-subject" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="np. Wycena tabliczki z logo, Zamówienie napisu...">
+                    </div>
                     <!-- Kod produktu -->
                     <div id="product-codes-section" class="hidden bg-wood-600/10 rounded-xl p-3 border border-wood-600/20">
                         <label class="block text-[10px] font-bold text-wood-400 uppercase tracking-wider mb-2">Wybrany produkt</label>
@@ -3297,6 +3302,7 @@ xeomsc-laser.pl`);
 
                          const safeName       = escapeHTML(m.name);
                          const safeEmail      = escapeHTML(m.email);
+                         const safeSubject    = escapeHTML(m.subject || 'Zapytanie o wycenę');
                          const safeMessage    = escapeHTML(m.message);
                          const hasAttachment  = !!m.attachment;
                          // Przechowujemy załącznik w window żeby nie wbudowywać base64 w HTML
@@ -3307,7 +3313,7 @@ xeomsc-laser.pl`);
                              <div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')">
                                  <div><span class="status-badge ${statusData.class}">${statusData.label}</span></div>
                                  <div class="font-medium truncate">${safeName}</div>
-                                 <div class="text-sm text-stone-400 truncate">${safeEmail}</div>
+                                 <div class="text-sm text-wood-400 truncate font-semibold">${safeSubject}</div>
                                  <div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString('pl-PL')}</div>
                                  <div class="text-right flex items-center justify-end gap-3">
                                      <button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń" aria-label="Usuń wiadomość"><i class="fa-solid fa-trash"></i></button>
@@ -3318,6 +3324,8 @@ xeomsc-laser.pl`);
                              <div id="msg-body-${m.id}" class="msg-body-wrapper ${isOpen ? 'open' : ''}">
                                  <div class="p-6 space-y-4">
                                      <div>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-0.5">Temat:</p>
+                                         <p class="text-sky-300 text-sm font-semibold mb-3">${safeSubject}</p>
                                          <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
                                          <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${safeMessage}</p>
                                      </div>
@@ -4151,7 +4159,7 @@ xeomsc-laser.pl`);
              document.getElementById('contact-modal').classList.remove('hidden');
              document.getElementById('product-codes-section').classList.add('hidden');
              document.getElementById('contact-upload-section').classList.remove('hidden');
-             document.getElementById('contact-message').value = '';
+             document.getElementById('contact-message').value = ''; const _st = document.getElementById('contact-subject'); if(_st) _st.value = '';
         };
 
         window.closeContactModal = () => {
@@ -4171,6 +4179,8 @@ xeomsc-laser.pl`);
              const name = nameInp.value.trim();
              const emailInp = document.getElementById('contact-email-input');
              const email = emailInp.value.trim();
+             const subjectInp = document.getElementById('contact-subject');
+             const subject = subjectInp ? subjectInp.value.trim() : '';
              const msgInp = document.getElementById('contact-message');
              const msg = msgInp.value.trim();
              const fileInput = document.getElementById('contact-file-input');
@@ -4236,6 +4246,7 @@ xeomsc-laser.pl`);
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
                         name: name,
                         email: email,
+                        subject: subject || 'Zapytanie o wycenę',
                         message: msg,
                         attachment: attachmentData,
                         date: new Date().toISOString(),
