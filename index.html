@@ -999,7 +999,7 @@
                 <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
                     <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie, max 1MB)</label>
                     <div class="relative">
-                        <input type="file" id="contact-file-input" accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
+                        <input type="file" id="contact-file-input" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
                     </div>
                     <p class="text-[10px] text-stone-400 mt-1">Zdjęcie zostanie wysłane do administratora.</p>
                 </div>
@@ -1269,7 +1269,7 @@
                              <i class="fa-solid fa-cloud-arrow-up text-4xl text-wood-500 mb-3 block group-hover:scale-110 transition"></i>
                              <p class="text-white font-semibold text-lg">Kliknij lub przeciągnij zdjęcia tutaj</p>
                              <p class="text-stone-400 text-sm mt-1">Możesz wybrać wiele plików naraz (JPG, PNG, WEBP)</p>
-                             <input id="orders-file-input" type="file" accept="image/*" multiple class="hidden">
+                             <input id="orders-file-input" type="file" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" multiple class="hidden">
                          </div>
                          <div id="orders-upload-progress" class="hidden mt-4 space-y-2"></div>
                      </div>
@@ -3095,17 +3095,27 @@
                 o.start(); o.stop(ctx.currentTime + 0.4);
             } catch(e) {}
         };
-        // Funkcja pobierania załącznika — zachowuje oryginalny format pliku
+        // Funkcja pobierania załącznika — zachowuje DOKŁADNIE oryginalny format
         window.downloadAttachment = (encodedUrl, baseFilename) => {
             const url = encodedUrl;
-            // Wykryj rozszerzenie z MIME typu (base64) lub z URL
+            // Pełna mapa MIME → rozszerzenie (każdy format zachowany 1:1)
+            const MIME_EXT = {
+                'image/png': 'png', 'image/jpeg': 'jpg', 'image/jpg': 'jpg',
+                'image/gif': 'gif', 'image/webp': 'webp', 'image/bmp': 'bmp',
+                'image/tiff': 'tiff', 'image/svg+xml': 'svg', 'image/avif': 'avif',
+                'image/heic': 'heic', 'image/heif': 'heif',
+                'application/pdf': 'pdf',
+                'text/plain': 'txt', 'text/svg+xml': 'svg'
+            };
             const getExt = (u) => {
-                if (u.startsWith('data:image/png'))  return 'png';
-                if (u.startsWith('data:image/gif'))  return 'gif';
-                if (u.startsWith('data:image/webp')) return 'webp';
-                if (u.startsWith('data:image/'))     return 'jpg';
-                const m = u.match(/\.(png|jpg|jpeg|gif|webp|bmp|svg)(\?|$)/i);
-                return m ? m[1].toLowerCase() : 'jpg';
+                // Z MIME typu w data URL (np. data:image/svg+xml;base64,...)
+                if (u.startsWith('data:')) {
+                    const mime = u.match(/^data:([^;,]+)/)?.[1]?.toLowerCase();
+                    if (mime && MIME_EXT[mime]) return MIME_EXT[mime];
+                }
+                // Z rozszerzenia w URL (np. .../plik.svg?query)
+                const m = u.match(/\.([a-z0-9]{1,5})(?:\?|#|$)/i);
+                return m ? m[1].toLowerCase() : 'bin';
             };
             const filename = baseFilename.replace(/\.\w+$/, '') + '.' + getExt(url);
             if (url.startsWith('data:')) {
