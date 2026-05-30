@@ -4281,11 +4281,29 @@ xeomsc-laser.pl`);
                 }
 
                 if(isOnline) {
+                    // Zbierz wybrane parametry z formularza
+                    const _w = document.getElementById('cf-width')?.value;
+                    const _h = document.getElementById('cf-height')?.value;
+                    const _thick = document.querySelector('.cf-opt[data-group="thickness"].border-sky-500')?.dataset.val || '';
+                    const _exec  = document.querySelector('.cf-opt[data-group="exec"].border-sky-500')?.dataset.val || '';
+                    const _color = document.querySelector('.cf-opt[data-group="color"].border-sky-500')?.dataset.val || '';
+                    const _params = [
+                        (_w || _h) ? `Wymiary: ${_w||'?'} × ${_h||'?'} mm` : '',
+                        _thick ? `Grubość: ${_thick}` : '',
+                        _exec  ? `Wykonanie: ${_exec}` : '',
+                        _color ? `Wykończenie: ${_color}` : ''
+                    ].filter(Boolean);
+                    const paramsText = _params.length ? '
+
+--- Parametry produktu ---
+' + _params.join('
+') : '';
+
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
                         name: name,
                         email: email,
                         subject: subject || 'Zapytanie o wycenę',
-                        message: msg,
+                        message: msg + paramsText,
                         attachment: attachmentData,
                         date: new Date().toISOString(),
                         status: 'new',
