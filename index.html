@@ -1570,7 +1570,9 @@
             // USTAWIENIA KALKULATORA
             calcSettings: {
                 materialRate: 0.0038, // Cena za cm2 (bazowa dla 3mm)
-                laserRate: 0.50       // Cena za minutę
+                laserRate: 0.50,      // Cena za minutę
+                margin: 30,           // Marża domyślna %
+                thickness: 3          // Grubość domyślna mm
             },
             textContent: {
                 hero: { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo", desc: "Zamieniamy Twój pomysł w wyjątkowy produkt z drewna. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
@@ -2821,8 +2823,11 @@
             // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
             else if (id === 'calculator') {
                 if(!siteData.calcSettings) siteData.calcSettings = initialData.calcSettings;
-                document.getElementById('setting-material-rate').value = siteData.calcSettings.materialRate || 0.0038;
-                document.getElementById('setting-laser-rate').value = siteData.calcSettings.laserRate || 0.50;
+                const _cs = siteData.calcSettings;
+                document.getElementById('setting-material-rate').value = _cs.materialRate || 0.0038;
+                document.getElementById('setting-laser-rate').value    = _cs.laserRate    || 0.50;
+                if (_cs.margin)    document.getElementById('calc-margin').value    = _cs.margin;
+                if (_cs.thickness) document.getElementById('calc-thickness').value = _cs.thickness;
                 
                 renderSavedCalculations();
                 calculatePrice(); // Uruchom przeliczenie na starcie
@@ -2831,24 +2836,21 @@
         
         // --- FUNKCJE KALKULATORA ---
         
-        // Zapisywanie domyślnych stawek
+        // Zapisywanie domyślnych parametrów kalkulatora
         window.saveCalculatorSettings = async () => {
-             const matRate = parseFloat(document.getElementById('setting-material-rate').value);
+             const matRate   = parseFloat(document.getElementById('setting-material-rate').value);
              const laserRate = parseFloat(document.getElementById('setting-laser-rate').value);
+             const margin    = parseFloat(document.getElementById('calc-margin').value) || 30;
+             const thickness = parseFloat(document.getElementById('calc-thickness').value) || 3;
              
              if(isNaN(matRate) || isNaN(laserRate)) {
                  showToast("Wprowadź poprawne liczby!", 'error');
                  return;
              }
-             
-             siteData.calcSettings = {
-                 materialRate: matRate,
-                 laserRate: laserRate
-             };
-             
+             siteData.calcSettings = { materialRate: matRate, laserRate: laserRate, margin, thickness };
              await saveData();
-             showToast("Zapisano domyślne stawki kalkulatora!");
-             calculatePrice(); // Przelicz przy nowej stawce
+             showToast("✓ Parametry zapisane — zapamiętane na stałe!");
+             calculatePrice();
         };
 
         // Obliczanie ceny (Automatyczne)
