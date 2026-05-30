@@ -3136,7 +3136,21 @@ xeomsc-laser.pl`);
             setTimeout(() => { const f = document.getElementById(`reply-form-${msgId}`); if(f) f.classList.add('hidden'); }, 800);
         };
         window.copyEmail = (email) => {
-            navigator.clipboard?.writeText(email).then(() => showToast('📋 Email skopiowany!')).catch(() => showToast('Skopiuj: ' + email));
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(email)
+                    .then(() => showToast('📋 Email skopiowany!'))
+                    .catch(() => window._fallbackCopy(email));
+            } else {
+                window._fallbackCopy(email);
+            }
+        };
+        window._fallbackCopy = (text) => {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+            document.body.appendChild(ta); ta.focus(); ta.select();
+            try { document.execCommand('copy'); showToast('📋 Email skopiowany!'); }
+            catch { showToast('Email: ' + text); }
+            ta.remove();
         };
 
         function startMessageListener() {
@@ -3241,7 +3255,9 @@ xeomsc-laser.pl`);
                                              <div class="flex items-center gap-3 flex-wrap">
                                                  <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do:</p>
                                                  <a href="mailto:${safeEmail}" class="text-wood-400 font-bold text-sm hover:text-wood-300 transition">${safeName} &lt;${safeEmail}&gt;</a>
-                                                 <button onclick="window.copyEmail('${m.email}')" class="text-[10px] bg-stone-700 hover:bg-stone-600 text-stone-300 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                                 <button data-copy-email="${safeEmail}"
+                                                     onclick="window.copyEmail(this.dataset.copyEmail)"
+                                                     class="text-[10px] bg-stone-700 hover:bg-stone-600 text-stone-300 px-2 py-1 rounded-lg transition flex items-center gap-1">
                                                      <i class="fa-solid fa-copy"></i> Kopiuj email
                                                  </button>
                                              </div>
