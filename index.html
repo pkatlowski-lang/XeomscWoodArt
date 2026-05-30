@@ -3095,9 +3095,19 @@
                 o.start(); o.stop(ctx.currentTime + 0.4);
             } catch(e) {}
         };
-        // Funkcja pobierania załącznika (obsługuje base64 i URL)
-        window.downloadAttachment = (encodedUrl, filename) => {
+        // Funkcja pobierania załącznika — zachowuje oryginalny format pliku
+        window.downloadAttachment = (encodedUrl, baseFilename) => {
             const url = encodedUrl;
+            // Wykryj rozszerzenie z MIME typu (base64) lub z URL
+            const getExt = (u) => {
+                if (u.startsWith('data:image/png'))  return 'png';
+                if (u.startsWith('data:image/gif'))  return 'gif';
+                if (u.startsWith('data:image/webp')) return 'webp';
+                if (u.startsWith('data:image/'))     return 'jpg';
+                const m = u.match(/\.(png|jpg|jpeg|gif|webp|bmp|svg)(\?|$)/i);
+                return m ? m[1].toLowerCase() : 'jpg';
+            };
+            const filename = baseFilename.replace(/\.\w+$/, '') + '.' + getExt(url);
             if (url.startsWith('data:')) {
                 const a = document.createElement('a');
                 a.href = url; a.download = filename; a.click();
@@ -3232,7 +3242,7 @@ xeomsc-laser.pl`);
                                                      <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
                                                  </div>
                                              </div>
-                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}.jpg')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
                                                  <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz zdjęcie
                                              </button>
                                          </div>
