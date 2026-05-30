@@ -2256,13 +2256,14 @@
             // Przycisk powrotu cofa do listy produktów kategorii
             document.getElementById('back-to-sub-btn').onclick = () => window.openCategoryProducts(catId);
             
-            const galleryData = siteData.galleries?.[product.id] || { images: [] };
-            let _galImgs = galleryData.images;
-            if (_galImgs.length === 0 && product.gallery && product.gallery.length > 0) {
-                const _allG = Array.isArray(product.gallery) ? product.gallery : [];
-                _galImgs = _allG.filter((u,i) => i > 0 || u !== product.image).map(u => ({ src: u }));
+            // Galeria = WYŁĄCZNIE zdjęcia tego produktu (product.gallery to źródło prawdy)
+            let _gal = Array.isArray(product.gallery) ? product.gallery.filter(Boolean) : [];
+            // Fallback: stary format siteData.galleries[id] tylko jeśli produkt ma id i pustą gallery
+            if (_gal.length === 0 && product.id && siteData.galleries?.[product.id]?.images?.length) {
+                _gal = siteData.galleries[product.id].images.map(i => i.src || i).filter(Boolean);
             }
-            const allImages = [ { src: product.image, isCover: true }, ..._galImgs ];
+            if (_gal.length === 0 && product.image) _gal = [product.image];
+            const allImages = _gal.map(u => ({ src: u }));
             window.currentLightboxImages = allImages;
             window.currentImgIndex = 0;
 
