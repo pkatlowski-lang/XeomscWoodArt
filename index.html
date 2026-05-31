@@ -314,7 +314,7 @@
         /* FLOATING PHONE BUTTON */
         #float-phone-btn {
             position: fixed;
-            bottom: 22px;
+            bottom: 86px;
             right: 22px;
             width: 52px;
             height: 52px;
@@ -335,6 +335,31 @@
         #float-phone-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 30px rgba(56, 189, 248, 0.55);
+        }
+        /* FLOATING WHATSAPP BUTTON */
+        #float-wa-btn {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            width: 56px;
+            height: 56px;
+            background: #25D366;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 9982;
+            font-size: 1.7rem;
+            text-decoration: none;
+        }
+        #float-wa-btn:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(37,211,102,0.7); }
+        #float-wa-btn .wa-pulse {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: rgba(37,211,102,0.35); animation: phonePulse 2s ease-out infinite;
         }
         #float-phone-btn .phone-pulse {
             position: absolute;
@@ -428,6 +453,12 @@
     <button id="scroll-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Wróć na górę strony" title="Wróć na górę">
         <i class="fa-solid fa-arrow-up text-sm"></i>
     </button>
+
+    <!-- Floating: WhatsApp Button -->
+    <a id="float-wa-btn" href="https://wa.me/48537191717?text=Dzie%C5%84%20dobry%2C%20pisz%C4%99%20w%20sprawie%20wyceny" target="_blank" rel="noopener" aria-label="Napisz na WhatsApp" title="Napisz na WhatsApp">
+        <span class="wa-pulse"></span>
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
     <!-- Floating: Phone Button -->
     <a id="float-phone-btn" href="#contact" onclick="goHome(); setTimeout(()=>document.getElementById('contact').scrollIntoView({behavior:'smooth'}),100)" aria-label="Skontaktuj się z nami" title="Kontakt">
@@ -581,6 +612,15 @@
                         <a href="#products" onclick="openAllProductsPage(); return false;" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
                             Zobacz nasze prace
                         </a>
+                        <a href="https://wa.me/48537191717?text=Dzie%C5%84%20dobry%2C%20pisz%C4%99%20w%20sprawie%20wyceny" target="_blank" rel="noopener" class="px-8 py-4 bg-[#25D366] text-white rounded-full hover:bg-[#1ebe5a] hover:scale-105 transform transition shadow-xl font-bold text-center flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-xl"></i> Napisz na WhatsApp
+                        </a>
+                    </div>
+                    <!-- Pasek zaufania -->
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-start mt-8 text-white/80 text-sm font-medium">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> Zadowoleni klienci</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-truck text-sky-400"></i> Wysyłka w całej Polsce</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-bolt text-sky-400"></i> Wycena w 24h</span>
                     </div>
                 </div>
             </div>
@@ -599,6 +639,45 @@
                         <i class="fa-solid fa-message"></i> Zapytaj o wycenę — to nic nie kosztuje
                     </a>
                 </div>
+            </div>
+        </section>
+
+        <!-- JAK ZAMÓWIĆ — 3 KROKI -->
+        <section id="how-to-order" class="py-24 bg-slate-950 border-t border-white/5">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <p class="text-wood-400 font-bold uppercase tracking-widest text-sm mb-3">Prosto i szybko</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">Jak zamówić?</h2>
+                <p class="text-slate-400 text-lg mb-16 max-w-2xl mx-auto">Trzy proste kroki dzielą Cię od wymarzonego produktu.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="relative bg-slate-800/50 rounded-3xl p-8 border border-white/5 hover:border-sky-500/40 transition group">
+                        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-2xl font-bold group-hover:bg-sky-500 group-hover:text-white transition">1</div>
+                        <i class="fa-solid fa-comment-dots text-sky-400 text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-white mb-2">Napisz do nas</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Opisz pomysł lub wyślij zdjęcie przez formularz albo WhatsApp. Podaj wymiary i preferencje.</p>
+                    </div>
+                    <div class="relative bg-slate-800/50 rounded-3xl p-8 border border-white/5 hover:border-sky-500/40 transition group">
+                        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-2xl font-bold group-hover:bg-sky-500 group-hover:text-white transition">2</div>
+                        <i class="fa-solid fa-file-invoice-dollar text-sky-400 text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-white mb-2">Otrzymasz wycenę</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">W ciągu 24 godzin przygotujemy wycenę i ustalimy szczegóły oraz termin realizacji.</p>
+                    </div>
+                    <div class="relative bg-slate-800/50 rounded-3xl p-8 border border-white/5 hover:border-sky-500/40 transition group">
+                        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-2xl font-bold group-hover:bg-sky-500 group-hover:text-white transition">3</div>
+                        <i class="fa-solid fa-box-open text-sky-400 text-3xl mb-4"></i>
+                        <h3 class="text-xl font-bold text-white mb-2">Realizacja i wysyłka</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Wykonujemy produkt z najwyższą precyzją i wysyłamy kurierem do całej Polski.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPINIE KLIENTÓW -->
+        <section id="reviews" class="py-24 bg-slate-900 border-t border-white/5">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <p class="text-wood-400 font-bold uppercase tracking-widest text-sm mb-3">Opinie</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">Co mówią nasi klienci</h2>
+                <div class="w-24 h-1.5 bg-wood-600 mx-auto rounded-full mb-16 opacity-80"></div>
+                <div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
             </div>
         </section>
 
@@ -671,6 +750,53 @@
                     <button onclick="openCustomOrdersGallery()" class="px-8 py-3 bg-stone-100 text-stone-600 rounded-full hover:bg-stone-200 hover:text-wood-600 transition font-bold shadow-sm inline-flex items-center gap-2">
                         <i class="fa-solid fa-grid-2"></i> Zobacz wszystkie realizacje
                     </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-24 bg-slate-900 border-t border-white/5">
+            <div class="max-w-3xl mx-auto px-6">
+                <div class="text-center mb-14">
+                    <p class="text-wood-400 font-bold uppercase tracking-widest text-sm mb-3">Masz pytania?</p>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white">Często zadawane pytania</h2>
+                </div>
+                <div class="space-y-3" id="faq-list">
+                    <div class="faq-item bg-slate-800/50 rounded-2xl border border-white/5 overflow-hidden">
+                        <button onclick="window.toggleFaq(this)" class="w-full flex justify-between items-center text-left p-5 text-white font-semibold hover:bg-white/5 transition">
+                            <span>Ile kosztuje wykonanie produktu?</span>
+                            <i class="fa-solid fa-chevron-down transition-transform text-sky-400 shrink-0 ml-3"></i>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300"><p class="px-5 pb-5 text-slate-400 leading-relaxed">Każdy produkt wyceniamy indywidualnie — cena zależy od rozmiaru, grubości materiału, stopnia skomplikowania i wykończenia. Napisz do nas z opisem, a wycenę otrzymasz w ciągu 24 godzin, bez żadnych zobowiązań.</p></div>
+                    </div>
+                    <div class="faq-item bg-slate-800/50 rounded-2xl border border-white/5 overflow-hidden">
+                        <button onclick="window.toggleFaq(this)" class="w-full flex justify-between items-center text-left p-5 text-white font-semibold hover:bg-white/5 transition">
+                            <span>Jak długo trwa realizacja?</span>
+                            <i class="fa-solid fa-chevron-down transition-transform text-sky-400 shrink-0 ml-3"></i>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300"><p class="px-5 pb-5 text-slate-400 leading-relaxed">Czas realizacji zależy od produktu — od 24 godzin dla prostych elementów do około 2 tygodni dla bardziej skomplikowanych, malowanych projektów. Dokładny termin podajemy przy wycenie.</p></div>
+                    </div>
+                    <div class="faq-item bg-slate-800/50 rounded-2xl border border-white/5 overflow-hidden">
+                        <button onclick="window.toggleFaq(this)" class="w-full flex justify-between items-center text-left p-5 text-white font-semibold hover:bg-white/5 transition">
+                            <span>Czy wysyłacie produkty?</span>
+                            <i class="fa-solid fa-chevron-down transition-transform text-sky-400 shrink-0 ml-3"></i>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300"><p class="px-5 pb-5 text-slate-400 leading-relaxed">Tak! Realizujemy zamówienia z całej Polski i wysyłamy kurierem. Produkty pakujemy starannie, aby dotarły w idealnym stanie.</p></div>
+                    </div>
+                    <div class="faq-item bg-slate-800/50 rounded-2xl border border-white/5 overflow-hidden">
+                        <button onclick="window.toggleFaq(this)" class="w-full flex justify-between items-center text-left p-5 text-white font-semibold hover:bg-white/5 transition">
+                            <span>Czy mogę zamówić własny, indywidualny projekt?</span>
+                            <i class="fa-solid fa-chevron-down transition-transform text-sky-400 shrink-0 ml-3"></i>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300"><p class="px-5 pb-5 text-slate-400 leading-relaxed">Oczywiście — to nasza specjalność! Tworzymy produkty całkowicie od zera według Twojego pomysłu. Prześlij wzór, logo lub opis, a my zajmiemy się resztą.</p></div>
+                    </div>
+                    <div class="faq-item bg-slate-800/50 rounded-2xl border border-white/5 overflow-hidden">
+                        <button onclick="window.toggleFaq(this)" class="w-full flex justify-between items-center text-left p-5 text-white font-semibold hover:bg-white/5 transition">
+                            <span>Z jakiego materiału wykonujecie produkty?</span>
+                            <i class="fa-solid fa-chevron-down transition-transform text-sky-400 shrink-0 ml-3"></i>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300"><p class="px-5 pb-5 text-slate-400 leading-relaxed">Pracujemy głównie na sklejce brzozowej i płycie HDF w różnych grubościach (3–6 mm). Wykonanie dostępne jako surowe (naturalne drewno) lub malowane w dowolnym kolorze.</p></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1589,6 +1715,11 @@
                     title: "Dlaczego klienci nas wybierają?",
                     subtitle: "Setki zadowolonych klientów i produkty, które zostają w pamięci na lata."
                 },
+                reviews: [
+                    { name: "Anna K.", stars: 5, text: "Zamówiłam napis na ślub — wykonanie perfekcyjne, a kontakt błyskawiczny. Goście pytali gdzie zamawiałam. Polecam z całego serca!" },
+                    { name: "Marek W.", stars: 5, text: "Logo mojej firmy w 3D zrobiło ogromne wrażenie w biurze. Precyzja wykonania na najwyższym poziomie. Na pewno wrócę." },
+                    { name: "Kasia P.", stars: 5, text: "Drewniana koszulka LED dla męża kibica — był zachwycony! Szybka realizacja i świetna jakość. Dziękuję!" }
+                ],
                 aboutCards: [
                     { icon: "fa-solid fa-fingerprint", title: "Tylko Twój projekt", desc: "Nie ma u nas produktów z półki. Każde zamówienie projektujemy od zera według Twoich wskazówek — dostaniesz dokładnie to, o czym marzysz." },
                     { icon: "fa-solid fa-bolt", title: "Wycena w 24 godziny", desc: "Wyślij wiadomość, a odpiszę z gotową wyceną w ciągu doby. Czas realizacji ustalam indywidualnie — od 24h do 2 tygodni, w zależności od produktu i wykonania." },
@@ -1878,7 +2009,39 @@
                         </div>
                     </div>`).join('');
             }
+
+            // OPINIE KLIENTÓW
+            const reviewsGrid = document.getElementById('reviews-grid');
+            if (reviewsGrid) {
+                const revs = (t.reviews && t.reviews.length) ? t.reviews : initialData.textContent.reviews;
+                reviewsGrid.innerHTML = revs.map(r => {
+                    const stars = '★'.repeat(Math.max(1, Math.min(5, r.stars || 5)));
+                    return `<div class="bg-slate-800/60 rounded-3xl p-7 border border-white/5 text-left hover:border-wood-600/40 transition">
+                        <div class="text-yellow-400 text-lg mb-3">${stars}</div>
+                        <p class="text-slate-300 leading-relaxed mb-5 text-sm">„${escapeHTML(r.text)}"</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-wood-600/20 text-wood-400 flex items-center justify-center font-bold">${escapeHTML((r.name||'?').charAt(0))}</div>
+                            <span class="font-bold text-white text-sm">${escapeHTML(r.name)}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
         }
+
+        // FAQ akordeon
+        window.toggleFaq = (btn) => {
+            const item = btn.closest('.faq-item');
+            const ans = item.querySelector('.faq-answer');
+            const icon = btn.querySelector('i');
+            const isOpen = ans.style.maxHeight && ans.style.maxHeight !== '0px';
+            // Zamknij wszystkie
+            document.querySelectorAll('.faq-answer').forEach(a => { a.style.maxHeight = '0px'; });
+            document.querySelectorAll('.faq-item i').forEach(i => i.classList.remove('rotate-180'));
+            if (!isOpen) {
+                ans.style.maxHeight = ans.scrollHeight + 'px';
+                icon.classList.add('rotate-180');
+            }
+        };
 
         function renderHero() {
             const container = document.getElementById('hero-carousel-container');
