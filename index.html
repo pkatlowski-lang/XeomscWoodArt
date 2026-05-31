@@ -956,7 +956,7 @@
                 <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
                     <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie, max 1MB)</label>
                     <div class="relative">
-                        <input type="file" id="contact-file-input" accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
+                        <input type="file" id="contact-file-input" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
                     </div>
                     <p class="text-[10px] text-stone-400 mt-1">Zdjęcie zostanie wysłane do administratora.</p>
                 </div>
@@ -3095,9 +3095,24 @@
                 o.start(); o.stop(ctx.currentTime + 0.4);
             } catch(e) {}
         };
-        // Funkcja pobierania załącznika (obsługuje base64 i URL)
-        window.downloadAttachment = (encodedUrl, filename) => {
+        // Funkcja pobierania załącznika — zachowuje ORYGINALNY format pliku
+        window.downloadAttachment = (encodedUrl, baseFilename) => {
             const url = encodedUrl;
+            // Mapa MIME → rozszerzenie (każdy format zachowany 1:1)
+            const MIME_EXT = {
+                'image/png':'png','image/jpeg':'jpg','image/jpg':'jpg','image/gif':'gif',
+                'image/webp':'webp','image/bmp':'bmp','image/tiff':'tiff','image/svg+xml':'svg',
+                'image/avif':'avif','image/heic':'heic','image/heif':'heif','application/pdf':'pdf'
+            };
+            let ext = 'jpg';
+            if (url.startsWith('data:')) {
+                const mime = (url.match(/^data:([^;,]+)/)||[])[1];
+                if (mime && MIME_EXT[mime.toLowerCase()]) ext = MIME_EXT[mime.toLowerCase()];
+            } else {
+                const m = url.match(/\.([a-z0-9]{1,5})(?:\?|#|$)/i);
+                if (m) ext = m[1].toLowerCase();
+            }
+            const filename = String(baseFilename).replace(/\.\w+$/, '') + '.' + ext;
             if (url.startsWith('data:')) {
                 const a = document.createElement('a');
                 a.href = url; a.download = filename; a.click();
@@ -3207,8 +3222,8 @@
                                                      <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
                                                  </div>
                                              </div>
-                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}.jpg')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
-                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz zdjęcie
+                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz plik
                                              </button>
                                          </div>
                                      </div>` : ''}
