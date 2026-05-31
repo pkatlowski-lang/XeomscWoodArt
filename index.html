@@ -2028,19 +2028,20 @@
         // Inicjalizacja SEO dla strony głównej
         window.updateSEO({});
 
+        // GLOBALNA — używana w renderMain, openAllProductsPage i in.
+        window.catHasProducts = (c) => {
+            return Object.values(c.subs || {}).some(sub => {
+                const prods = sub.products;
+                return Array.isArray(prods) ? prods.some(p => !p.isHidden) : false;
+            });
+        };
+
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (grid) {
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
-                // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
-                const catHasProducts = (c) => {
-                    const subs = c.subs || {};
-                    return Object.values(subs).some(sub => {
-                        const prods = sub.products;
-                        return Array.isArray(prods) ? prods.length > 0 : (prods && Object.keys(prods).length > 0);
-                    });
-                };
+                const catHasProducts = window.catHasProducts;
                 const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
                     .filter(([, c]) => !c.isHidden && (isAdmin || catHasProducts(c)))
@@ -2096,66 +2097,59 @@
             window.startAutoScroll();
         }
 
-        window.selectMainCategory = (id, preventScroll = false) => {
-            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
-            const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
-            selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
+        // Kliknięcie kategorii → OD RAZU produkty (bez warstwy podkategorii)
+        window.selectMainCategory = (id) => { window.openCategoryProducts(id); };
 
-            const cat = siteData.categories[id]; if(!cat) return;
+        // Pokazuje WSZYSTKIE produkty kategorii (zebrane ze wszystkich podkategorii)
+        window.openCategoryProducts = (catId) => {
+            const cat = siteData.categories[catId];
+            if (!cat) return;
+            window.currentCatId = catId;
+            window.activeMainCatId = catId;
 
-            // Zapisz aktywną kategorię
-            window.activeMainCatId = id;
+            document.getElementById('subcategory-title').textContent = cat.title;
+            const grid = document.getElementById('subcategory-grid');
+
+            // Zbierz produkty ze wszystkich podkategorii (zachowując subId+idx dla openGallery)
+            const items = [];
+            Object.keys(cat.subs || {}).forEach(sid => {
+                (cat.subs[sid].products || []).forEach((prod, idx) => {
+                    items.push({ subId: sid, idx, prod });
+                });
+            });
 
             // SEO
-            const _cs = _SEO_CATS[id] || {};
-            const _catImg = cat.image || _productImgsFromCat(cat)[0] || '';
+            const _cs = _SEO_CATS[catId] || {};
             window.updateSEO({
                 title: cat.title,
-                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. Precyzyjne cięcie laserowe, personalizacja. ${_SEO_SITE}.`).slice(0,160),
+                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. ${_SEO_SITE}.`).slice(0,160),
                 kw: _cs.kw,
-                image: _catImg,
+                image: cat.image || _productImgsFromCat(cat)[0] || '',
                 breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
             });
-            window._setHash('kat/' + id);
+            window._setHash('kat/' + catId);
 
-            const container = document.getElementById('sub-categories-container');
-            const title = document.getElementById('selected-cat-title');
-            const grid = document.getElementById('sub-categories-grid');
-            const btnSeeAll = document.getElementById('btn-see-all-subcats');
-
-            title.textContent = cat.title; grid.innerHTML = '';
-            const descEl = document.getElementById('selected-cat-desc');
-            if(cat.desc) { descEl.textContent = cat.desc; descEl.classList.remove('hidden'); } else { descEl.classList.add('hidden'); }
-            
-            // Konfiguracja przycisku "Zobacz wszystkie"
-            btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
-
-            const subs = cat.subs || {}; 
-            
-            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
-            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
-
-            if(subKeys.length > 0) {
-                // Wyświetl wszystkie podkategorie w karuzeli
-                grid.innerHTML = subKeys.map(sid => {
-                    const sub = subs[sid];
-                    return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
-                             <div class="h-48 overflow-hidden relative">${_slideshowImg(sub.image ? [sub.image] : _productImgsFromSub(sub), 'pointer-events-none')}</div>
-                            <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${escapeHTML(sub.title)}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
-                }).join('');
-                _initSlideshows();
-            } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
-
-            // Aktywuj drag dla podkategorii
-            window.enableDragScroll('sub-categories-grid');
-            window.makeInfiniteCarousel('sub-categories-grid');
-
-            container.classList.remove('hidden');
-            
-            // Scrollujemy tylko jeśli to nowa interakcja, a nie odświeżenie danych
-            if (!preventScroll) {
-                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            const visible = items.filter(it => !it.prod.isHidden);
+            if (grid) {
+                if (visible.length > 0) {
+                    grid.innerHTML = items.map(it => {
+                        if (it.prod.isHidden) return '';
+                        const p = it.prod;
+                        return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${catId}', '${it.subId}', ${it.idx})">
+                            <div class="h-64 overflow-hidden relative"><img src="${p.image || 'https://via.placeholder.com/300'}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia';this.onerror=null;" alt="${escapeHTML(p.title || p.name || '')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                            <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(p.title || p.name || '')}</h3><div class="flex justify-between items-center mt-2"><p class="text-wood-600 font-bold text-lg">${p.price ? escapeHTML(String(p.price)) + ' PLN' : 'Wycena indywidualna'}</p></div></div></div>`;
+                    }).join('');
+                } else {
+                    grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów w tej kategorii.</p></div>';
+                }
             }
+
+            ['main-content','subcategories-full-view','gallery-view','custom-orders-full-view','legal-view'].forEach(vid => {
+                const el = document.getElementById(vid); if (el) el.classList.add('hidden');
+            });
+            const _sc = document.getElementById('sub-categories-container'); if (_sc) _sc.style.display = 'none';
+            document.getElementById('subcategory-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
         };
         
         // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
@@ -2208,7 +2202,7 @@
             const cats = siteData.categories || {};
             const isAdm = document.body.classList.contains('is-admin');
             const sortedCats = Object.entries(cats)
-                .filter(([, c]) => !c.isHidden && (isAdm || catHasProducts(c)))
+                .filter(([, c]) => !c.isHidden && (isAdm || window.catHasProducts(c)))
                 .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0) || a.title.localeCompare(b.title, 'pl'));
 
             const grid  = document.getElementById('subcategories-full-grid');
@@ -2219,12 +2213,15 @@
 
             grid.innerHTML = sortedCats.map(([catId, cat]) => {
                 const imgs = _productImgsFromCat(cat);
-                const subCount = Object.keys(cat.subs || {}).length;
-                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openFullSubcategoryList('${catId}', true)">
+                // Licznik produktów (suma ze wszystkich podkategorii)
+                let prodCount = 0;
+                Object.values(cat.subs || {}).forEach(sub => { prodCount += (sub.products || []).filter(p => !p.isHidden).length; });
+                const word = prodCount === 1 ? 'produkt' : (prodCount % 10 >= 2 && prodCount % 10 <= 4 && (prodCount < 10 || prodCount > 20)) ? 'produkty' : 'produktów';
+                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openCategoryProducts('${catId}')">
                     <div class="h-64 overflow-hidden relative">${_slideshowImg(cat.image ? [cat.image] : imgs, '')}</div>
                     <div class="p-6">
                         <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(cat.title)}</h3>
-                        <p class="text-stone-500 mt-2">${subCount} ${subCount === 1 ? 'podkategoria' : 'podkategorii'}</p>
+                        <p class="text-stone-500 mt-2">${prodCount} ${word}</p>
                     </div></div>`;
             }).join('') || '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak kategorii.</p></div>';
 
@@ -2315,8 +2312,9 @@
             window.scrollTo(0,0);
         };
         
-        // Funkcja powrotu z listy produktów (subcategory-view) do listy podkategorii (full-view)
+        // Powrót z listy produktów → strona główna (brak warstwy podkategorii)
         window.goBackToSubcategoryList = () => {
+             window.goHome(); return;
              if(window.currentCatId) {
                  window.openFullSubcategoryList(window.currentCatId);
              } else {
@@ -2345,8 +2343,8 @@
             // Przekazujemy zdjęcie do funkcji modala
             askBtn.onclick = () => window.openContactModal(codeToPass, imageToPass);
             
-            // ZMIANA: Przycisk powrotu cofa do podkategorii
-            document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
+            // Przycisk powrotu cofa do listy produktów kategorii
+            document.getElementById('back-to-sub-btn').onclick = () => window.openCategoryProducts(catId);
             
             // GŁÓWNE źródło: product.gallery (tablica URL). Fallback: siteData.galleries[id]
             let _allImgs = [];
@@ -4423,12 +4421,12 @@
                     window.goHome();
                 } else if (parts[0]==='prod' && parts[1] && parts[2] && parts[3]!==undefined) {
                     window.openGallery(parts[1], parts[2], parseInt(parts[3]));
-                } else if (parts[0]==='sub' && parts[1] && parts[2]) {
-                    window.openSubcategoryView(parts[1], parts[2]);
+                } else if (parts[0]==='sub' && parts[1]) {
+                    window.openCategoryProducts(parts[1]);
                 } else if (parts[0]==='kat' && parts[1]) {
-                    window.selectMainCategory(parts[1]);
+                    window.openCategoryProducts(parts[1]);
                 } else if (parts[0]==='full-sub' && parts[1]) {
-                    window.openFullSubcategoryList(parts[1]);
+                    window.openCategoryProducts(parts[1]);
                 } else if (parts[0]==='products') {
                     window.openAllProductsPage();
                 } else if (parts[0]==='orders') {
