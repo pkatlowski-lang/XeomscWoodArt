@@ -92,53 +92,10 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #38bdf8 80%, #818cf8 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 24px rgba(56,189,248,0.5));
-            animation: shimmerText 4s linear infinite;
-        }
-        @keyframes shimmerText {
-            0%   { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-        /* Hero entrance animations */
-        .hero-badge-enter {
-            animation: heroBadgeIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .hero-title-enter {
-            animation: heroTitleIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s both;
-        }
-        .hero-desc-enter {
-            animation: heroDescIn 0.8s ease-out 0.55s both;
-        }
-        .hero-btn-enter {
-            animation: heroBtnIn 0.8s cubic-bezier(0.22,1,0.36,1) 0.75s both;
-        }
-        @keyframes heroBadgeIn {
-            from { opacity:0; transform:translateY(-16px) scale(0.9); }
-            to   { opacity:1; transform:translateY(0) scale(1); }
-        }
-        @keyframes heroTitleIn {
-            from { opacity:0; transform:translateY(32px) skewY(2deg); }
-            to   { opacity:1; transform:translateY(0) skewY(0); }
-        }
-        @keyframes heroDescIn {
-            from { opacity:0; transform:translateX(-20px); }
-            to   { opacity:1; transform:translateX(0); }
-        }
-        @keyframes heroBtnIn {
-            from { opacity:0; transform:translateY(20px) scale(0.95); }
-            to   { opacity:1; transform:translateY(0) scale(1); }
-        }
-        /* Hero image ken-burns */
-        .hero-slide img.hero-ken-burns {
-            animation: kenBurns 12s ease-in-out infinite alternate;
-        }
-        @keyframes kenBurns {
-            from { transform: scale(1.08) translate(-1%, -1%); }
-            to   { transform: scale(1.0)  translate(1%, 1%); }
+            filter: drop-shadow(0 0 20px rgba(56,189,248,0.4));
         }
         
         .white-outline-text {
@@ -582,17 +539,17 @@
             
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
                 <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
-                    <span class="hero-badge-enter inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
-                        ✦ Pracownia Laserowa
+                    <span class="inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
+                        Pracownia Laserowa
                     </span>
-                    <h1 class="hero-title-enter text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
-                        <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span>
+                    <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
+                        <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span> 
                         <span id="hero-title-accent" class="gradient-text white-outline-text">Sklejki</span>.
                     </h1>
-                    <p id="hero-desc" class="hero-desc-enter text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
+                    <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
                         Witaj w Xeomsc Laser. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.
                     </p>
-                    <div class="hero-btn-enter flex flex-wrap gap-4 justify-center md:justify-start">
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                         <a href="#products" onclick="openAllProductsPage(); return false;" class="px-10 py-4 bg-sky-500 text-white rounded-full hover:bg-sky-400 hover:scale-105 transform transition shadow-xl shadow-sky-500/25 font-bold text-center">
                             Zobacz nasze prace
                         </a>
@@ -635,7 +592,7 @@
                     </button>
                 </div>
 
-                <div id="sub-categories-container" class="hidden" style="display:none!important">
+                <div id="sub-categories-container" class="hidden animate-fade-in border-t border-stone-200 pt-12">
                     <p class="text-sky-400 text-sm font-bold uppercase tracking-widest mb-4">Wybierz rodzaj produktu</p>
                     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                         <h3 id="selected-cat-title" class="text-3xl font-bold text-white"></h3>
@@ -965,138 +922,54 @@
         </button>
     </div>
 
-    <!-- MODAL FORMULARZA WYCENY -->
-    <div id="contact-modal" class="fixed inset-0 z-[3000] bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-3">
-        <div class="bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[95vh] border border-white/10">
-            <!-- Naglowek -->
-            <div class="bg-gradient-to-r from-wood-600 to-sky-600 p-5 text-white flex justify-between items-center shrink-0">
-                <div>
-                    <h3 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-calculator"></i> Zapytanie o wycene</h3>
-                    <p class="text-white/70 text-xs mt-0.5">Wypelnij ponizej — odezwiemy sie w ciagu 24h</p>
-                </div>
-                <button onclick="closeContactModal()" class="text-white/70 hover:text-white transition p-2 rounded-lg hover:bg-white/10">
+    <!-- MODAL FORMULARZA KONTAKTOWEGO -->
+    <div id="contact-modal" class="fixed inset-0 z-[3000] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh] border border-white/10">
+            <div class="bg-sky-600 p-6 text-white flex justify-between items-center shrink-0">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-regular fa-paper-plane"></i> Formularz zapytania
+                </h3>
+                <button onclick="closeContactModal()" class="text-white/70 hover:text-white transition p-2">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            <div class="overflow-y-auto flex-1">
-                <div class="p-5 space-y-4">
-                    <!-- Dane kontaktowe -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Imie i Nazwisko</label>
-                            <input type="text" id="contact-name" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="Jan Kowalski">
+            <div class="p-6 space-y-4 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Twoje Imię</label>
+                    <input type="text" id="contact-name" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. Jan Kowalski">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Twój Email</label>
+                    <!-- DODANO AUTOCOMPLETE OFF -->
+                    <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white placeholder-slate-600" placeholder="np. jan@example.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+                
+                <div id="product-codes-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
+                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Kod Produktu</label>
+                    <div id="product-codes-container" class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="code-input-0" class="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2 text-sm font-mono text-stone-700" readonly>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
-                            <input type="email" id="contact-email-input" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="jan@example.com" autocomplete="off">
-                        </div>
-                    </div>
-                    <!-- Temat -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5"><i class="fa-solid fa-tag text-stone-500 mr-1"></i> Temat zapytania</label>
-                        <input type="text" id="contact-subject" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600" placeholder="np. Wycena tabliczki z logo, Zamówienie napisu...">
-                    </div>
-                    <!-- Kod produktu -->
-                    <div id="product-codes-section" class="hidden bg-wood-600/10 rounded-xl p-3 border border-wood-600/20">
-                        <label class="block text-[10px] font-bold text-wood-400 uppercase tracking-wider mb-2">Wybrany produkt</label>
-                        <div id="product-codes-container">
-                            <input type="text" id="code-input-0" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-wood-300" readonly>
-                        </div>
-                    </div>
-                    <!-- Tresc wiadomosci — WIDOCZNA OD RAZU -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            <i class="fa-solid fa-pen-to-square text-stone-500 mr-1"></i> Treść wiadomości
-                        </label>
-                        <textarea id="contact-message" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition text-white text-sm placeholder-slate-600 resize-none" placeholder="Dzień dobry, chciałbym zapytać o wycenę..."></textarea>
-                    </div>
-                    <!-- Parametry produktu -->
-                    <div class="border-t border-white/5 pt-4">
-                        <p class="text-[10px] font-bold text-sky-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-sliders"></i> Parametry produktu
-                        </p>
-                        <!-- Wymiary -->
-                        <div class="mb-4">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                <i class="fa-solid fa-ruler-combined text-stone-500 mr-1"></i> Wymiary
-                            </label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div class="relative">
-                                    <input type="number" id="cf-width" min="1" max="9999"
-                                        class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 pr-12 text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none transition placeholder-slate-600" placeholder="Szerokosc">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">mm</span>
-                                </div>
-                                <div class="relative">
-                                    <input type="number" id="cf-height" min="1" max="9999"
-                                        class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2.5 pr-12 text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none transition placeholder-slate-600" placeholder="Wysokosc">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">mm</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Grubosc -->
-                        <div class="mb-4">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                <i class="fa-solid fa-layer-group text-stone-500 mr-1"></i> Grubosc sklejki
-                            </label>
-                            <div class="flex gap-2 flex-wrap">
-                                <button type="button" data-group="thickness" data-val="3 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">3 mm</button>
-                                <button type="button" data-group="thickness" data-val="4 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">4 mm</button>
-                                <button type="button" data-group="thickness" data-val="6 mm" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">6 mm</button>
-                                <button type="button" data-group="thickness" data-val="inna grubosc" onclick="window.toggleCfOption(this)" class="cf-opt px-4 py-2 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">Inna</button>
-                            </div>
-                        </div>
-                        <!-- Wykonanie -->
-                        <div class="mb-4">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                <i class="fa-solid fa-cubes text-stone-500 mr-1"></i> Wykonanie
-                            </label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" data-group="exec" data-val="plaskie (jednowarstwowe)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
-                                    <i class="fa-solid fa-square text-xl"></i>
-                                    <span>Plaskie</span>
-                                    <span class="text-[10px] text-stone-500 font-normal">jednowarstwowe</span>
-                                </button>
-                                <button type="button" data-group="exec" data-val="3D (wielowarstwowe)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
-                                    <i class="fa-solid fa-layer-group text-xl"></i>
-                                    <span>Efekt 3D</span>
-                                    <span class="text-[10px] text-stone-500 font-normal">wielowarstwowe</span>
-                                </button>
-                            </div>
-                        </div>
-                        <!-- Kolor -->
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                <i class="fa-solid fa-palette text-stone-500 mr-1"></i> Wykonczenie / Kolor
-                            </label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" data-group="color" data-val="surowe (naturalne drewno)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
-                                    <span class="w-6 h-6 rounded-full bg-amber-200 border-2 border-amber-300 shadow-sm inline-block"></span>
-                                    <span>Surowe</span>
-                                    <span class="text-[10px] text-stone-500 font-normal">naturalne drewno</span>
-                                </button>
-                                <button type="button" data-group="color" data-val="malowane (prosze podac kolor)" onclick="window.toggleCfOption(this)" class="cf-opt flex flex-col items-center gap-1 px-3 py-3 rounded-xl border border-white/10 bg-slate-800 text-slate-300 text-sm font-bold transition hover:border-sky-500/50">
-                                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-red-400 via-sky-400 to-green-400 shadow-sm inline-block"></span>
-                                    <span>Malowane</span>
-                                    <span class="text-[10px] text-stone-500 font-normal">dowolny kolor</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Zalacznik -->
-                    <div id="contact-upload-section" class="hidden border-t border-white/5 pt-4">
-                        <label class="block text-[10px] font-bold text-wood-400 uppercase tracking-wider mb-2">
-                            <i class="fa-solid fa-paperclip mr-1"></i> Zalacz plik / projekt (opcjonalnie, max 1MB)
-                        </label>
-                        <input type="file" id="contact-file-input" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" class="w-full text-sm text-stone-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-wood-600/20 file:text-wood-400 hover:file:bg-wood-600/30 cursor-pointer transition">
                     </div>
                 </div>
+
+                <div id="contact-upload-section" class="border-t border-b border-stone-100 py-4 my-2 hidden">
+                    <label class="block text-xs font-bold text-wood-600 uppercase mb-2 ml-1">Załącz zdjęcie (Opcjonalnie, max 1MB)</label>
+                    <div class="relative">
+                        <input type="file" id="contact-file-input" accept="image/*" class="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 cursor-pointer">
+                    </div>
+                    <p class="text-[10px] text-stone-400 mt-1">Zdjęcie zostanie wysłane do administratora.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1 ml-1">Treść Wiadomości / Zapytanie</label>
+                    <textarea id="contact-message" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 outline-none transition h-32 resize-none text-white placeholder-slate-600" placeholder="Dzień dobry, chciałbym zapytać o..."></textarea>
+                </div>
             </div>
-            <!-- Wyslij -->
-            <div class="p-5 border-t border-white/5 bg-slate-800/50 shrink-0">
-                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-gradient-to-r from-wood-600 to-sky-600 hover:from-wood-500 hover:to-sky-500 text-white py-4 rounded-xl font-bold transition shadow-lg transform active:scale-95 flex items-center justify-center gap-2 text-base">
-                    <i class="fa-solid fa-paper-plane"></i> Wyslij zapytanie o wycene
+            <div class="p-6 border-t border-white/5 bg-slate-800/50 shrink-0">
+                <button onclick="submitContactForm()" id="submit-contact-btn" class="w-full bg-sky-500 text-white py-4 rounded-xl font-bold hover:bg-sky-400 transition shadow-lg shadow-sky-500/20 transform active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Wyślij zapytanie
                 </button>
-                <p class="text-center text-[10px] text-stone-600 mt-2"><i class="fa-solid fa-clock mr-1"></i>Odpowiadamy w ciagu 24 godzin</p>
             </div>
         </div>
     </div>
@@ -1124,7 +997,7 @@
                     <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-5 text-center text-xs"></i> Karuzela Hero</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Katalog Produktów</p>
                     <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-layer-group w-5 text-center text-xs"></i> Kategorie</button>
-                    
+                    <button onclick="switchAdminView('subcategories')" id="btn-subcategories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-tree w-5 text-center text-xs"></i> Podkategorie</button>
                     <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-plus-circle w-5 text-center text-xs"></i> Dodaj Produkty</button>
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-5 text-center text-xs"></i> Lista Produktów</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Narzędzia</p>
@@ -1353,7 +1226,7 @@
                              <i class="fa-solid fa-cloud-arrow-up text-4xl text-wood-500 mb-3 block group-hover:scale-110 transition"></i>
                              <p class="text-white font-semibold text-lg">Kliknij lub przeciągnij zdjęcia tutaj</p>
                              <p class="text-stone-400 text-sm mt-1">Możesz wybrać wiele plików naraz (JPG, PNG, WEBP)</p>
-                             <input id="orders-file-input" type="file" accept="image/*,.svg,.pdf,.bmp,.tiff,.tif,.avif,.heic,.heif" multiple class="hidden">
+                             <input id="orders-file-input" type="file" accept="image/*" multiple class="hidden">
                          </div>
                          <div id="orders-upload-progress" class="hidden mt-4 space-y-2"></div>
                      </div>
@@ -1654,9 +1527,7 @@
             // USTAWIENIA KALKULATORA
             calcSettings: {
                 materialRate: 0.0038, // Cena za cm2 (bazowa dla 3mm)
-                laserRate: 0.50,      // Cena za minutę
-                margin: 30,           // Marża domyślna %
-                thickness: 3          // Grubość domyślna mm
+                laserRate: 0.50       // Cena za minutę
             },
             textContent: {
                 hero: { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo", desc: "Zamieniamy Twój pomysł w wyjątkowy produkt z drewna. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
@@ -1924,7 +1795,7 @@
                 <div class="hero-slide ${idx === 0 ? 'active' : ''}">
                     ${it.type === 'image'
                         ? `<img src="${it.url}" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60">
-                           <img src="${it.url}" class="absolute inset-0 w-full h-full object-contain object-center hero-ken-burns">`
+                           <img src="${it.url}" class="absolute inset-0 w-full h-full object-contain object-center">`
                         : `<video src="${it.url}" class="w-full h-full object-cover object-center pointer-events-none" muted autoplay loop playsinline disablepictureinpicture disableremoteplayback></video>`}
                 </div>`).join('');
             
@@ -1937,10 +1808,6 @@
         }
 
         function _productImgsFromCat(cat) {
-            // Nowa struktura
-            const direct = (cat.products || []).filter(p => p.image && !p.isHidden).map(p => p.image);
-            if (direct.length > 0) return direct;
-            // Stara struktura (cache)
             const out = [];
             Object.values(cat.subs || {}).forEach(sub => {
                 (sub.products || []).forEach(p => { if(p.image && !p.isHidden) out.push(p.image); });
@@ -2069,21 +1936,19 @@
         // Inicjalizacja SEO dla strony głównej
         window.updateSEO({});
 
-        // Globalna funkcja — używana w renderMain, openAllProductsPage i in.
-        window.catHasProducts = (c) => {
-            const direct = c.products || [];
-            if (direct.length > 0) return direct.some(p => !p.isHidden);
-            return Object.values(c.subs || {}).some(sub =>
-                (sub.products || []).some(p => !p.isHidden)
-            );
-        };
-
         function renderMain() {
             const grid = document.getElementById('main-categories-grid');
             if (grid) {
                 grid.innerHTML = '';
                 const cats = siteData.categories || {};
-                const catHasProducts = window.catHasProducts; // użyj globalnej
+                // SORTOWANIE KATEGORII GŁÓWNYCH PO POLU 'order' (JEŚLI BRAK, DOMYŚLNIE 9999 LUB KOLEJNOŚĆ W BAZIE)
+                const catHasProducts = (c) => {
+                    const subs = c.subs || {};
+                    return Object.values(subs).some(sub => {
+                        const prods = sub.products;
+                        return Array.isArray(prods) ? prods.length > 0 : (prods && Object.keys(prods).length > 0);
+                    });
+                };
                 const isAdmin = document.body.classList.contains('is-admin');
                 const visibleCategories = Object.entries(cats)
                     .filter(([, c]) => !c.isHidden && (isAdmin || catHasProducts(c)))
@@ -2095,25 +1960,18 @@
                 
                 if (visibleCategories.length === 0) { grid.innerHTML = '<p class="text-stone-400 w-full text-center py-10">Brak widocznych kategorii.</p>'; } 
                 else {
-                    const createCardHTML = ([id, c]) => {
-                        const prodCount = (c.products || []).filter(p => !p.isHidden).length ||
-                            Object.values(c.subs || {}).reduce((s,sub)=>s+(sub.products||[]).filter(p=>!p.isHidden).length,0);
-                        return `
-                        <div id="main-cat-${id}" class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in w-[320px] md:w-[400px] snap-center shrink-0 category-card-item" onclick="window.openCategoryProducts('${id}')">
-                            <div class="h-72 overflow-hidden relative">
+                    const createCardHTML = ([id, c]) => `
+                        <div id="main-cat-${id}" class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 fade-in w-[320px] md:w-[400px] snap-center shrink-0 category-card-item">
+                            <div class="h-72 overflow-hidden relative" onclick="window.selectMainCategory('${id}')">
                                 ${_slideshowImg(c.image ? [c.image] : _productImgsFromCat(c), 'pointer-events-none')}
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
-                                <div class="absolute bottom-6 left-8 right-8 text-white">
-                                    <h3 class="font-bold text-2xl mb-1">${escapeHTML(c.title)}</h3>
-                                    <p class="text-white/70 text-sm">${prodCount} ${prodCount===1?'produkt':prodCount<5?'produkty':'produktów'}</p>
-                                </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
+                                <div class="absolute bottom-6 left-8 text-white"><h3 class="font-bold text-2xl">${escapeHTML(c.title)}</h3></div>
                             </div>
-                            <div class="p-6 flex justify-between items-center bg-white group-hover:bg-slate-50 transition">
-                                <span class="text-stone-600 font-semibold text-sm">Zobacz produkty</span>
-                                <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition"><i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></div>
+                            <div class="p-8 flex justify-between items-center" onclick="window.selectMainCategory('${id}')">
+                                <span class="text-stone-500 font-medium text-sm">Pokaż podkategorie</span>
+                                <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-wood-600 group-hover:text-white transition"><i class="fa-solid fa-arrow-down"></i></div>
                             </div>
                         </div>`;
-                    };
                     visibleCategories.forEach(item => { grid.innerHTML += createCardHTML(item); });
                     _initSlideshows();
                 }
@@ -2138,13 +1996,75 @@
                 window.makeInfiniteCarousel('custom-orders-carousel');
             }
             
-
+            // FIX: ODŚWIEŻ WIDOK PODKATEGORII JEŚLI JEST OTWARTY
+            if(window.activeMainCatId && siteData.categories[window.activeMainCatId]) {
+                window.selectMainCategory(window.activeMainCatId, true); // true = preventScroll
+            }
 
             window.startAutoScroll();
         }
 
-        // selectMainCategory → otwiera produkty kategorii bezpośrednio
-        window.selectMainCategory = (id) => { window.openCategoryProducts(id); };
+        window.selectMainCategory = (id, preventScroll = false) => {
+            document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
+            const selectedCards = document.querySelectorAll(`#main-cat-${id}`);
+            selectedCards.forEach(el => el.classList.add('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
+
+            const cat = siteData.categories[id]; if(!cat) return;
+
+            // Zapisz aktywną kategorię
+            window.activeMainCatId = id;
+
+            // SEO
+            const _cs = _SEO_CATS[id] || {};
+            const _catImg = cat.image || _productImgsFromCat(cat)[0] || '';
+            window.updateSEO({
+                title: cat.title,
+                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. Precyzyjne cięcie laserowe, personalizacja. ${_SEO_SITE}.`).slice(0,160),
+                kw: _cs.kw,
+                image: _catImg,
+                breadcrumbs: [{ name: 'Strona główna', hash: '' }, { name: cat.title }]
+            });
+            window._setHash('kat/' + id);
+
+            const container = document.getElementById('sub-categories-container');
+            const title = document.getElementById('selected-cat-title');
+            const grid = document.getElementById('sub-categories-grid');
+            const btnSeeAll = document.getElementById('btn-see-all-subcats');
+
+            title.textContent = cat.title; grid.innerHTML = '';
+            const descEl = document.getElementById('selected-cat-desc');
+            if(cat.desc) { descEl.textContent = cat.desc; descEl.classList.remove('hidden'); } else { descEl.classList.add('hidden'); }
+            
+            // Konfiguracja przycisku "Zobacz wszystkie"
+            btnSeeAll.onclick = () => window.openFullSubcategoryList(id);
+
+            const subs = cat.subs || {}; 
+            
+            // SORTOWANIE PODKATEGORII ALFABETYCZNIE
+            const subKeys = Object.keys(subs).sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'));
+
+            if(subKeys.length > 0) {
+                // Wyświetl wszystkie podkategorie w karuzeli
+                grid.innerHTML = subKeys.map(sid => {
+                    const sub = subs[sid];
+                    return `<div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-stone-100 w-[280px] snap-center shrink-0" onclick="window.openSubcategoryView('${id}', '${sid}')">
+                             <div class="h-48 overflow-hidden relative">${_slideshowImg(sub.image ? [sub.image] : _productImgsFromSub(sub), 'pointer-events-none')}</div>
+                            <div class="p-5"><h3 class="font-bold text-lg text-stone-800 line-clamp-1 text-center">${escapeHTML(sub.title)}</h3><p class="text-xs text-stone-400 text-center mt-1">${sub.products ? sub.products.length : 0} produktów</p></div></div>`;
+                }).join('');
+                _initSlideshows();
+            } else { grid.innerHTML = '<p class="text-stone-400 italic">Brak podkategorii.</p>'; }
+
+            // Aktywuj drag dla podkategorii
+            window.enableDragScroll('sub-categories-grid');
+            window.makeInfiniteCarousel('sub-categories-grid');
+
+            container.classList.remove('hidden');
+            
+            // Scrollujemy tylko jeśli to nowa interakcja, a nie odświeżenie danych
+            if (!preventScroll) {
+                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            }
+        };
         
         // NOWA FUNKCJA: Otwiera pełną siatkę podkategorii
         window.openFullSubcategoryList = (catId, fromAllProducts = false) => {
@@ -2196,7 +2116,7 @@
             const cats = siteData.categories || {};
             const isAdm = document.body.classList.contains('is-admin');
             const sortedCats = Object.entries(cats)
-                .filter(([, c]) => !c.isHidden && (isAdm || window.catHasProducts(c)))
+                .filter(([, c]) => !c.isHidden && (isAdm || catHasProducts(c)))
                 .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0) || a.title.localeCompare(b.title, 'pl'));
 
             const grid  = document.getElementById('subcategories-full-grid');
@@ -2208,12 +2128,11 @@
             grid.innerHTML = sortedCats.map(([catId, cat]) => {
                 const imgs = _productImgsFromCat(cat);
                 const subCount = Object.keys(cat.subs || {}).length;
-                const prodCount = (cat.products || []).filter(p => !p.isHidden).length;
-                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openCategoryProducts('${catId}')">
+                return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openFullSubcategoryList('${catId}', true)">
                     <div class="h-64 overflow-hidden relative">${_slideshowImg(cat.image ? [cat.image] : imgs, '')}</div>
                     <div class="p-6">
                         <h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(cat.title)}</h3>
-                        <p class="text-stone-500 mt-2">${prodCount} ${prodCount === 1 ? 'produkt' : prodCount < 5 ? 'produkty' : 'produktów'}</p>
+                        <p class="text-stone-500 mt-2">${subCount} ${subCount === 1 ? 'podkategoria' : 'podkategorii'}</p>
                     </div></div>`;
             }).join('') || '<div class="col-span-full text-center py-20 opacity-50"><p class="text-stone-500 text-lg">Brak kategorii.</p></div>';
 
@@ -2254,75 +2173,70 @@
              }
         };
 
-        window.openCategoryView = (id) => { window.openCategoryProducts(id); };
+        window.openCategoryView = (id) => { window.selectMainCategory(id); };
 
-        // Otwiera listę produktów kategorii bezpośrednio (bez podkategorii)
-        window.openCategoryProducts = (catId) => {
+        window.openSubcategoryView = (catId, subId) => {
             const cat = siteData.categories[catId];
-            if(!cat) return;
-            window.currentCatId = catId;
-
-            document.getElementById('subcategory-title').textContent = cat.title;
+            if(!cat || !cat.subs || !cat.subs[subId]) return;
+            const sub = cat.subs[subId];
+            document.getElementById('subcategory-title').textContent = sub.title;
             const grid = document.getElementById('subcategory-grid');
+            
+            // Przechowywanie ID dla przycisku powrotu w widoku produktu
+            window.currentCatId = catId;
+            window.currentSubId = subId;
 
+            // SEO
             const _cs2 = _SEO_CATS[catId] || {};
+            const _subImg = sub.image || _productImgsFromSub(sub)[0] || cat.image || '';
             window.updateSEO({
-                title: cat.title,
-                desc: (cat.desc || `${cat.title} – ręcznie tworzone wyroby z drewna i sklejki. ${_SEO_SITE}.`).slice(0,160),
-                kw: [_cs2.kw, cat.title].filter(Boolean).join(', '),
-                image: cat.image || _productImgsFromCat(cat)[0] || '',
+                title: `${sub.title} – ${cat.title}`,
+                desc: (sub.desc || `${sub.title} – ${cat.title}. Drewniane wyroby laserowe z naturalnej sklejki brzozowej. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs2.kw, sub.title, cat.title].filter(Boolean).join(', '),
+                image: _subImg,
                 breadcrumbs: [
                     { name: 'Strona główna', hash: '' },
-                    { name: cat.title }
+                    { name: cat.title, hash: 'kat/' + catId },
+                    { name: sub.title }
                 ]
             });
-            window._setHash('kat/' + catId);
+            window._setHash('sub/' + catId + '/' + subId);
 
             if(grid) {
-                // Obsługa obu formatów: nowy (products[]) i stary cache (subs)
-                let products = cat.products || [];
-                if (products.length === 0 && cat.subs) {
-                    Object.values(cat.subs).forEach(sub => { products = products.concat(sub.products || []); });
-                }
-                const visible = products.filter(p => !p.isHidden);
-                if (visible.length > 0) {
+                grid.innerHTML = '';
+                const products = sub.products || [];
+                if (products.length > 0) {
                     grid.innerHTML = products.map((prod, index) => {
-                        if (prod.isHidden) return '';
-                        return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${catId}', ${index})" style="animation-delay: ${index * 50}ms">
-                            <div class="h-64 overflow-hidden relative"><img src="${prod.image || 'https://via.placeholder.com/300'}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia';this.onerror=null;" alt="${escapeHTML(prod.title || prod.name || '')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
-                            <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(prod.title || prod.name || '')}</h3><div class="flex justify-between items-center mt-2"><p class="text-wood-600 font-bold text-lg">${prod.price && prod.price !== 'Wycena indywidualna' ? escapeHTML(String(prod.price)) + ' PLN' : 'Wycena indywidualna'}</p></div></div></div>`;
+                        if (prod.isHidden) return ''; 
+                        return `<div class="bg-stone-50 rounded-[2rem] overflow-hidden border border-stone-100 hover:border-wood-200 transition group cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 fade-in" onclick="window.openGallery('${catId}', '${subId}', ${index})" style="animation-delay: ${index * 50}ms">
+                            <div class="h-64 overflow-hidden relative"><img src="${prod.image || 'https://via.placeholder.com/300'}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Brak+Zdjecia';this.onerror=null;" alt="${escapeHTML(prod.title || prod.name || "")}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700"></div>
+                            <div class="p-6"><h3 class="font-bold text-xl text-stone-800 line-clamp-1">${escapeHTML(prod.title || prod.name || "")}\</h3><div class="flex justify-between items-center mt-2"><p class="text-wood-600 font-bold text-lg">${prod.price ? escapeHTML(String(prod.price)) + ' PLN' : 'Wycena indywidualna'}</p></div></div></div>`;
                     }).join('');
-                } else {
-                    grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>';
-                }
+                } else { grid.innerHTML = '<div class="col-span-full text-center py-20 opacity-50"><div class="text-6xl mb-4 text-stone-300"><i class="fa-solid fa-box-open"></i></div><p class="text-stone-500 text-lg">Brak produktów.</p></div>'; }
             }
-
-            ['main-content','subcategories-full-view','gallery-view','custom-orders-full-view','legal-view'].forEach(id => {
-                const el = document.getElementById(id); if(el) el.classList.add('hidden');
-            });
+            
+            // FIX: Ukrywanie innych widoków przy powrocie
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('subcategories-full-view').classList.add('hidden'); 
+            document.getElementById('gallery-view').classList.add('hidden'); // Ważne: ukryj widok produktu
             document.getElementById('subcategory-view').classList.remove('hidden');
             window.scrollTo(0,0);
         };
-
-        // Backward compat — stara sygnatura z subId (ignorujemy subId)
-        window.openSubcategoryView = (catId, subId) => window.openCategoryProducts(catId);
-
-        // Powrót z listy produktów → strona główna
+        
+        // Funkcja powrotu z listy produktów (subcategory-view) do listy podkategorii (full-view)
         window.goBackToSubcategoryList = () => {
-            window.goHome();
+             if(window.currentCatId) {
+                 window.openFullSubcategoryList(window.currentCatId);
+             } else {
+                 window.goHome();
+             }
         };
 
-        window.openGallery = (catId, prodIndexOrSubId, prodIndexIfOld) => {
-            // Obsługa starej sygnatury (catId, subId, prodIndex) — backward compat
-            const prodIndex = (prodIndexIfOld !== undefined) ? prodIndexIfOld : prodIndexOrSubId;
+        window.openGallery = (catId, subId, prodIndex) => {
             const cat = siteData.categories[catId];
-            if(!cat) return;
-            let products = cat.products || [];
-            if (products.length === 0 && cat.subs) {
-                Object.values(cat.subs).forEach(sub => { products = products.concat(sub.products || []); });
-            }
-            const product = products[prodIndex]; if (!product) return;
-            // Ukryj wszystkie widoki
+            if(!cat || !cat.subs || !cat.subs[subId]) return;
+            const sub = cat.subs[subId]; const product = sub.products[prodIndex]; if (!product) return;
+            // Ukryj wszystkie widoki — może być wywołane z wyszukiwarki lub karuzeli
             ['main-content','subcategory-view','subcategories-full-view','custom-orders-full-view','legal-view'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.classList.add('hidden');
             });
@@ -2339,17 +2253,16 @@
             // Przekazujemy zdjęcie do funkcji modala
             askBtn.onclick = () => window.openContactModal(codeToPass, imageToPass);
             
-            // Przycisk powrotu cofa do listy produktów kategorii
-            document.getElementById('back-to-sub-btn').onclick = () => window.openCategoryProducts(catId);
+            // ZMIANA: Przycisk powrotu cofa do podkategorii
+            document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
             
-            // Galeria = WYŁĄCZNIE zdjęcia tego produktu (product.gallery to źródło prawdy)
-            let _gal = Array.isArray(product.gallery) ? product.gallery.filter(Boolean) : [];
-            // Fallback: stary format siteData.galleries[id] tylko jeśli produkt ma id i pustą gallery
-            if (_gal.length === 0 && product.id && siteData.galleries?.[product.id]?.images?.length) {
-                _gal = siteData.galleries[product.id].images.map(i => i.src || i).filter(Boolean);
+            const galleryData = siteData.galleries?.[product.id] || { images: [] };
+            let _galImgs = galleryData.images;
+            if (_galImgs.length === 0 && product.gallery && product.gallery.length > 0) {
+                const _allG = Array.isArray(product.gallery) ? product.gallery : [];
+                _galImgs = _allG.filter((u,i) => i > 0 || u !== product.image).map(u => ({ src: u }));
             }
-            if (_gal.length === 0 && product.image) _gal = [product.image];
-            const allImages = _gal.map(u => ({ src: u }));
+            const allImages = [ { src: product.image, isCover: true }, ..._galImgs ];
             window.currentLightboxImages = allImages;
             window.currentImgIndex = 0;
 
@@ -2381,20 +2294,22 @@
 
             // SEO – Product schema
             const _catSeo = siteData.categories[catId];
+            const _subSeo = _catSeo?.subs?.[subId];
             const _cs3 = _SEO_CATS[catId] || {};
             window.updateSEO({
                 title: product.title || product.name || '',
-                desc: (product.desc || `${product.title || product.name}. Wyrób z naturalnej sklejki brzozowej, wycinany laserem diodowym. ${_SEO_SITE}.`).slice(0,160),
-                kw: [_cs3.kw, product.title, _catSeo?.title].filter(Boolean).join(', '),
+                desc: (product.desc || `${product.title}. Wyrób z naturalnej sklejki brzozowej, wycinany laserem diodowym. ${_SEO_SITE}.`).slice(0,160),
+                kw: [_cs3.kw, product.title, _catSeo?.title, _subSeo?.title].filter(Boolean).join(', '),
                 image: product.image || '',
                 product,
                 breadcrumbs: [
                     { name: 'Strona główna', hash: '' },
                     { name: _catSeo?.title || '', hash: 'kat/' + catId },
-                    { name: product.title || product.name || '' }
+                    { name: _subSeo?.title || '', hash: 'sub/' + catId + '/' + subId },
+                    { name: product.title }
                 ]
             });
-            window._setHash('prod/' + catId + '/' + prodIndex);
+            window._setHash('prod/' + catId + '/' + subId + '/' + prodIndex);
         };
 
         window.updateMainImage = (index) => {
@@ -2526,7 +2441,7 @@
             document.getElementById('custom-orders-full-view').classList.add('hidden');
             document.getElementById('legal-view').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
-            const _sc = document.getElementById('sub-categories-container'); if(_sc) _sc.style.display='none';
+            document.getElementById('sub-categories-container').classList.add('hidden');
             document.querySelectorAll('.category-card-item').forEach(el => el.classList.remove('selected-category-border', 'border-wood-600', 'ring-4', 'ring-wood-200'));
             window._setHash('');
             window.scrollTo(0,0);
@@ -2571,15 +2486,17 @@
             const found = [];
             const cats = siteData.categories || {};
             Object.entries(cats).forEach(([catId, cat]) => {
-                (cat.products || []).forEach((prod, idx) => {
-                    if (prod.isHidden) return;
-                    if (
-                        ((prod.title || prod.name || '').toLowerCase()).includes(q) ||
-                        (prod.code || '').toLowerCase().includes(q) ||
-                        (prod.desc || '').toLowerCase().includes(q)
-                    ) {
-                        found.push({ catId, subId: null, idx, prod, catTitle: cat.title, subTitle: '' });
-                    }
+                Object.entries(cat.subs || {}).forEach(([subId, sub]) => {
+                    (sub.products || []).forEach((prod, idx) => {
+                        if (prod.isHidden) return;
+                        if (
+                            ((prod.title || prod.name || '').toLowerCase()).includes(q) ||
+                            (prod.code || '').toLowerCase().includes(q) ||
+                            (prod.desc || '').toLowerCase().includes(q)
+                        ) {
+                            found.push({ catId, subId, idx, prod, catTitle: cat.title, subTitle: sub.title });
+                        }
+                    });
                 });
             });
 
@@ -2590,8 +2507,7 @@
 
             results.innerHTML = found.map(({ catId, subId, idx, prod, catTitle, subTitle }) => `
                 <div class="flex items-center gap-4 p-4 bg-slate-900/70 rounded-2xl border border-white/5 hover:border-sky-500/30 hover:bg-sky-500/5 cursor-pointer transition group"
-                     onclick="window.closeSearch(); window.openGallery('${catId}', ${idx})"
->
+                     onclick="window.closeSearch(); window.openGallery('${catId}', '${subId}', ${idx})">
                     <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center">
                         ${prod.image ? `<img src="${escapeHTML(prod.image)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">` : '<i class="fa-solid fa-image text-slate-600"></i>'}
                     </div>
@@ -2907,11 +2823,8 @@
             // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
             else if (id === 'calculator') {
                 if(!siteData.calcSettings) siteData.calcSettings = initialData.calcSettings;
-                const _cs = siteData.calcSettings;
-                document.getElementById('setting-material-rate').value = _cs.materialRate || 0.0038;
-                document.getElementById('setting-laser-rate').value    = _cs.laserRate    || 0.50;
-                if (_cs.margin)    document.getElementById('calc-margin').value    = _cs.margin;
-                if (_cs.thickness) document.getElementById('calc-thickness').value = _cs.thickness;
+                document.getElementById('setting-material-rate').value = siteData.calcSettings.materialRate || 0.0038;
+                document.getElementById('setting-laser-rate').value = siteData.calcSettings.laserRate || 0.50;
                 
                 renderSavedCalculations();
                 calculatePrice(); // Uruchom przeliczenie na starcie
@@ -2920,21 +2833,24 @@
         
         // --- FUNKCJE KALKULATORA ---
         
-        // Zapisywanie domyślnych parametrów kalkulatora
+        // Zapisywanie domyślnych stawek
         window.saveCalculatorSettings = async () => {
-             const matRate   = parseFloat(document.getElementById('setting-material-rate').value);
+             const matRate = parseFloat(document.getElementById('setting-material-rate').value);
              const laserRate = parseFloat(document.getElementById('setting-laser-rate').value);
-             const margin    = parseFloat(document.getElementById('calc-margin').value) || 30;
-             const thickness = parseFloat(document.getElementById('calc-thickness').value) || 3;
              
              if(isNaN(matRate) || isNaN(laserRate)) {
                  showToast("Wprowadź poprawne liczby!", 'error');
                  return;
              }
-             siteData.calcSettings = { materialRate: matRate, laserRate: laserRate, margin, thickness };
+             
+             siteData.calcSettings = {
+                 materialRate: matRate,
+                 laserRate: laserRate
+             };
+             
              await saveData();
-             showToast("✓ Parametry zapisane — zapamiętane na stałe!");
-             calculatePrice();
+             showToast("Zapisano domyślne stawki kalkulatora!");
+             calculatePrice(); // Przelicz przy nowej stawce
         };
 
         // Obliczanie ceny (Automatyczne)
@@ -3179,29 +3095,9 @@
                 o.start(); o.stop(ctx.currentTime + 0.4);
             } catch(e) {}
         };
-        // Funkcja pobierania załącznika — zachowuje DOKŁADNIE oryginalny format
-        window.downloadAttachment = (encodedUrl, baseFilename) => {
+        // Funkcja pobierania załącznika (obsługuje base64 i URL)
+        window.downloadAttachment = (encodedUrl, filename) => {
             const url = encodedUrl;
-            // Pełna mapa MIME → rozszerzenie (każdy format zachowany 1:1)
-            const MIME_EXT = {
-                'image/png': 'png', 'image/jpeg': 'jpg', 'image/jpg': 'jpg',
-                'image/gif': 'gif', 'image/webp': 'webp', 'image/bmp': 'bmp',
-                'image/tiff': 'tiff', 'image/svg+xml': 'svg', 'image/avif': 'avif',
-                'image/heic': 'heic', 'image/heif': 'heif',
-                'application/pdf': 'pdf',
-                'text/plain': 'txt', 'text/svg+xml': 'svg'
-            };
-            const getExt = (u) => {
-                // Z MIME typu w data URL (np. data:image/svg+xml;base64,...)
-                if (u.startsWith('data:')) {
-                    const mime = u.match(/^data:([^;,]+)/)?.[1]?.toLowerCase();
-                    if (mime && MIME_EXT[mime]) return MIME_EXT[mime];
-                }
-                // Z rozszerzenia w URL (np. .../plik.svg?query)
-                const m = u.match(/\.([a-z0-9]{1,5})(?:\?|#|$)/i);
-                return m ? m[1].toLowerCase() : 'bin';
-            };
-            const filename = baseFilename.replace(/\.\w+$/, '') + '.' + getExt(url);
             if (url.startsWith('data:')) {
                 const a = document.createElement('a');
                 a.href = url; a.download = filename; a.click();
@@ -3223,38 +3119,13 @@
             const body = document.getElementById(`reply-body-${msgId}`)?.value?.trim();
             if (!body) { showToast('Wpisz treść odpowiedzi!', 'error'); return; }
             const subject = encodeURIComponent('Odpowiedź od Xeomsc Laser');
-            const bodyEnc = encodeURIComponent(`Witaj ${rawName},
-
-${body}
-
----
-Xeomsc Laser
-xeomsc-laser.pl`);
-            // Użyj tymczasowego <a> — nie zamyka panelu, niezawodnie otwiera Outlook
-            const a = document.createElement('a');
-            a.href = `mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => a.remove(), 100);
+            const bodyEnc = encodeURIComponent(`Witaj ${rawName},\n\n${body}\n\n---\nXeomsc Laser`);
+            window.open(`mailto:${rawEmail}?subject=${subject}&body=${bodyEnc}`, '_self');
             window.updateMessageStatus(msgId, 'replied');
-            setTimeout(() => { const f = document.getElementById(`reply-form-${msgId}`); if(f) f.classList.add('hidden'); }, 800);
-        };
-        window.copyEmail = (email) => {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(email)
-                    .then(() => showToast('📋 Email skopiowany!'))
-                    .catch(() => window._fallbackCopy(email));
-            } else {
-                window._fallbackCopy(email);
-            }
-        };
-        window._fallbackCopy = (text) => {
-            const ta = document.createElement('textarea');
-            ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-            document.body.appendChild(ta); ta.focus(); ta.select();
-            try { document.execCommand('copy'); showToast('📋 Email skopiowany!'); }
-            catch { showToast('Email: ' + text); }
-            ta.remove();
+            setTimeout(() => {
+                const f = document.getElementById(`reply-form-${msgId}`);
+                if (f) f.classList.add('hidden');
+            }, 600);
         };
 
         function startMessageListener() {
@@ -3301,7 +3172,6 @@ xeomsc-laser.pl`);
 
                          const safeName       = escapeHTML(m.name);
                          const safeEmail      = escapeHTML(m.email);
-                         const safeSubject    = escapeHTML(m.subject || 'Zapytanie o wycenę');
                          const safeMessage    = escapeHTML(m.message);
                          const hasAttachment  = !!m.attachment;
                          // Przechowujemy załącznik w window żeby nie wbudowywać base64 w HTML
@@ -3312,7 +3182,7 @@ xeomsc-laser.pl`);
                              <div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')">
                                  <div><span class="status-badge ${statusData.class}">${statusData.label}</span></div>
                                  <div class="font-medium truncate">${safeName}</div>
-                                 <div class="text-sm text-wood-400 truncate font-semibold">${safeSubject}</div>
+                                 <div class="text-sm text-stone-400 truncate">${safeEmail}</div>
                                  <div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString('pl-PL')}</div>
                                  <div class="text-right flex items-center justify-end gap-3">
                                      <button onclick="event.stopPropagation(); window.deleteMessage('${m.id}')" class="text-stone-500 hover:text-red-500 transition p-2" title="Usuń" aria-label="Usuń wiadomość"><i class="fa-solid fa-trash"></i></button>
@@ -3323,8 +3193,6 @@ xeomsc-laser.pl`);
                              <div id="msg-body-${m.id}" class="msg-body-wrapper ${isOpen ? 'open' : ''}">
                                  <div class="p-6 space-y-4">
                                      <div>
-                                         <p class="text-xs font-bold text-stone-500 uppercase mb-0.5">Temat:</p>
-                                         <p class="text-sky-300 text-sm font-semibold mb-3">${safeSubject}</p>
                                          <p class="text-xs font-bold text-stone-500 uppercase mb-1">Treść wiadomości:</p>
                                          <p class="text-white text-sm whitespace-pre-wrap leading-relaxed">${safeMessage}</p>
                                      </div>
@@ -3339,7 +3207,7 @@ xeomsc-laser.pl`);
                                                      <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
                                                  </div>
                                              </div>
-                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                             <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}.jpg')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
                                                  <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz zdjęcie
                                              </button>
                                          </div>
@@ -3359,27 +3227,17 @@ xeomsc-laser.pl`);
                                          </div>
                                          <!-- Formularz odpowiedzi -->
                                          <div id="reply-form-${m.id}" class="hidden bg-black/30 rounded-2xl p-5 border border-wood-600/20 space-y-3">
-                                             <div class="flex items-center gap-3 flex-wrap">
-                                                 <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do:</p>
-                                                 <a href="mailto:${safeEmail}" class="text-wood-400 font-bold text-sm hover:text-wood-300 transition">${safeName} &lt;${safeEmail}&gt;</a>
-                                                 <button data-copy-email="${safeEmail}"
-                                                     onclick="window.copyEmail(this.dataset.copyEmail)"
-                                                     class="text-[10px] bg-stone-700 hover:bg-stone-600 text-stone-300 px-2 py-1 rounded-lg transition flex items-center gap-1">
-                                                     <i class="fa-solid fa-copy"></i> Kopiuj email
-                                                 </button>
-                                             </div>
+                                             <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Odpowiedź do: <span class="text-wood-400">${safeName}</span> &lt;${safeEmail}&gt;</p>
                                              <textarea id="reply-body-${m.id}" class="calc-input h-36 resize-none text-sm leading-relaxed" placeholder="Wpisz treść odpowiedzi..."></textarea>
-                                             <div class="flex gap-3 flex-wrap">
-                                                 <button data-msgid="${m.id}" data-email="${safeEmail}" data-name="${safeName}"
-                                                     onclick="window.sendReplyEmail(this.dataset.msgid, this.dataset.email, this.dataset.name)"
-                                                     class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
-                                                     <i class="fa-brands fa-microsoft"></i> Otwórz w Outlooku
+                                             <div class="flex gap-3">
+                                                 <button onclick="window.sendReplyEmail('${m.id}', ${JSON.stringify(m.email)}, ${JSON.stringify(m.name)})" class="flex items-center gap-2 bg-wood-600 hover:bg-wood-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-wood-600/20">
+                                                     <i class="fa-solid fa-paper-plane"></i> Wyślij mailem
                                                  </button>
                                                  <button onclick="window.toggleReplyForm('${m.id}')" class="px-4 py-2.5 rounded-xl text-stone-400 hover:text-white text-sm transition hover:bg-white/5">
                                                      Anuluj
                                                  </button>
                                              </div>
-                                             <p class="text-[11px] text-stone-600"><i class="fa-solid fa-circle-info mr-1"></i>Kliknij "Otwórz w Outlooku" — otworzy się z uzupełnioną treścią, kliknij Wyślij w Outlooku.</p>
+                                             <p class="text-[11px] text-stone-600"><i class="fa-solid fa-circle-info mr-1"></i>Otworzy Twój klient pocztowy z uzupełnioną wiadomością.</p>
                                          </div>
                                      </div>
                                  </div>
@@ -3504,29 +3362,16 @@ xeomsc-laser.pl`);
             container.innerHTML = `
                 <h3 class="text-3xl font-bold mb-6">Kategorie Główne</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
-                    <h4 class="text-xs uppercase font-bold text-stone-500" id="cat-form-title">Nowa kategoria</h4>
+                    <h4 class="text-xs uppercase font-bold text-stone-500">Edytuj kategorię</h4>
                     <input type="hidden" id="edit-cat-id">
-                    <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii (np. Tabliczki i Dekoracje)">
-                    <textarea id="cat-d" class="calc-input h-16 resize-none" placeholder="Krótki opis (opcjonalny)"></textarea>
-                    <!-- Zdjęcie kategorii -->
-                    <div>
-                        <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Zdjęcie kategorii</label>
-                        <div class="flex gap-3 items-start">
-                            <img id="cat-img-preview" src="" class="w-16 h-16 rounded-xl object-cover bg-stone-700 shrink-0 hidden" onerror="this.classList.add('hidden')">
-                            <div class="flex-1 space-y-2">
-                                <div class="flex gap-2 items-center">
-                                    <input id="cat-i" class="calc-input flex-1 text-sm" placeholder="Wklej URL zdjęcia lub prześlij z dysku →"
-                                        oninput="const p=document.getElementById('cat-img-preview');p.src=this.value;this.value?p.classList.remove('hidden'):p.classList.add('hidden')">
-                                    <button type="button" onclick="window.uploadCatImage()" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl px-4 h-10 flex items-center gap-2 transition text-sm font-bold" title="Prześlij z dysku">
-                                        <i class="fa-solid fa-upload text-sm"></i> Wgraj
-                                    </button>
-                                </div>
-                                <p class="text-[10px] text-stone-600">Zalecany format: JPG/PNG, proporcje 4:3 lub 16:9</p>
-                            </div>
-                        </div>
+                    <input id="cat-t" class="calc-input" placeholder="Nazwa Kategorii">
+                    <textarea id="cat-d" class="calc-input h-20 resize-none" placeholder="Krótki opis kategorii (opcjonalny)"></textarea>
+                    <div class="flex gap-2 items-center">
+                        <input id="cat-i" class="calc-input flex-1" placeholder="Link do zdjęcia (URL)">
+                        <button type="button" onclick="window.uploadImageToElement(document.getElementById('cat-i'), this)" class="shrink-0 bg-wood-600 hover:bg-wood-500 text-white rounded-xl w-10 h-10 flex items-center justify-center transition" title="Prześlij z dysku"><i class="fa-solid fa-upload text-sm"></i></button>
                     </div>
                     <div class="flex gap-2">
-                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz kategorię</button>
+                        <button id="add-cat-btn" class="bg-wood-600 hover:bg-wood-500 w-full py-3 rounded-xl font-bold transition">Utwórz</button>
                         <button id="cancel-cat-btn" class="hidden bg-stone-600 w-1/3 py-3 rounded-xl font-bold">Anuluj</button>
                     </div>
                 </div>
@@ -3557,18 +3402,12 @@ xeomsc-laser.pl`);
                         const id = 'c' + Date.now(); 
                         // Nowa kategoria trafia na koniec
                         const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
-                        siteData.categories[id] = { title: t, desc: d, image: i, products: [], isHidden: false, order: maxOrder + 1 };
+                        siteData.categories[id] = { title: t, desc: d, image: i, subs: {}, isHidden: false, order: maxOrder + 1 }; 
                     }
                     saveData(); renderCategoriesAdmin(); renderMain();
                 }
             };
             document.getElementById('cancel-cat-btn').onclick = () => { renderCategoriesAdmin(); };
-            // Reset podglądu jeśli input zmieniony ręcznie
-            document.getElementById('cat-i').oninput = function() {
-                const p = document.getElementById('cat-img-preview');
-                if(this.value) { p.src=this.value; p.classList.remove('hidden'); }
-                else { p.classList.add('hidden'); }
-            };
         }
         
         // NOWA FUNKCJA DO ZMIANY KOLEJNOŚCI KATEGORII
@@ -3606,32 +3445,11 @@ xeomsc-laser.pl`);
 
         window.editCat = (id) => {
             const cat = siteData.categories[id];
-            document.getElementById('cat-t').value = cat.title || '';
+            document.getElementById('cat-t').value = cat.title; 
             document.getElementById('cat-d').value = cat.desc || '';
-            const imgVal = cat.image || '';
-            document.getElementById('cat-i').value = imgVal;
-            // Pokaż podgląd aktualnego zdjęcia
-            const preview = document.getElementById('cat-img-preview');
-            if (imgVal) { preview.src = imgVal; preview.classList.remove('hidden'); }
-            else { preview.classList.add('hidden'); }
+            document.getElementById('cat-i').value = cat.image;
             document.getElementById('edit-cat-id').value = id;
-            document.getElementById('cat-form-title').textContent = 'Edycja: ' + cat.title;
-            document.getElementById('add-cat-btn').textContent = 'Zapisz Zmiany';
-            document.getElementById('cancel-cat-btn').classList.remove('hidden');
-            document.getElementById('cat-t').focus();
-        };
-
-        // Upload zdjęcia kategorii z dysku
-        window.uploadCatImage = () => {
-            const inp = document.getElementById('cat-i');
-            const btn = document.querySelector('[onclick="window.uploadCatImage()"]');
-            window.uploadImageToElement(inp, btn);
-            // Po upload — pokaż podgląd
-            inp.addEventListener('input', function onImgInput() {
-                const p = document.getElementById('cat-img-preview');
-                if(this.value) { p.src = this.value; p.classList.remove('hidden'); }
-                inp.removeEventListener('input', onImgInput);
-            });
+            document.getElementById('add-cat-btn').textContent = "Zapisz Zmiany"; document.getElementById('cancel-cat-btn').classList.remove('hidden');
         };
 
         function renderSubcategoriesAdmin() {
@@ -3816,7 +3634,8 @@ xeomsc-laser.pl`);
                 <h3 class="text-3xl font-bold mb-6">Dodaj Nowe Produkty</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Nowy Produkt</h4>
-                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria</label><select id="new-p-cat" class="calc-input text-white font-bold"><option value="">-- Wybierz kategorię --</option>${categoryOptions}</select></div>
+                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria Główna</label><select id="new-p-cat" class="calc-input text-white font-bold" onchange="updateSubSelectForAdd()"><option value="">-- Wybierz --</option>${categoryOptions}</select></div>
+                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Podkategoria</label><select id="new-p-sub" class="calc-input text-white font-bold" disabled><option value="">-- Najpierw wybierz kategorię --</option></select></div>
                     <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
@@ -3835,27 +3654,52 @@ xeomsc-laser.pl`);
             window.appendGalleryRow(document.getElementById('new-gallery-container'));
 
             document.getElementById('btn-add-prod').onclick = () => {
-                const cid = document.getElementById('new-p-cat').value;
-                const t = document.getElementById('new-p-t').value;
-                let img = document.getElementById('new-p-i').value.trim();
-                const code = document.getElementById('new-p-code').value;
-                const price = document.getElementById('new-p-price').value;
+                const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
+                const t = document.getElementById('new-p-t').value; 
+                let img = document.getElementById('new-p-i').value.trim(); // Trim added
+                
+                const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value;
                 const desc = document.getElementById('new-p-desc').value;
-                if(cid && t) {
+                
+                if(cid && sid && t) {
                     const prodId = 'p' + Date.now();
                     const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
-                    const galleryUrls = [];
-                    galleryInputs.forEach(inp => { if(inp.value.trim()) galleryUrls.push(inp.value.trim()); });
-                    if (!img && galleryUrls.length > 0) img = galleryUrls[0];
-                    if(!siteData.categories[cid].products) siteData.categories[cid].products = [];
-                    siteData.categories[cid].products.push({ id: prodId, title: t, name: t, image: img, gallery: galleryUrls, code, price, desc, isHidden: false });
-                    siteData.galleries[prodId] = { images: galleryUrls.map(u=>({src:u})) };
+                    const galleryImages = []; 
+                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
+                    
+                    // --- AUTO-MINIATURA FIX ---
+                    // Jeśli nie podano miniatury, weź pierwsze zdjęcie z galerii
+                    if (!img && galleryImages.length > 0) {
+                        img = galleryImages[0].src;
+                    }
+
+                    if(!siteData.categories[cid].subs[sid].products) siteData.categories[cid].subs[sid].products = [];
+                    siteData.categories[cid].subs[sid].products.push({ id: prodId, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
+                    siteData.galleries[prodId] = { images: galleryImages };
                     saveData(); showToast("Produkt dodany!"); renderAddProductView();
-                } else { showToast("Wybierz kategorię i podaj nazwę produktu."); }
+                } else { showToast("Wybierz kategorię, podkategorię i podaj nazwę produktu."); }
             };
         }
 
-
+        window.updateSubSelectForAdd = () => {
+            const cid = document.getElementById('new-p-cat').value; const subSelect = document.getElementById('new-p-sub');
+            subSelect.innerHTML = '<option value="">-- Wybierz Podkategorię --</option>';
+            if(cid && siteData.categories[cid].subs) {
+                const subs = siteData.categories[cid].subs;
+                // SORTOWANIE ALFABETYCZNE W DROPDOWNIE
+                Object.keys(subs)
+                    .sort((a, b) => subs[a].title.localeCompare(subs[b].title, 'pl'))
+                    .forEach(sid => { 
+                        const opt = document.createElement('option'); 
+                        opt.value = sid; 
+                        // DODANO LICZNIK PRODUKTÓW
+                        const count = subs[sid].products ? subs[sid].products.length : 0;
+                        opt.text = `${subs[sid].title} (${count})`; 
+                        subSelect.appendChild(opt); 
+                    });
+                subSelect.disabled = false;
+            } else { subSelect.disabled = true; }
+        };
 
         window.addGalleryInput = (el) => {
             const container = el.closest('.space-y-2');
@@ -3884,8 +3728,10 @@ xeomsc-laser.pl`);
             const all = [];
             catKeys.forEach(ck => {
                 const cat = cats[ck];
-                (cat.products||[]).forEach((p,idx) => {
-                    all.push({ p, ck, sk: null, idx, catTitle: cat.title, subTitle: '', color: colorMap[ck] });
+                Object.keys(cat.subs||{}).forEach(sk => {
+                    (cat.subs[sk].products||[]).forEach((p,idx) => {
+                        all.push({ p, ck, sk, idx, catTitle: cat.title, subTitle: cat.subs[sk].title, color: colorMap[ck] });
+                    });
                 });
             });
             window._plAll = all; window._plColorMap = colorMap; window._plCats = cats; window._plCatKeys = catKeys;
@@ -3906,7 +3752,7 @@ xeomsc-laser.pl`);
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[11px] px-2 py-0.5 rounded-full font-bold border shrink-0" style="background:${color.bg};color:${color.text};border-color:${color.border}">${escapeHTML(catTitle)}</span>
-
+                            <span class="text-[11px] text-stone-400 shrink-0">› ${escapeHTML(subTitle)}</span>
                             ${p.code ? `<span class="text-[11px] text-stone-500 font-mono shrink-0">${escapeHTML(p.code)}</span>` : ''}
                             ${p.price && p.price !== 'Do ustalenia' ? `<span class="text-[11px] text-emerald-400 font-semibold shrink-0">${escapeHTML(p.price)}</span>` : ''}
                         </div>
@@ -3928,7 +3774,7 @@ xeomsc-laser.pl`);
                 <button id="pill-all" onclick="window.plFilter(null,null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border border-white/20 bg-white/10 text-white transition" style="outline:2px solid white">Wszystkie <span class="opacity-60">(${all.length})</span></button>
                 ${catKeys.filter(ck=>!cats[ck].isHidden).map(ck => {
                     const c = colorMap[ck];
-                    const cnt = (cats[ck].products||[]).length;
+                    const cnt = Object.values(cats[ck].subs||{}).reduce((s,sub)=>s+(sub.products?.length||0),0);
                     return `<button data-pcat="${ck}" onclick="window.plFilter('${ck}',null)" class="prod-pill px-4 py-1.5 rounded-full text-sm font-semibold border transition" style="background:${c.bg};color:${c.text};border-color:${c.border}">${escapeHTML(cats[ck].title)} <span class="opacity-60">(${cnt})</span></button>`;
                 }).join('')}`;
 
@@ -3982,24 +3828,28 @@ xeomsc-laser.pl`);
             // Filtr podkategorii
             const subBar = document.getElementById('pl-sub-bar');
             const subSel = document.getElementById('pl-sub-sel');
-            if(catId) {
+            if(catId && subBar && subSel) {
                 filtered = filtered.filter(x => x.ck === catId);
-            }
-            if(subBar) { subBar.classList.add('hidden'); }
+                const subs = siteData.categories[catId]?.subs || {};
+                subSel.innerHTML = '<option value="">Wszystkie podkategorie</option>' +
+                    Object.keys(subs).sort((a,b) => subs[a].title.localeCompare(subs[b].title,'pl'))
+                    .map(sk => `<option value="${sk}"${sk===subId?' selected':''}>${escapeHTML(subs[sk].title)} (${subs[sk].products?.length||0})</option>`).join('');
+                subBar.classList.remove('hidden');
+                if(subId) filtered = filtered.filter(x => x.sk === subId);
+            } else if(subBar) { subBar.classList.add('hidden'); }
             const rows = document.getElementById('pl-rows');
             if(rows) rows.innerHTML = window._plRows(filtered);
         };
 
         window.plToggle = (ck, sk, idx) => {
-            const p = (siteData.categories[ck].products||[])[idx];
-            if(!p) return;
+            const p = siteData.categories[ck].subs[sk].products[idx];
             p.isHidden = !p.isHidden; saveData();
             window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
         };
 
         window.plEdit = (ck, sk, idx) => {
             window._plEditCk = ck; window._plEditSk = sk; window._plEditIdx = idx;
-            const p = (siteData.categories[ck].products||[])[idx]; if(!p) return;
+            const p = siteData.categories[ck].subs[sk].products[idx];
             const form = document.getElementById('list-edit-form');
             document.getElementById('edit-p-t').value = p.title || '';
             document.getElementById('edit-p-code').value = p.code || '';
@@ -4009,23 +3859,23 @@ xeomsc-laser.pl`);
             const mainThumb = document.getElementById('edit-p-main-thumb');
             if (p.image) { mainThumb.src = p.image; mainThumb.classList.remove('hidden'); } else { mainThumb.classList.add('hidden'); }
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
-            const gallery = p.gallery ? p.gallery.map(u=>({src:u})) : (siteData.galleries?.[p.id]?.images || []);
-            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src || img); });
+            const gallery = siteData.galleries?.[p.id]?.images || [];
+            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
             window.appendGalleryRow(galContainer);
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
         window.plDel = (ck, sk, idx) => {
             window.openConfirm("Usunąć ten produkt?", () => {
-                (siteData.categories[ck].products||[]).splice(idx, 1);
+                siteData.categories[ck].subs[sk].products.splice(idx, 1);
                 saveData(); window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
             });
         };
 
         window.plSaveEdit = () => {
-            const ck = window._plEditCk; const idx = window._plEditIdx;
+            const ck = window._plEditCk; const sk = window._plEditSk; const idx = window._plEditIdx;
             if(ck === undefined) return;
-            const p = (siteData.categories[ck].products||[])[idx]; if(!p) return;
+            const p = siteData.categories[ck].subs[sk].products[idx];
             p.title = document.getElementById('edit-p-t').value;
             p.code = document.getElementById('edit-p-code').value;
             p.price = document.getElementById('edit-p-price').value;
@@ -4035,8 +3885,6 @@ xeomsc-laser.pl`);
             const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryImages.push({ src: inp.value.trim() }); });
             if(!img && galleryImages.length > 0) img = galleryImages[0].src;
             p.image = img;
-            p.gallery = galleryImages.map(i=>i.src||i);
-            if(!p.image && p.gallery.length>0) p.image = p.gallery[0];
             siteData.galleries[p.id] = { images: galleryImages };
             saveData(); showToast("Zapisano zmiany!");
             document.getElementById('list-edit-form').classList.add('hidden');
@@ -4153,56 +4001,18 @@ xeomsc-laser.pl`);
              document.getElementById('contact-message').value = code ? `Dzień dobry, interesuje mnie produkt o kodzie ${code}. Proszę o informację o dostępności.` : '';
         };
 
-        // Przełącznik opcji w formularzu (grubosc, wykonanie, kolor)
-        window.toggleCfOption = (btn) => {
-            const group = btn.dataset.group;
-            document.querySelectorAll(`.cf-opt[data-group="${group}"]`).forEach(b => {
-                b.classList.remove('border-sky-500','bg-sky-500/10','text-sky-300');
-                b.classList.add('border-white/10','bg-slate-800','text-slate-300');
-            });
-            btn.classList.add('border-sky-500','bg-sky-500/10','text-sky-300');
-            btn.classList.remove('border-white/10','bg-slate-800','text-slate-300');
-        };
-
-        // Auto-generowanie treści wiadomości z wybranych parametrów
-        window.buildContactMessage = () => {
-            const w = document.getElementById('cf-width')?.value;
-            const h = document.getElementById('cf-height')?.value;
-            const thick = document.querySelector('.cf-opt[data-group="thickness"].border-sky-500')?.dataset.val || '';
-            const exec  = document.querySelector('.cf-opt[data-group="exec"].border-sky-500')?.dataset.val || '';
-            const color = document.querySelector('.cf-opt[data-group="color"].border-sky-500')?.dataset.val || '';
-            const code  = document.getElementById('code-input-0')?.value;
-
-            let msg = 'Dzien dobry,\n\nchcialbym zapytac o wycene';
-            if (code) msg += ` produktu (kod: ${code})`;
-            msg += '.\n\nParametry:\n';
-            if (w || h) msg += `- Wymiary: ${w||'?'} x ${h||'?'} mm\n`;
-            if (thick)  msg += `- Grubosc: ${thick}\n`;
-            if (exec)   msg += `- Wykonanie: ${exec}\n`;
-            if (color)  msg += `- Wykonczenie: ${color}\n`;
-            msg += '\nProsze o informacje o cenie i terminie realizacji.\n\nPozdrawiam';
-
-            const ta = document.getElementById('contact-message');
-            if (ta && (w || h || thick || exec || color)) ta.value = msg;
-        };
-
         window.openGeneralContactModal = () => {
+             // Resetujemy zdjęcie produktu przy ogólnym kontakcie
              window.currentContactProductImage = null;
-             // Reset opcji
-             document.querySelectorAll('.cf-opt').forEach(b => {
-                 b.classList.remove('border-sky-500','bg-sky-500/10','text-sky-300');
-                 b.classList.add('border-white/10','bg-slate-800','text-slate-300');
-             });
-             ['cf-width','cf-height'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-             document.getElementById('contact-modal').classList.remove('hidden');
-             document.getElementById('product-codes-section').classList.add('hidden');
-             document.getElementById('contact-upload-section').classList.remove('hidden');
-             document.getElementById('contact-message').value = ''; const _st = document.getElementById('contact-subject'); if(_st) _st.value = '';
+             document.getElementById('contact-modal').classList.remove('hidden'); 
+             document.getElementById('product-codes-section').classList.add('hidden'); 
+             document.getElementById('contact-upload-section').classList.remove('hidden'); 
+             document.getElementById('contact-message').value = '';
         };
 
-        window.closeContactModal = () => {
-            document.getElementById('contact-modal').classList.add('hidden');
-            window.currentContactProductImage = null;
+        window.closeContactModal = () => { 
+            document.getElementById('contact-modal').classList.add('hidden'); 
+            window.currentContactProductImage = null; // Czyścimy po zamknięciu
         };
 
         window.submitContactForm = async () => {
@@ -4217,8 +4027,6 @@ xeomsc-laser.pl`);
              const name = nameInp.value.trim();
              const emailInp = document.getElementById('contact-email-input');
              const email = emailInp.value.trim();
-             const subjectInp = document.getElementById('contact-subject');
-             const subject = subjectInp ? subjectInp.value.trim() : '';
              const msgInp = document.getElementById('contact-message');
              const msg = msgInp.value.trim();
              const fileInput = document.getElementById('contact-file-input');
@@ -4281,29 +4089,10 @@ xeomsc-laser.pl`);
                 }
 
                 if(isOnline) {
-                    // Zbierz wybrane parametry z formularza
-                    const _w = document.getElementById('cf-width')?.value;
-                    const _h = document.getElementById('cf-height')?.value;
-                    const _thick = document.querySelector('.cf-opt[data-group="thickness"].border-sky-500')?.dataset.val || '';
-                    const _exec  = document.querySelector('.cf-opt[data-group="exec"].border-sky-500')?.dataset.val || '';
-                    const _color = document.querySelector('.cf-opt[data-group="color"].border-sky-500')?.dataset.val || '';
-                    const _params = [
-                        (_w || _h) ? `Wymiary: ${_w||'?'} × ${_h||'?'} mm` : '',
-                        _thick ? `Grubość: ${_thick}` : '',
-                        _exec  ? `Wykonanie: ${_exec}` : '',
-                        _color ? `Wykończenie: ${_color}` : ''
-                    ].filter(Boolean);
-                    const paramsText = _params.length ? '
-
---- Parametry produktu ---
-' + _params.join('
-') : '';
-
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
                         name: name,
                         email: email,
-                        subject: subject || 'Zapytanie o wycenę',
-                        message: msg + paramsText,
+                        message: msg,
                         attachment: attachmentData,
                         date: new Date().toISOString(),
                         status: 'new',
@@ -4400,9 +4189,7 @@ xeomsc-laser.pl`);
                                     updateDataSourceIndicator('cloud');
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
                                     localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
-                                    try { renderHero(); }  catch(e) { console.error('renderHero:', e); }
-                                    try { renderMain(); }  catch(e) { console.error('renderMain:', e); }
-                                    try { renderTexts(); } catch(e) { console.error('renderTexts:', e); }
+                                    renderHero(); renderMain(); renderTexts();
                                     if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
                                         if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
                                     }
@@ -4417,35 +4204,8 @@ xeomsc-laser.pl`);
             } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
         }
 
-        // Wczytaj cache, ale ZWERYFIKUJ czy nie jest uszkodzony (puste/stare kategorie)
-        try {
-            const _cached = JSON.parse(localStorage.getItem('xeomsc_cached_data'));
-            if (_cached && _cached.categories) {
-                const _cats = Object.values(_cached.categories);
-                // Sprawdź czy jakakolwiek kategoria ma produkty (nowy format) lub subs (stary)
-                const _hasAnyProducts = _cats.some(c =>
-                    (Array.isArray(c.products) && c.products.length > 0) ||
-                    (c.subs && Object.values(c.subs).some(s => (s.products||[]).length > 0))
-                );
-                if (_hasAnyProducts) {
-                    siteData = _cached;
-                } else {
-                    // Cache pusty/uszkodzony — użyj initialData, Firebase i tak nadpisze
-                    localStorage.removeItem('xeomsc_cached_data');
-                    siteData = initialData;
-                }
-            } else {
-                siteData = initialData;
-            }
-        } catch(e) {
-            localStorage.removeItem('xeomsc_cached_data');
-            siteData = initialData;
-        }
-        // KRYTYCZNE: każda funkcja w osobnym try/catch — błąd jednej NIE blokuje start()
-        try { renderHero(); }  catch(e) { console.error('renderHero error:', e); }
-        try { renderMain(); }  catch(e) { console.error('renderMain error:', e); }
-        try { renderTexts(); } catch(e) { console.error('renderTexts error:', e); }
-        try { start(); }       catch(e) { console.error('start error:', e); }
+        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        renderHero(); renderMain(); renderTexts(); start();
 
         // ===== NAWIGACJA HASHAMI — WSTECZ/DALEJ =====
         // Funkcja zmiany hasha BEZ wywoływania nawigacji (używana przez widoki)
@@ -4464,16 +4224,14 @@ xeomsc-laser.pl`);
                 const parts = hash.split('/');
                 if (!hash || hash === '') {
                     window.goHome();
-                } else if (parts[0]==='prod' && parts[1]) {
-                    // Nowy: #prod/catId/idx | Stary: #prod/catId/subId/idx
-                    const idx = parts.length >= 4 ? parseInt(parts[3]) : parseInt(parts[2]);
-                    window.openGallery(parts[1], idx);
+                } else if (parts[0]==='prod' && parts[1] && parts[2] && parts[3]!==undefined) {
+                    window.openGallery(parts[1], parts[2], parseInt(parts[3]));
+                } else if (parts[0]==='sub' && parts[1] && parts[2]) {
+                    window.openSubcategoryView(parts[1], parts[2]);
                 } else if (parts[0]==='kat' && parts[1]) {
-                    window.openCategoryProducts(parts[1]);
-                } else if (parts[0]==='sub' && parts[1]) {
-                    window.openCategoryProducts(parts[1]);
+                    window.selectMainCategory(parts[1]);
                 } else if (parts[0]==='full-sub' && parts[1]) {
-                    window.openCategoryProducts(parts[1]);
+                    window.openFullSubcategoryList(parts[1]);
                 } else if (parts[0]==='products') {
                     window.openAllProductsPage();
                 } else if (parts[0]==='orders') {
