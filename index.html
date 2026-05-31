@@ -2350,13 +2350,17 @@
             // ZMIANA: Przycisk powrotu cofa do podkategorii
             document.getElementById('back-to-sub-btn').onclick = () => window.openSubcategoryView(catId, subId);
             
-            const galleryData = siteData.galleries?.[product.id] || { images: [] };
-            let _galImgs = galleryData.images;
-            if (_galImgs.length === 0 && product.gallery && product.gallery.length > 0) {
-                const _allG = Array.isArray(product.gallery) ? product.gallery : [];
-                _galImgs = _allG.filter((u,i) => i > 0 || u !== product.image).map(u => ({ src: u }));
+            // GŁÓWNE źródło: product.gallery (tablica URL). Fallback: siteData.galleries[id]
+            let _allImgs = [];
+            if (Array.isArray(product.gallery) && product.gallery.length > 0) {
+                _allImgs = product.gallery.filter(Boolean);
+            } else if (product.id && siteData.galleries?.[product.id]?.images?.length) {
+                _allImgs = siteData.galleries[product.id].images.map(im => im.src || im).filter(Boolean);
+                if (product.image) _allImgs = [product.image, ..._allImgs];
+            } else if (product.image) {
+                _allImgs = [product.image];
             }
-            const allImages = [ { src: product.image, isCover: true }, ..._galImgs ];
+            const allImages = _allImgs.map(u => ({ src: u }));
             window.currentLightboxImages = allImages;
             window.currentImgIndex = 0;
 
@@ -3517,11 +3521,16 @@
                 const d = document.getElementById('cat-d').value.trim();
                 const i = document.getElementById('cat-i').value.trim(); const editId = document.getElementById('edit-cat-id').value;
                 if(t) {
-                    if (editId) { 
-                        siteData.categories[editId].title = t; 
+                    if (editId) {
+                        siteData.categories[editId].title = t;
                         siteData.categories[editId].desc = d;
-                        siteData.categories[editId].image = i; 
-                    } else { 
+                        siteData.categories[editId].image = i;
+                        // Propaguj zdjęcie kategorii do jej podkategorii (karuzela pokaże wybrane zdjęcie, nie produktu)
+                        if (i) {
+                            const _subs = siteData.categories[editId].subs || {};
+                            Object.keys(_subs).forEach(sid => { _subs[sid].image = i; });
+                        }
+                    } else {
                         const id = 'c' + Date.now(); 
                         // Nowa kategoria trafia na koniec
                         const maxOrder = Object.values(siteData.categories).reduce((max, c) => Math.max(max, c.order || 0), 0);
@@ -3982,9 +3991,16 @@
             const mainThumb = document.getElementById('edit-p-main-thumb');
             if (p.image) { mainThumb.src = p.image; mainThumb.classList.remove('hidden'); } else { mainThumb.classList.add('hidden'); }
             const galContainer = document.getElementById('edit-gallery-container'); galContainer.innerHTML = '';
-            const gallery = siteData.galleries?.[p.id]?.images || [];
-            gallery.forEach(img => { window.appendGalleryRow(galContainer, img.src); });
-            window.appendGalleryRow(galContainer);
+            // Czytaj galerię z p.gallery (nowy format) lub siteData.galleries (stary)
+            let galleryUrls = [];
+            if (Array.isArray(p.gallery) && p.gallery.length) {
+                galleryUrls = p.gallery.filter(Boolean);
+            } else if (siteData.galleries?.[p.id]?.images?.length) {
+                galleryUrls = siteData.galleries[p.id].images.map(im => im.src || im).filter(Boolean);
+            }
+            if (galleryUrls.length === 0 && p.image) galleryUrls = [p.image];
+            galleryUrls.forEach(u => { window.appendGalleryRow(galContainer, u); });
+            window.appendGalleryRow(galContainer); // pusty wiersz na nowe zdjęcie
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
@@ -4005,10 +4021,11 @@
             p.desc = document.getElementById('edit-p-desc').value;
             let img = document.getElementById('edit-p-i').value.trim();
             const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
-            const galleryImages = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryImages.push({ src: inp.value.trim() }); });
-            if(!img && galleryImages.length > 0) img = galleryImages[0].src;
+            const galleryUrls = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryUrls.push(inp.value.trim()); });
+            if(!img && galleryUrls.length > 0) img = galleryUrls[0];
             p.image = img;
-            siteData.galleries[p.id] = { images: galleryImages };
+            p.gallery = galleryUrls; // GŁÓWNE źródło galerii
+            if (p.id) siteData.galleries[p.id] = { images: galleryUrls.map(u => ({ src: u })) }; // kompatybilność
             saveData(); showToast("Zapisano zmiany!");
             document.getElementById('list-edit-form').classList.add('hidden');
             window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
