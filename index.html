@@ -1151,7 +1151,6 @@
                     <button onclick="switchAdminView('hero-gallery')" id="btn-hero-gallery" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-images w-5 text-center text-xs"></i> Karuzela Hero</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Katalog Produktów</p>
                     <button onclick="switchAdminView('categories')" id="btn-categories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-layer-group w-5 text-center text-xs"></i> Kategorie</button>
-                    <button onclick="switchAdminView('subcategories')" id="btn-subcategories" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-folder-tree w-5 text-center text-xs"></i> Podkategorie</button>
                     <button onclick="switchAdminView('products')" id="btn-products" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-plus-circle w-5 text-center text-xs"></i> Dodaj Produkty</button>
                     <button onclick="switchAdminView('product-list')" id="btn-product-list" class="admin-sidebar-item w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/5 transition flex items-center gap-3 text-sm font-medium text-stone-400 hover:text-white"><i class="fa-solid fa-list-ul w-5 text-center text-xs"></i> Lista Produktów</button>
                     <p class="text-[9px] text-stone-700 font-bold uppercase tracking-widest px-3 pb-1 pt-4">Narzędzia</p>
@@ -3991,8 +3990,7 @@
                 <h3 class="text-3xl font-bold mb-6">Dodaj Nowe Produkty</h3>
                 <div class="bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4 mb-8">
                     <h4 class="text-xs uppercase font-bold text-wood-500"><i class="fa-solid fa-plus"></i> Nowy Produkt</h4>
-                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria Główna</label><select id="new-p-cat" class="calc-input text-white font-bold" onchange="updateSubSelectForAdd()"><option value="">-- Wybierz --</option>${categoryOptions}</select></div>
-                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Podkategoria</label><select id="new-p-sub" class="calc-input text-white font-bold" disabled><option value="">-- Najpierw wybierz kategorię --</option></select></div>
+                    <div><label class="text-[10px] uppercase font-bold text-stone-500">Kategoria</label><select id="new-p-cat" class="calc-input text-white font-bold"><option value="">-- Wybierz kategorię --</option>${categoryOptions}</select></div>
                     <input id="new-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4"><input id="new-p-code" class="calc-input" placeholder="Kod produktu"><input id="new-p-price" class="calc-input" placeholder="Cena"></div>
                     <textarea id="new-p-desc" class="calc-input h-24" placeholder="Opis"></textarea>
@@ -4011,30 +4009,33 @@
             window.appendGalleryRow(document.getElementById('new-gallery-container'));
 
             document.getElementById('btn-add-prod').onclick = () => {
-                const cid = document.getElementById('new-p-cat').value; const sid = document.getElementById('new-p-sub').value;
-                const t = document.getElementById('new-p-t').value; 
-                let img = document.getElementById('new-p-i').value.trim(); // Trim added
-                
-                const code = document.getElementById('new-p-code').value; const price = document.getElementById('new-p-price').value;
+                const cid = document.getElementById('new-p-cat').value;
+                const t = document.getElementById('new-p-t').value;
+                let img = document.getElementById('new-p-i').value.trim();
+                const code = document.getElementById('new-p-code').value;
+                const price = document.getElementById('new-p-price').value;
                 const desc = document.getElementById('new-p-desc').value;
-                
-                if(cid && sid && t) {
+
+                if(cid && t) {
+                    const cat = siteData.categories[cid];
+                    if(!cat.subs) cat.subs = {};
+                    // Auto-przypisanie: użyj istniejącej podkategorii lub utwórz domyślną
+                    let sid = Object.keys(cat.subs)[0];
+                    if(!sid) {
+                        sid = 's' + Date.now();
+                        cat.subs[sid] = { title: cat.title, image: '', order: 0, products: [] };
+                    }
                     const prodId = 'p' + Date.now();
                     const galleryInputs = document.querySelectorAll('#new-gallery-container .gallery-input');
-                    const galleryImages = []; 
-                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryImages.push({ src: inp.value.trim() }); });
-                    
-                    // --- AUTO-MINIATURA FIX ---
-                    // Jeśli nie podano miniatury, weź pierwsze zdjęcie z galerii
-                    if (!img && galleryImages.length > 0) {
-                        img = galleryImages[0].src;
-                    }
+                    const galleryUrls = [];
+                    galleryInputs.forEach(inp => { if(inp.value.trim() !== '') galleryUrls.push(inp.value.trim()); });
+                    if (!img && galleryUrls.length > 0) img = galleryUrls[0];
 
-                    if(!siteData.categories[cid].subs[sid].products) siteData.categories[cid].subs[sid].products = [];
-                    siteData.categories[cid].subs[sid].products.push({ id: prodId, title: t, image: img, code: code, price: price, desc: desc, isHidden: false });
-                    siteData.galleries[prodId] = { images: galleryImages };
-                    saveData(); showToast("Produkt dodany!"); renderAddProductView();
-                } else { showToast("Wybierz kategorię, podkategorię i podaj nazwę produktu."); }
+                    if(!cat.subs[sid].products) cat.subs[sid].products = [];
+                    cat.subs[sid].products.push({ id: prodId, title: t, name: t, image: img, gallery: galleryUrls, code: code, price: price, desc: desc, isHidden: false });
+                    siteData.galleries[prodId] = { images: galleryUrls.map(u => ({ src: u })) };
+                    saveData(); showToast("Produkt dodany do kategorii!"); renderAddProductView();
+                } else { showToast("Wybierz kategorię i podaj nazwę produktu.", 'error'); }
             };
         }
 
