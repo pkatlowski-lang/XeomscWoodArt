@@ -97,6 +97,34 @@
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 20px rgba(56,189,248,0.4));
         }
+
+        /* ===== ROTUJĄCE NAGŁÓWKI HERO — efekt wystrzałowy ===== */
+        #hero-rotator { display: inline-block; will-change: transform, opacity, filter; }
+        .hero-anim-out {
+            animation: heroBlastOut 0.55s cubic-bezier(0.7,0,0.84,0) forwards;
+        }
+        .hero-anim-in {
+            animation: heroBlastIn 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes heroBlastOut {
+            0%   { opacity:1; transform: translateY(0) scale(1) rotateX(0); filter: blur(0); }
+            100% { opacity:0; transform: translateY(-60px) scale(1.15) rotateX(40deg); filter: blur(14px); }
+        }
+        @keyframes heroBlastIn {
+            0%   { opacity:0; transform: translateY(70px) scale(0.85) rotateX(-50deg); filter: blur(16px); }
+            55%  { opacity:1; filter: blur(0); }
+            70%  { transform: translateY(0) scale(1.06) rotateX(0); }
+            85%  { transform: translateY(0) scale(0.98); }
+            100% { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        /* Błysk akcentu przy wejściu */
+        .hero-accent-flash { animation: accentFlash 0.9s ease-out; }
+        @keyframes accentFlash {
+            0%   { filter: drop-shadow(0 0 0 rgba(56,189,248,0)) brightness(1); }
+            30%  { filter: drop-shadow(0 0 35px rgba(56,189,248,0.95)) brightness(1.8); }
+            100% { filter: drop-shadow(0 0 20px rgba(56,189,248,0.4)) brightness(1); }
+        }
+        h1 .hero-line { display: inline-block; perspective: 800px; }
         
         .white-outline-text {
             text-shadow: 
@@ -543,8 +571,10 @@
                         Pracownia Laserowa
                     </span>
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white text-outline">
-                        <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span> 
-                        <span id="hero-title-accent" class="gradient-text white-outline-text">Sklejki</span>.
+                        <span id="hero-rotator" class="hero-line">
+                            <span id="hero-title-main">Precyzja Lasera,<br>Piękno</span>
+                            <span id="hero-title-accent" class="gradient-text white-outline-text">Sklejki</span>.
+                        </span>
                     </h1>
                     <p id="hero-desc" class="text-lg md:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0 font-medium text-outline leading-relaxed">
                         Witaj w Xeomsc Laser. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.
@@ -1023,9 +1053,29 @@
                  <div id="view-content" class="admin-view hidden space-y-10">
                     <h3 class="text-3xl font-bold mb-6">Edycja Treści</h3>
                     <div class="space-y-6">
-                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Linia 1)</label><input id="edit-hero-main" class="calc-input"></div>
-                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Nagłówek Hero (Akcent)</label><input id="edit-hero-accent" class="calc-input text-wood-500"></div>
-                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis Hero</label><textarea id="edit-hero-desc" class="calc-input h-24"></textarea></div>
+                        <!-- 3 ROTUJĄCE NAGŁÓWKI HERO -->
+                        <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+                            <h4 class="text-sm font-bold text-wood-500 mb-1">🎬 Rotujące nagłówki Hero (3 szt)</h4>
+                            <p class="text-stone-500 text-xs mb-4">Zmieniają się automatycznie co 4,5s z efektem. Główny tekst + wyróżniony akcent (niebieski).</p>
+                            <div class="space-y-4">
+                                <div class="bg-black/30 p-3 rounded-lg">
+                                    <p class="text-[10px] text-wood-400 font-bold uppercase mb-2">Nagłówek 1</p>
+                                    <input id="edit-hero-main-1" class="calc-input mb-2" placeholder="Tekst główny (użyj <br> dla nowej linii)">
+                                    <input id="edit-hero-accent-1" class="calc-input text-sky-400" placeholder="Słowo akcent (niebieskie)">
+                                </div>
+                                <div class="bg-black/30 p-3 rounded-lg">
+                                    <p class="text-[10px] text-wood-400 font-bold uppercase mb-2">Nagłówek 2</p>
+                                    <input id="edit-hero-main-2" class="calc-input mb-2" placeholder="Tekst główny">
+                                    <input id="edit-hero-accent-2" class="calc-input text-sky-400" placeholder="Słowo akcent">
+                                </div>
+                                <div class="bg-black/30 p-3 rounded-lg">
+                                    <p class="text-[10px] text-wood-400 font-bold uppercase mb-2">Nagłówek 3</p>
+                                    <input id="edit-hero-main-3" class="calc-input mb-2" placeholder="Tekst główny">
+                                    <input id="edit-hero-accent-3" class="calc-input text-sky-400" placeholder="Słowo akcent">
+                                </div>
+                            </div>
+                        </div>
+                        <div><label class="block text-xs font-bold text-stone-500 mb-2">Opis Hero (pod nagłówkiem)</label><textarea id="edit-hero-desc" class="calc-input h-24"></textarea></div>
                         <!-- EDYCJA SEKCJI "DLACZEGO NAS WYBIERAJĄ" -->
                         <div class="border-t border-white/5 pt-6">
                             <h4 class="text-xl font-bold mb-4 text-wood-500">Sekcja Oferty</h4>
@@ -1530,7 +1580,13 @@
                 laserRate: 0.50       // Cena za minutę
             },
             textContent: {
-                hero: { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo", desc: "Zamieniamy Twój pomysł w wyjątkowy produkt z drewna. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym." },
+                hero: { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo", desc: "Zamieniamy Twój pomysł w wyjątkowy produkt z drewna. Tworzymy unikalne wyroby z drewna i sklejki — napisy, pudełka, dekoracje i gadżety reklamowe wycinane precyzyjnym laserem diodowym.",
+                    headlines: [
+                        { main: "Twój pomysł,<br>Nasze", accent: "Mistrzostwo" },
+                        { main: "Precyzja Lasera,<br>Piękno", accent: "Sklejki" },
+                        { main: "Drewno, które<br>robi", accent: "Wrażenie" }
+                    ]
+                },
                 about: {
                     title: "Dlaczego klienci nas wybierają?",
                     subtitle: "Setki zadowolonych klientów i produkty, które zostają w pamięci na lata."
@@ -1748,6 +1804,38 @@
         // ZMIENNA DO ŚLEDZENIA AKTYWNEJ KATEGORII NA STRONIE GŁÓWNEJ
         window.activeMainCatId = null;
 
+        // ===== ROTATOR NAGŁÓWKÓW HERO =====
+        window.startHeroRotator = (headlines) => {
+            const rotator = document.getElementById('hero-rotator');
+            const mainEl = document.getElementById('hero-title-main');
+            const accentEl = document.getElementById('hero-title-accent');
+            if (!rotator || !mainEl || !accentEl) return;
+
+            if (window._heroRotTimer) clearInterval(window._heroRotTimer);
+            let i = 0;
+            // Ustaw pierwszy bez animacji
+            mainEl.innerHTML = headlines[0].main || '';
+            accentEl.textContent = headlines[0].accent || '';
+
+            if (headlines.length < 2) return; // jeden nagłówek = brak rotacji
+
+            const swap = () => {
+                rotator.classList.remove('hero-anim-in');
+                rotator.classList.add('hero-anim-out');
+                setTimeout(() => {
+                    i = (i + 1) % headlines.length;
+                    mainEl.innerHTML = headlines[i].main || '';
+                    accentEl.textContent = headlines[i].accent || '';
+                    rotator.classList.remove('hero-anim-out');
+                    rotator.classList.add('hero-anim-in');
+                    accentEl.classList.remove('hero-accent-flash');
+                    void accentEl.offsetWidth; // reset animacji
+                    accentEl.classList.add('hero-accent-flash');
+                }, 550); // czas heroBlastOut
+            };
+            window._heroRotTimer = setInterval(swap, 4500);
+        };
+
         function renderTexts() {
             if(!siteData.textContent || !siteData.textContent.aboutCards) { siteData.textContent = initialData.textContent; }
             
@@ -1756,8 +1844,14 @@
             if(!siteData.textContent.footer) siteData.textContent.footer = initialData.textContent.footer;
 
             const t = siteData.textContent;
-            if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
-            if(document.getElementById('hero-title-accent')) document.getElementById('hero-title-accent').textContent = t.hero.accent;
+            // HERO: rotujące nagłówki (jeśli zdefiniowane) lub statyczny
+            const _heads = (t.hero.headlines && t.hero.headlines.length) ? t.hero.headlines.filter(h => h && (h.main || h.accent)) : null;
+            if (_heads && _heads.length > 0) {
+                window.startHeroRotator(_heads);
+            } else {
+                if(document.getElementById('hero-title-main')) document.getElementById('hero-title-main').innerHTML = t.hero.main;
+                if(document.getElementById('hero-title-accent')) document.getElementById('hero-title-accent').textContent = t.hero.accent;
+            }
             if(document.getElementById('hero-desc')) document.getElementById('hero-desc').textContent = t.hero.desc;
             if(document.getElementById('contact-email')) document.getElementById('contact-email').textContent = t.contact.email;
             if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
@@ -2781,8 +2875,13 @@
                 if(!siteData.textContent.footer) siteData.textContent.footer = JSON.parse(JSON.stringify(initialData.textContent.footer));
                 
                 const t = siteData.textContent;
-                document.getElementById('edit-hero-main').value = t.hero.main || "";
-                document.getElementById('edit-hero-accent').value = t.hero.accent || "";
+                // Załaduj 3 rotujące nagłówki (fallback do statycznego hero)
+                const _h = (t.hero.headlines && t.hero.headlines.length) ? t.hero.headlines : [{main:t.hero.main, accent:t.hero.accent}];
+                [1,2,3].forEach(n => {
+                    const hd = _h[n-1] || {main:'',accent:''};
+                    document.getElementById('edit-hero-main-'+n).value = hd.main || '';
+                    document.getElementById('edit-hero-accent-'+n).value = hd.accent || '';
+                });
                 document.getElementById('edit-hero-desc').value = t.hero.desc || "";
                 document.getElementById('edit-contact-email').value = t.contact.email || "";
                 document.getElementById('edit-contact-phone').value = t.contact.phone || "";
@@ -3033,8 +3132,17 @@
 
             siteData.textContent.about.title    = document.getElementById('edit-about-title').value.trim()    || initialData.textContent.about.title;
             siteData.textContent.about.subtitle = document.getElementById('edit-about-subtitle').value.trim() || initialData.textContent.about.subtitle;
-            siteData.textContent.hero.main = document.getElementById('edit-hero-main').value;
-            siteData.textContent.hero.accent = document.getElementById('edit-hero-accent').value;
+            // Zapisz 3 rotujące nagłówki
+            const _headlines = [1,2,3].map(n => ({
+                main: document.getElementById('edit-hero-main-'+n).value.trim(),
+                accent: document.getElementById('edit-hero-accent-'+n).value.trim()
+            })).filter(h => h.main || h.accent);
+            siteData.textContent.hero.headlines = _headlines;
+            // Zachowaj kompatybilność — pierwszy nagłówek jako statyczny fallback
+            if (_headlines[0]) {
+                siteData.textContent.hero.main = _headlines[0].main;
+                siteData.textContent.hero.accent = _headlines[0].accent;
+            }
             siteData.textContent.hero.desc = document.getElementById('edit-hero-desc').value;
             siteData.textContent.contact.email = document.getElementById('edit-contact-email').value;
             siteData.textContent.contact.phone = document.getElementById('edit-contact-phone').value;
