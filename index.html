@@ -1554,7 +1554,72 @@
                         </button>
                     </div>
 
+                    <!-- NOWY KALKULATOR Z WIZUALIZATOREM 3D (wgrywanie pliku) -->
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-wood-500/25 mb-8 shadow-lg">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-8 h-8 bg-wood-500/10 rounded-lg flex items-center justify-center border border-wood-500/20">
+                                <i class="fa-solid fa-cube text-wood-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Kalkulator z wizualizatorem 3D</h4>
+                                <p class="text-stone-500 text-xs">Wgraj plik projektu (.lbrn2 / .svg / .dxf) — zobaczysz model 3D i pełne rozbicie ceny. Klient widzi tylko cenę końcową.</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 xl:grid-cols-5 gap-5">
+                            <!-- LEWA: dropzone + 3D -->
+                            <div class="xl:col-span-3 space-y-4">
+                                <div id="adm3dDrop" class="border-2 border-dashed border-white/15 rounded-xl p-4 text-center cursor-pointer hover:border-wood-500 transition" onclick="document.getElementById('adm3dFile').click()">
+                                    <input type="file" id="adm3dFile" class="hidden" accept=".lbrn2,.lbrn,.svg,.dxf" onchange="adm3dHandle(this.files)">
+                                    <i class="fa-solid fa-cloud-arrow-up text-wood-400 text-xl mb-1"></i>
+                                    <p class="text-stone-300 text-sm font-semibold">Przeciągnij plik lub kliknij, aby wybrać</p>
+                                    <p class="text-stone-500 text-xs mt-0.5">.lbrn2 · .lbrn · .svg · .dxf</p>
+                                </div>
+                                <div id="adm3dWrap" class="relative w-full rounded-xl overflow-hidden border border-white/10 bg-slate-900" style="height:380px">
+                                    <div id="adm3dEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-stone-600 text-sm gap-2 pointer-events-none"><i class="fa-solid fa-cube text-4xl opacity-40"></i><span>Tu pojawi się model 3D</span></div>
+                                    <div id="adm3dLoad" class="hidden absolute inset-0 flex items-center justify-center bg-slate-900/80 text-wood-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>
+                                </div>
+                                <div id="adm3dCtrls" class="hidden flex flex-wrap items-center gap-3">
+                                    <button onclick="adm3dFit()" class="bg-white/5 hover:bg-white/10 text-stone-200 px-3 py-1.5 rounded-lg text-xs border border-white/10"><i class="fa-solid fa-expand mr-1"></i>Dopasuj widok</button>
+                                    <label class="flex items-center gap-2 text-xs text-stone-300 cursor-pointer"><input type="checkbox" id="adm3dAuto" onchange="adm3dToggleAuto()"> Obrót auto</label>
+                                    <div class="flex items-center gap-1.5" id="adm3dSwatches"></div>
+                                    <span class="text-xs text-stone-400 ml-auto"><i class="fa-solid fa-ruler-combined mr-1 text-wood-400"></i><span id="adm3dDims">—</span></span>
+                                </div>
+                            </div>
+                            <!-- PRAWA: parametry + rozbicie ceny -->
+                            <div class="xl:col-span-2 bg-black/30 rounded-xl border border-white/8 p-5 flex flex-col">
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <div>
+                                        <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-1">Grubość sklejki</label>
+                                        <input type="range" id="adm3dThick" min="3" max="10" step="1" value="4" oninput="adm3dOnThick()" class="w-full" style="accent-color:#b5651d">
+                                        <div class="text-stone-300 text-xs mt-1 font-mono"><span id="adm3dThickLbl">4 mm</span></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-1">Ilość sztuk</label>
+                                        <input type="number" id="adm3dQty" min="1" value="1" oninput="adm3dPrice()" class="calc-input w-full font-mono">
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5 text-xs border-t border-white/8 pt-3">
+                                    <div class="flex justify-between text-stone-400"><span>Wymiary</span><span id="adm-bd-dims" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Powierzchnia</span><span id="adm-bd-area" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Czas lasera</span><span id="adm-bd-time" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Koszt materiału</span><span id="adm-bd-mat" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Koszt lasera</span><span id="adm-bd-laser" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Pakowanie</span><span id="adm-bd-pack" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-300 font-semibold border-t border-white/8 pt-1.5 mt-1"><span>Koszt netto</span><span id="adm-bd-net" class="font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Marża</span><span id="adm-bd-margin" class="text-stone-200 font-mono">—</span></div>
+                                    <div class="flex justify-between text-stone-400"><span>Cena z marżą</span><span id="adm-bd-gross" class="text-stone-200 font-mono">—</span></div>
+                                </div>
+                                <div class="mt-auto pt-4">
+                                    <div class="text-[10px] text-wood-400 font-bold uppercase tracking-widest mb-1">Cena końcowa dla klienta</div>
+                                    <div id="adm3dPrice" class="text-3xl font-extrabold text-wood-400 leading-none">—</div>
+                                    <p class="text-stone-500 text-[10px] mt-2">Zmieniasz stawki wyżej → kliknij „Zapisz", a ta cena (i cena u klienta) przeliczy się automatycznie.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- GŁÓWNA SEKCJA: FORMULARZ + WYNIKI -->
+                    <p class="text-stone-500 text-xs mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info text-stone-600"></i> Poniżej stary, ręczny kalkulator (opcjonalny) — możesz go ignorować, jeśli korzystasz z wizualizatora powyżej.</p>
                     <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 mb-8">
 
                         <!-- FORMULARZ (3/5) -->
@@ -4850,9 +4915,99 @@
       window.pub3dFit=()=>{if(last)fitV(last.maxDim,last.th);};
       window.pub3dToggleAuto=()=>{if(controls)controls.autoRotate=document.getElementById('pub3dAuto').checked;};
       window.pub3dOnThick=()=>{const t=document.getElementById('pub3dThick').value;document.getElementById('pub3dThickLbl').textContent=t+' mm';if(CUR){CUR.metrics=build();}updatePrice();};
-      window.xeomscPriceRefresh=updatePrice;
+      window.xeomscPriceRefresh=()=>{updatePrice();if(window.adm3dPrice)window.adm3dPrice();};
+      window.__xeoParse={parseLBRN,parseSVG,parseDXF};
       function initUI(){const box=document.getElementById('pub3dSwatches');if(box&&!box.children.length){COLORS.forEach((c,i)=>{const d=document.createElement('div');d.style.cssText='width:20px;height:20px;border-radius:5px;cursor:pointer;border:2px solid '+(i===0?'#b5651d':'transparent')+';background:#'+c.toString(16).padStart(6,'0');d.onclick=()=>{col=c;[...box.children].forEach(x=>x.style.borderColor='transparent');d.style.borderColor='#b5651d';if(CUR){CUR.metrics=build();updatePrice();}};box.appendChild(d);});}
         const dz=document.getElementById('pub3dDrop');if(dz){['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('border-wood-500');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('border-wood-500');}));dz.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length)handle(e.dataTransfer.files);});}}
+      if(document.readyState!=='loading')initUI();else document.addEventListener('DOMContentLoaded',initUI);
+    })();
+    </script>
+
+    <!-- ===== ADMIN: kalkulator z wizualizatorem 3D (panel admina, za logowaniem) ===== -->
+    <script>
+    (function(){
+      const $=id=>document.getElementById(id);
+      const COLORS=[0xc8a165,0xd9b380,0xb5651d,0x8a5a2b,0xe8d6b3,0x5c4326];let col=COLORS[0];
+      let scene,camera,renderer,controls,grid,pivot=null,tex=null,inited=false,last=null,CUR=null;
+      function bbE(bb,x,y){if(x<bb.minX)bb.minX=x;if(x>bb.maxX)bb.maxX=x;if(y<bb.minY)bb.minY=y;if(y>bb.maxY)bb.maxY=y;}
+      function woodTex(){const c=document.createElement('canvas');c.width=512;c.height=512;const x=c.getContext('2d');for(let i=0;i<512;i++){const v=200+Math.sin(i*0.05)*18+(Math.random()*22-11);x.fillStyle='rgb('+Math.round(v)+','+Math.round(v*0.82)+','+Math.round(v*0.55)+')';x.fillRect(0,i,512,1);}for(let k=0;k<28;k++){x.strokeStyle='rgba(110,75,40,'+(0.04+Math.random()*0.06)+')';x.lineWidth=1+Math.random()*2;x.beginPath();const y=Math.random()*512;x.moveTo(0,y);for(let xx=0;xx<=512;xx+=32)x.lineTo(xx,y+Math.sin(xx*0.03+k)*6);x.stroke();}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;}
+      function pArea(p){let a=0;for(let i=0,n=p.length;i<n;i++){const j=(i+1)%n;a+=p[i][0]*p[j][1]-p[j][0]*p[i][1];}return a/2;}
+      function pInP(pt,poly){let ins=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];if(((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/((yj-yi)||1e-9)+xi))ins=!ins;}return ins;}
+      function interior(pts){let cx=0,cy=0;for(const p of pts){cx+=p[0];cy+=p[1];}cx/=pts.length;cy/=pts.length;if(pInP([cx,cy],pts))return[cx,cy];let xs=[];for(let i=0,j=pts.length-1;i<pts.length;j=i++){const yi=pts[i][1],yj=pts[j][1];if((yi>cy)!==(yj>cy))xs.push(pts[j][0]+(pts[i][0]-pts[j][0])*(cy-yj)/((yi-yj)||1e-9));}xs.sort((a,b)=>a-b);for(let k=0;k+1<xs.length;k+=2){const mx=(xs[k]+xs[k+1])/2;if(pInP([mx,cy],pts))return[mx,cy];}for(const p of pts){const q=[(p[0]+cx)/2,(p[1]+cy)/2];if(pInP(q,pts))return q;}return pts[0];}
+      function orient(p,ccw){return (pArea(p)>0)===ccw?p:p.slice().reverse();}
+      function disp(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose();if(n.material){Array.isArray(n.material)?n.material.forEach(m=>m.dispose()):n.material.dispose();}});}
+      function visible(){const w=$('adm3dWrap');return w&&w.offsetParent!==null;}
+      function init3D(){if(inited||typeof THREE==='undefined')return;const wrap=$('adm3dWrap');if(!wrap)return;const w=wrap.clientWidth||600,h=wrap.clientHeight||380;
+        scene=new THREE.Scene();scene.background=new THREE.Color(0x0f172a);camera=new THREE.PerspectiveCamera(45,w/h,0.5,200000);camera.position.set(200,220,320);
+        renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(window.devicePixelRatio||1);renderer.setSize(w,h);renderer.domElement.style.display='block';wrap.appendChild(renderer.domElement);
+        controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.08;controls.screenSpacePanning=true;controls.autoRotateSpeed=2.0;controls.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};
+        scene.add(new THREE.HemisphereLight(0xffffff,0x33405c,0.75));let d=new THREE.DirectionalLight(0xffffff,0.9);d.position.set(0.6,1,0.5);scene.add(d);d=new THREE.DirectionalLight(0xffffff,0.4);d.position.set(-0.7,0.6,-0.6);scene.add(d);d=new THREE.DirectionalLight(0xffffff,0.25);d.position.set(0.2,-0.5,-0.8);scene.add(d);
+        grid=new THREE.GridHelper(600,30,0x334155,0x1b2638);scene.add(grid);tex=woodTex();
+        renderer.domElement.addEventListener('dblclick',dbl);window.addEventListener('resize',resize);inited=true;
+        (function loop(){requestAnimationFrame(loop);if(!visible()||!pivot)return;controls.update();renderer.render(scene,camera);})();}
+      function resize(){if(!inited)return;const wrap=$('adm3dWrap');if(!wrap)return;const w=wrap.clientWidth||600,h=wrap.clientHeight||380;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+      function fitV(maxDim,th){const d=Math.max(maxDim,40)*1.3;camera.position.set(d*0.32,d*0.82,d*0.62);controls.target.set(0,(th||4)/2,0);controls.update();}
+      function dbl(e){if(!pivot)return;const r=renderer.domElement.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);const hits=ray.intersectObjects(pivot.children,true).filter(h=>h.object.type==='Mesh');if(hits.length){controls.target.copy(hits[0].point);controls.update();}}
+      function build(){if(!inited)return null;if(pivot){scene.remove(pivot);disp(pivot);pivot=null;}
+        const R=CUR&&CUR.render?CUR.render:null;if(!R||!R.bbox)return null;
+        const th=parseFloat(($('adm3dThick')||{}).value)||4;
+        const allSubs=[];R.shapes.forEach(sh=>sh.subs.forEach(sub=>{if(sub&&sub.length>=2)allSubs.push({sub,isEng:sh.isEng});}));
+        const ext=allSubs.map(o=>{let xn=1e9,xx=-1e9,yn=1e9,yx=-1e9;for(const p of o.sub){if(p[0]<xn)xn=p[0];if(p[0]>xx)xx=p[0];if(p[1]<yn)yn=p[1];if(p[1]>yx)yx=p[1];}return Math.max(xx-xn,yx-yn);});
+        const se=ext.slice().sort((a,b)=>a-b),med=se.length?se[Math.floor(se.length/2)]:0,lim=Math.max(2000,med*15);
+        const s2=allSubs.filter((o,i)=>ext[i]<=lim&&isFinite(ext[i]));
+        const bb={minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9};s2.forEach(o=>{for(const p of o.sub)bbE(bb,p[0],p[1]);});if(!(bb.maxX>bb.minX))return null;
+        const cx=(bb.minX+bb.maxX)/2,cy=(bb.minY+bb.maxY)/2,maxDim=Math.max(bb.maxX-bb.minX,bb.maxY-bb.minY),tol=Math.max(2,maxDim*0.02);
+        let cutLen=0,hasEng=false;const eBB={minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9};s2.forEach(o=>{const s=o.sub;if(o.isEng){hasEng=true;for(const p of s)bbE(eBB,p[0],p[1]);}else{let L=0;for(let k=0;k<s.length-1;k++)L+=Math.hypot(s[k+1][0]-s[k][0],s[k+1][1]-s[k][1]);cutLen+=L;}});
+        const engW=(hasEng&&eBB.maxX>eBB.minX)?eBB.maxX-eBB.minX:0,engH=(hasEng&&eBB.maxY>eBB.minY)?eBB.maxY-eBB.minY:0;
+        const cutPolys=[],engClosed=[],openLines=[];s2.forEach(sh=>{let pts=sh.sub.map(p=>[p[0],p[1]]);const rg=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);const ex=pts.length>=4&&rg<1e-6;if(ex)pts=pts.slice(0,-1);const gn=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);const cl=pts.length>=3&&(ex||gn<tol);if(cl)(sh.isEng?engClosed:cutPolys).push(pts);else openLines.push({pts,isEng:sh.isEng});});
+        const polys=cutPolys.map((pts,idx)=>({pts,idx,area:Math.abs(pArea(pts)),depth:0,rep:interior(pts)}));
+        for(let a=0;a<polys.length;a++){const rep=polys[a].rep;for(let b=0;b<polys.length;b++){if(a!==b&&polys[b].area>polys[a].area&&pInP(rep,polys[b].pts))polys[a].depth++;}}
+        polys.forEach(h=>{if(h.depth%2===1){let best=-1,ba=Infinity;polys.forEach(c=>{if(c!==h&&c.depth===h.depth-1&&c.area<ba&&pInP(h.rep,c.pts)){best=c.idx;ba=c.area;}});h.parent=best;}});
+        const model=new THREE.Group();
+        const wMat=new THREE.MeshStandardMaterial({color:col,roughness:0.78,metalness:0,map:tex,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+        const eMat=new THREE.LineBasicMaterial({color:0x2e2110,transparent:true,opacity:0.35});
+        polys.filter(p=>p.depth%2===0).forEach((sd,si)=>{try{const shape=new THREE.Shape(orient(sd.pts,true).map(p=>new THREE.Vector2(p[0],p[1])));polys.filter(h=>h.depth%2===1&&h.parent===sd.idx).forEach(ho=>{shape.holes.push(new THREE.Path(orient(ho.pts,false).map(p=>new THREE.Vector2(p[0],p[1]))));});const geo=new THREE.ExtrudeGeometry(shape,{depth:th,bevelEnabled:false,curveSegments:14,steps:1});geo.computeVertexNormals();const me=new THREE.Mesh(geo,wMat);me.position.z=(si%24)*0.01;model.add(me);const lseg=new THREE.LineSegments(new THREE.EdgesGeometry(geo,50),eMat);lseg.position.z=me.position.z;model.add(lseg);}catch(e){}});
+        const lMat=new THREE.LineBasicMaterial({color:0x1c1206}),zT=th+0.18;
+        cutPolys.forEach(pts=>{const a=pts.map(p=>new THREE.Vector3(p[0],p[1],zT));a.push(a[0].clone());model.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(a),lMat));});
+        openLines.forEach(o=>{model.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(o.pts.map(p=>new THREE.Vector3(p[0],p[1],zT))),lMat));});
+        model.position.set(-cx,-cy,0);pivot=new THREE.Group();pivot.rotation.x=-Math.PI/2;pivot.add(model);scene.add(pivot);
+        const gs=Math.max(maxDim*1.4,60);scene.remove(grid);grid=new THREE.GridHelper(gs,Math.max(10,Math.round(gs/20)),0x334155,0x1b2638);scene.add(grid);
+        last={maxDim,th};fitV(maxDim,th);
+        return {w:bb.maxX-bb.minX,h:bb.maxY-bb.minY,cutLenMm:cutLen,hasEng,engW,engH};}
+      function priceParts(m,th,qty){if(!m||!(m.w>0))return null;const cs=(window.siteData&&window.siteData.calcSettings)||{};
+        const matRate=+(cs.materialRate??0.0038),laserRate=+(cs.laserRate??0.50),cutSpeed=+(cs.cutSpeed??600),margin=+(cs.pubMargin??30),pack=+(cs.packaging??0),minP=+(cs.minPrice??25);
+        qty=Math.max(1,qty||1);const area=(m.w*m.h/100);const matCost=area*((th/3)*matRate)*qty;
+        let tMin=cutSpeed>0?(m.cutLenMm/cutSpeed):0;if(m.hasEng&&m.engW>0&&m.engH>0){const dpi=254,lsp=25.4/dpi,lines=Math.ceil(m.engH/lsp),sp=cutSpeed*4;tMin+=(lines*(m.engW/sp))*1.2;}tMin*=qty;
+        const laserCost=tMin*laserRate;const net=matCost+laserCost+pack;const gross=net*(1+margin/100);const fin=Math.max(gross,minP);
+        return {area,matCost,tMin,laserCost,pack,net,margin,gross,minP,fin,qty};}
+      function fmtTime(t){const mm=Math.floor(t),ss=Math.round((t-mm)*60);return mm+' min '+(ss<10?'0':'')+ss+' s';}
+      function updatePrice(){const m=CUR?CUR.metrics:null;const th=parseFloat(($('adm3dThick')||{}).value)||4;const qty=Math.max(1,parseInt(($('adm3dQty')||{}).value)||1);const p=m?priceParts(m,th,qty):null;
+        const set=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+        set('adm3dPrice',p?p.fin.toFixed(2)+' zł':'—');
+        set('adm3dDims',m?Math.round(m.w)+' × '+Math.round(m.h)+' mm':'—');
+        set('adm-bd-dims',m?Math.round(m.w)+' × '+Math.round(m.h)+' mm':'—');
+        set('adm-bd-area',p?p.area.toFixed(1)+' cm²':'—');
+        set('adm-bd-time',p?fmtTime(p.tMin):'—');
+        set('adm-bd-mat',p?p.matCost.toFixed(2)+' zł':'—');
+        set('adm-bd-laser',p?p.laserCost.toFixed(2)+' zł':'—');
+        set('adm-bd-pack',p?p.pack.toFixed(2)+' zł':'—');
+        set('adm-bd-net',p?p.net.toFixed(2)+' zł':'—');
+        set('adm-bd-margin',p?p.margin+'%':'—');
+        set('adm-bd-gross',p?p.gross.toFixed(2)+' zł':'—');}
+      function applyFile(parsed){const empty=$('adm3dEmpty'),ctr=$('adm3dCtrls');
+        if(!parsed.render||!parsed.render.bbox){alert('Nie udało się odczytać geometrii (możliwe: sam tekst — zamień na ścieżki).');return;}
+        init3D();CUR=parsed;resize();const m=build();CUR.metrics=m;
+        if(!m){if(empty)empty.classList.remove('hidden');return;}
+        if(empty)empty.classList.add('hidden');if(ctr)ctr.classList.remove('hidden');updatePrice();}
+      function handle(files){if(!files||!files.length)return;if(!window.__xeoParse){alert('Parser jeszcze się ładuje — spróbuj ponownie za chwilę.');return;}const f=files[0],ext=f.name.toLowerCase().split('.').pop(),ld=$('adm3dLoad');if(ld)ld.classList.remove('hidden');
+        const rd=new FileReader();rd.onload=e=>{try{let p;if(ext==='lbrn2'||ext==='lbrn')p=window.__xeoParse.parseLBRN(e.target.result);else if(ext==='svg')p=window.__xeoParse.parseSVG(e.target.result);else if(ext==='dxf')p=window.__xeoParse.parseDXF(e.target.result);else if(ext==='cdr'){alert('Format .cdr nie jest obsługiwany — wyeksportuj do SVG.');if(ld)ld.classList.add('hidden');return;}else{alert('Nieobsługiwany format: .'+ext);if(ld)ld.classList.add('hidden');return;}applyFile(p);}catch(err){alert('Błąd odczytu: '+err.message);}if(ld)ld.classList.add('hidden');};rd.onerror=()=>{alert('Nie udało się odczytać pliku.');if(ld)ld.classList.add('hidden');};rd.readAsText(f);}
+      function initUI(){const box=$('adm3dSwatches');if(box&&!box.children.length){COLORS.forEach((c,i)=>{const d=document.createElement('div');d.style.cssText='width:20px;height:20px;border-radius:5px;cursor:pointer;border:2px solid '+(i===0?'#b5651d':'transparent')+';background:#'+c.toString(16).padStart(6,'0');d.onclick=()=>{col=c;[...box.children].forEach(x=>x.style.borderColor='transparent');d.style.borderColor='#b5651d';if(CUR){CUR.metrics=build();updatePrice();}};box.appendChild(d);});}
+        const dz=$('adm3dDrop');if(dz){['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('border-wood-500');}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('border-wood-500');}));dz.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length)handle(e.dataTransfer.files);});}}
+      window.adm3dHandle=handle;
+      window.adm3dPrice=updatePrice;
+      window.adm3dFit=()=>{if(last)fitV(last.maxDim,last.th);};
+      window.adm3dToggleAuto=()=>{const a=$('adm3dAuto');if(controls&&a)controls.autoRotate=a.checked;};
+      window.adm3dOnThick=()=>{const t=($('adm3dThick')||{}).value;const l=$('adm3dThickLbl');if(l)l.textContent=t+' mm';if(CUR){CUR.metrics=build();}updatePrice();};
       if(document.readyState!=='loading')initUI();else document.addEventListener('DOMContentLoaded',initUI);
     })();
     </script>
