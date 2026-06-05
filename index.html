@@ -1497,8 +1497,8 @@
                                 <i class="fa-solid fa-sliders text-sky-400 text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="text-white font-bold text-sm">Stawki Bazowe</h4>
-                                <p class="text-stone-500 text-xs">Używane do wszystkich obliczeń — zapisz po zmianie</p>
+                                <h4 class="text-white font-bold text-sm">Parametry ceny dla klienta (wizualizator na stronie)</h4>
+                                <p class="text-stone-500 text-xs">Te wartości ustalają cenę, którą widzi klient w wizualizatorze 3D na stronie głównej. Zapisz po zmianie. Pełny program masz poniżej.</p>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1554,234 +1554,16 @@
                         </button>
                     </div>
 
-                    <!-- NOWY KALKULATOR Z WIZUALIZATOREM 3D (wgrywanie pliku) -->
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl border border-wood-500/25 mb-8 shadow-lg">
-                        <div class="flex items-center gap-3 mb-5">
-                            <div class="w-8 h-8 bg-wood-500/10 rounded-lg flex items-center justify-center border border-wood-500/20">
-                                <i class="fa-solid fa-cube text-wood-400 text-sm"></i>
+                    <!-- PEŁNY PROGRAM: Kalkulator Laserowy v1.7 (tylko admin, za logowaniem) -->
+                    <div class="bg-stone-950 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+                        <div class="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-stone-900">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-calculator text-wood-400"></i>
+                                <span class="text-white font-bold text-sm">Kalkulator Laserowy — pełny program (Import, Podgląd 3D, Cięcie, Grawerowanie, Materiał, Wycena, Cennik, Ustawienia)</span>
                             </div>
-                            <div>
-                                <h4 class="text-white font-bold text-sm">Kalkulator z wizualizatorem 3D</h4>
-                                <p class="text-stone-500 text-xs">Wgraj plik projektu (.lbrn2 / .svg / .dxf) — zobaczysz model 3D i pełne rozbicie ceny. Klient widzi tylko cenę końcową.</p>
-                            </div>
+                            <a href="kalkulator-cms.html" target="_blank" class="text-stone-400 hover:text-white text-xs flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-up-right-from-square"></i> Otwórz w nowej karcie</a>
                         </div>
-                        <div class="grid grid-cols-1 xl:grid-cols-5 gap-5">
-                            <!-- LEWA: dropzone + 3D -->
-                            <div class="xl:col-span-3 space-y-4">
-                                <div id="adm3dDrop" class="border-2 border-dashed border-white/15 rounded-xl p-4 text-center cursor-pointer hover:border-wood-500 transition" onclick="document.getElementById('adm3dFile').click()">
-                                    <input type="file" id="adm3dFile" class="hidden" accept=".lbrn2,.lbrn,.svg,.dxf" onchange="adm3dHandle(this.files)">
-                                    <i class="fa-solid fa-cloud-arrow-up text-wood-400 text-xl mb-1"></i>
-                                    <p class="text-stone-300 text-sm font-semibold">Przeciągnij plik lub kliknij, aby wybrać</p>
-                                    <p class="text-stone-500 text-xs mt-0.5">.lbrn2 · .lbrn · .svg · .dxf</p>
-                                </div>
-                                <div id="adm3dWrap" class="relative w-full rounded-xl overflow-hidden border border-white/10 bg-slate-900" style="height:380px">
-                                    <div id="adm3dEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-stone-600 text-sm gap-2 pointer-events-none"><i class="fa-solid fa-cube text-4xl opacity-40"></i><span>Tu pojawi się model 3D</span></div>
-                                    <div id="adm3dLoad" class="hidden absolute inset-0 flex items-center justify-center bg-slate-900/80 text-wood-400"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>
-                                </div>
-                                <div id="adm3dCtrls" class="hidden flex flex-wrap items-center gap-3">
-                                    <button onclick="adm3dFit()" class="bg-white/5 hover:bg-white/10 text-stone-200 px-3 py-1.5 rounded-lg text-xs border border-white/10"><i class="fa-solid fa-expand mr-1"></i>Dopasuj widok</button>
-                                    <label class="flex items-center gap-2 text-xs text-stone-300 cursor-pointer"><input type="checkbox" id="adm3dAuto" onchange="adm3dToggleAuto()"> Obrót auto</label>
-                                    <div class="flex items-center gap-1.5" id="adm3dSwatches"></div>
-                                    <span class="text-xs text-stone-400 ml-auto"><i class="fa-solid fa-ruler-combined mr-1 text-wood-400"></i><span id="adm3dDims">—</span></span>
-                                </div>
-                            </div>
-                            <!-- PRAWA: parametry + rozbicie ceny -->
-                            <div class="xl:col-span-2 bg-black/30 rounded-xl border border-white/8 p-5 flex flex-col">
-                                <div class="grid grid-cols-2 gap-3 mb-4">
-                                    <div>
-                                        <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-1">Grubość sklejki</label>
-                                        <input type="range" id="adm3dThick" min="3" max="10" step="1" value="4" oninput="adm3dOnThick()" class="w-full" style="accent-color:#b5651d">
-                                        <div class="text-stone-300 text-xs mt-1 font-mono"><span id="adm3dThickLbl">4 mm</span></div>
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-1">Ilość sztuk</label>
-                                        <input type="number" id="adm3dQty" min="1" value="1" oninput="adm3dPrice()" class="calc-input w-full font-mono">
-                                    </div>
-                                </div>
-                                <div class="space-y-1.5 text-xs border-t border-white/8 pt-3">
-                                    <div class="flex justify-between text-stone-400"><span>Wymiary</span><span id="adm-bd-dims" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Powierzchnia</span><span id="adm-bd-area" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Czas lasera</span><span id="adm-bd-time" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Koszt materiału</span><span id="adm-bd-mat" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Koszt lasera</span><span id="adm-bd-laser" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Pakowanie</span><span id="adm-bd-pack" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-300 font-semibold border-t border-white/8 pt-1.5 mt-1"><span>Koszt netto</span><span id="adm-bd-net" class="font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Marża</span><span id="adm-bd-margin" class="text-stone-200 font-mono">—</span></div>
-                                    <div class="flex justify-between text-stone-400"><span>Cena z marżą</span><span id="adm-bd-gross" class="text-stone-200 font-mono">—</span></div>
-                                </div>
-                                <div class="mt-auto pt-4">
-                                    <div class="text-[10px] text-wood-400 font-bold uppercase tracking-widest mb-1">Cena końcowa dla klienta</div>
-                                    <div id="adm3dPrice" class="text-3xl font-extrabold text-wood-400 leading-none">—</div>
-                                    <p class="text-stone-500 text-[10px] mt-2">Zmieniasz stawki wyżej → kliknij „Zapisz", a ta cena (i cena u klienta) przeliczy się automatycznie.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- GŁÓWNA SEKCJA: FORMULARZ + WYNIKI -->
-                    <p class="text-stone-500 text-xs mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info text-stone-600"></i> Poniżej stary, ręczny kalkulator (opcjonalny) — możesz go ignorować, jeśli korzystasz z wizualizatora powyżej.</p>
-                    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 mb-8">
-
-                        <!-- FORMULARZ (3/5) -->
-                        <div class="xl:col-span-3 bg-stone-800 rounded-2xl border border-white/8 overflow-hidden">
-                            <div class="px-6 py-5 border-b border-white/8 flex items-center gap-3">
-                                <i class="fa-solid fa-pen-ruler text-wood-400"></i>
-                                <h4 class="font-bold text-white">Parametry projektu</h4>
-                            </div>
-                            <div class="p-6 space-y-5">
-                                <input type="hidden" id="calc-edit-id">
-
-                                <!-- Nazwa -->
-                                <div>
-                                    <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
-                                        <i class="fa-solid fa-tag mr-1 text-stone-600"></i> Nazwa wyceny
-                                    </label>
-                                    <input type="text" id="calc-name" class="calc-input" placeholder="np. Pudełko na biżuterię — Klient Jan K.">
-                                </div>
-
-                                <!-- Wymiary materiału -->
-                                <div class="bg-black/25 rounded-xl border border-white/5 overflow-hidden">
-                                    <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 text-xs font-bold text-stone-400 uppercase tracking-wider">
-                                            <i class="fa-solid fa-vector-square text-stone-500"></i> Wymiary materiału
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="text-[10px] text-stone-600 uppercase">Koszt materiału:</span>
-                                            <span class="text-wood-400 font-bold text-sm ml-2"><span id="display-material-cost">0.00</span> PLN</span>
-                                        </div>
-                                    </div>
-                                    <div class="p-4 grid grid-cols-3 gap-3">
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Szerokość</label>
-                                            <div class="relative">
-                                                <input type="number" id="calc-width" class="calc-input pr-10" placeholder="0" oninput="calculatePrice()">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Wysokość</label>
-                                            <div class="relative">
-                                                <input type="number" id="calc-height" class="calc-input pr-10" placeholder="0" oninput="calculatePrice()">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] text-stone-500 font-bold uppercase block mb-1.5">Grubość</label>
-                                            <div class="relative">
-                                                <input type="number" id="calc-thickness" class="calc-input pr-10" value="3" oninput="calculatePrice()">
-                                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 text-xs font-mono">mm</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Czas lasera -->
-                                <div>
-                                    <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
-                                        <i class="fa-solid fa-stopwatch mr-1 text-stone-600"></i> Czas pracy lasera
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" id="calc-time" class="calc-input pr-14" placeholder="0" oninput="calculatePrice()">
-                                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">min</span>
-                                    </div>
-                                </div>
-
-                                <!-- Dodatkowe + Marża -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
-                                            <i class="fa-solid fa-circle-plus mr-1 text-stone-600"></i> Koszty dodatkowe
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="calc-extra" class="calc-input pr-12" value="0" oninput="calculatePrice()">
-                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">PLN</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="text-[11px] text-stone-400 font-bold uppercase tracking-widest block mb-2">
-                                            <i class="fa-solid fa-percent mr-1 text-stone-600"></i> Marża
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="calc-margin" class="calc-input pr-8" value="30" oninput="calculatePrice()">
-                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">%</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Przyciski -->
-                                <div class="flex flex-col gap-2 pt-2">
-                                    <button onclick="saveCalculation()" class="bg-wood-600 hover:bg-wood-500 w-full py-3.5 rounded-xl font-bold transition text-base shadow-lg flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-floppy-disk"></i> Zapisz wycenę
-                                    </button>
-                                    <button id="btn-calc-cancel" onclick="clearCalculator()" class="hidden bg-stone-700 hover:bg-stone-600 w-full py-3 rounded-xl font-bold transition text-sm text-stone-300 flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-xmark"></i> Anuluj edycję
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- WYNIKI (2/5) -->
-                        <div class="xl:col-span-2 flex flex-col gap-4">
-
-                            <!-- Rozbicie kosztów -->
-                            <div class="bg-stone-800 rounded-2xl border border-white/8 overflow-hidden flex-1">
-                                <div class="px-5 py-4 border-b border-white/8 flex items-center gap-3">
-                                    <i class="fa-solid fa-chart-pie text-stone-400 text-sm"></i>
-                                    <h4 class="font-bold text-white text-sm">Rozbicie kosztów</h4>
-                                </div>
-                                <div class="p-5 space-y-3">
-                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                        <div class="flex items-center gap-2 text-xs text-stone-400">
-                                            <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span> Materiał
-                                        </div>
-                                        <span id="display-material-cost-2" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
-                                    </div>
-                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                        <div class="flex items-center gap-2 text-xs text-stone-400">
-                                            <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span> Laser
-                                        </div>
-                                        <span id="display-laser-cost" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
-                                    </div>
-                                    <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                        <div class="flex items-center gap-2 text-xs text-stone-400">
-                                            <span class="w-2 h-2 rounded-full bg-purple-400 inline-block"></span> Dodatkowe
-                                        </div>
-                                        <span id="display-extra-cost" class="text-sm font-bold text-white font-mono">0.00 PLN</span>
-                                    </div>
-                                    <div class="flex justify-between items-center py-2.5">
-                                        <div class="text-xs text-stone-400 font-bold uppercase tracking-wider">Koszt netto</div>
-                                        <span id="calc-net-price" class="text-base font-bold text-stone-200 font-mono">0.00 PLN</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Cena końcowa — duże wyróżnienie -->
-                            <div class="bg-gradient-to-br from-sky-900/40 to-slate-800 rounded-2xl border border-sky-500/30 p-6 text-center shadow-xl shadow-sky-500/5">
-                                <p class="text-sky-400 text-[10px] font-bold uppercase tracking-widest mb-1">Cena dla klienta</p>
-                                <div class="text-5xl font-bold text-white my-3 leading-none">
-                                    <span id="calc-gross-price">0.00</span>
-                                    <span class="text-xl text-wood-400 ml-1">PLN</span>
-                                </div>
-                                <div class="mt-3 pt-3 border-t border-white/10 flex justify-between text-xs">
-                                    <span class="text-stone-500">Zysk (marża):</span>
-                                    <span id="calc-profit" class="text-green-400 font-bold font-mono">0.00 PLN</span>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- LISTA ZAPISANYCH WYCEN -->
-                    <div class="border-t border-white/10 pt-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h4 class="text-xl font-bold text-white">Zapisane Wyceny</h4>
-                                <p class="text-stone-500 text-xs mt-0.5">Kliknij <i class="fa-solid fa-pen text-xs"></i> aby edytować, <i class="fa-solid fa-trash text-xs"></i> aby usunąć</p>
-                            </div>
-                        </div>
-                        <div id="saved-calcs-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            <!-- Tu pojawią się kafelki -->
-                        </div>
+                        <iframe src="kalkulator-cms.html" title="Kalkulator Laserowy" loading="lazy" class="w-full block" style="height:calc(100vh - 120px);min-height:800px;border:0;background:#0f172a"></iframe>
                     </div>
                 </div>
 
@@ -3295,9 +3077,7 @@
                 document.getElementById('setting-pub-margin').value = cs.pubMargin ?? 30;
                 document.getElementById('setting-packaging').value = cs.packaging ?? 0;
                 document.getElementById('setting-min-price').value = cs.minPrice ?? 25;
-
-                renderSavedCalculations();
-                calculatePrice(); // Uruchom przeliczenie na starcie
+                if (window.xeomscPriceRefresh) window.xeomscPriceRefresh();
             }
         };
         
@@ -3325,11 +3105,10 @@
              await saveData();
              if (typeof window.xeomscPriceRefresh === 'function') window.xeomscPriceRefresh();
              showToast("Zapisano domyślne stawki kalkulatora!");
-             calculatePrice(); // Przelicz przy nowej stawce
         };
 
         // Obliczanie ceny (Automatyczne)
-        window.calculatePrice = () => {
+        window.calculatePrice = () => { return; /* stary kalkulator usunięty — pełny program jest w iframe */
             // Pobranie stawek BAZOWYCH (dla 3mm)
             const baseRate3mm = parseFloat(document.getElementById('setting-material-rate').value) || 0;
             const laserRate = parseFloat(document.getElementById('setting-laser-rate').value) || 0;

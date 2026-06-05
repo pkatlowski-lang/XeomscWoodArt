@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Laserowy — Xeomsc Laser Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { poppins: ['Poppins','sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        body { background: #0f172a; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 3px; }
+
+        .calc-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: #f1f5f9;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+            font-size: 14px;
+        }
+        .calc-input:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249,115,22,.15);
+        }
+        .calc-input:disabled {
+            opacity: .5; cursor: not-allowed;
+        }
+        select.calc-input option { background: #1e293b; }
+
+        .tab-btn {
+            padding: 9px 15px;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid transparent;
+            border-bottom: none;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        .tab-btn.active {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f97316;
+        }
+        .tab-btn:not(.active):hover { color: #cbd5e1; background: rgba(30,41,59,.4); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .preset-btn {
+            padding: 5px 11px;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .2s;
+            border: 1px solid #334155;
+            white-space: nowrap;
+        }
+        .preset-btn:hover { background: #f97316; color: #fff; border-color: #f97316; }
+
+        .calc-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 22px;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #f97316;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top:0;left:0;right:0;bottom:0; background:#334155; border-radius:24px; transition:.3s; }
+        .toggle-slider:before { position:absolute; content:""; height:18px;width:18px; left:3px;bottom:3px; background:white; border-radius:50%; transition:.3s; }
+        .toggle-switch input:checked + .toggle-slider { background:#f97316; }
+        .toggle-switch input:checked + .toggle-slider:before { transform:translateX(22px); }
+
+        .result-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:13px; }
+        .result-row .label { color:#94a3b8; }
+        .result-row .value { color:#f1f5f9; font-weight:500; }
+        .result-row.total .label { color:#cbd5e1; font-weight:600; }
+        .result-row.total .value { color:#f97316; font-weight:700; }
+
+        .divider { border:none; border-top:1px solid #334155; margin:8px 0; }
+
+        @keyframes flashOrange {
+            0%   { color: #f97316; transform: scale(1.05); }
+            100% { color: #fff; transform: scale(1); }
+        }
+        .flash { animation: flashOrange .4s ease forwards; }
+
+        input[type="range"] { accent-color: #f97316; width:100%; cursor:pointer; }
+
+        .info-box { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px 14px; font-size:12px; color:#64748b; }
+        .info-box strong { color:#94a3b8; }
+
+        .price-glow { text-shadow: 0 0 24px rgba(249,115,22,.6); }
+
+        .eng-type-btn { padding:7px 16px; border-radius:7px; font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; border:1px solid #334155; background:#0f172a; color:#94a3b8; }
+        .eng-type-btn.active { background:#f97316; color:#fff; border-color:#f97316; }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .no-print { display: none !important; }
+        }
+
+        /* Tooltip */
+        .tooltip { position:relative; }
+        .tooltip .tip { visibility:hidden; background:#0f172a; color:#94a3b8; text-align:left; padding:8px 10px; border-radius:6px; position:absolute; z-index:100; bottom:130%; left:50%; transform:translateX(-50%); width:220px; font-size:11px; border:1px solid #334155; opacity:0; transition:opacity .2s; pointer-events:none; }
+        .tooltip:hover .tip { visibility:visible; opacity:1; }
+
+        .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+        .badge-orange { background:rgba(249,115,22,.15); color:#fb923c; }
+        .badge-green  { background:rgba(34,197,94,.15);  color:#4ade80; }
+        .badge-blue   { background:rgba(59,130,246,.15); color:#60a5fa; }
+        .badge-red    { background:rgba(239,68,68,.15);  color:#f87171; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-200">
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-fire text-white"></i>
+            </div>
+            <div>
+                <div class="text-base font-bold text-white leading-none">Kalkulator Laserowy <span id="appVersion" class="text-[10px] text-slate-500 font-normal align-middle">v—</span></div>
+                <div class="text-xs text-orange-400 font-semibold">Xeomsc Laser Studio</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="resetAll()" class="preset-btn no-print">
+                <i class="fas fa-rotate-left mr-1 text-orange-400"></i>Reset
+            </button>
+            <button onclick="copyQuote()" class="preset-btn no-print">
+                <i class="fas fa-copy mr-1 text-orange-400"></i>Kopiuj
+            </button>
+            <button onclick="printQuote()" class="preset-btn no-print" style="background:#f97316;color:#fff;border-color:#f97316;">
+                <i class="fas fa-print mr-1"></i>Drukuj / PDF
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ═══ LEFT: INPUT PANEL ═══ -->
+        <div class="lg:col-span-2 no-print">
+
+            <!-- TABS -->
+            <div class="flex flex-wrap gap-1 mb-0">
+                <button class="tab-btn active" onclick="switchTab('import',this)">📂 Import pliku</button>
+                <button class="tab-btn" onclick="switchTab('podglad3d',this)">🧊 Podgląd 3D</button>
+                <button class="tab-btn" onclick="switchTab('ciecie',this)">✂️ Cięcie</button>
+                <button class="tab-btn" onclick="switchTab('grawerowanie',this)">🔲 Grawerowanie</button>
+                <button class="tab-btn" onclick="switchTab('material',this)">📦 Materiał</button>
+                <button class="tab-btn" onclick="switchTab('wycena',this)">💰 Wycena</button>
+                <button class="tab-btn" onclick="switchTab('cennik',this)">📐 Cennik wg rozmiaru</button>
+                <button class="tab-btn" onclick="switchTab('ustawienia',this)">⚙️ Ustawienia</button>
+            </div>
+
+            <!-- TAB WRAPPER -->
+            <div class="calc-card" style="border-top-left-radius:0; border-top:none;">
+
+                <!-- ╔═══════════════╗ -->
+                <!-- ╔════════════════╗ -->
+                <!-- ║  TAB: IMPORT   ║ -->
+                <!-- ╚════════════════╝ -->
+                <div id="tab-import" class="tab-content active">
+                    <div class="section-label"><i class="fas fa-file-import"></i> Import projektu LightBurn / SVG</div>
+
+                    <!-- DROP ZONE -->
+                    <div id="dropZone"
+                         class="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center cursor-pointer transition hover:border-orange-500 hover:bg-slate-900/50 mb-4"
+                         onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-arrow-up text-4xl text-orange-400 mb-3"></i>
+                        <div class="text-slate-200 font-semibold mb-1">Przeciągnij plik tutaj lub kliknij</div>
+                        <div class="text-xs text-slate-500">Obsługiwane: <span class="text-orange-300">.lbrn2 · .lbrn · .svg · .dxf</span></div>
+                        <input type="file" id="fileInput" class="hidden" accept=".lbrn2,.lbrn,.svg,.dxf" onchange="handleFileSelect(this.files)">
+                    </div>
+
+                    <!-- STATUS / BŁĄD -->
+                    <div id="importStatus" class="hidden mb-4"></div>
+
+                    <!-- WYNIK IMPORTU -->
+                    <div id="importResult" class="hidden">
+                        <!-- Nagłówek pliku -->
+                        <div class="bg-slate-900 border border-orange-500/40 rounded-lg p-3 mb-4 flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <div class="text-sm font-semibold text-white"><i class="fas fa-file-code text-orange-400 mr-2"></i><span id="impFileName">—</span></div>
+                                <div class="text-xs text-slate-400 mt-1">
+                                    Warstw: <span id="impLayerCount" class="text-orange-300 font-medium">0</span> ·
+                                    Kształtów: <span id="impShapeCount" class="text-orange-300 font-medium">0</span>
+                                </div>
+                            </div>
+                            <button onclick="clearImport()" class="preset-btn"><i class="fas fa-xmark mr-1 text-red-400"></i>Wyczyść</button>
+                        </div>
+
+                        <!-- POLE ROBOCZE (bounding box całego projektu) -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 mb-4">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <div class="text-xs text-slate-400">
+                                    <i class="fas fa-vector-square text-orange-400 mr-1"></i>
+                                    <strong class="text-slate-300">Pole robocze</strong> (prostokąt od skrajnych punktów XY <strong class="text-slate-300">wszystkich</strong> elementów):
+                                </div>
+                                <div class="text-sm">
+                                    <span id="impDims" class="text-orange-300 font-bold">—</span>
+                                    &nbsp;=&nbsp;<span id="impArea" class="text-orange-300 font-bold">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PODGLĄD WIZUALNY -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 mb-4">
+                            <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                                <div class="text-xs text-slate-400">
+                                    <i class="fas fa-eye text-orange-400 mr-1"></i>Podgląd projektu
+                                    <span class="ml-3"><span style="color:#f97316">▬</span> cięcie</span>
+                                    <span class="ml-2"><span style="color:#60a5fa">▬</span> grawer</span>
+                                    <span class="ml-2 text-slate-600">▭ pole robocze</span>
+                                </div>
+                                <div class="flex items-end gap-2">
+                                    <div>
+                                        <label class="block text-[10px] text-slate-500 mb-0.5">Skala %</label>
+                                        <input type="number" id="scalePct" class="calc-input !py-1 !px-2" value="100" min="1" step="5" style="width:64px" oninput="setScalePct(this.value)">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-slate-500 mb-0.5">Szer. docelowa mm</label>
+                                        <input type="number" id="targetW" class="calc-input !py-1 !px-2" placeholder="—" min="1" style="width:78px" oninput="setTargetWidth(this.value)">
+                                    </div>
+                                    <button onclick="resetScale()" class="preset-btn !py-1.5" title="Skala 100%"><i class="fas fa-rotate-left text-orange-400"></i></button>
+                                </div>
+                            </div>
+                            <canvas id="previewCanvas" style="width:100%;height:300px;display:block;border-radius:8px;background:#0f172a;"></canvas>
+                            <div class="text-[11px] text-slate-500 mt-1">
+                                <i class="fas fa-circle-info mr-1"></i>Zmień <strong>Skalę</strong> lub <strong>szerokość docelową</strong>, aby przeskalować projekt — długość cięcia, pole i czas przeliczą się automatycznie. Geometria czytana w oryginalnym rozmiarze z pliku.
+                            </div>
+                        </div>
+
+                        <!-- Moc lasera maszyny -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Moc lasera maszyny (W)
+                                    <span class="tip">Twój laser. Przelicza % mocy z pliku na realne waty. Domyślnie 48W diodowy.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="number" id="machineMaxW" class="calc-input" value="48" min="1" step="1" oninput="updateImportTotals()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Odstęp linii grawera (mm)
+                                    <span class="tip">Interwał skanowania dla warstw grawerowanych (Scan/Fill). LightBurn nie zapisuje go w pliku — ustaw ręcznie. 0.1mm = 254 DPI.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="number" id="impInterval" class="calc-input" value="0.1" min="0.01" step="0.01" oninput="updateImportTotals()">
+                            </div>
+                        </div>
+
+                        <!-- TABELA WARSTW -->
+                        <div class="overflow-x-auto rounded-lg border border-slate-700 mb-4">
+                            <table class="w-full text-xs" id="layerTable">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-400">
+                                        <th class="p-2 text-left font-semibold">Warstwa</th>
+                                        <th class="p-2 text-left font-semibold">Tryb</th>
+                                        <th class="p-2 text-right font-semibold tooltip">Moc %<span class="tip">Edytowalne — zmień moc lasera dla tej warstwy.</span></th>
+                                        <th class="p-2 text-right font-semibold">Waty</th>
+                                        <th class="p-2 text-right font-semibold tooltip">Prędkość<span class="tip">mm/min — edytowalne.</span></th>
+                                        <th class="p-2 text-right font-semibold">×</th>
+                                        <th class="p-2 text-right font-semibold">Długość / Pow.</th>
+                                        <th class="p-2 text-right font-semibold">Czas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="layerTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Podsumowanie importu -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 p-4">
+                            <div class="grid grid-cols-3 gap-3 text-center">
+                                <div>
+                                    <div class="text-xs text-slate-500 mb-1">✂️ Czas cięcia</div>
+                                    <div id="impCutTime" class="text-2xl font-bold text-orange-400">0 min</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-500 mb-1">🔲 Czas grawera</div>
+                                    <div id="impEngTime" class="text-2xl font-bold text-blue-400">0 min</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-500 mb-1">⏱ Czas maszyny</div>
+                                    <div id="impMachTime" class="text-2xl font-bold text-white">0 min</div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3 text-xs text-green-400">
+                                <i class="fas fa-circle-check mr-1"></i>Dane automatycznie zastosowane w wycenie (panel po prawej)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POMOC FORMATY -->
+                    <div class="info-box mt-4">
+                        <i class="fas fa-circle-info text-blue-400 mr-1"></i>
+                        <strong>.lbrn2 / .lbrn</strong> — pełny odczyt: długość cięcia, warstwy grawera, moc i prędkość każdej warstwy.<br>
+                        <strong>.svg</strong> — odczyt geometrii (długość ścieżek). Tryb/moc ustaw ręcznie w zakładkach.<br>
+                        <strong>.dxf</strong> — odczyt linii, łuków, okręgów i polilinii.<br>
+                        <strong>.cdr (CorelDRAW)</strong> — format zamknięty, nieczytelny w przeglądarce. Wyeksportuj z Corela do <strong>SVG</strong> (Plik → Eksportuj → SVG) lub otwórz w LightBurn i zapisz jako .lbrn2.
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════════╗ -->
+                <!-- ║  TAB: PODGLĄD 3D     ║ -->
+                <!-- ╚══════════════════════╝ -->
+                <div id="tab-podglad3d" class="tab-content">
+                    <div class="section-label"><i class="fas fa-cube"></i> Podgląd 3D projektu</div>
+
+                    <!-- pasek kontrolek 3D -->
+                    <div id="v3dControls" class="hidden flex flex-wrap items-center gap-2 mb-3">
+                        <button onclick="v3dFit()" class="preset-btn"><i class="fas fa-expand mr-1 text-orange-400"></i>Dopasuj widok</button>
+                        <div class="flex items-center gap-1" id="v3dSwatches"></div>
+                        <span class="text-slate-700">|</span>
+                        <label class="flex items-center gap-1 text-xs text-slate-400"><input type="checkbox" id="v3dEng" checked onchange="v3dRebuild()"> rysunek/grawer</label>
+                        <label class="flex items-center gap-1 text-xs text-slate-400"><input type="checkbox" id="v3dEdges" checked onchange="v3dRebuild()"> krawędzie</label>
+                        <label class="flex items-center gap-1 text-xs text-slate-400"><input type="checkbox" id="v3dGrid" checked onchange="v3dToggleGrid()"> siatka</label>
+                        <label class="flex items-center gap-1 text-xs text-slate-400"><input type="checkbox" id="v3dAuto" onchange="v3dToggleAuto()"> auto-obrót</label>
+                    </div>
+
+                    <div id="v3dCanvasWrap" class="relative rounded-xl overflow-hidden border border-slate-700" style="height:460px;background:#0f172a;">
+                        <div id="v3dEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-slate-600 text-center px-4">
+                            <i class="fas fa-cube text-5xl mb-3"></i>
+                            <div class="font-semibold">Wczytaj plik w zakładce 📂 Import</div>
+                            <div class="text-xs mt-1">Projekt pojawi się tu w 3D (sklejka o grubości z zakładki Materiał)</div>
+                        </div>
+                    </div>
+                    <div id="v3dInfo" class="hidden text-[11px] text-slate-500 mt-2">
+                        <i class="fas fa-circle-info mr-1 text-orange-400"></i>Obrót: lewy przycisk · Przesuwanie: prawy · Zoom: kółko · <strong class="text-slate-400">Podwójne kliknięcie</strong> = środek obrotu na elemencie.
+                        Grubość: <span id="v3dThick" class="text-orange-300">4 mm</span> (zmień w zakładce 📦 Materiał). <span id="v3dParts" class="text-orange-300"></span>
+                    </div>
+                </div>
+
+                <!-- ║  TAB: CIĘCIE  ║ -->
+                <!-- ╚═══════════════╝ -->
+                <div id="tab-ciecie" class="tab-content">
+                    <div class="section-label"><i class="fas fa-scissors"></i> Parametry Cięcia</div>
+
+                    <!-- Moc + grubość -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Moc lasera (W)</label>
+                            <select id="laserPowerCut" class="calc-input" onchange="updateCuttingPreset()">
+                                <optgroup label="— Diodowy (niebieski 450nm) —">
+                                    <option value="d5">5 W diodowy</option>
+                                    <option value="d10">10 W diodowy</option>
+                                    <option value="d20">20 W diodowy</option>
+                                    <option value="d33">33 W diodowy</option>
+                                    <option value="d48" selected>48 W diodowy ← Twój laser</option>
+                                    <option value="d60">60 W diodowy</option>
+                                </optgroup>
+                                <optgroup label="— CO₂ (szkło/RF) —">
+                                    <option value="40">40 W CO₂</option>
+                                    <option value="60">60 W CO₂</option>
+                                    <option value="80">80 W CO₂</option>
+                                    <option value="100">100 W CO₂</option>
+                                    <option value="130">130 W CO₂</option>
+                                    <option value="150">150 W CO₂</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Grubość sklejki (mm)</label>
+                            <select id="plywoodThickness" class="calc-input" onchange="syncThickness('cut')">
+                                <option value="3">3 mm</option>
+                                <option value="4" selected>4 mm</option>
+                                <option value="5">5 mm</option>
+                                <option value="6">6 mm</option>
+                                <option value="7">7 mm</option>
+                                <option value="8">8 mm</option>
+                                <option value="9">9 mm</option>
+                                <option value="10">10 mm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Baner diodowy -->
+                    <div id="diodeBanner" class="bg-blue-950 border border-blue-500/40 rounded-lg p-3 mb-4 text-xs text-blue-200 hidden">
+                        <i class="fas fa-circle-info text-blue-400 mr-1"></i>
+                        <strong class="text-blue-300">Laser diodowy (niebieski 450nm)</strong> —
+                        podane prędkości zakładają <strong>air assist (dmuchawa)</strong> i sklejkę brzozową suchą.
+                        Bez air assist zmniejsz prędkość o ~40% lub dodaj przejście.
+                        Grubości ≥10mm mogą wymagać wielu przejść z przerwą na schłodzenie.
+                    </div>
+
+                    <!-- Preset suggestion -->
+                    <div id="presetBox" class="bg-slate-900 border border-orange-500/30 rounded-lg p-3 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-lightbulb text-orange-400 text-sm"></i>
+                                <span class="text-xs text-slate-300">Sugerowane dla <span id="presetLabel" class="text-orange-400 font-semibold">100W / 4mm</span>:</span>
+                            </div>
+                            <button onclick="applyPreset()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md transition font-medium">
+                                Zastosuj →
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-4 text-xs">
+                            <span class="text-slate-400">Prędkość: <span id="presetSpeed" class="text-white font-semibold">1200 mm/min</span></span>
+                            <span class="text-slate-400">Przejścia: <span id="presetPasses" class="text-white font-semibold">1×</span></span>
+                            <span class="text-slate-400">Moc lasera: <span id="presetPowerPct" class="text-white font-semibold">75%</span></span>
+                            <span id="presetWarning" class="hidden text-red-400"><i class="fas fa-exclamation-triangle mr-1"></i>Brak danych dla tej kombinacji</span>
+                        </div>
+                    </div>
+
+                    <!-- Długość drogi cięcia -->
+                    <div class="mb-4">
+                        <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                            Długość drogi cięcia
+                            <span class="tip">Suma wszystkich linii wektora cięcia (kontury + otwory). W LightBurn możesz sprawdzić statystyki projektu.</span>
+                            <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="number" id="pathLength" class="calc-input" value="1500" min="0" step="10" oninput="calculate()">
+                            <select id="pathLengthUnit" class="calc-input" style="max-width:80px" onchange="calculate()">
+                                <option value="1" selected>mm</option>
+                                <option value="1000">m</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Szybkie projekty -->
+                    <div class="mb-4">
+                        <label class="block text-xs text-slate-500 mb-2">Załaduj typowy projekt:</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="preset-btn" onclick="loadQuickProject('box_s')">📦 Pudełko S</button>
+                            <button class="preset-btn" onclick="loadQuickProject('box_m')">📦 Pudełko M</button>
+                            <button class="preset-btn" onclick="loadQuickProject('napis')">🔤 Napis 5 liter</button>
+                            <button class="preset-btn" onclick="loadQuickProject('logo')">⭐ Logo firmowe</button>
+                            <button class="preset-btn" onclick="loadQuickProject('zegar')">🕐 Zegar 30cm</button>
+                            <button class="preset-btn" onclick="loadQuickProject('polka')">🔨 Półka ścienna</button>
+                            <button class="preset-btn" onclick="loadQuickProject('tabliczka')">🏷️ Tabliczka</button>
+                        </div>
+                    </div>
+
+                    <!-- Prędkość + przejścia -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Prędkość cięcia (mm/min)</label>
+                            <input type="number" id="cuttingSpeed" class="calc-input" value="1200" min="1" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">
+                                Liczba przejść: <span id="passesDisplay" class="text-orange-400 font-bold">1×</span>
+                            </label>
+                            <input type="range" id="passesRange" min="1" max="5" value="1"
+                                   oninput="document.getElementById('passesDisplay').textContent=this.value+'×'; calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Punkty przebijania -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Punkty przebijania (pierce)
+                                <span class="tip">Liczba miejsc gdzie laser zaczyna cięcie: otwory, osobne kontury, przerwy w ścieżce.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="piercePoints" class="calc-input" value="5" min="0" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Czas przebijania (s / punkt)
+                                <span class="tip">Czas potrzebny laserowi na przebicie materiału w każdym punkcie startu. 3mm≈0.3s, 6mm≈0.8s, 12mm≈2s.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="pierceTime" class="calc-input" value="0.5" min="0" step="0.1" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Narzut przyspieszenia -->
+                    <div class="mb-1">
+                        <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                            Narzut przyspieszenia/hamowania: <span id="accelLabel" class="text-orange-400">15%</span>
+                            <span class="tip">Czas tracony na przyspieszenie i hamowanie głowicy przy zakrętach. Małe detale = więcej zakrętów = wyższy narzut.</span>
+                            <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                        </label>
+                        <input type="range" id="accelOverhead" min="5" max="50" value="15"
+                               oninput="document.getElementById('accelLabel').textContent=this.value+'%'; calculate()">
+                        <div class="flex justify-between text-xs text-slate-600 mt-1">
+                            <span>5% — proste linie</span><span>25% — złożone</span><span>50% — bardzo skomplikowane</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════════╗ -->
+                <!-- ║  TAB: GRAWEROWANIE   ║ -->
+                <!-- ╚══════════════════════╝ -->
+                <div id="tab-grawerowanie" class="tab-content">
+                    <div class="section-label"><i class="fas fa-pen-nib"></i> Parametry Grawerowania</div>
+
+                    <!-- Włącz/wyłącz -->
+                    <div class="flex items-center justify-between mb-4 p-3 bg-slate-900 rounded-lg border border-slate-700">
+                        <span class="text-sm text-slate-300 font-medium">Uwzględnij grawerowanie w wycenie</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="engEnabled" checked onchange="calculate()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Typ grawerowania -->
+                    <div class="flex gap-2 mb-5">
+                        <button id="btnRaster" class="eng-type-btn active" onclick="setEngType('raster')">
+                            <i class="fas fa-th mr-1"></i>Rastrowe (wypełnienie)
+                        </button>
+                        <button id="btnVector" class="eng-type-btn" onclick="setEngType('vector')">
+                            <i class="fas fa-bezier-curve mr-1"></i>Wektorowe (linie)
+                        </button>
+                    </div>
+
+                    <!-- RASTER SETTINGS -->
+                    <div id="rasterPanel">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Szerokość obszaru (mm)</label>
+                                <input type="number" id="engWidth" class="calc-input" value="100" min="1" oninput="calculate(); updateDPIInfo()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Wysokość obszaru (mm)</label>
+                                <input type="number" id="engHeight" class="calc-input" value="80" min="1" oninput="calculate(); updateDPIInfo()">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Rozdzielczość (DPI)</label>
+                                <select id="engDPI" class="calc-input" onchange="updateDPIInfo(); calculate()">
+                                    <option value="100">100 DPI — szybkie / grube wzory</option>
+                                    <option value="150">150 DPI — standardowe drewno</option>
+                                    <option value="200">200 DPI — dobra jakość</option>
+                                    <option value="254" selected>254 DPI — wysoka jakość</option>
+                                    <option value="300">300 DPI — detale, text</option>
+                                    <option value="500">500 DPI — foto, bardzo wolne</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Prędkość skanowania (mm/min)</label>
+                                <input type="number" id="engSpeed" class="calc-input" value="3000" min="100" oninput="calculate()">
+                            </div>
+                        </div>
+
+                        <!-- Info box DPI -->
+                        <div class="info-box mb-4">
+                            <div class="flex flex-wrap gap-4">
+                                <span><strong>Odstęp linii:</strong> <span id="lineSpacingInfo" class="text-orange-300">0.10 mm</span></span>
+                                <span><strong>Linii łącznie:</strong> <span id="numLinesInfo" class="text-orange-300">800</span></span>
+                                <span><strong>Powrót głowicy:</strong> <span class="text-orange-300">3× szybszy niż forward</span></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Liczba warstw (przejść)</label>
+                                <input type="number" id="engLayers" class="calc-input" value="1" min="1" max="10" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Wypełnienie wzoru: <span id="fillLabel" class="text-orange-400">60%</span>
+                                    <span class="tip">Ile procent obszaru jest faktycznie grawerowane (reszta to tło). Logo pełne ≈ 70%, tekst ≈ 30-40%.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="range" id="engFill" min="5" max="100" value="60"
+                                       oninput="document.getElementById('fillLabel').textContent=this.value+'%'; calculate()">
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <i class="fas fa-info-circle text-blue-400 mr-1"></i>
+                            <strong>Wzór na czas rastrowania:</strong>
+                            T = (H ÷ (25.4÷DPI)) × (W×fill ÷ speed_forward + W ÷ speed_return) × overhead × warstwy
+                        </div>
+                    </div>
+
+                    <!-- VECTOR ENGRAVING SETTINGS -->
+                    <div id="vectorPanel" class="hidden">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Długość ścieżek grawerowania (mm)</label>
+                                <input type="number" id="vecEngPath" class="calc-input" value="800" min="0" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Prędkość grawerowania (mm/min)</label>
+                                <input type="number" id="vecEngSpeed" class="calc-input" value="2000" min="100" oninput="calculate()">
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <i class="fas fa-info-circle text-blue-400 mr-1"></i>
+                            Grawerowanie wektorowe = jak cięcie ale mniejsza moc, wyższa prędkość. Wzór: T = (L ÷ speed) × 1.15
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════╗ -->
+                <!-- ║  TAB: MATERIAŁ   ║ -->
+                <!-- ╚══════════════════╝ -->
+                <div id="tab-material" class="tab-content">
+                    <div class="section-label"><i class="fas fa-layer-group"></i> Materiał — podstawa wyceny</div>
+
+                    <!-- ═══ MATERIAŁ: rodzaj + grubość + cena za cm² ═══ -->
+                    <div class="bg-slate-900 border border-orange-500/30 rounded-lg p-3 mb-4">
+                        <div class="grid grid-cols-3 gap-3 mb-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Rodzaj materiału</label>
+                                <select id="matType" class="calc-input" onchange="onMatTypeChange()">
+                                    <option value="0.0038" selected>Sklejka brzozowa</option>
+                                    <option value="0.0030">Sklejka topolowa</option>
+                                    <option value="0.0042">Sklejka liściasta</option>
+                                    <option value="0.0028">MDF</option>
+                                    <option value="0.0050">Plexi / akryl</option>
+                                    <option value="custom">Inny (własna cena)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium">Grubość (mm)</label>
+                                <select id="matThickness" class="calc-input" onchange="syncThickness('mat')">
+                                    <option value="3">3 mm</option>
+                                    <option value="4" selected>4 mm</option>
+                                    <option value="5">5 mm</option>
+                                    <option value="6">6 mm</option>
+                                    <option value="7">7 mm</option>
+                                    <option value="8">8 mm</option>
+                                    <option value="9">9 mm</option>
+                                    <option value="10">10 mm</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Cena 3mm (zł/cm²)
+                                    <span class="tip">Cena materiału 3mm za 1 cm². Gdy zdrożeje — zmień, a wszystkie grubości przeliczą się proporcjonalnie. Sklejka brzozowa ≈ 0,0038.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="number" id="priceBase3mm" class="calc-input" value="0.0038" min="0" step="0.0001" oninput="updateMaterialPricing()">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm mb-2 pb-2 border-b border-slate-700">
+                            <span class="text-slate-400">Cena dla <span id="matThLabel" class="text-orange-300 font-semibold">4 mm</span>:</span>
+                            <span id="matPricePerCm2" class="text-orange-400 font-bold">0.0051 zł/cm²</span>
+                        </div>
+                        <table class="w-full text-[11px]">
+                            <thead><tr class="text-slate-500">
+                                <th class="text-left font-medium py-0.5">Grubość</th>
+                                <th class="text-right font-medium">zł/cm²</th>
+                                <th class="text-right font-medium">zł / 10×10cm</th>
+                            </tr></thead>
+                            <tbody id="matPriceTableBody"></tbody>
+                        </table>
+                        <p class="text-[11px] text-slate-500 mt-2"><i class="fas fa-circle-info mr-1"></i>Model liniowy: każdy 1 mm ≈ cena_bazowa ÷ 3. Wybierz grubość — cena wskakuje sama.</p>
+                    </div>
+
+                    <!-- Wymiary projektu + ilość -->
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Szer. projektu (mm)</label>
+                            <input type="number" id="projW" class="calc-input" value="200" min="1" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Wys. projektu (mm)</label>
+                            <input type="number" id="projH" class="calc-input" value="150" min="1" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Liczba sztuk</label>
+                            <input type="number" id="qty" class="calc-input" value="1" min="1" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Podsumowanie materiału -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-700 p-4">
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div>
+                                <div class="text-xs text-slate-500 mb-1">Pole 1 szt.</div>
+                                <div id="matAreaOne" class="text-2xl font-bold text-slate-300">— cm²</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 mb-1">Materiał łącznie (×szt.)</div>
+                                <div id="sheetAreaDisp" class="text-2xl font-bold text-orange-400">— cm²</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 mb-1">Koszt materiału</div>
+                                <div id="matCostDisp" class="text-2xl font-bold text-white">— PLN</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════╗ -->
+                <!-- ║  TAB: WYCENA     ║ -->
+                <!-- ╚══════════════════╝ -->
+                <div id="tab-wycena" class="tab-content">
+                    <div class="section-label"><i class="fas fa-tag"></i> Dane Projektu i Marża</div>
+
+                    <!-- Projekt + klient -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Nazwa projektu</label>
+                            <input type="text" id="projName" class="calc-input" placeholder="np. Logo firmowe 3D" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Klient</label>
+                            <input type="text" id="clientName" class="calc-input" placeholder="np. Jan Kowalski" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Stawki -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Stawka maszynowa (PLN/h)
+                                <span class="tip">Koszt pracy maszyny laserowej za godzinę. Oblicz w zakładce ⚙️ Ustawienia → Amortyzacja.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="machineRate" class="calc-input" value="80" min="0" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Stawka robocizny (PLN/h)</label>
+                            <input type="number" id="laborRate" class="calc-input" value="50" min="0" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Czasy przygotowania -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Czas przygotowania pliku (min)</label>
+                            <input type="number" id="prepTime" class="calc-input" value="15" min="0" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Czas ustawiania maszyny (min)</label>
+                            <input type="number" id="setupTime" class="calc-input" value="10" min="0" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- Marża — wybór trybu -->
+                    <div class="mb-4 bg-slate-900 border border-orange-500/30 rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                            <span class="text-xs text-slate-400 font-medium">📈 Marża — tryb naliczania</span>
+                            <span class="text-sm">Twój projekt: <span id="marginLabel" class="text-orange-400 font-bold">0%</span></span>
+                        </div>
+                        <select id="marginMode" class="calc-input mb-2" onchange="onMarginModeChange()">
+                            <option value="mixed" selected>Wg rozmiaru: +3% co 5 cm, od 40 cm +5% (zalecana)</option>
+                            <option value="linear">Wg rozmiaru: +3% co 5 cm (jednolicie)</option>
+                            <option value="manual">Ręczna — stały procent</option>
+                        </select>
+                        <div id="marginManualWrap" class="hidden mb-1">
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Marża ręczna (%)</label>
+                            <input type="number" id="marginManual" class="calc-input" value="30" min="0" max="500" step="1" oninput="calculate()">
+                        </div>
+                        <div id="marginScheduleInfo" class="text-[11px] text-slate-500 leading-relaxed"></div>
+                    </div>
+
+                    <!-- Zniżka -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">
+                                Zniżka dla klienta: <span id="discountLabel" class="text-green-400 font-bold">0%</span>
+                            </label>
+                            <input type="range" id="discountRange" min="0" max="60" value="0"
+                                   oninput="document.getElementById('discountLabel').textContent=this.value+'%'; calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Minimalna opłata (PLN)
+                                <span class="tip">Cena finalna nigdy nie będzie niższa od tej kwoty — chroni przed stratami na małych zleceniach.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="minCharge" class="calc-input" value="25" min="0" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <!-- ═══ KOSZTY DODATKOWE + PAKOWANIE (raz na zamówienie) ═══ -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 mb-4">
+                        <div class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Koszty stałe zamówienia (raz, nie ×szt.)</div>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Dodatkowe koszta (zł)
+                                    <span class="tip">Np. okucia, farba, folia, wysyłka. Doliczane raz do zamówienia, niezależnie od liczby sztuk.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="number" id="extraCost" class="calc-input" value="0" min="0" step="0.5" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                    Pakowanie bazowe @5cm (zł)
+                                    <span class="tip">Koszt pakowania przy rozmiarze 5 cm. Rośnie o 20% na każde 5 cm dłuższego boku. Doliczany raz; ×2 powyżej 50 szt.</span>
+                                    <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                                </label>
+                                <input type="number" id="packBase" class="calc-input" value="0.5" min="0" step="0.1" oninput="calculate()">
+                            </div>
+                        </div>
+                        <div class="info-box text-[11px]">
+                            <i class="fas fa-box text-orange-400 mr-1"></i>
+                            Pakowanie auto: <span id="packInfo" class="text-orange-300 font-semibold">—</span>
+                            <span class="text-slate-500"> (0,5 zł @5cm, +20% co 5cm; ×2 gdy >50 szt.)</span>
+                        </div>
+                    </div>
+
+                    <!-- ═══ PROWIZJA ALLEGRO ═══ -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Prowizja Allegro (%)
+                                <span class="tip">Procent który pobiera Allegro od ceny sprzedaży. Cena na Allegro zostanie podbita tak, byś po prowizji otrzymał swoją cenę. Wpisz 0 jeśli sprzedaż poza Allegro.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="allegroPct" class="calc-input" value="0" min="0" max="90" step="0.5" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Notatka do wyceny</label>
+                            <input type="text" id="quoteNote" class="calc-input" placeholder="np. Dostawa gratis od 100 zł">
+                        </div>
+                    </div>
+
+                    <!-- Waluta -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Waluta</label>
+                            <select id="currency" class="calc-input" onchange="calculate()">
+                                <option value="PLN" selected>PLN</option>
+                                <option value="EUR">EUR</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════════╗ -->
+                <!-- ║  TAB: CENNIK         ║ -->
+                <!-- ╚══════════════════════╝ -->
+                <div id="tab-cennik" class="tab-content">
+                    <div class="section-label"><i class="fas fa-ruler-combined"></i> Cennik wg Rozmiaru</div>
+                    <p class="text-xs text-slate-500 mb-4">
+                        Projekt skalowany proporcjonalnie — dłuższy bok od <strong>5 cm</strong> do <strong>75 cm</strong> co 5 cm.
+                        Dla każdego rozmiaru: czas i cena (cięcie rośnie liniowo, grawer i materiał z kwadratem skali).
+                        Rozmiar bazowy projektu: <span id="sizeTableBase" class="text-orange-400 font-semibold">—</span>.
+                    </p>
+                    <div class="overflow-x-auto rounded-lg border border-slate-700">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-400">
+                                    <th class="p-2 text-left font-semibold">Rozmiar (dłuższy bok)</th>
+                                    <th class="p-2 text-left font-semibold">Wymiary (szer × wys)</th>
+                                    <th class="p-2 text-right font-semibold">Czas</th>
+                                    <th class="p-2 text-right font-semibold">Cena</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sizeTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="info-box mt-3">
+                        <i class="fas fa-circle-info text-blue-400 mr-1"></i>
+                        ★ = rozmiar zbliżony do bazowego. <strong class="text-slate-300">Kliknij wiersz</strong>, aby rozwinąć pełne zestawienie składników i skopiować cenę.
+                        Każda cena zawiera materiał, robociznę, pakowanie i prowizję Allegro. Przelicza się automatycznie.
+                    </div>
+                </div>
+
+                <!-- ╔══════════════════════╗ -->
+                <!-- ║  TAB: USTAWIENIA     ║ -->
+                <!-- ╚══════════════════════╝ -->
+                <div id="tab-ustawienia" class="tab-content">
+                    <div class="section-label"><i class="fas fa-cog"></i> Ustawienia Maszyny i Energii</div>
+
+                    <!-- Moc + prąd -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Typ lasera</label>
+                            <select id="laserType" class="calc-input" onchange="calculate()">
+                                <option value="co2">CO₂ — drewno, sklejka, MDF</option>
+                                <option value="diode" selected>Diodowy (niebieski 450nm) ← Twój</option>
+                                <option value="fiber">Fiber — metale</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium tooltip">
+                                Moc elektryczna systemu (W)
+                                <span class="tip">Pełne zużycie energii: laser + chłodzenie wodne + napędy. Dla CO₂ 100W ≈ 2000-3000W systemu.</span>
+                                <i class="fas fa-info-circle text-slate-600 ml-1 cursor-help"></i>
+                            </label>
+                            <input type="number" id="systemPowerW" class="calc-input" value="250" min="50" step="50" oninput="calculate()">
+                            <p class="text-xs text-slate-500 mt-1">Diodowy 48W ≈ ~250W systemu (brak chilera). CO₂ 100W ≈ 2000-3000W.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Cena energii elektrycznej (PLN/kWh)</label>
+                            <input type="number" id="elecPrice" class="calc-input" value="0.75" min="0" step="0.01" oninput="calculate()">
+                        </div>
+                        <div></div>
+                    </div>
+
+                    <hr class="divider mb-6">
+                    <div class="section-label"><i class="fas fa-calculator"></i> Kalkulator Amortyzacji Maszyny</div>
+                    <p class="text-xs text-slate-500 mb-4">Oblicz ile kosztuje jedna godzina pracy maszyny i automatycznie zastosuj w zakładce Wycena.</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Wartość zakupu maszyny (PLN)</label>
+                            <input type="number" id="machineValue" class="calc-input" value="25000" min="0" step="500" oninput="recalcMachineRate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Czas amortyzacji (lata)</label>
+                            <input type="number" id="deprYears" class="calc-input" value="5" min="1" max="20" oninput="recalcMachineRate()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Godziny pracy rocznie (h/rok)</label>
+                            <input type="number" id="annualHours" class="calc-input" value="500" min="1" oninput="recalcMachineRate()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1 font-medium">Wyliczona stawka maszynowa</label>
+                            <div class="flex gap-2">
+                                <div id="calcRateDisp" class="calc-input text-orange-400 font-bold" style="background:#0f172a;cursor:default;">10.00 PLN/h</div>
+                                <button onclick="applyMachineRate()" class="preset-btn" style="min-width:70px">
+                                    ← Zastosuj
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-lightbulb text-yellow-400 mr-1"></i>
+                        <strong>Wzór:</strong> Stawka = (Wartość maszyny ÷ lata) ÷ h_rocznie.
+                        Przykład: 25 000 PLN ÷ 5 lat = 5 000 PLN/rok ÷ 500 h = <strong class="text-orange-300">10 PLN/h</strong> (tylko amortyzacja — dodaj stawkę robocizny osobno).
+                    </div>
+                </div>
+
+            </div><!-- end tab wrapper -->
+        </div><!-- end LEFT panel -->
+
+        <!-- ═══ RIGHT: RESULTS PANEL ═══ -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-20 space-y-4">
+
+                <!-- RESULTS CARD -->
+                <div class="calc-card">
+                    <div class="section-label mb-4"><i class="fas fa-chart-bar"></i> Podsumowanie</div>
+
+                    <!-- Baner trybu importu -->
+                    <div id="importModeBanner" class="hidden mb-4 p-2.5 rounded-lg bg-orange-500/15 border border-orange-500/40 text-xs text-orange-200">
+                        <i class="fas fa-file-import mr-1 text-orange-400"></i>
+                        Czasy z pliku: <strong id="importModeFile" class="text-orange-300">—</strong>
+                    </div>
+
+                    <!-- CZAS -->
+                    <div class="mb-5">
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">⏱ Czas</div>
+                        <div class="result-row"><span class="label">✂️ Cięcie</span><span id="r_cut" class="value">0 min</span></div>
+                        <div class="result-row"><span class="label">🔲 Grawerowanie</span><span id="r_eng" class="value">0 min</span></div>
+                        <div class="result-row"><span class="label">⚙️ Przygotowanie</span><span id="r_prep" class="value">25 min</span></div>
+                        <hr class="divider">
+                        <div class="result-row total"><span class="label">📊 ŁĄCZNIE</span><span id="r_total_time" class="value">25 min</span></div>
+                    </div>
+
+                    <!-- KOSZTY -->
+                    <div class="mb-5">
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">💸 Koszty własne</div>
+                        <div class="result-row"><span class="label">📦 Materiał</span><span id="r_mat" class="value">18.00 PLN</span></div>
+                        <div class="result-row"><span class="label">🔧 Maszynowy</span><span id="r_machine" class="value">0.00 PLN</span></div>
+                        <div class="result-row"><span class="label">👤 Robocizna</span><span id="r_labor" class="value">0.00 PLN</span></div>
+                        <div class="result-row"><span class="label">⚡ Prąd</span><span id="r_elec" class="value">0.00 PLN</span></div>
+                        <hr class="divider">
+                        <div class="result-row total"><span class="label">💸 Koszt własny</span><span id="r_own_cost" class="value">20.00 PLN</span></div>
+                    </div>
+
+                    <!-- WYCENA -->
+                    <div class="mb-5">
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">🏷 Wycena</div>
+                        <div class="result-row">
+                            <span class="label">📈 Marża (<span id="r_margin_pct">30</span>%)</span>
+                            <span id="r_margin_amt" class="value text-green-400">+6.00 PLN</span>
+                        </div>
+                        <div class="result-row" id="r_discount_row">
+                            <span class="label">🎁 Zniżka (<span id="r_discount_pct">0</span>%)</span>
+                            <span id="r_discount_amt" class="value text-red-400">-0.00 PLN</span>
+                        </div>
+                        <div class="result-row"><span class="label">➕ Dodatkowe koszta</span><span id="r_extra" class="value">0.00 PLN</span></div>
+                        <div class="result-row"><span class="label">📦 Pakowanie</span><span id="r_pack" class="value">0.00 PLN</span></div>
+                        <hr class="divider">
+                        <div class="result-row total"><span class="label">💰 Twoja cena</span><span id="r_net" class="value">0.00 PLN</span></div>
+                        <div class="result-row" id="r_allegro_row"><span class="label">🛒 Prowizja Allegro (<span id="r_allegro_pct">0</span>%)</span><span id="r_allegro_amt" class="value text-red-400">+0.00 PLN</span></div>
+                    </div>
+
+                    <!-- CENA FINALNA -->
+                    <div class="bg-gradient-to-br from-orange-600/20 to-red-700/20 border border-orange-500/40 rounded-xl p-4 text-center mb-4">
+                        <div id="r_finalLabel" class="text-xs text-orange-300 font-semibold uppercase tracking-widest mb-1">Cena finalna</div>
+                        <div id="r_final" class="text-4xl font-extrabold text-white price-glow">26.00 PLN</div>
+                        <div id="r_perPiece" class="mt-1 text-xs text-slate-400">— /szt.</div>
+                        <div id="r_minNote" class="hidden mt-1 text-xs text-amber-400">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Zastosowano minimum: <span id="r_minVal">25</span> PLN
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            Efektywna stawka: <span id="r_eff_rate" class="text-orange-300 font-semibold">— PLN/h</span>
+                        </div>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="space-y-2">
+                        <button onclick="copyQuote()" class="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm">
+                            <i class="fas fa-copy text-orange-400"></i>Kopiuj wycenę do schowka
+                        </button>
+                        <button onclick="printQuote()" class="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition text-sm">
+                            <i class="fas fa-print"></i>Drukuj / Zapisz PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TIPS CARD -->
+                <div class="calc-card">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                        <i class="fas fa-lightbulb text-yellow-400 mr-1"></i>Wskazówki
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-500 leading-relaxed">
+                        <p>💡 <strong class="text-slate-400">Prędkość cięcia</strong> — użyj przycisku <em>Zastosuj →</em> na górze zakładki ✂️ Cięcie, by automatycznie ustawić parametry dla swojego lasera.</p>
+                        <p>💡 <strong class="text-slate-400">Czas grawerowania</strong> rośnie proporcjonalnie do DPI. Przejście z 254→500 DPI oznacza prawie 2× dłuższy czas.</p>
+                        <p>💡 <strong class="text-slate-400">Materiał = podstawa</strong> — koszt z pola projektu × cena za cm² (wg grubości) × ilość.</p>
+                        <p>💡 <strong class="text-slate-400">Pakowanie i dodatkowe koszta</strong> doliczane raz na zamówienie. Pakowanie rośnie 20% co 5 cm; ×2 powyżej 50 szt.</p>
+                        <p>💡 <strong class="text-slate-400">Prowizja Allegro</strong> — cena zostaje podbita tak, byś po prowizji otrzymał swoją cenę.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- end RIGHT panel -->
+
+    </div><!-- end grid -->
+</main>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white text-sm font-medium px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+    <i class="fas fa-check-circle"></i><span id="toastTxt">OK</span>
+</div>
+
+<script>
+"use strict";
+
+// Wersja programu (zwiększana przy każdej zmianie = aktualizacja)
+const APP_VERSION = '1.7';
+
+// ═══════════════════════════════════════════
+//  TABELE PARAMETRÓW LASERA CO₂
+//  Źródło: producenci maszyn, doświadczenie
+//  Format: { grubość_mm: [speed_mm_min, passes, power_%] }
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+//  UWAGA: Diodowy laser (niebieski 450nm) vs CO₂
+//  — Diodowy WYMAGA asysty powietrza (air assist)!
+//  — Bez air assist: prędkości o ~40% niższe, więcej przypalenia
+//  — Diodowy gorzej tnie materiały z dużą zawartością żywicy
+//  — Podane prędkości: z air assist, sklejka brzozowa sucha
+//  — Format: [speed_mm_min, passes, power_%]
+// ═══════════════════════════════════════════
+const CUT_PRESETS = {
+    // ── LASERY DIODOWE (niebieski 450nm) ──────────────────────────────
+    // Prędkości z air assist, 100% moc, sklejka brzozowa
+    d5:  { 3:[180,2,100], 4:[100,3,100] },
+    d10: { 3:[300,2,100], 4:[180,2,100], 6:[80,3,100] },
+    d20: { 3:[500,1,100], 4:[300,2,100], 6:[150,2,100], 8:[80,3,100] },
+    d33: { 3:[700,1,100], 4:[450,1,100], 6:[250,2,100], 8:[130,2,100], 10:[70,3,100] },
+    // ── TWÓJ LASER: 48W diodowy ─────────────────────────────────────
+    d48: { 3:[900,1,100], 4:[600,1,100], 6:[320,2,100], 8:[170,2,100], 10:[90,3,100], 12:[50,4,100] },
+    d60: { 3:[1100,1,100],4:[750,1,100], 6:[420,1,100], 8:[230,2,100], 10:[130,2,100],12:[75,3,100] },
+    // ── LASERY CO₂ (szkło/RF) ─────────────────────────────────────────
+    40:  { 3:[480,1,80],  4:[300,1,90],  6:[150,2,95] },
+    60:  { 3:[900,1,75],  4:[600,1,85],  6:[360,1,90],  8:[200,2,95] },
+    80:  { 3:[1200,1,70], 4:[900,1,80],  6:[600,1,88],  8:[360,1,92],  10:[200,2,95] },
+    100: { 3:[1500,1,65], 4:[1200,1,75], 6:[900,1,85],  8:[600,1,90],  10:[360,1,93], 12:[220,2,95] },
+    130: { 3:[1800,1,60], 4:[1500,1,70], 6:[1080,1,80], 8:[720,1,87],  10:[480,1,90], 12:[300,1,93] },
+    150: { 3:[2100,1,55], 4:[1800,1,65], 6:[1200,1,75], 8:[900,1,82],  10:[600,1,87], 12:[420,1,90] }
+};
+
+// Szybkie projekty [długość_ścieżki_mm, pierce_punkty, engW, engH, name]
+const QUICK_PROJECTS = {
+    box_s:     [1400,  8,   0,   0,  'Pudełko małe ~100×80×40mm'],
+    box_m:     [2800, 14,   0,   0,  'Pudełko średnie ~200×150×60mm'],
+    napis:     [2800, 25, 160,  50,  'Napis 5 liter z grawerem'],
+    logo:      [2000, 12, 150, 100,  'Logo firmowe 150×100mm'],
+    zegar:     [4500, 30, 280, 280,  'Zegar dekoracyjny Ø300mm'],
+    polka:     [5500, 35,   0,   0,  'Półka ścienna 400×200mm'],
+    tabliczka: [1200, 10, 180,  60,  'Tabliczka 200×80mm z grawerem'],
+};
+
+// ═══════════════════════════════════════════
+//  ALGORYTM 1: CZAS CIĘCIA
+//  T_cut = (L ÷ v) × passes × (1 + overhead/100)  +  pierce_pts × pierce_s / 60
+// ═══════════════════════════════════════════
+function algoCuttingTime(L_mm, v_mm_min, passes, overhead_pct, pierce_pts, pierce_s) {
+    if (L_mm <= 0 || v_mm_min <= 0) return 0;
+    const base = (L_mm / v_mm_min) * passes;
+    const overhead = base * (overhead_pct / 100);
+    const pierce = (pierce_pts * pierce_s) / 60;
+    return base + overhead + pierce;  // minutes
+}
+
+// ═══════════════════════════════════════════
+//  ALGORYTM 2: CZAS GRAWEROWANIA RASTROWEGO
+//  lineSpacing = 25.4 / DPI  [mm]
+//  numLines    = H / lineSpacing
+//  T_forward   = numLines × (W × fill) / speed_fwd   [min]
+//  T_return    = numLines × W / (speed_fwd × 3)      [min]
+//  T_total     = (T_forward + T_return) × 1.20 × layers
+// ═══════════════════════════════════════════
+function algoRasterEngTime(W_mm, H_mm, speed_mm_min, dpi, fill_pct, layers) {
+    if (W_mm <= 0 || H_mm <= 0 || speed_mm_min <= 0) return 0;
+    const lineSpacing = 25.4 / dpi;
+    const numLines    = Math.ceil(H_mm / lineSpacing);
+    const effWidth    = W_mm * (fill_pct / 100);
+    const t_fwd       = numLines * (effWidth / speed_mm_min);
+    const t_ret       = numLines * (W_mm / (speed_mm_min * 3));
+    const overhead    = 1.20;  // przyspieszenia, hamowania, zawracania
+    return (t_fwd + t_ret) * overhead * layers;
+}
+
+// ═══════════════════════════════════════════
+//  ALGORYTM 3: CZAS GRAWEROWANIA WEKTOROWEGO
+//  T_vec = (L ÷ v) × 1.15
+// ═══════════════════════════════════════════
+function algoVectorEngTime(L_mm, v_mm_min) {
+    if (L_mm <= 0 || v_mm_min <= 0) return 0;
+    return (L_mm / v_mm_min) * 1.15;
+}
+
+// ═══════════════════════════════════════════
+//  ALGORYTM 4: KOSZT MATERIAŁU (PODSTAWA) — cena za cm² wg grubości
+//  pole_cm² = projW × projH / 100 × ilość
+//  koszt    = pole_cm² × cena_za_cm²
+// ═══════════════════════════════════════════
+function algoMaterialCost(pricePerCm2, pW, pH, qty) {
+    if (pW <= 0 || pH <= 0) return { cost:0, areaCm2:0 };
+    const areaCm2 = (pW * pH / 100) * (qty || 1);
+    return { cost: areaCm2 * (pricePerCm2 || 0), areaCm2 };
+}
+
+// ═══════════════════════════════════════════
+//  KOSZT PAKOWANIA — 0,5 zł @5cm, +20% na każde 5cm dłuższego boku.
+//  Raz na zamówienie; ×2 powyżej 50 szt.
+// ═══════════════════════════════════════════
+function packagingCost(longestCm, qty) {
+    const base = gn('packBase');
+    if (longestCm <= 0 || base <= 0) return 0;
+    const steps = Math.max(0, (longestCm - 5) / 5);   // ile pełnych/ułamkowych kroków 5cm ponad 5cm
+    let cost = base * Math.pow(1.2, steps);
+    if ((qty || 1) > 50) cost *= 2;
+    return cost;
+}
+
+// ═══════════════════════════════════════════
+//  ALGORYTM 5: KOSZT ENERGII
+//  E = (T_min / 60) × (P_W / 1000) × cena_kWh
+// ═══════════════════════════════════════════
+function algoElecCost(time_min, power_W, price_kWh) {
+    return (time_min / 60) * (power_W / 1000) * price_kWh;
+}
+
+// ═══════════════════════════════════════════
+//  HELPERY
+// ═══════════════════════════════════════════
+function gn(id) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    if (el.type === 'checkbox') return el.checked ? 1 : 0;
+    const v = parseFloat(el.value);
+    return isNaN(v) ? 0 : v;
+}
+function gs(id) { return (document.getElementById(id)||{value:''}).value; }
+function setText(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+function fmtTime(min) {
+    if (min <= 0) return '0 s';
+    const totalSec = Math.round(min * 60);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h > 0) return h + ' h ' + m + ' min ' + s + ' s';
+    if (m > 0) return m + ' min ' + s + ' s';
+    return s + ' s';
+}
+
+function fmtPLN(v) {
+    const cur = gs('currency') || 'PLN';
+    return v.toFixed(2) + ' ' + cur;
+}
+
+function flash(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+}
+
+// ═══════════════════════════════════════════
+//  CENA MATERIAŁU ZA cm² (liniowo wg grubości)
+//  cena(T) = cena_bazowa_3mm × T / 3
+// ═══════════════════════════════════════════
+function pricePerCm2() {
+    const base3 = gn('priceBase3mm');
+    const th    = gn('matThickness') || 4;
+    return base3 * th / 3;
+}
+
+function fmtZl4(v) { return v.toFixed(4); }
+
+// Odśwież cennik sklejki (etykieta + tabela grubości) i przelicz
+function updateMaterialPricing() {
+    const base3 = gn('priceBase3mm');
+    const th    = gn('matThickness') || 4;
+    setText('matThLabel', th + ' mm');
+    setText('matPricePerCm2', fmtZl4(pricePerCm2()) + ' zł/cm²');
+
+    const body = document.getElementById('matPriceTableBody');
+    if (body) {
+        const ths = [3,4,5,6,7,8,9,10];
+        body.innerHTML = ths.map(t => {
+            const p = base3 * t / 3;
+            const cur = (t === th);
+            return '<tr class="'+(cur?'text-orange-400 font-semibold':'text-slate-400')+'">'+
+                '<td class="text-left py-0.5">'+t+' mm'+(cur?' ◀':'')+'</td>'+
+                '<td class="text-right">'+fmtZl4(p)+'</td>'+
+                '<td class="text-right">'+(p*100).toFixed(2)+'</td>'+
+                '</tr>';
+        }).join('');
+    }
+    calculate();
+}
+
+// ═══════════════════════════════════════════
+//  MARŻA AUTOMATYCZNA wg rozmiaru (dłuższy bok w cm)
+//  5–10cm: 0% | od 15cm: +3% co 5cm (15→3..35→15) | od 40cm: 20%, dalej +5% co 5cm (..75→55)
+//  Marża jest stała w obrębie pasma 5cm i skacze na granicy.
+// ═══════════════════════════════════════════
+function marginForSize(cm) {
+    const mode = gs('marginMode') || 'mixed';
+    if (mode === 'manual') return gn('marginManual') || 0;   // stały % niezależny od rozmiaru
+    const b = Math.floor((cm + 1e-6) / 5) * 5;               // dolna granica pasma 5cm
+    if (b < 15) return 0;
+    if (mode === 'linear') return ((b - 10) / 5) * 3;        // jednolicie +3% co 5cm (15→3 ... 75→39)
+    if (b <= 35) return ((b - 10) / 5) * 3;                  // mieszana: 15→3 ... 35→15
+    return 20 + ((b - 40) / 5) * 5;                          // od 40cm: 20%, +5% co 5cm (... 75→55)
+}
+
+// Przełączenie trybu marży: pokaż/ukryj pole ręczne + opis harmonogramu
+function onMarginModeChange() {
+    const mode = gs('marginMode') || 'mixed';
+    const mw = document.getElementById('marginManualWrap');
+    const inf = document.getElementById('marginScheduleInfo');
+    if (mw)  mw.classList.toggle('hidden', mode !== 'manual');
+    if (inf) {
+        inf.classList.toggle('hidden', mode === 'manual');
+        if (mode === 'linear')
+            inf.innerHTML = 'Poniżej 15 cm: <b class="text-slate-400">0%</b>. Od 15 cm: <b class="text-slate-400">+3% co 5 cm</b> jednolicie (15→3, 20→6 … 40→18, 45→21 … 75→39).';
+        else
+            inf.innerHTML = 'Poniżej 15 cm: <b class="text-slate-400">0%</b>. 15–35 cm: <b class="text-slate-400">+3% co 5 cm</b> (15→3 … 35→15). Od 40 cm: skok do <b class="text-slate-400">20%</b>, dalej <b class="text-slate-400">+5% co 5 cm</b> (45→25 … 75→55).';
+    }
+    calculate();
+}
+
+// Rodzaj materiału → ustaw cenę bazową 3mm (wartość opcji = cena 3mm); "custom" zostawia ręczną
+function onMatTypeChange() {
+    const v = gs('matType');
+    if (v && v !== 'custom') document.getElementById('priceBase3mm').value = v;
+    updateMaterialPricing();
+}
+
+// Synchronizacja grubości między zakładką Cięcie (preset) a Materiał (cena)
+function syncThickness(src) {
+    const cut = document.getElementById('plywoodThickness');
+    const mat = document.getElementById('matThickness');
+    if (src === 'cut' && cut && mat) {
+        if ([...mat.options].some(o => o.value === cut.value)) mat.value = cut.value;
+    } else if (src === 'mat' && cut && mat) {
+        if ([...cut.options].some(o => o.value === mat.value)) cut.value = mat.value;
+    }
+    updateCuttingPreset();     // odśwież sugestię prędkości (nie woła calculate)
+    updateMaterialPricing();   // odśwież cennik + przelicz (woła calculate)
+}
+
+// ═══════════════════════════════════════════
+//  GŁÓWNA FUNKCJA KALKULATORA
+// ═══════════════════════════════════════════
+function calculate() {
+    // — CIĘCIE —
+    const pathLenMM    = gn('pathLength') * gn('pathLengthUnit');
+    const cutSpeed     = gn('cuttingSpeed');
+    const passes       = gn('passesRange');
+    const accel        = gn('accelOverhead');
+    const pierce_pts   = gn('piercePoints');
+    const pierce_s     = gn('pierceTime');
+
+    let t_cut, t_eng;
+
+    if (IMPORT.active) {
+        // ── TRYB IMPORTU: czasy z analizy pliku (suma wszystkich warstw) ──
+        t_cut = IMPORT.cutTime;
+        t_eng = IMPORT.engTime;
+    } else {
+        // ── TRYB RĘCZNY ──
+        t_cut = algoCuttingTime(pathLenMM, cutSpeed, passes, accel, pierce_pts, pierce_s);
+        t_eng = 0;
+        if (gn('engEnabled')) {
+            const isRaster = document.getElementById('btnRaster').classList.contains('active');
+            if (isRaster) {
+                t_eng = algoRasterEngTime(
+                    gn('engWidth'), gn('engHeight'),
+                    gn('engSpeed'), gn('engDPI'),
+                    gn('engFill'), gn('engLayers')
+                );
+            } else {
+                t_eng = algoVectorEngTime(gn('vecEngPath'), gn('vecEngSpeed'));
+            }
+        }
+    }
+
+    // Baner trybu importu w panelu wyniku
+    const impBanner = document.getElementById('importModeBanner');
+    if (impBanner) {
+        impBanner.classList.toggle('hidden', !IMPORT.active);
+        if (IMPORT.active) setText('importModeFile', IMPORT.fileName);
+    }
+
+    // — ILOŚĆ —
+    const qty = Math.max(1, gn('qty') || 1);
+
+    // — CZASY (produkcja = czas/szt × ilość + przygotowanie raz) —
+    const t_prep     = gn('prepTime') + gn('setupTime');
+    const t_perPiece = t_cut + t_eng;
+    const t_prod     = t_perPiece * qty + t_prep;
+    const t_prod_h   = t_prod / 60;
+
+    // — MATERIAŁ = PODSTAWA: pole projektu × cena/cm² × ilość —
+    const matResult = algoMaterialCost(pricePerCm2(), gn('projW'), gn('projH'), qty);
+
+    // — KOSZTY (czasowe wg czasu produkcji) —
+    const cost_machine = t_prod_h * gn('machineRate');
+    const cost_labor   = t_prod_h * gn('laborRate');
+    const cost_elec    = algoElecCost(t_prod, gn('systemPowerW'), gn('elecPrice'));
+    const cost_own     = matResult.cost + cost_machine + cost_labor + cost_elec;
+
+    // — MARŻA AUTOMATYCZNA wg rozmiaru + ZNIŻKA —
+    const longestCm    = Math.max(gn('projW'), gn('projH')) / 10;
+    const margin_pct   = marginForSize(longestCm);
+    const discount_pct = gn('discountRange');
+    const minCharge    = gn('minCharge');
+    const margin_amt   = cost_own * (margin_pct / 100);
+    const afterMargin  = cost_own + margin_amt;
+    const disc_amt     = afterMargin * (discount_pct / 100);
+    const afterDisc    = afterMargin - disc_amt;
+
+    // — KOSZTY STAŁE ZAMÓWIENIA (raz, nie ×szt.) —
+    const packCost     = packagingCost(longestCm, qty);
+    const extraCost    = gn('extraCost');
+
+    let netPrice       = afterDisc + extraCost + packCost;
+    const isMin        = netPrice < minCharge;
+    netPrice           = Math.max(netPrice, minCharge);
+
+    // — PROWIZJA ALLEGRO (podbicie ceny, by po prowizji otrzymać swoją cenę) —
+    const allegroPct   = Math.min(89, gn('allegroPct'));
+    const finalPrice   = allegroPct > 0 ? netPrice / (1 - allegroPct/100) : netPrice;
+    const allegro_amt  = finalPrice - netPrice;
+
+    const effRate      = t_prod_h > 0.01 ? netPrice / t_prod_h : 0;
+
+    // — UI: CZAS —
+    setText('r_cut',        fmtTime(t_cut));
+    setText('r_eng',        fmtTime(t_eng));
+    setText('r_prep',       fmtTime(t_prep));
+    setText('r_total_time', fmtTime(t_prod) + (qty > 1 ? '  (×' + qty + ' szt.)' : ''));
+
+    // — UI: KOSZTY —
+    setText('r_mat',       fmtPLN(matResult.cost));
+    setText('r_machine',   fmtPLN(cost_machine));
+    setText('r_labor',     fmtPLN(cost_labor));
+    setText('r_elec',      fmtPLN(cost_elec));
+    setText('r_own_cost',  fmtPLN(cost_own));
+
+    // — UI: WYCENA —
+    setText('r_margin_pct',  margin_pct);
+    setText('r_margin_amt',  '+' + fmtPLN(margin_amt));
+    setText('marginLabel',   margin_pct + '%');
+    setText('r_discount_pct', discount_pct);
+    setText('r_discount_amt', '-' + fmtPLN(disc_amt));
+    setText('r_extra',       fmtPLN(extraCost));
+    setText('r_pack',        fmtPLN(packCost));
+    setText('r_net',         fmtPLN(netPrice));
+    setText('r_allegro_pct', allegroPct);
+    setText('r_allegro_amt', '+' + fmtPLN(allegro_amt));
+    const allRow = document.getElementById('r_allegro_row');
+    if (allRow) allRow.classList.toggle('hidden', allegroPct <= 0);
+
+    setText('r_final',      fmtPLN(finalPrice));
+    setText('r_finalLabel', allegroPct > 0 ? 'Cena na Allegro' : 'Cena finalna');
+    setText('r_perPiece',   qty > 1 ? (fmtPLN(finalPrice / qty) + ' /szt.') : '1 szt.');
+    setText('r_eff_rate',   effRate > 0 ? fmtPLN(effRate) + '/h' : '— PLN/h');
+
+    // — UI: pakowanie info (Wycena) —
+    setText('packInfo', fmtPLN(packCost) + '  (rozmiar ' + longestCm.toFixed(0) + ' cm' + (qty > 50 ? ', >50szt ×2' : '') + ')');
+
+    // — UI: Materiał —
+    setText('matAreaOne',   (gn('projW') * gn('projH') / 100).toFixed(0) + ' cm²');
+    setText('sheetAreaDisp', Math.round(matResult.areaCm2) + ' cm²');
+    setText('matCostDisp',  fmtPLN(matResult.cost));
+
+    // Min charge note
+    const minNoteEl = document.getElementById('r_minNote');
+    if (minNoteEl) {
+        minNoteEl.classList.toggle('hidden', !isMin);
+        setText('r_minVal', minCharge);
+    }
+
+    flash('r_final');
+    updateDPIInfo();
+    buildSizeTable();
+    saveSettings();   // zapamiętaj wpisane wartości
+}
+
+// ═══════════════════════════════════════════
+//  CENNIK WG ROZMIARU
+//  Skaluje projekt proporcjonalnie: dłuższy bok 5..75 cm co 5 cm.
+//  Cięcie ∝ skala, grawer (pole) ∝ skala², materiał (pole) ∝ skala².
+// ═══════════════════════════════════════════
+function getBaseGeometry(){
+    // Czasy i wymiary przy SKALI 1 (oryginalny rozmiar projektu)
+    if (IMPORT.active && IMPORT.bbox){
+        const interval = gn('impInterval') || 0.1, dpi = 25.4/interval;
+        let cut=0, eng=0;
+        IMPORT.layers.forEach(L=>{
+            const isEng = isEngraveLayer(L);
+            const sp = L._speedMMmin||1, ps = L._passes||1;
+            if (isEng){
+                const w=Math.max(0,L.bbox.maxX-L.bbox.minX), h=Math.max(0,L.bbox.maxY-L.bbox.minY);
+                eng += algoRasterEngTime(w,h,sp,dpi,100,ps);
+            } else cut += (L.length/sp)*ps;
+        });
+        return { cutMin:cut, engMin:eng, baseW:IMPORT.bbox.maxX-IMPORT.bbox.minX, baseH:IMPORT.bbox.maxY-IMPORT.bbox.minY };
+    }
+    // tryb ręczny
+    const cut = algoCuttingTime(gn('pathLength')*gn('pathLengthUnit'), gn('cuttingSpeed'), gn('passesRange'), gn('accelOverhead'), gn('piercePoints'), gn('pierceTime'));
+    let eng = 0;
+    if (gn('engEnabled')){
+        const isRaster = document.getElementById('btnRaster').classList.contains('active');
+        eng = isRaster ? algoRasterEngTime(gn('engWidth'),gn('engHeight'),gn('engSpeed'),gn('engDPI'),gn('engFill'),gn('engLayers'))
+                       : algoVectorEngTime(gn('vecEngPath'),gn('vecEngSpeed'));
+    }
+    return { cutMin:cut, engMin:eng, baseW:gn('projW'), baseH:gn('projH') };
+}
+
+// Pełna wycena dla danej skali geometrii (s=1 → rozmiar bazowy) — ten sam model co calculate()
+function priceForScale(base, s){
+    const qty    = Math.max(1, gn('qty')||1);
+    const cutMin = base.cutMin * s;
+    const engMin = base.engMin * s * s;
+    const prep   = gn('prepTime') + gn('setupTime');
+    const prodMin = (cutMin + engMin) * qty + prep;
+    const th = prodMin/60;
+    const wmm = base.baseW*s, hmm = base.baseH*s;
+    const mat = algoMaterialCost(pricePerCm2(), wmm, hmm, qty);
+    const cMachine = th*gn('machineRate');
+    const cLabor   = th*gn('laborRate');
+    const cElec    = algoElecCost(prodMin, gn('systemPowerW'), gn('elecPrice'));
+    const costOwn  = mat.cost + cMachine + cLabor + cElec;
+    const marginPct = marginForSize(Math.max(wmm,hmm)/10), marginAmt = costOwn * (marginPct/100);
+    const afterMargin = costOwn + marginAmt;
+    const discPct = gn('discountRange'), discAmt = afterMargin * (discPct/100);
+    const afterDisc = afterMargin - discAmt;
+    const pack = packagingCost(Math.max(wmm,hmm)/10, qty);
+    const extra = gn('extraCost');
+    let net = afterDisc + extra + pack;
+    const isMin = net < gn('minCharge');
+    net = Math.max(net, gn('minCharge'));
+    const allegro = Math.min(89, gn('allegroPct'));
+    const price = allegro > 0 ? net/(1-allegro/100) : net;
+    const allegroAmt = price - net;
+    return { price, totalMin:prodMin, cutMin, engMin, prep, w:wmm, h:hmm, qty,
+             matCost:mat.cost, matArea:mat.areaCm2, cMachine, cLabor, cElec, costOwn,
+             marginPct, marginAmt, discPct, discAmt, extra, pack, net, isMin, allegro, allegroAmt };
+}
+
+let SIZE_EXPANDED = {};   // które rozmiary są rozwinięte (zachowane przy przeliczaniu)
+
+function buildSizeTable(){
+    const body = document.getElementById('sizeTableBody');
+    if (!body) return;
+    const base = getBaseGeometry();
+    const longestMM = Math.max(base.baseW, base.baseH);
+
+    if (longestMM <= 0){
+        body.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Podaj wymiary projektu (zakładka 📦 Materiał) lub wczytaj plik.</td></tr>';
+        return;
+    }
+    const baseCm = longestMM/10;
+    let rows = '';
+    for (let cm=5; cm<=75; cm+=5){
+        const s = (cm*10)/longestMM;
+        const q = priceForScale(base, s);
+        const wcm = (q.w/10), hcm = (q.h/10);
+        const isBase = Math.abs(cm - baseCm) < 2.5;
+        const open = !!SIZE_EXPANDED[cm];
+        rows +=
+            '<tr class="border-t border-slate-700/60 cursor-pointer hover:bg-slate-800/40 '+(isBase?'bg-orange-500/10':'')+'" onclick="toggleSizeDetail('+cm+')">'+
+            '<td class="p-2 font-semibold '+(isBase?'text-orange-400':'text-slate-300')+'">'+
+                '<i id="sizeChev'+cm+'" class="fas fa-chevron-'+(open?'down':'right')+' text-slate-600 mr-2"></i>'+cm+' cm'+(isBase?' ★':'')+'</td>'+
+            '<td class="p-2 text-slate-400">'+wcm.toFixed(1)+' × '+hcm.toFixed(1)+' cm</td>'+
+            '<td class="p-2 text-right text-slate-400">'+fmtTime(q.totalMin)+'</td>'+
+            '<td class="p-2 text-right font-bold text-white">'+fmtPLN(q.price)+'</td>'+
+            '</tr>'+
+            '<tr id="sizeDetail'+cm+'" class="'+(open?'':'hidden')+'"><td colspan="4" class="p-0">'+sizeDetailHTML(q, cm)+'</td></tr>';
+    }
+    body.innerHTML = rows;
+    setText('sizeTableBase', baseCm.toFixed(0)+' cm (dłuższy bok)');
+}
+
+// Rozkład składników dla danego rozmiaru (rozwijany wiersz)
+function sizeDetailHTML(q, cm){
+    const row = (label,val,cls)=> '<div class="flex justify-between py-0.5"><span class="text-slate-400">'+label+'</span><span class="'+(cls||'text-slate-200')+'">'+val+'</span></div>';
+    let h = '<div class="p-3 bg-slate-950/60 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0.5 text-xs">';
+    // lewa: czas + koszty własne
+    h += '<div>';
+    h += '<div class="text-orange-400 font-semibold mb-1">⏱ Czas (×'+q.qty+' szt.)</div>';
+    h += row('Cięcie / szt.', fmtTime(q.cutMin));
+    h += row('Grawer / szt.', fmtTime(q.engMin));
+    h += row('Przygotowanie', fmtTime(q.prep));
+    h += row('Łącznie', fmtTime(q.totalMin), 'text-white font-medium');
+    h += '<div class="text-orange-400 font-semibold mt-2 mb-1">💸 Koszty własne</div>';
+    h += row('Materiał ('+q.matArea.toFixed(0)+' cm²)', fmtPLN(q.matCost));
+    h += row('Maszynowy', fmtPLN(q.cMachine));
+    h += row('Robocizna', fmtPLN(q.cLabor));
+    h += row('Prąd', fmtPLN(q.cElec));
+    h += row('Koszt własny', fmtPLN(q.costOwn), 'text-white font-medium');
+    h += '</div>';
+    // prawa: wycena
+    h += '<div>';
+    h += '<div class="text-orange-400 font-semibold mb-1">🏷 Wycena</div>';
+    h += row('Marża ('+q.marginPct+'%)', '+'+fmtPLN(q.marginAmt), 'text-green-400');
+    h += row('Zniżka ('+q.discPct+'%)', '-'+fmtPLN(q.discAmt), 'text-red-400');
+    h += row('Dodatkowe koszta', fmtPLN(q.extra));
+    h += row('Pakowanie', fmtPLN(q.pack));
+    h += row('Twoja cena', fmtPLN(q.net), 'text-white font-medium');
+    if (q.allegro>0) h += row('Prowizja Allegro ('+q.allegro+'%)', '+'+fmtPLN(q.allegroAmt), 'text-red-400');
+    h += '<div class="flex justify-between py-1 mt-1 border-t border-slate-700"><span class="text-orange-300 font-semibold">'+(q.allegro>0?'Cena na Allegro':'Cena finalna')+'</span><span class="text-orange-400 font-extrabold text-sm">'+fmtPLN(q.price)+'</span></div>';
+    if (q.isMin) h += '<div class="text-amber-400 text-[11px]"><i class="fas fa-exclamation-triangle mr-1"></i>Zastosowano cenę minimalną</div>';
+    h += '<button onclick="event.stopPropagation(); copySizePrice('+cm+')" class="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white py-1.5 rounded text-xs font-medium"><i class="fas fa-copy mr-1"></i>Kopiuj cenę i zestawienie</button>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+}
+
+function toggleSizeDetail(cm){
+    SIZE_EXPANDED[cm] = !SIZE_EXPANDED[cm];
+    const d = document.getElementById('sizeDetail'+cm);
+    const c = document.getElementById('sizeChev'+cm);
+    if (d) d.classList.toggle('hidden', !SIZE_EXPANDED[cm]);
+    if (c) { c.classList.toggle('fa-chevron-down', SIZE_EXPANDED[cm]); c.classList.toggle('fa-chevron-right', !SIZE_EXPANDED[cm]); }
+}
+
+function copySizePrice(cm){
+    const base = getBaseGeometry();
+    const longest = Math.max(base.baseW, base.baseH);
+    if (longest <= 0) return;
+    const q = priceForScale(base, (cm*10)/longest);
+    const proj = gs('projName') || 'Projekt laserowy';
+    const L = [
+        '🔥 WYCENA — Xeomsc Laser Studio',
+        'Projekt: ' + proj,
+        'Rozmiar: ' + cm + ' cm (dłuższy bok)  ·  ' + (q.w/10).toFixed(1) + ' × ' + (q.h/10).toFixed(1) + ' cm  ·  ' + q.qty + ' szt.',
+        '',
+        'Czas (×'+q.qty+'): cięcie/szt '+fmtTime(q.cutMin)+', grawer/szt '+fmtTime(q.engMin)+', przyg. '+fmtTime(q.prep)+' = '+fmtTime(q.totalMin),
+        'Materiał: '+fmtPLN(q.matCost)+'  ·  Maszyna: '+fmtPLN(q.cMachine)+'  ·  Robocizna: '+fmtPLN(q.cLabor)+'  ·  Prąd: '+fmtPLN(q.cElec),
+        'Koszt własny: '+fmtPLN(q.costOwn),
+        'Marża ('+q.marginPct+'%): +'+fmtPLN(q.marginAmt)+'  ·  Zniżka ('+q.discPct+'%): -'+fmtPLN(q.discAmt),
+        'Dodatkowe: '+fmtPLN(q.extra)+'  ·  Pakowanie: '+fmtPLN(q.pack),
+        'Twoja cena: '+fmtPLN(q.net) + (q.allegro>0 ? ('  ·  Allegro '+q.allegro+'%: +'+fmtPLN(q.allegroAmt)) : ''),
+        '═══════════════════════════════',
+        (q.allegro>0?'CENA NA ALLEGRO: ':'CENA FINALNA: ') + fmtPLN(q.price),
+    ];
+    copyTextToClipboard(L.join('\n'), 'Skopiowano cenę i zestawienie ('+cm+' cm) ✓');
+}
+
+function copyTextToClipboard(text, msg){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(()=>showToast(msg)).catch(()=>fallbackCopy(text,msg));
+    } else { fallbackCopy(text,msg); }
+}
+function fallbackCopy(text,msg){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta);
+    showToast(msg);
+}
+
+// ═══════════════════════════════════════════
+//  PRESET CIĘCIA
+// ═══════════════════════════════════════════
+function updateCuttingPreset() {
+    const pwRaw = gs('laserPowerCut') || 'd48';
+    const th    = parseInt(gs('plywoodThickness')) || 4;
+    const isDiode = pwRaw.startsWith('d');
+
+    // Pokaż / ukryj baner diodowy
+    const banner = document.getElementById('diodeBanner');
+    if (banner) banner.classList.toggle('hidden', !isDiode);
+
+    // Klucz do tabeli
+    const key = isDiode ? pwRaw : (parseInt(pwRaw) || 100);
+    const table = CUT_PRESETS[key] || {};
+    const exact = !!table[th];
+    const preset = getPreset(table, th);
+
+    document.getElementById('presetWarning').classList.add('hidden');
+
+    const labelPower = isDiode ? pwRaw.replace('d','') + 'W diodowy' : key + 'W CO₂';
+
+    if (!preset) {
+        setText('presetLabel', labelPower + ' / ' + th + 'mm');
+        document.getElementById('presetWarning').classList.remove('hidden');
+        window._preset = null;
+        return;
+    }
+    const [speed, passes, powerPct] = preset;
+    const speedPerSec = (speed / 60).toFixed(1);
+    const interpNote = exact ? '' : ' (interpolowane)';
+    setText('presetLabel',    labelPower + ' / ' + th + 'mm sklejka');
+    setText('presetSpeed',    speed + ' mm/min  (' + speedPerSec + ' mm/s)' + interpNote);
+    setText('presetPasses',   passes + '×');
+    setText('presetPowerPct', powerPct + '%' + (isDiode ? ' (maks)' : ''));
+    window._preset = { speed, passes };
+}
+
+// Pobierz preset dla grubości; jeśli brak dokładnej — interpoluj liniowo między sąsiadami
+function getPreset(table, th) {
+    if (!table) return null;
+    if (table[th]) return table[th];
+    const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
+    if (!keys.length) return null;
+    if (th <= keys[0]) return table[keys[0]];
+    if (th >= keys[keys.length-1]) return table[keys[keys.length-1]];
+    let lo = keys[0], hi = keys[keys.length-1];
+    for (let i=0; i<keys.length-1; i++){ if (keys[i] <= th && keys[i+1] >= th){ lo=keys[i]; hi=keys[i+1]; break; } }
+    const a = table[lo], b = table[hi], t = (th-lo)/(hi-lo);
+    return [ Math.round(a[0] + (b[0]-a[0])*t), Math.max(a[1], b[1]), Math.round(a[2] + (b[2]-a[2])*t) ];
+}
+
+function applyPreset() {
+    if (!window._preset) return;
+    document.getElementById('cuttingSpeed').value = window._preset.speed;
+    document.getElementById('passesRange').value  = window._preset.passes;
+    setText('passesDisplay', window._preset.passes + '×');
+    calculate();
+    showToast('Preset zastosowany ✓');
+}
+
+// ═══════════════════════════════════════════
+//  DPI INFO
+// ═══════════════════════════════════════════
+function updateDPIInfo() {
+    const dpi  = gn('engDPI');
+    const H    = gn('engHeight');
+    if (dpi <= 0) return;
+    const ls   = (25.4 / dpi);
+    const lines = Math.ceil(H / ls);
+    setText('lineSpacingInfo', ls.toFixed(3) + ' mm');
+    setText('numLinesInfo', lines.toLocaleString('pl-PL') + ' linii');
+}
+
+// ═══════════════════════════════════════════
+//  POZOSTAŁE HELPERY UI
+// ═══════════════════════════════════════════
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const el = document.getElementById('tab-' + name);
+    if (el) el.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'podglad3d') v3dOpen();   // leniwa inicjalizacja + budowa modelu 3D
+}
+
+function setEngType(type) {
+    const isRaster = type === 'raster';
+    document.getElementById('btnRaster').classList.toggle('active', isRaster);
+    document.getElementById('btnVector').classList.toggle('active', !isRaster);
+    document.getElementById('rasterPanel').classList.toggle('hidden', !isRaster);
+    document.getElementById('vectorPanel').classList.toggle('hidden', isRaster);
+    calculate();
+}
+
+
+function loadQuickProject(key) {
+    const p = QUICK_PROJECTS[key];
+    if (!p) return;
+    const [path, pierce, engW, engH, name] = p;
+    document.getElementById('pathLength').value     = path;
+    document.getElementById('pathLengthUnit').value = '1';
+    document.getElementById('piercePoints').value   = pierce;
+    if (engW > 0) {
+        document.getElementById('engEnabled').checked = true;
+        document.getElementById('engWidth').value  = engW;
+        document.getElementById('engHeight').value = engH;
+    } else {
+        document.getElementById('engEnabled').checked = false;
+    }
+    calculate();
+    showToast('Załadowano: ' + name);
+}
+
+
+function recalcMachineRate() {
+    const val   = gn('machineValue');
+    const years = gn('deprYears');
+    const hours = gn('annualHours');
+    if (years <= 0 || hours <= 0) return;
+    const rate = val / years / hours;
+    window._calcRate = rate;
+    const el = document.getElementById('calcRateDisp');
+    if (el) el.textContent = rate.toFixed(2) + ' PLN/h';
+}
+
+function applyMachineRate() {
+    if (window._calcRate == null) recalcMachineRate();
+    if (window._calcRate == null) return;
+    document.getElementById('machineRate').value = window._calcRate.toFixed(2);
+    calculate();
+    showToast('Stawka maszynowa zaktualizowana ✓');
+}
+
+function resetAll() {
+    if (!confirm('Zresetować wszystkie wartości do domyślnych? Usunie też zapamiętane ustawienia.')) return;
+    try { localStorage.removeItem(SETTINGS_KEY); } catch(e) {}
+    location.reload();
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    const txt = document.getElementById('toastTxt');
+    if (!t || !txt) return;
+    txt.textContent = msg;
+    t.style.transform = 'translateY(0)';
+    t.style.opacity   = '1';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => {
+        t.style.transform = 'translateY(24px)';
+        t.style.opacity   = '0';
+    }, 2800);
+}
+
+// ═══════════════════════════════════════════
+//  KOPIOWANIE WYCENY
+// ═══════════════════════════════════════════
+function copyQuote() {
+    const proj  = gs('projName')   || 'Projekt laserowy';
+    const klient = gs('clientName') || '—';
+    const note  = gs('quoteNote');
+
+    const lines = [
+        '🔥 WYCENA LASEROWA — Xeomsc Laser Studio',
+        '═══════════════════════════════════════',
+        '📋 Projekt : ' + proj,
+        '👤 Klient  : ' + klient,
+        '📅 Data    : ' + new Date().toLocaleDateString('pl-PL'),
+        '',
+        '⏱  CZAS REALIZACJI',
+        '   Cięcie lasera   : ' + document.getElementById('r_cut').textContent,
+        '   Grawerowanie    : ' + document.getElementById('r_eng').textContent,
+        '   Przygotowanie   : ' + document.getElementById('r_prep').textContent,
+        '   ─────────────────────────────────────',
+        '   ŁĄCZNIE         : ' + document.getElementById('r_total_time').textContent,
+        '',
+        '💸 KOSZTY WŁASNE',
+        '   Materiał        : ' + document.getElementById('r_mat').textContent,
+        '   Praca maszyny   : ' + document.getElementById('r_machine').textContent,
+        '   Robocizna       : ' + document.getElementById('r_labor').textContent,
+        '   Energia         : ' + document.getElementById('r_elec').textContent,
+        '   ─────────────────────────────────────',
+        '   Koszt własny    : ' + document.getElementById('r_own_cost').textContent,
+        '',
+        '🏷  WYCENA',
+        '   Marża ('+document.getElementById('r_margin_pct').textContent+'%)   : ' + document.getElementById('r_margin_amt').textContent,
+        '   Zniżka ('+document.getElementById('r_discount_pct').textContent+'%)  : ' + document.getElementById('r_discount_amt').textContent,
+        '   Dodatkowe koszta: ' + document.getElementById('r_extra').textContent,
+        '   Pakowanie       : ' + document.getElementById('r_pack').textContent,
+        '   ─────────────────────────────────────',
+        '   Twoja cena      : ' + document.getElementById('r_net').textContent,
+        '   Prowizja Allegro('+document.getElementById('r_allegro_pct').textContent+'%): ' + document.getElementById('r_allegro_amt').textContent,
+        '',
+        '═══════════════════════════════════════',
+        '💰 ' + document.getElementById('r_finalLabel').textContent.toUpperCase() + ' : ' + document.getElementById('r_final').textContent,
+        '   ' + document.getElementById('r_perPiece').textContent,
+        '═══════════════════════════════════════',
+        note ? ('📌 ' + note) : '',
+        '',
+        'Xeomsc Laser Studio | Wyroby z drewna i sklejki',
+        'Wycena orientacyjna — ostateczna po zatwierdzeniu projektu.',
+    ].filter(l => l !== undefined);
+
+    const text = lines.join('\n');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast('Wycena skopiowana do schowka ✓'));
+    } else {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Wycena skopiowana ✓');
+    }
+}
+
+// ═══════════════════════════════════════════
+//  DRUKOWANIE / PDF
+// ═══════════════════════════════════════════
+function printQuote() {
+    const proj    = gs('projName')   || 'Projekt laserowy';
+    const klient  = gs('clientName') || '—';
+    const note    = gs('quoteNote');
+    const date    = new Date().toLocaleDateString('pl-PL');
+    const final_  = document.getElementById('r_final').textContent;
+
+    const html = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8">
+    <title>Wycena — ${proj}</title>
+    <style>
+        body{font-family:Arial,sans-serif;max-width:640px;margin:40px auto;color:#222;font-size:14px;}
+        h1{color:#ea580c;border-bottom:3px solid #ea580c;padding-bottom:8px;margin-bottom:4px;font-size:22px;}
+        .sub{font-size:13px;color:#888;margin-bottom:20px;}
+        .meta{display:flex;gap:24px;color:#555;font-size:13px;margin-bottom:20px;flex-wrap:wrap;}
+        .meta strong{color:#333;}
+        table{width:100%;border-collapse:collapse;margin:12px 0;}
+        td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+        td:last-child{text-align:right;font-weight:500;white-space:nowrap;}
+        .sec td{background:#fff7ed;font-weight:700;color:#ea580c;padding:5px 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;}
+        .total td{font-weight:700;background:#fafafa;}
+        .final{background:linear-gradient(135deg,#fff7ed,#fde8d3);border:2px solid #ea580c;border-radius:10px;padding:20px;text-align:right;margin:20px 0;}
+        .final .lbl{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.07em;}
+        .final .price{font-size:32px;font-weight:900;color:#ea580c;margin-top:4px;}
+        .note{background:#f8f8f8;border-left:3px solid #ea580c;padding:8px 14px;font-size:13px;color:#555;margin:12px 0;border-radius:0 6px 6px 0;}
+        .footer{margin-top:40px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:14px;}
+    </style></head><body>
+    <h1>🔥 Wycena Laserowa</h1>
+    <div class="sub">Xeomsc Laser Studio — wyroby z drewna i sklejki</div>
+    <div class="meta">
+        <span><strong>Projekt:</strong> ${proj}</span>
+        <span><strong>Klient:</strong> ${klient}</span>
+        <span><strong>Data:</strong> ${date}</span>
+    </div>
+    <table>
+        <tr class="sec"><td colspan="2">⏱ Czas realizacji</td></tr>
+        <tr><td>Cięcie lasera</td><td>${document.getElementById('r_cut').textContent}</td></tr>
+        <tr><td>Grawerowanie</td><td>${document.getElementById('r_eng').textContent}</td></tr>
+        <tr><td>Przygotowanie i ustawianie</td><td>${document.getElementById('r_prep').textContent}</td></tr>
+        <tr class="total"><td>ŁĄCZNIE</td><td>${document.getElementById('r_total_time').textContent}</td></tr>
+
+        <tr class="sec"><td colspan="2">💸 Koszty własne</td></tr>
+        <tr><td>Materiał (sklejka)</td><td>${document.getElementById('r_mat').textContent}</td></tr>
+        <tr><td>Praca maszyny</td><td>${document.getElementById('r_machine').textContent}</td></tr>
+        <tr><td>Robocizna</td><td>${document.getElementById('r_labor').textContent}</td></tr>
+        <tr><td>Energia elektryczna</td><td>${document.getElementById('r_elec').textContent}</td></tr>
+        <tr class="total"><td>Koszt własny</td><td>${document.getElementById('r_own_cost').textContent}</td></tr>
+
+        <tr class="sec"><td colspan="2">🏷 Wycena</td></tr>
+        <tr><td>Koszt własny</td><td>${document.getElementById('r_own_cost').textContent}</td></tr>
+        <tr><td>Marża (${document.getElementById('r_margin_pct').textContent}%)</td><td>${document.getElementById('r_margin_amt').textContent}</td></tr>
+        <tr><td>Zniżka (${document.getElementById('r_discount_pct').textContent}%)</td><td>${document.getElementById('r_discount_amt').textContent}</td></tr>
+        <tr><td>Dodatkowe koszta</td><td>${document.getElementById('r_extra').textContent}</td></tr>
+        <tr><td>Pakowanie</td><td>${document.getElementById('r_pack').textContent}</td></tr>
+        <tr class="total"><td>Twoja cena</td><td>${document.getElementById('r_net').textContent}</td></tr>
+        <tr><td>Prowizja Allegro (${document.getElementById('r_allegro_pct').textContent}%)</td><td>${document.getElementById('r_allegro_amt').textContent}</td></tr>
+    </table>
+    <div class="final">
+        <div class="lbl">${document.getElementById('r_finalLabel').textContent}</div>
+        <div class="price">${final_}</div>
+        <div style="font-size:13px;color:#888;margin-top:4px;">${document.getElementById('r_perPiece').textContent}</div>
+    </div>
+    ${note ? '<div class="note">📌 ' + note + '</div>' : ''}
+    <div class="footer">
+        Wycena wygenerowana przez Kalkulator Laserowy Xeomsc Laser Studio — ${new Date().toLocaleString('pl-PL')}<br>
+        Ceny mają charakter orientacyjny. Ostateczna cena po zatwierdzeniu projektu graficznego.<br>
+        Xeomsc Laser Studio | wyroby z drewna i sklejki metodą cięcia i grawerowania laserowego.
+    </div>
+    </body></html>`;
+
+    const w = window.open('', '_blank', 'width=720,height=900');
+    if (!w) { showToast('Odblokuj pop-upy w przeglądarce!'); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 400);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ███  MODUŁ IMPORTU PLIKÓW  ███
+//  Parsery: LightBurn (.lbrn2/.lbrn), SVG, DXF
+//  Wynik → globalny obiekt IMPORT { active, layers[], cutTime, engTime, bbox }
+// ═══════════════════════════════════════════════════════════════
+let IMPORT = { active:false, layers:[], cutTime:0, engTime:0, bbox:null, fileName:'', shapeCount:0, render:null, scale:1 };
+
+// ── Macierz afiniczna 2D [a,b,c,d,e,f] → punkt (x,y): (a*x+c*y+e, b*x+d*y+f) ──
+function matIdentity(){ return [1,0,0,1,0,0]; }
+function matMul(P, C){
+    // wynik = P ∘ C  (najpierw C, potem P)
+    return [
+        P[0]*C[0] + P[2]*C[1],          // a
+        P[1]*C[0] + P[3]*C[1],          // b
+        P[0]*C[2] + P[2]*C[3],          // c
+        P[1]*C[2] + P[3]*C[3],          // d
+        P[0]*C[4] + P[2]*C[5] + P[4],   // e
+        P[1]*C[4] + P[3]*C[5] + P[5]    // f
+    ];
+}
+function matApply(M, x, y){ return [ M[0]*x + M[2]*y + M[4], M[1]*x + M[3]*y + M[5] ]; }
+function parseXForm(str){
+    if(!str) return matIdentity();
+    const n = str.trim().split(/\s+/).map(parseFloat);
+    return (n.length===6 && n.every(v=>!isNaN(v))) ? n : matIdentity();
+}
+
+// ── Długość odcinka po transformacji ──
+function distW(M, x1,y1, x2,y2){
+    const a = matApply(M,x1,y1), b = matApply(M,x2,y2);
+    return Math.hypot(b[0]-a[0], b[1]-a[1]);
+}
+// ── Długość krzywej Béziera sześciennej (próbkowanie) ──
+function bezierLenW(M, p0, p1, p2, p3, steps){
+    steps = steps || 18;
+    let len=0, prev=matApply(M, p0[0], p0[1]);
+    for(let i=1;i<=steps;i++){
+        const t=i/steps, mt=1-t;
+        const x = mt*mt*mt*p0[0] + 3*mt*mt*t*p1[0] + 3*mt*t*t*p2[0] + t*t*t*p3[0];
+        const y = mt*mt*mt*p0[1] + 3*mt*mt*t*p1[1] + 3*mt*t*t*p2[1] + t*t*t*p3[1];
+        const cur = matApply(M, x, y);
+        len += Math.hypot(cur[0]-prev[0], cur[1]-prev[1]);
+        prev = cur;
+    }
+    return len;
+}
+
+// ── Parsowanie VertList LightBurn ──
+// Format: V<x> <y>[c0x<cx>c0y<cy>][c1x<cx>c1y<cy>]  (brak uchwytu = "c0x1" bez c0y)
+function parseVertList(str){
+    const verts=[];
+    if(!str) return verts;
+    const chunks = str.split('V').filter(s=>s.length>0);
+    for(const ch of chunks){
+        const pos = ch.match(/^(-?[\d.]+)\s+(-?[\d.]+)/);
+        if(!pos) continue;
+        const v = { x:parseFloat(pos[1]), y:parseFloat(pos[2]), h0:null, h1:null };
+        const m0 = ch.match(/c0x(-?[\d.]+)c0y(-?[\d.]+)/);
+        const m1 = ch.match(/c1x(-?[\d.]+)c1y(-?[\d.]+)/);
+        if(m0) v.h0=[parseFloat(m0[1]), parseFloat(m0[2])];
+        if(m1) v.h1=[parseFloat(m1[1]), parseFloat(m1[2])];
+        verts.push(v);
+    }
+    return verts;
+}
+
+// ── Długość ścieżki Path (VertList + PrimList) w przestrzeni świata ──
+function pathLengthW(M, verts, prim){
+    if(verts.length<2) return 0;
+    let len=0;
+    const seg = (a,b)=>{
+        const va=verts[a], vb=verts[b];
+        if(!va||!vb) return 0;
+        return distW(M, va.x,va.y, vb.x,vb.y);
+    };
+    const bez = (a,b)=>{
+        const va=verts[a], vb=verts[b];
+        if(!va||!vb) return 0;
+        const p0=[va.x,va.y];
+        const p1= va.h0 ? va.h0 : [va.x,va.y];   // c0 = uchwyt WYJŚCIOWY wierzchołka a
+        const p2= vb.h1 ? vb.h1 : [vb.x,vb.y];   // c1 = uchwyt WEJŚCIOWY wierzchołka b
+        const p3=[vb.x,vb.y];
+        return bezierLenW(M, p0,p1,p2,p3);
+    };
+    const p = (prim||'').trim();
+    if(p==='LineClosed' || p==='Line' || p===''){
+        for(let i=0;i<verts.length-1;i++) len+=seg(i,i+1);
+        if(p!=='Line') len+=seg(verts.length-1,0); // zamknięcie
+        return len;
+    }
+    // Jawna lista: B0 1L1 2...
+    const re=/([BL])(\d+)\s+(\d+)/g; let mm;
+    while((mm=re.exec(p))!==null){
+        const a=+mm[2], b=+mm[3];
+        len += (mm[1]==='B') ? bez(a,b) : seg(a,b);
+    }
+    return len;
+}
+
+// ── Obwód prostokąta (z zaokrągleniem narożników) po transformacji ──
+function rectLengthW(M, W, H, Cr){
+    Cr = Cr||0;
+    // przeskaluj wymiary przez średnią skalę macierzy
+    const sx=Math.hypot(M[0],M[1]), sy=Math.hypot(M[2],M[3]);
+    const w=W*sx, h=H*sy, r=Cr*((sx+sy)/2);
+    if(r<=0) return 2*(w+h);
+    return 2*((w-2*r)+(h-2*r)) + 2*Math.PI*r;
+}
+// ── Obwód elipsy (Ramanujan) po transformacji ──
+function ellipseLengthW(M, Rx, Ry){
+    const sx=Math.hypot(M[0],M[1]), sy=Math.hypot(M[2],M[3]);
+    const a=Rx*sx, b=Ry*sy;
+    return Math.PI*(3*(a+b) - Math.sqrt((3*a+b)*(a+3*b)));
+}
+
+// ── BBox aktualizacja ──
+function bboxExpand(bb, x, y){
+    if(bb.minX>x)bb.minX=x; if(bb.maxX<x)bb.maxX=x;
+    if(bb.minY>y)bb.minY=y; if(bb.maxY<y)bb.maxY=y;
+}
+function shapeBBoxW(bb, M, type, attrs, verts){
+    const push=(lx,ly)=>{ const p=matApply(M,lx,ly); bboxExpand(bb,p[0],p[1]); };
+    if(type==='Rect' || type==='Bitmap'){
+        const w=attrs.W||0, h=attrs.H||0;
+        push(-w/2,-h/2); push(w/2,-h/2); push(w/2,h/2); push(-w/2,h/2);
+    } else if(type==='Ellipse'){
+        const rx=attrs.Rx||0, ry=attrs.Ry||0;
+        push(-rx,-ry); push(rx,-ry); push(rx,ry); push(-rx,ry);
+    } else if(verts){
+        for(const v of verts){ push(v.x,v.y); }
+    }
+}
+
+// ═══════════════════════════════════════════
+//  PARSER LIGHTBURN (.lbrn2 / .lbrn)
+// ═══════════════════════════════════════════
+// ── Buduj polilinie kształtu w przestrzeni świata (do podglądu + bbox) ──
+function buildSubpaths(M, type, attrs, verts, prim){
+    const ap=(x,y)=>matApply(M,x,y);
+    const subs=[];
+    if(type==='Rect' || type==='Bitmap' || type==='Image'){
+        const w=attrs.W||0, h=attrs.H||0;
+        if(w>0&&h>0) subs.push([ap(-w/2,-h/2),ap(w/2,-h/2),ap(w/2,h/2),ap(-w/2,h/2),ap(-w/2,-h/2)]);
+    } else if(type==='Ellipse'){
+        const rx=attrs.Rx||0, ry=attrs.Ry||0, N=48, pts=[];
+        if(rx>0&&ry>0){ for(let i=0;i<=N;i++){ const t=i/N*2*Math.PI; pts.push(ap(rx*Math.cos(t),ry*Math.sin(t))); } subs.push(pts); }
+    } else if(verts && verts.length){
+        const p=(prim||'').trim();
+        const bez=(va,vb)=>{
+            const p0=[va.x,va.y],p1=va.h0||[va.x,va.y],p2=vb.h1||[vb.x,vb.y],p3=[vb.x,vb.y],out=[],S=28;
+            for(let i=1;i<=S;i++){ const t=i/S,mt=1-t;
+                out.push(ap(mt*mt*mt*p0[0]+3*mt*mt*t*p1[0]+3*mt*t*t*p2[0]+t*t*t*p3[0],
+                            mt*mt*mt*p0[1]+3*mt*mt*t*p1[1]+3*mt*t*t*p2[1]+t*t*t*p3[1])); }
+            return out;
+        };
+        if(p===''||p==='Line'||p==='LineClosed'){
+            const pts=verts.map(v=>ap(v.x,v.y));
+            if(p!=='Line' && verts.length>1) pts.push(ap(verts[0].x,verts[0].y));
+            subs.push(pts);
+        } else {
+            const re=/([BL])(\d+)\s+(\d+)/g; let m, cur=null, last=-1;
+            while((m=re.exec(p))!==null){
+                const a=+m[2], b=+m[3], va=verts[a], vb=verts[b];
+                if(!va||!vb) continue;
+                if(cur===null || a!==last){ if(cur&&cur.length>1) subs.push(cur); cur=[ap(va.x,va.y)]; }
+                if(m[1]==='B') cur.push(...bez(va,vb)); else cur.push(ap(vb.x,vb.y));
+                last=b;
+            }
+            if(cur&&cur.length>1) subs.push(cur);
+        }
+    }
+    return subs;
+}
+
+function parseLBRN(xmlString){
+    const doc = new DOMParser().parseFromString(xmlString, 'application/xml');
+    if(doc.querySelector('parsererror')) throw new Error('Nieprawidłowy plik XML LightBurn');
+
+    // 1) Warstwy (CutSetting)
+    const layers = {}; // index → obiekt
+    doc.querySelectorAll('CutSetting, CutSetting_Img').forEach(cs=>{
+        const type = cs.getAttribute('type') || 'Cut';
+        const gv = (tag)=>{ const e=cs.querySelector(tag); return e ? e.getAttribute('Value') : null; };
+        const idx = parseInt(gv('index')) || 0;
+        layers[idx] = {
+            index: idx,
+            type: type,
+            name: gv('name') || ('C'+idx),
+            power: parseFloat(gv('maxPower')) || 0,
+            minPower: parseFloat(gv('minPower')) || 0,
+            speed: parseFloat(gv('speed')) || 0,   // mm/sec (GRBL)
+            passes: parseInt(gv('numPasses')) || 1,
+            length: 0,      // mm (cięcie/wektor)
+            bbox: { minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9 },
+            hasArea: false,
+            shapes: 0
+        };
+    });
+
+    const globalBB = { minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9 };
+    let shapeCount = 0, textWarning=false;
+    const renderShapes = [];
+
+    // 1b) PRE-PASS: rejestr współdzielonej geometrii po VertID.
+    //     Kopie elementów (np. dwa serca) odwołują się do tej samej listy przez VertID — bez własnych punktów!
+    const geomById = {};
+    doc.querySelectorAll('Shape').forEach(sh=>{
+        const t=sh.getAttribute('Type');
+        if(t!=='Path' && t!=='Line') return;
+        const vid=sh.getAttribute('VertID');
+        const vl=sh.querySelector(':scope > VertList');
+        if(vid!==null && vl){
+            const pl=sh.querySelector(':scope > PrimList');
+            geomById[vid]={ verts:parseVertList(vl.textContent), prim: pl?pl.textContent:'' };
+        }
+    });
+
+    const expandBB=(bb,pts)=>{ for(const p of pts){ if(bb.minX>p[0])bb.minX=p[0]; if(bb.maxX<p[0])bb.maxX=p[0]; if(bb.minY>p[1])bb.minY=p[1]; if(bb.maxY<p[1])bb.maxY=p[1]; } };
+
+    // 2) Rekurencyjny obchód kształtów z transformacją (zagnieżdżone grupy)
+    function walk(el, parentM){
+        for(const shape of Array.from(el.children)){
+            if(shape.tagName!=='Shape') continue;
+            const type = shape.getAttribute('Type');
+            const xf = shape.querySelector(':scope > XForm');
+            const localM = parseXForm(xf ? xf.textContent : null);
+            const M = matMul(parentM, localM);
+
+            if(type==='Group'){
+                const children = shape.querySelector(':scope > Children');
+                if(children) walk(children, M);
+                continue;
+            }
+
+            const ci = parseInt(shape.getAttribute('CutIndex'));
+            const layer = layers[isNaN(ci)?0:ci] || layers[0];
+            if(!layer) continue;
+
+            let attrs={}, verts=null, prim='';
+            if(type==='Rect'){
+                attrs.W=parseFloat(shape.getAttribute('W'))||0;
+                attrs.H=parseFloat(shape.getAttribute('H'))||0;
+                attrs.Cr=parseFloat(shape.getAttribute('Cr'))||0;
+                layer.length += rectLengthW(M, attrs.W, attrs.H, attrs.Cr);
+            } else if(type==='Ellipse'){
+                attrs.Rx=parseFloat(shape.getAttribute('Rx'))||0;
+                attrs.Ry=parseFloat(shape.getAttribute('Ry'))||0;
+                layer.length += ellipseLengthW(M, attrs.Rx, attrs.Ry);
+            } else if(type==='Path' || type==='Line'){
+                const vl=shape.querySelector(':scope > VertList');
+                const pl=shape.querySelector(':scope > PrimList');
+                if(vl){ verts=parseVertList(vl.textContent); prim=pl?pl.textContent:''; }
+                else {                       // ← REFERENCJA: pobierz geometrię z rejestru po VertID
+                    const g=geomById[shape.getAttribute('VertID')];
+                    if(g){ verts=g.verts; prim=g.prim; } else verts=[];
+                }
+                if(type==='Line' && !prim) prim='Line';
+                layer.length += pathLengthW(M, verts, prim);
+            } else if(type==='Bitmap' || type==='Image'){
+                attrs.W=parseFloat(shape.getAttribute('W'))||0;
+                attrs.H=parseFloat(shape.getAttribute('H'))||0;
+                layer.hasArea=true;
+            } else if(type==='Text'){
+                textWarning=true;
+            }
+
+            shapeCount++; layer.shapes++;
+
+            // geometria do podglądu + bbox z rzeczywistych punktów (obejmuje WSZYSTKIE kopie)
+            const subs = buildSubpaths(M, type, attrs, verts, prim);
+            const isEng = (layer.type==='Scan'||layer.type==='Fill'||layer.type==='Image'||layer.hasArea);
+            for(const s of subs){ expandBB(layer.bbox, s); expandBB(globalBB, s); }
+            if(subs.length) renderShapes.push({ subs, isEng });
+        }
+    }
+    walk(doc.querySelector('LightBurnProject') || doc, matIdentity());
+
+    const list = Object.values(layers).filter(l=>l.shapes>0).sort((a,b)=>a.index-b.index);
+    const bbox = globalBB.maxX>globalBB.minX ? globalBB : null;
+    return {
+        format:'LightBurn',
+        layers:list,
+        bbox,
+        shapeCount,
+        textWarning,
+        render:{ shapes:renderShapes, bbox }
+    };
+}
+
+// ═══════════════════════════════════════════
+//  PARSER SVG  (używa natywnego getTotalLength przeglądarki)
+// ═══════════════════════════════════════════
+function parseSVG(text){
+    const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    if(!svg) throw new Error('Brak elementu <svg> w pliku');
+
+    // Skala jednostek → mm
+    let unitScale = 25.4/96; // domyślnie px (96 DPI) → mm
+    const wAttr = svg.getAttribute('width');
+    const vb = (svg.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(parseFloat);
+    if(wAttr && vb.length===4 && vb[2]>0){
+        const m = wAttr.match(/^([\d.]+)\s*(mm|cm|in|px)?$/);
+        if(m){
+            let wmm = parseFloat(m[1]);
+            const u=m[2]||'px';
+            if(u==='cm') wmm*=10; else if(u==='in') wmm*=25.4; else if(u==='px') wmm*=25.4/96;
+            unitScale = wmm / vb[2]; // mm na jednostkę użytkownika
+        }
+    }
+
+    // Wstaw SVG do DOM (ukryty) by użyć getTotalLength()
+    const holder=document.createElement('div');
+    holder.style.cssText='position:absolute;width:0;height:0;overflow:hidden;opacity:0;';
+    holder.appendChild(svg);
+    document.body.appendChild(holder);
+
+    let totalLen=0, shapeCount=0;
+    const bb={ minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9 };  // w mm (Y odwrócone na "do góry")
+    const renderShapes=[];
+    try{
+        const els=svg.querySelectorAll('path,line,polyline,polygon,circle,ellipse,rect');
+        els.forEach(el=>{
+            try{
+                if(typeof el.getTotalLength!=='function') return;
+                const L=el.getTotalLength();
+                if(L<=0) return;
+                totalLen+=L; shapeCount++;
+                // próbkuj punkty do podglądu (mm, Y w górę)
+                if(typeof el.getPointAtLength==='function'){
+                    const N=Math.max(2, Math.min(160, Math.round(L/2)));
+                    const pts=[];
+                    for(let i=0;i<=N;i++){ const p=el.getPointAtLength(L*i/N);
+                        const x=p.x*unitScale, y=-p.y*unitScale;
+                        pts.push([x,y]); if(bb.minX>x)bb.minX=x; if(bb.maxX<x)bb.maxX=x; if(bb.minY>y)bb.minY=y; if(bb.maxY<y)bb.maxY=y;
+                    }
+                    renderShapes.push({subs:[pts], isEng:false});
+                }
+            }catch(e){}
+        });
+    } finally {
+        document.body.removeChild(holder);
+    }
+
+    const lenMM = totalLen*unitScale;
+    const bbox = bb.maxX>bb.minX ? bb : null;
+    const layer = {
+        index:0, type:'Cut', name:'SVG (geometria)',
+        power:0, minPower:0, speed:0, passes:1,
+        length:lenMM, bbox: bbox||{minX:0,minY:0,maxX:0,maxY:0}, hasArea:false, shapes:shapeCount
+    };
+    return {
+        format:'SVG',
+        layers:[layer],
+        bbox,
+        shapeCount,
+        unitScale,
+        textWarning:false,
+        render:{ shapes:renderShapes, bbox }
+    };
+}
+
+// ═══════════════════════════════════════════
+//  PARSER DXF  (ASCII — LINE, LWPOLYLINE, CIRCLE, ARC, POLYLINE)
+// ═══════════════════════════════════════════
+function parseDXF(text){
+    const lines = text.split(/\r\n|\r|\n/);
+    // pary (kod, wartość)
+    const pairs=[];
+    for(let i=0;i+1<lines.length;i+=2){
+        pairs.push([parseInt(lines[i].trim()), lines[i+1].trim()]);
+    }
+    let totalLen=0, shapeCount=0;
+    const bb={ minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9 };
+    const renderShapes=[];
+    let i=0;
+    function findEntities(){
+        for(;i<pairs.length;i++){ if(pairs[i][0]===2 && pairs[i][1]==='ENTITIES'){ i++; return true; } }
+        return false;
+    }
+    if(!findEntities()) i=0; // brak sekcji — przeszukaj całość
+
+    let cur=null, verts=[];
+    const flush=()=>{
+        if(!cur) return;
+        if(cur.type==='LINE'){
+            totalLen+=Math.hypot((cur.x2-cur.x1),(cur.y2-cur.y1)); shapeCount++;
+            bboxExpand(bb,cur.x1,cur.y1); bboxExpand(bb,cur.x2,cur.y2);
+            renderShapes.push({subs:[[[cur.x1,cur.y1],[cur.x2,cur.y2]]], isEng:false});
+        } else if(cur.type==='CIRCLE'){
+            totalLen+=2*Math.PI*(cur.r||0); shapeCount++;
+            bboxExpand(bb,cur.cx-cur.r,cur.cy-cur.r); bboxExpand(bb,cur.cx+cur.r,cur.cy+cur.r);
+            const pts=[]; for(let a=0;a<=48;a++){const t=a/48*2*Math.PI; pts.push([cur.cx+cur.r*Math.cos(t),cur.cy+cur.r*Math.sin(t)]);}
+            renderShapes.push({subs:[pts], isEng:false});
+        } else if(cur.type==='ARC'){
+            let sweep=((cur.a2-cur.a1)%360+360)%360;
+            totalLen+=2*Math.PI*(cur.r||0)*(sweep/360); shapeCount++;
+            bboxExpand(bb,cur.cx-cur.r,cur.cy-cur.r); bboxExpand(bb,cur.cx+cur.r,cur.cy+cur.r);
+            const pts=[],N=Math.max(2,Math.round(sweep/5)); for(let a=0;a<=N;a++){const t=(cur.a1+sweep*a/N)*Math.PI/180; pts.push([cur.cx+cur.r*Math.cos(t),cur.cy+cur.r*Math.sin(t)]);}
+            renderShapes.push({subs:[pts], isEng:false});
+        } else if((cur.type==='LWPOLYLINE'||cur.type==='POLYLINE') && verts.length>1){
+            for(let k=0;k<verts.length-1;k++) totalLen+=Math.hypot(verts[k+1][0]-verts[k][0],verts[k+1][1]-verts[k][1]);
+            if(cur.closed) totalLen+=Math.hypot(verts[0][0]-verts[verts.length-1][0],verts[0][1]-verts[verts.length-1][1]);
+            verts.forEach(v=>bboxExpand(bb,v[0],v[1]));
+            const pts=verts.slice(); if(cur.closed) pts.push(verts[0]);
+            renderShapes.push({subs:[pts], isEng:false});
+            shapeCount++;
+        }
+        cur=null; verts=[];
+    };
+    for(;i<pairs.length;i++){
+        const [code,val]=pairs[i];
+        if(code===0){
+            flush();
+            if(['LINE','LWPOLYLINE','POLYLINE','CIRCLE','ARC'].includes(val)){
+                cur={type:val,closed:false,r:0,a1:0,a2:0}; verts=[];
+            } else cur=null;
+            if(val==='ENDSEC') break;
+        } else if(cur){
+            const num=parseFloat(val);
+            if(cur.type==='LINE'){
+                if(code===10)cur.x1=num; else if(code===20)cur.y1=num;
+                else if(code===11)cur.x2=num; else if(code===21)cur.y2=num;
+            } else if(cur.type==='CIRCLE'||cur.type==='ARC'){
+                if(code===10)cur.cx=num; else if(code===20)cur.cy=num;
+                else if(code===40)cur.r=num; else if(code===50)cur.a1=num; else if(code===51)cur.a2=num;
+            } else if(cur.type==='LWPOLYLINE'||cur.type==='POLYLINE'){
+                if(code===70)cur.closed=(parseInt(val)&1)===1;
+                if(code===10)verts.push([num,0]);
+                else if(code===20 && verts.length)verts[verts.length-1][1]=num;
+            }
+        }
+    }
+    flush();
+    const bbox = bb.maxX>bb.minX?bb:null;
+    const layer={ index:0,type:'Cut',name:'DXF (geometria)',power:0,minPower:0,speed:0,passes:1,
+                  length:totalLen,bbox: bbox||{minX:0,minY:0,maxX:0,maxY:0},hasArea:false,shapes:shapeCount };
+    return { format:'DXF', layers:[layer], bbox, shapeCount, textWarning:false, render:{shapes:renderShapes, bbox} };
+}
+
+// ═══════════════════════════════════════════
+//  OBSŁUGA WYBORU PLIKU
+// ═══════════════════════════════════════════
+function handleFileSelect(files){
+    if(!files || !files.length) return;
+    const file=files[0];
+    const ext=file.name.toLowerCase().split('.').pop();
+    const reader=new FileReader();
+
+    reader.onload=function(e){
+        const content=e.target.result;
+        try{
+            let parsed;
+            if(ext==='lbrn2'||ext==='lbrn') parsed=parseLBRN(content);
+            else if(ext==='svg')           parsed=parseSVG(content);
+            else if(ext==='dxf')           parsed=parseDXF(content);
+            else if(ext==='cdr'){
+                showImportError('Format .cdr (CorelDRAW) jest zamknięty i nie da się go odczytać w przeglądarce. '+
+                    'Wyeksportuj z Corela do <strong>SVG</strong> (Plik → Eksportuj → SVG) lub otwórz w LightBurn i zapisz jako .lbrn2.');
+                return;
+            } else { showImportError('Nieobsługiwany format: .'+ext); return; }
+
+            applyParsed(parsed, file.name);
+        }catch(err){
+            showImportError('Błąd odczytu pliku: '+err.message);
+        }
+    };
+    reader.onerror=function(){ showImportError('Nie udało się odczytać pliku.'); };
+    reader.readAsText(file);
+}
+
+function showImportError(msg){
+    const s=document.getElementById('importStatus');
+    s.className='mb-4 p-3 rounded-lg bg-red-950 border border-red-500/40 text-red-200 text-xs';
+    s.innerHTML='<i class="fas fa-triangle-exclamation mr-1 text-red-400"></i>'+msg;
+    s.classList.remove('hidden');
+    document.getElementById('importResult').classList.add('hidden');
+}
+
+// ── Zapisz sparsowane dane i przelicz ──
+function applyParsed(parsed, fileName){
+    IMPORT.active=true;
+    IMPORT.layers=parsed.layers;
+    IMPORT.bbox=parsed.bbox;
+    IMPORT.fileName=fileName;
+    IMPORT.shapeCount=parsed.shapeCount;
+    IMPORT.format=parsed.format;
+    IMPORT.render=parsed.render||null;
+    IMPORT.scale=1;
+    // reset kontrolek skali
+    const sp=document.getElementById('scalePct'); if(sp) sp.value=100;
+    const tw=document.getElementById('targetW');  if(tw) tw.value='';
+
+    // status
+    const s=document.getElementById('importStatus');
+    let msg='<i class="fas fa-circle-check mr-1 text-green-400"></i>Wczytano <strong>'+fileName+'</strong> ('+parsed.format+')';
+    if(parsed.textWarning) msg+='<br><span class="text-amber-300"><i class="fas fa-triangle-exclamation mr-1"></i>Uwaga: projekt zawiera żywy TEKST — zamień go w LightBurn na ścieżki (Edit → Convert to Path), by policzyć jego długość.</span>';
+    if(parsed.format!=='LightBurn') msg+='<br><span class="text-slate-400">Format bez danych laserowych — ustaw tryb/moc/prędkość ręcznie w tabeli poniżej.</span>';
+    s.className='mb-4 p-3 rounded-lg bg-green-950/50 border border-green-500/30 text-green-200 text-xs';
+    s.innerHTML=msg;
+    s.classList.remove('hidden');
+
+    // nagłówek
+    setText('impFileName', fileName);
+    setText('impLayerCount', parsed.layers.length);
+    setText('impShapeCount', parsed.shapeCount);
+
+    document.getElementById('importResult').classList.remove('hidden');
+    renderLayerTable();
+    refreshImportView();   // wymiary + pole + podgląd + przeliczenie
+    v3dOnImport();         // odśwież podgląd 3D jeśli zakładka otwarta
+}
+
+// ── Wymiary/pole/podgląd + przeliczenie (uwzględnia skalę) ──
+function refreshImportView(){
+    if(!IMPORT.active) return;
+    const bb = IMPORT.bbox;
+    const s = IMPORT.scale||1;
+    if(bb){
+        const w=(bb.maxX-bb.minX)*s, h=(bb.maxY-bb.minY)*s;
+        setText('impDims', w.toFixed(0)+' × '+h.toFixed(0)+' mm');
+        setText('impArea', (w*h/100).toFixed(0)+' cm²');
+        // wymiary projektu (materiał) = prostokąt bounding-box CAŁEGO projektu
+        document.getElementById('projW').value=Math.max(1,Math.round(w));
+        document.getElementById('projH').value=Math.max(1,Math.round(h));
+    } else { setText('impDims','—'); setText('impArea','—'); }
+    drawPreview();
+    updateImportTotals();
+}
+
+// ── Rysowanie podglądu projektu na canvas (jak podgląd LightBurn) ──
+function drawPreview(){
+    const cv=document.getElementById('previewCanvas');
+    if(!cv || !IMPORT.render || !IMPORT.render.bbox) return;
+    const R=IMPORT.render, bb=R.bbox;
+    const W=(bb.maxX-bb.minX), H=(bb.maxY-bb.minY);
+    const ctx=cv.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const cw=cv.clientWidth||600, ch=300;
+    cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);          // ostrość na ekranach HiDPI
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,cw,ch);
+    if(W<=0||H<=0){ return; }
+
+    const margin=38;
+    const sc=Math.min((cw-2*margin)/W,(ch-2*margin)/H);
+    const flipY=(IMPORT.format!=='SVG');         // SVG ma Y już znormalizowane (w górę)
+    const ox=(cw-W*sc)/2, oy=(ch-H*sc)/2;
+    const tx=x=>ox+(x-bb.minX)*sc;
+    const ty=y=>flipY ? oy+(bb.maxY-y)*sc : oy+(y-bb.minY)*sc;
+    const isClosed=pts=> pts.length>2 && Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]) < 0.5;
+
+    // ramka bounding-box
+    ctx.strokeStyle='#3f4a5e'; ctx.setLineDash([6,4]); ctx.lineWidth=1;
+    ctx.strokeRect(ox, oy, W*sc, H*sc);
+    ctx.setLineDash([]);
+
+    ctx.lineJoin='round'; ctx.lineCap='round';
+
+    // 1) wypełnienia TYLKO warstw grawera (jak LightBurn: scan=wypełnione, cięcie=kontur)
+    R.shapes.forEach(sh=>{
+        if(!sh.isEng) return;
+        ctx.fillStyle = 'rgba(96,165,250,0.22)';
+        sh.subs.forEach(pts=>{
+            if(!pts||pts.length<3||!isClosed(pts)) return;
+            ctx.beginPath(); ctx.moveTo(tx(pts[0][0]),ty(pts[0][1]));
+            for(let i=1;i<pts.length;i++) ctx.lineTo(tx(pts[i][0]),ty(pts[i][1]));
+            ctx.closePath(); ctx.fill();
+        });
+    });
+    // 2) kontury na wierzchu
+    R.shapes.forEach(sh=>{
+        ctx.strokeStyle = sh.isEng ? '#60a5fa' : '#f97316';
+        ctx.lineWidth=1.5;
+        sh.subs.forEach(pts=>{
+            if(!pts||pts.length<2) return;
+            ctx.beginPath(); ctx.moveTo(tx(pts[0][0]),ty(pts[0][1]));
+            for(let i=1;i<pts.length;i++) ctx.lineTo(tx(pts[i][0]),ty(pts[i][1]));
+            ctx.stroke();
+        });
+    });
+
+    // etykiety wymiarów (przeskalowane)
+    const s=IMPORT.scale||1;
+    ctx.fillStyle='#cbd5e1'; ctx.font='600 11px Poppins,sans-serif'; ctx.textAlign='center';
+    ctx.fillText((W*s).toFixed(0)+' mm', ox+W*sc/2, oy-14);
+    ctx.save(); ctx.translate(ox-16, oy+H*sc/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText((H*s).toFixed(0)+' mm', 0, 0); ctx.restore();
+    ctx.textAlign='left';
+}
+
+// ── Sterowanie skalą ──
+function setScalePct(v){
+    const n=parseFloat(v);
+    if(isNaN(n)||n<=0) return;
+    IMPORT.scale=n/100;
+    const tw=document.getElementById('targetW'); if(tw && IMPORT.bbox){ tw.value=Math.round((IMPORT.bbox.maxX-IMPORT.bbox.minX)*IMPORT.scale); }
+    refreshImportView();
+}
+function setTargetWidth(v){
+    const n=parseFloat(v);
+    if(isNaN(n)||n<=0 || !IMPORT.bbox) return;
+    const baseW=(IMPORT.bbox.maxX-IMPORT.bbox.minX);
+    if(baseW<=0) return;
+    IMPORT.scale=n/baseW;
+    const sp=document.getElementById('scalePct'); if(sp) sp.value=(IMPORT.scale*100).toFixed(0);
+    refreshImportView();
+}
+function resetScale(){
+    IMPORT.scale=1;
+    const sp=document.getElementById('scalePct'); if(sp) sp.value=100;
+    const tw=document.getElementById('targetW');  if(tw) tw.value='';
+    refreshImportView();
+}
+
+// ── Klasyfikacja: czy warstwa to grawer rastrowy ──
+function isEngraveLayer(layer){
+    return layer.type==='Scan' || layer.type==='Fill' || layer.type==='Image' || layer.hasArea;
+}
+
+// ── Czas warstwy = CZYSTA geometria z linii projektu (minuty) ──
+//  Cięcie: długość ścieżek ÷ prędkość × przejścia.  Grawer: czas rastrowania pola.
+function layerPureTime(L, speedMM, passes, dpi){
+    if(speedMM<=0) return 0;
+    if(isEngraveLayer(L)){
+        const w=Math.max(0,(L.bbox.maxX-L.bbox.minX));
+        const h=Math.max(0,(L.bbox.maxY-L.bbox.minY));
+        return algoRasterEngTime(w,h,speedMM,dpi,100,passes);
+    }
+    return (L.length/speedMM)*passes;
+}
+
+// ── Zbuduj tabelę warstw RAZ (trwałe pola input — nie znikają przy wpisywaniu) ──
+function renderLayerTable(){
+    const body=document.getElementById('layerTableBody');
+    body.innerHTML='';
+    IMPORT.layers.forEach((L,i)=>{
+        const isEng=isEngraveLayer(L);
+        if(L._speedMMmin===undefined) L._speedMMmin = L.speed>0 ? L.speed*60 : (isEng?6000:600);
+        if(L._power===undefined)  L._power  = L.power>0 ? L.power : (isEng?60:90);
+        if(L._passes===undefined) L._passes = L.passes||1;
+        const trybBadge = isEng ? '<span class="badge badge-blue">Grawer</span>' : '<span class="badge badge-orange">Cięcie</span>';
+        const tr=document.createElement('tr');
+        tr.className='border-t border-slate-700/60';
+        tr.innerHTML=
+            '<td class="p-2 text-slate-300">'+L.name+'</td>'+
+            '<td class="p-2">'+trybBadge+'</td>'+
+            '<td class="p-2 text-right"><input type="number" id="lp'+i+'" value="'+L._power+'" min="0" max="100" '+
+                'style="width:54px;text-align:right" class="calc-input !py-1 !px-2 inline-block" '+
+                'oninput="setLayerVal('+i+',\'_power\',this.value)"></td>'+
+            '<td class="p-2 text-right text-orange-300" id="lw'+i+'">—</td>'+
+            '<td class="p-2 text-right"><input type="number" id="ls'+i+'" value="'+Math.round(L._speedMMmin)+'" min="1" '+
+                'style="width:72px;text-align:right" class="calc-input !py-1 !px-2 inline-block" '+
+                'oninput="setLayerVal('+i+',\'_speedMMmin\',this.value)"></td>'+
+            '<td class="p-2 text-right"><input type="number" id="lx'+i+'" value="'+L._passes+'" min="1" max="20" '+
+                'style="width:44px;text-align:right" class="calc-input !py-1 !px-2 inline-block" '+
+                'oninput="setLayerVal('+i+',\'_passes\',this.value)"></td>'+
+            '<td class="p-2 text-right text-slate-300" id="lm'+i+'">—</td>'+
+            '<td class="p-2 text-right text-white font-medium" id="lt'+i+'">—</td>';
+        body.appendChild(tr);
+    });
+}
+
+// ── Przelicz czasy i zaktualizuj TYLKO komórki wynikowe (zachowuje focus/wpisywanie) ──
+function updateImportTotals(){
+    if(!IMPORT.active) return;
+    const machineW=gn('machineMaxW')||48;
+    const interval=gn('impInterval')||0.1;
+    const dpi=25.4/interval;
+    const scale=IMPORT.scale||1;
+    let cutTime=0, engTime=0;
+
+    IMPORT.layers.forEach((L,i)=>{
+        const isEng=isEngraveLayer(L);
+        const speedMM=L._speedMMmin||1, passes=L._passes||1, powerPct=L._power||0;
+        const watts=machineW*powerPct/100;
+        // skala: długość ×scale, pole ×scale²
+        let pure;
+        if(isEng){
+            const w=Math.max(0,(L.bbox.maxX-L.bbox.minX))*scale;
+            const h=Math.max(0,(L.bbox.maxY-L.bbox.minY))*scale;
+            pure=algoRasterEngTime(w,h,speedMM,dpi,100,passes);
+        } else {
+            pure=(L.length*scale/speedMM)*passes;
+        }
+        // Czas = CZYSTA geometria: cięcie = długość/prędkość×przejścia; grawer = raster z pola. Bez mnożników.
+        const tMin=pure;
+        L._timeMin=tMin;
+        if(isEng) engTime+=tMin; else cutTime+=tMin;
+        const metric = isEng
+            ? (Math.max(0,(L.bbox.maxX-L.bbox.minX))*scale*Math.max(0,(L.bbox.maxY-L.bbox.minY))*scale/100).toFixed(0)+' cm²'
+            : (L.length*scale/1000).toFixed(2)+' m';
+        const wEl=document.getElementById('lw'+i); if(wEl) wEl.textContent=watts.toFixed(1)+' W';
+        const mEl=document.getElementById('lm'+i); if(mEl) mEl.textContent=metric;
+        const tEl=document.getElementById('lt'+i); if(tEl) tEl.textContent=fmtTime(tMin);
+    });
+
+    IMPORT.cutTime=cutTime; IMPORT.engTime=engTime;
+    setText('impCutTime', fmtTime(cutTime));
+    setText('impEngTime', fmtTime(engTime));
+    setText('impMachTime', fmtTime(cutTime+engTime));
+
+    calculate();
+}
+
+// pełne odświeżenie (po imporcie / zmianie mocy maszyny / interwału)
+function recomputeImport(){
+    if(!IMPORT.active) return;
+    renderLayerTable();
+    updateImportTotals();
+}
+
+function setLayerVal(i, key, val){
+    if(!IMPORT.layers[i]) return;
+    const num=parseFloat(val);
+    IMPORT.layers[i][key]= isNaN(num)?0:num;
+    updateImportTotals();   // BEZ przebudowy tabeli → można wpisać całą liczbę
+}
+
+function clearImport(){
+    IMPORT={ active:false, layers:[], cutTime:0, engTime:0, bbox:null, fileName:'', shapeCount:0, render:null, scale:1 };
+    document.getElementById('importResult').classList.add('hidden');
+    document.getElementById('importStatus').classList.add('hidden');
+    document.getElementById('fileInput').value='';
+    const cv=document.getElementById('previewCanvas'); if(cv){ const c=cv.getContext('2d'); c.clearRect(0,0,cv.width,cv.height); }
+    calculate();
+    v3dOnImport();   // wyczyść podgląd 3D
+    showToast('Import wyczyszczony — kalkulator w trybie ręcznym');
+}
+
+// ── Drag & drop ──
+function initDropZone(){
+    const dz=document.getElementById('dropZone');
+    if(!dz) return;
+    ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{
+        e.preventDefault(); dz.classList.add('border-orange-500','bg-slate-900/50');
+    }));
+    ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{
+        e.preventDefault(); dz.classList.remove('border-orange-500','bg-slate-900/50');
+    }));
+    dz.addEventListener('drop',e=>{
+        if(e.dataTransfer && e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ███  PODGLĄD 3D (Three.js) — używa danych z importu (IMPORT.render)  ███
+// ═══════════════════════════════════════════════════════════════
+let v3dScene,v3dCamera,v3dRenderer,v3dControls,v3dGrid,v3dPivot=null,v3dTex=null,v3dInited=false,v3dLast=null;
+const V3D_COLORS=[0xc8a165,0xd9b380,0xb5651d,0x8a5a2b,0xe8d6b3,0x5c4326,0x8d99ae];
+let v3dColor=V3D_COLORS[0];
+function v3dVisible(){ const t=document.getElementById('tab-podglad3d'); return t && t.classList.contains('active'); }
+
+function v3dInitSwatches(){
+  const box=document.getElementById('v3dSwatches'); if(!box) return;
+  V3D_COLORS.forEach((col,i)=>{ const d=document.createElement('div'); d.style.cssText='width:22px;height:22px;border-radius:5px;cursor:pointer;border:2px solid '+(i===0?'#f97316':'transparent')+';background:#'+col.toString(16).padStart(6,'0'); d.onclick=()=>{ v3dColor=col; [...box.children].forEach(c=>c.style.borderColor='transparent'); d.style.borderColor='#f97316'; v3dRebuild(); }; box.appendChild(d); });
+}
+
+function v3dWoodTexture(){
+  const c=document.createElement('canvas');c.width=512;c.height=512;const x=c.getContext('2d');
+  for(let i=0;i<512;i++){const v=200+Math.sin(i*0.05)*18+(Math.random()*22-11);x.fillStyle='rgb('+Math.round(v)+','+Math.round(v*0.82)+','+Math.round(v*0.55)+')';x.fillRect(0,i,512,1);}
+  for(let k=0;k<28;k++){x.strokeStyle='rgba(110,75,40,'+(0.04+Math.random()*0.06)+')';x.lineWidth=1+Math.random()*2;x.beginPath();const y=Math.random()*512;x.moveTo(0,y);for(let xx=0;xx<=512;xx+=32)x.lineTo(xx,y+Math.sin(xx*0.03+k)*6);x.stroke();}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;
+}
+function v3dPolyArea(p){let a=0;for(let i=0,n=p.length;i<n;i++){const j=(i+1)%n;a+=p[i][0]*p[j][1]-p[j][0]*p[i][1];}return a/2;}
+function v3dPointInPoly(pt,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];if(((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/((yj-yi)||1e-9)+xi))inside=!inside;}return inside;}
+// Punkt NA PEWNO wewnątrz wielokąta (do testu zawierania) — niezawodny dla kształtów wklęsłych/cienkich
+function v3dInteriorPoint(pts){
+  let cx=0,cy=0; for(const p of pts){cx+=p[0];cy+=p[1];} cx/=pts.length; cy/=pts.length;
+  if(v3dPointInPoly([cx,cy],pts)) return [cx,cy];
+  // środek najlepszej "poziomej cięciwy" na wysokości środka ciężkości
+  let xs=[]; for(let i=0,j=pts.length-1;i<pts.length;j=i++){ const yi=pts[i][1],yj=pts[j][1]; if((yi>cy)!==(yj>cy)){ xs.push(pts[j][0]+(pts[i][0]-pts[j][0])*(cy-yj)/((yi-yj)||1e-9)); } }
+  xs.sort((a,b)=>a-b); for(let k=0;k+1<xs.length;k+=2){ const mx=(xs[k]+xs[k+1])/2; if(v3dPointInPoly([mx,cy],pts)) return [mx,cy]; }
+  // fallback: punkt w stronę środka od każdego wierzchołka
+  for(const p of pts){ const q=[(p[0]+cx)/2,(p[1]+cy)/2]; if(v3dPointInPoly(q,pts)) return q; }
+  return pts[0];
+}
+function v3dOrient(p,ccw){return (v3dPolyArea(p)>0)===ccw?p:p.slice().reverse();}
+function v3dDispose(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose();if(n.material){Array.isArray(n.material)?n.material.forEach(m=>m.dispose()):n.material.dispose();}});}
+
+function v3dInit(){
+  if(v3dInited || typeof THREE==='undefined') return;
+  const wrap=document.getElementById('v3dCanvasWrap'); if(!wrap) return;
+  const w=wrap.clientWidth||600, h=wrap.clientHeight||460;
+  v3dScene=new THREE.Scene(); v3dScene.background=new THREE.Color(0x0f172a);
+  v3dCamera=new THREE.PerspectiveCamera(45, w/h, 0.5, 200000); v3dCamera.position.set(200,220,320);
+  v3dRenderer=new THREE.WebGLRenderer({antialias:true}); v3dRenderer.setPixelRatio(window.devicePixelRatio||1); v3dRenderer.setSize(w,h);
+  v3dRenderer.domElement.style.display='block'; wrap.appendChild(v3dRenderer.domElement);
+  v3dControls=new THREE.OrbitControls(v3dCamera, v3dRenderer.domElement);
+  v3dControls.enableDamping=true; v3dControls.dampingFactor=0.08; v3dControls.screenSpacePanning=true; v3dControls.autoRotateSpeed=2.2;
+  v3dControls.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};
+  v3dScene.add(new THREE.HemisphereLight(0xffffff,0x33405c,0.75));
+  let dl=new THREE.DirectionalLight(0xffffff,0.9);dl.position.set(0.6,1,0.5);v3dScene.add(dl);
+  dl=new THREE.DirectionalLight(0xffffff,0.4);dl.position.set(-0.7,0.6,-0.6);v3dScene.add(dl);
+  dl=new THREE.DirectionalLight(0xffffff,0.25);dl.position.set(0.2,-0.5,-0.8);v3dScene.add(dl);
+  v3dGrid=new THREE.GridHelper(600,30,0x334155,0x1b2638); v3dScene.add(v3dGrid);
+  v3dTex=v3dWoodTexture();
+  v3dRenderer.domElement.addEventListener('dblclick', v3dDblClick);
+  window.addEventListener('resize', v3dResize);
+  v3dInited=true;
+  (function loop(){ requestAnimationFrame(loop); if(!v3dVisible())return; v3dControls.update(); v3dRenderer.render(v3dScene,v3dCamera); })();
+}
+function v3dResize(){ if(!v3dInited)return; const wrap=document.getElementById('v3dCanvasWrap'); const w=wrap.clientWidth||600,h=wrap.clientHeight||460; v3dCamera.aspect=w/h; v3dCamera.updateProjectionMatrix(); v3dRenderer.setSize(w,h); }
+function v3dFitView(maxDim,thickness){ const d=Math.max(maxDim,40)*1.3; v3dCamera.position.set(d*0.32,d*0.82,d*0.62); v3dControls.target.set(0,(thickness||4)/2,0); v3dControls.update(); }
+function v3dFit(){ if(v3dLast) v3dFitView(v3dLast.maxDim, v3dLast.thick); }
+function v3dRebuild(){ if(v3dInited) v3dBuild(); }
+function v3dToggleGrid(){ if(v3dGrid) v3dGrid.visible=document.getElementById('v3dGrid').checked; }
+function v3dToggleAuto(){ if(v3dControls) v3dControls.autoRotate=document.getElementById('v3dAuto').checked; }
+function v3dDblClick(e){ if(!v3dPivot)return; const r=v3dRenderer.domElement.getBoundingClientRect(); const ray=new THREE.Raycaster(); ray.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1), v3dCamera); const hits=ray.intersectObjects(v3dPivot.children,true).filter(h=>h.object.type==='Mesh'); if(hits.length){ v3dControls.target.copy(hits[0].point); v3dControls.update(); showToast('Środek obrotu ustawiony na elemencie'); } }
+
+function v3dOpen(){ v3dInit(); if(v3dInited){ v3dResize(); v3dBuild(); } }
+function v3dOnImport(){ if(v3dInited && v3dVisible()) v3dBuild(); }
+
+function v3dBuild(){
+  if(!v3dInited) return;
+  const empty=document.getElementById('v3dEmpty'), ctrls=document.getElementById('v3dControls'), info=document.getElementById('v3dInfo');
+  if(v3dPivot){ v3dScene.remove(v3dPivot); v3dDispose(v3dPivot); v3dPivot=null; }
+  const R = (IMPORT.active && IMPORT.render) ? IMPORT.render : null;
+  if(!R || !R.bbox){ if(empty)empty.classList.remove('hidden'); if(ctrls)ctrls.classList.add('hidden'); if(info)info.classList.add('hidden'); return; }
+  if(empty)empty.classList.add('hidden'); if(ctrls)ctrls.classList.remove('hidden'); if(info)info.classList.remove('hidden');
+
+  const thickness=gn('matThickness')||4;
+  const showEng=document.getElementById('v3dEng').checked, showEdges=document.getElementById('v3dEdges').checked;
+
+  // odfiltruj odstające kształty (linie pomocnicze ±40000mm)
+  const allSubs=[]; R.shapes.forEach(sh=>sh.subs.forEach(sub=>{ if(sub&&sub.length>=2) allSubs.push({sub,isEng:sh.isEng}); }));
+  const ext=allSubs.map(o=>{let xn=1e9,xx=-1e9,yn=1e9,yx=-1e9;for(const p of o.sub){if(p[0]<xn)xn=p[0];if(p[0]>xx)xx=p[0];if(p[1]<yn)yn=p[1];if(p[1]>yx)yx=p[1];}return Math.max(xx-xn,yx-yn);});
+  const se=ext.slice().sort((a,b)=>a-b), med=se.length?se[Math.floor(se.length/2)]:0, lim=Math.max(2000,med*15);
+  const subs2=allSubs.filter((o,i)=>ext[i]<=lim&&isFinite(ext[i]));
+  const bb={minX:1e9,minY:1e9,maxX:-1e9,maxY:-1e9}; subs2.forEach(o=>{for(const p of o.sub){if(bb.minX>p[0])bb.minX=p[0];if(bb.maxX<p[0])bb.maxX=p[0];if(bb.minY>p[1])bb.minY=p[1];if(bb.maxY<p[1])bb.maxY=p[1];}});
+  if(!(bb.maxX>bb.minX)){ if(empty)empty.classList.remove('hidden'); return; }
+  const cx=(bb.minX+bb.maxX)/2, cy=(bb.minY+bb.maxY)/2, maxDim=Math.max(bb.maxX-bb.minX,bb.maxY-bb.minY), tol=Math.max(2,maxDim*0.02);
+
+  const cutPolys=[], engClosed=[], openLines=[];
+  subs2.forEach(sh=>{ let pts=sh.sub.map(p=>[p[0],p[1]]);
+    const rawGap=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);
+    const ex=pts.length>=4&&rawGap<1e-6; if(ex)pts=pts.slice(0,-1);
+    const gapNow=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);
+    const closed=pts.length>=3&&(ex||gapNow<tol);
+    if(closed)(sh.isEng?engClosed:cutPolys).push(pts); else openLines.push({pts,isEng:sh.isEng});
+  });
+
+  const polys=cutPolys.map((pts,idx)=>({pts,idx,area:Math.abs(v3dPolyArea(pts)),depth:0,rep:v3dInteriorPoint(pts)}));
+  for(let a=0;a<polys.length;a++){const rep=polys[a].rep;for(let b=0;b<polys.length;b++){if(a!==b&&polys[b].area>polys[a].area&&v3dPointInPoly(rep,polys[b].pts))polys[a].depth++;}}
+  let holeCount=0;
+  polys.forEach(h=>{if(h.depth%2===1){holeCount++;let best=-1,ba=Infinity;polys.forEach(c=>{if(c!==h&&c.depth===h.depth-1&&c.area<ba&&v3dPointInPoly(h.rep,c.pts)){best=c.idx;ba=c.area;}});h.parent=best;}});
+
+  const model=new THREE.Group();
+  const woodMat=new THREE.MeshStandardMaterial({color:v3dColor,roughness:0.78,metalness:0,map:v3dTex,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  const edgeMat=new THREE.LineBasicMaterial({color:0x2e2110,transparent:true,opacity:0.35});
+  let partCount=0;
+  const solids=polys.filter(p=>p.depth%2===0);
+  solids.forEach((solid,si)=>{ try{
+    const shape=new THREE.Shape(v3dOrient(solid.pts,true).map(p=>new THREE.Vector2(p[0],p[1])));
+    polys.filter(h=>h.depth%2===1&&h.parent===solid.idx).forEach(hole=>{ shape.holes.push(new THREE.Path(v3dOrient(hole.pts,false).map(p=>new THREE.Vector2(p[0],p[1])))); });
+    const geo=new THREE.ExtrudeGeometry(shape,{depth:thickness,bevelEnabled:false,curveSegments:14,steps:1}); geo.computeVertexNormals();
+    const mesh=new THREE.Mesh(geo,woodMat); mesh.position.z=(si%24)*0.01; model.add(mesh); partCount++;
+    if(showEdges){const ls=new THREE.LineSegments(new THREE.EdgesGeometry(geo,50),edgeMat);ls.position.z=mesh.position.z;model.add(ls);}
+  }catch(e){} });
+  if(showEng){
+    // grawer rastrowy (warstwy Scan/Fill) — ciemne wypełnienie
+    const engMat=new THREE.MeshStandardMaterial({color:0x241808,roughness:1,metalness:0,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3});
+    engClosed.forEach(pts=>{try{const m=new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(v3dOrient(pts,true).map(p=>new THREE.Vector2(p[0],p[1])))),engMat);m.position.z=thickness+0.08;model.add(m);}catch(e){}});
+    // WSZYSTKIE linie projektu na górnej powierzchni — pełny detal rysunku (wszystkie przestrzenie widoczne)
+    const lmat=new THREE.LineBasicMaterial({color:0x1c1206}); const zTop=thickness+0.18;
+    cutPolys.forEach(pts=>{ const a=pts.map(p=>new THREE.Vector3(p[0],p[1],zTop)); a.push(a[0].clone()); model.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(a),lmat)); });
+    openLines.forEach(o=>{ model.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(o.pts.map(p=>new THREE.Vector3(p[0],p[1],zTop))),lmat)); });
+  }
+  model.position.set(-cx,-cy,0);
+  v3dPivot=new THREE.Group(); v3dPivot.rotation.x=-Math.PI/2; v3dPivot.add(model); v3dScene.add(v3dPivot);
+  const gsize=Math.max(maxDim*1.4,60);
+  v3dScene.remove(v3dGrid); v3dGrid=new THREE.GridHelper(gsize,Math.max(10,Math.round(gsize/20)),0x334155,0x1b2638); v3dGrid.visible=document.getElementById('v3dGrid').checked; v3dScene.add(v3dGrid);
+  v3dLast={maxDim,thick:thickness}; v3dFitView(maxDim,thickness);
+  setText('v3dThick', thickness+' mm'); setText('v3dParts', '· '+partCount+' elem. · '+holeCount+' otw.');
+}
+
+// ═══════════════════════════════════════════
+//  PAMIĘĆ USTAWIEŃ (localStorage) — wpisane wartości zostają po zamknięciu
+// ═══════════════════════════════════════════
+const SETTINGS_KEY = 'xeomsc_calc_settings';
+let SETTINGS_READY = false;
+
+function settingEls(){
+    return [...document.querySelectorAll('input[id], select[id]')].filter(el=>{
+        if (el.id === 'fileInput') return false;
+        if (el.closest('#layerTableBody')) return false;          // dynamiczne pola warstw
+        if (['scalePct','targetW'].includes(el.id)) return false; // skala importu (przejściowe)
+        return true;
+    });
+}
+
+function saveSettings(){
+    if (!SETTINGS_READY) return;
+    try{
+        const data = {};
+        settingEls().forEach(el => { data[el.id] = (el.type === 'checkbox') ? el.checked : el.value; });
+        data.__engMode = document.getElementById('btnRaster').classList.contains('active') ? 'raster' : 'vector';
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    }catch(e){}
+}
+
+function loadSettings(){
+    let data = null;
+    try{ data = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); }catch(e){}
+    if (!data) return false;
+    settingEls().forEach(el => {
+        if (data[el.id] === undefined) return;
+        if (el.type === 'checkbox') el.checked = !!data[el.id]; else el.value = data[el.id];
+    });
+    if (data.__engMode){
+        const isR = data.__engMode === 'raster';
+        document.getElementById('btnRaster').classList.toggle('active', isR);
+        document.getElementById('btnVector').classList.toggle('active', !isR);
+        document.getElementById('rasterPanel').classList.toggle('hidden', !isR);
+        document.getElementById('vectorPanel').classList.toggle('hidden', isR);
+    }
+    refreshSliderLabels();
+    return true;
+}
+
+function refreshSliderLabels(){
+    const set = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+    set('passesDisplay', (gn('passesRange')||1) + '×');
+    set('accelLabel',    (gn('accelOverhead')||0) + '%');
+    set('fillLabel',     (gn('engFill')||0) + '%');
+    set('discountLabel', (gn('discountRange')||0) + '%');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('pathLengthUnit').value = '1';
+    const verEl = document.getElementById('appVersion'); if (verEl) verEl.textContent = 'v' + APP_VERSION;
+    // Domyślnie: 48W diodowy — Twój laser (nadpisane jeśli są zapisane ustawienia)
+    document.getElementById('laserPowerCut').value = 'd48';
+    document.getElementById('laserType').value     = 'diode';
+    document.getElementById('systemPowerW').value  = '250';
+    loadSettings();            // przywróć zapamiętane wartości
+    updateCuttingPreset();
+    updateDPIInfo();
+    recalcMachineRate();
+    updateMaterialPricing();   // wypełnia cennik grubości + przelicza
+    onMarginModeChange();      // ustaw UI trybu marży wg zapisanego wyboru
+    initDropZone();
+    v3dInitSwatches();         // kolory materiału w podglądzie 3D
+    SETTINGS_READY = true;     // od teraz każda zmiana jest zapisywana
+    calculate();
+});
+</script>
+</body>
+</html>
