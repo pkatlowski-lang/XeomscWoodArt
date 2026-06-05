@@ -8,3 +8,7 @@ Thumbs.db
 
 # Local env
 *.env
+
+# Lokalne kopie zapasowe (nie publikować)
+index.BACKUP-*.html
+_test_*.lbrn2
