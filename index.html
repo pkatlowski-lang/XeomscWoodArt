@@ -1504,11 +1504,20 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
                                 <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
-                                    <i class="fa-solid fa-layer-group mr-1 text-sky-400"></i> Materiał — cena za cm² (3mm)
+                                    <i class="fa-solid fa-layer-group mr-1 text-sky-400"></i> Cena materiału za cm² — sklejka 3mm
                                 </label>
                                 <div class="flex items-center gap-2">
-                                    <input type="number" id="setting-material-rate" class="calc-input flex-1 font-mono text-lg" step="0.0001" value="0.0038" oninput="calculatePrice()">
+                                    <input type="number" id="setting-mat-base" class="calc-input flex-1 font-mono text-lg" step="0.0001" value="0.0038">
                                     <span class="text-stone-400 text-sm font-bold shrink-0">PLN/cm²</span>
+                                </div>
+                            </div>
+                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2">
+                                    <i class="fa-solid fa-plus mr-1 text-sky-400"></i> Wzrost ceny za cm² na każdy +1mm
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="setting-mat-permm" class="calc-input flex-1 font-mono text-lg" step="0.0001" value="0.0013">
+                                    <span class="text-stone-400 text-sm font-bold shrink-0">PLN/cm²/mm</span>
                                 </div>
                             </div>
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
@@ -1516,15 +1525,8 @@
                                     <i class="fa-solid fa-bolt mr-1 text-sky-400"></i> Laser — cena za minutę pracy
                                 </label>
                                 <div class="flex items-center gap-2">
-                                    <input type="number" id="setting-laser-rate" class="calc-input flex-1 font-mono text-lg" step="0.01" value="0.50" oninput="calculatePrice()">
+                                    <input type="number" id="setting-laser-rate" class="calc-input flex-1 font-mono text-lg" step="0.01" value="0.50">
                                     <span class="text-stone-400 text-sm font-bold shrink-0">PLN/min</span>
-                                </div>
-                            </div>
-                            <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                                <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-2"><i class="fa-solid fa-gauge-high mr-1 text-sky-400"></i> Prędkość cięcia (auto-czas 3D)</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" id="setting-cut-speed" class="calc-input flex-1 font-mono text-lg" step="10" value="600">
-                                    <span class="text-stone-400 text-sm font-bold shrink-0">mm/min</span>
                                 </div>
                             </div>
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
@@ -1547,6 +1549,22 @@
                                     <input type="number" id="setting-min-price" class="calc-input flex-1 font-mono text-lg" step="1" value="25">
                                     <span class="text-stone-400 text-sm font-bold shrink-0">PLN</span>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- PRĘDKOŚĆ CIĘCIA WG GRUBOŚCI SKLEJKI -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5 mt-4">
+                            <label class="text-[10px] text-wood-400 font-bold uppercase tracking-widest block mb-1"><i class="fa-solid fa-gauge-high mr-1 text-sky-400"></i> Prędkość cięcia wg grubości sklejki (mm/min)</label>
+                            <p class="text-stone-500 text-[11px] mb-3">Klient suwakiem wybiera grubość 3–10 mm — cena i czas liczą się z wartości dla tej grubości. Cena za cm² wylicza się automatycznie (3mm = bazowa, +wzrost za każdy mm).</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-white/5"><div class="text-[10px] text-stone-400 font-bold mb-1">3 mm</div><div class="flex items-center gap-1"><input type="number" id="setting-speed-3" class="calc-input w-full font-mono text-sm" step="10" value="760"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-white/5"><div class="text-[10px] text-stone-400 font-bold mb-1">4 mm</div><div class="flex items-center gap-1"><input type="number" id="setting-speed-4" class="calc-input w-full font-mono text-sm" step="10" value="620"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-white/5"><div class="text-[10px] text-stone-400 font-bold mb-1">5 mm</div><div class="flex items-center gap-1"><input type="number" id="setting-speed-5" class="calc-input w-full font-mono text-sm" step="10" value="480"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-white/5"><div class="text-[10px] text-stone-400 font-bold mb-1">6 mm</div><div class="flex items-center gap-1"><input type="number" id="setting-speed-6" class="calc-input w-full font-mono text-sm" step="10" value="340"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-white/5"><div class="text-[10px] text-stone-400 font-bold mb-1">7 mm</div><div class="flex items-center gap-1"><input type="number" id="setting-speed-7" class="calc-input w-full font-mono text-sm" step="10" value="200"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-amber-500/20"><div class="text-[10px] text-amber-400/80 font-bold mb-1">8 mm <span class="font-normal">(ustaw)</span></div><div class="flex items-center gap-1"><input type="number" id="setting-speed-8" class="calc-input w-full font-mono text-sm" step="10" value="120"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-amber-500/20"><div class="text-[10px] text-amber-400/80 font-bold mb-1">9 mm <span class="font-normal">(ustaw)</span></div><div class="flex items-center gap-1"><input type="number" id="setting-speed-9" class="calc-input w-full font-mono text-sm" step="10" value="90"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
+                                <div class="bg-stone-900/60 rounded-lg p-2.5 border border-amber-500/20"><div class="text-[10px] text-amber-400/80 font-bold mb-1">10 mm <span class="font-normal">(ustaw)</span></div><div class="flex items-center gap-1"><input type="number" id="setting-speed-10" class="calc-input w-full font-mono text-sm" step="10" value="60"><span class="text-stone-600 text-[10px]">mm/min</span></div></div>
                             </div>
                         </div>
                         <button onclick="saveCalculatorSettings()" class="mt-4 bg-wood-700 hover:bg-wood-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-wood-600/50 w-fit">
@@ -1630,11 +1648,12 @@
             savedCalculations: [], // NOWA TABLICA NA ZAPISANE WYCENY
             imgbbKey: "",
             emailjsConfig: { serviceId: "", templateId: "", publicKey: "", toEmail: "" },
-            // USTAWIENIA KALKULATORA
+            // USTAWIENIA KALKULATORA (cena klienta zależna od grubości sklejki)
             calcSettings: {
-                materialRate: 0.0038, // Cena za cm2 (bazowa dla 3mm)
-                laserRate: 0.50,      // Cena za minutę
-                cutSpeed: 600,        // Prędkość cięcia mm/min (do auto-czasu w wizualizatorze 3D)
+                matBase: 0.0038,      // Cena materiału za cm2 dla sklejki 3mm
+                matPerMm: 0.0013,     // Wzrost ceny za cm2 na każdy +1mm grubości
+                speeds: { "3":760, "4":620, "5":480, "6":340, "7":200, "8":120, "9":90, "10":60 }, // Prędkość cięcia mm/min wg grubości
+                laserRate: 0.50,      // Cena za minutę pracy lasera
                 pubMargin: 30,        // Marża % dla publicznej wyceny 3D
                 packaging: 0,         // Pakowanie/koszt stały (PLN) dla wyceny 3D
                 minPrice: 25          // Minimalna cena (PLN)
@@ -3069,34 +3088,49 @@
             }
             // OBSŁUGA ŁADOWANIA DANYCH KALKULATORA
             else if (id === 'calculator') {
-                if(!siteData.calcSettings) siteData.calcSettings = initialData.calcSettings;
+                if(!siteData.calcSettings) siteData.calcSettings = JSON.parse(JSON.stringify(initialData.calcSettings));
                 const cs = siteData.calcSettings;
-                document.getElementById('setting-material-rate').value = cs.materialRate ?? 0.0038;
+                const defSpeeds = { "3":760, "4":620, "5":480, "6":340, "7":200, "8":120, "9":90, "10":60 };
+                document.getElementById('setting-mat-base').value = cs.matBase ?? cs.materialRate ?? 0.0038;
+                document.getElementById('setting-mat-permm').value = cs.matPerMm ?? 0.0013;
                 document.getElementById('setting-laser-rate').value = cs.laserRate ?? 0.50;
-                document.getElementById('setting-cut-speed').value = cs.cutSpeed ?? 600;
                 document.getElementById('setting-pub-margin').value = cs.pubMargin ?? 30;
                 document.getElementById('setting-packaging').value = cs.packaging ?? 0;
                 document.getElementById('setting-min-price').value = cs.minPrice ?? 25;
+                const sp = cs.speeds || {};
+                for (let t = 3; t <= 10; t++) {
+                    const el = document.getElementById('setting-speed-' + t);
+                    if (el) el.value = sp[t] ?? sp[String(t)] ?? defSpeeds[t];
+                }
                 if (window.xeomscPriceRefresh) window.xeomscPriceRefresh();
             }
         };
         
         // --- FUNKCJE KALKULATORA ---
         
-        // Zapisywanie domyślnych stawek
+        // Zapisywanie domyślnych stawek (cena klienta zależna od grubości sklejki)
         window.saveCalculatorSettings = async () => {
-             const matRate = parseFloat(document.getElementById('setting-material-rate').value);
+             const matBase  = parseFloat(document.getElementById('setting-mat-base').value);
+             const matPerMm = parseFloat(document.getElementById('setting-mat-permm').value);
              const laserRate = parseFloat(document.getElementById('setting-laser-rate').value);
-             
-             if(isNaN(matRate) || isNaN(laserRate)) {
+
+             if(isNaN(matBase) || isNaN(matPerMm) || isNaN(laserRate)) {
                  showToast("Wprowadź poprawne liczby!", 'error');
                  return;
              }
-             
+
+             const defSpeeds = { "3":760, "4":620, "5":480, "6":340, "7":200, "8":120, "9":90, "10":60 };
+             const speeds = {};
+             for (let t = 3; t <= 10; t++) {
+                 const v = parseFloat(document.getElementById('setting-speed-' + t).value);
+                 speeds[t] = (!isNaN(v) && v > 0) ? v : defSpeeds[t];
+             }
+
              siteData.calcSettings = {
-                 materialRate: matRate,
+                 matBase: matBase,
+                 matPerMm: matPerMm,
+                 speeds: speeds,
                  laserRate: laserRate,
-                 cutSpeed: parseFloat(document.getElementById('setting-cut-speed').value) || 600,
                  pubMargin: parseFloat(document.getElementById('setting-pub-margin').value) || 0,
                  packaging: parseFloat(document.getElementById('setting-packaging').value) || 0,
                  minPrice: parseFloat(document.getElementById('setting-min-price').value) || 0
@@ -3104,7 +3138,7 @@
 
              await saveData();
              if (typeof window.xeomscPriceRefresh === 'function') window.xeomscPriceRefresh();
-             showToast("Zapisano domyślne stawki kalkulatora!");
+             showToast("Zapisano stawki — cena klienta zależna od grubości sklejki!");
         };
 
         // Obliczanie ceny (Automatyczne)
@@ -4671,9 +4705,14 @@
         return {w:bb.maxX-bb.minX,h:bb.maxY-bb.minY,cutLenMm:cutLen,hasEng,engW,engH};}
 
       /* ---- WYCENA (stawki z panelu admina: siteData.calcSettings) ---- */
+      var DEF_SPEEDS={3:760,4:620,5:480,6:340,7:200,8:120,9:90,10:60};
+      function thRate(cs,th){const base=+(cs.matBase??cs.materialRate??0.0038),per=+(cs.matPerMm??0.0013);return Math.max(0,base+(th-3)*per);}
+      function thSpeed(cs,th){const sp=cs.speeds||{};let v=+(sp[th]??sp[String(th)]??DEF_SPEEDS[th]??cs.cutSpeed??600);if(!(v>0))v=DEF_SPEEDS[th]||600;return v;}
       function priceCompute(m,th,qty){if(!m||!(m.w>0))return 0;const cs=(window.siteData&&window.siteData.calcSettings)||{};
-        const matRate=+(cs.materialRate??0.0038),laserRate=+(cs.laserRate??0.50),cutSpeed=+(cs.cutSpeed??600),margin=+(cs.pubMargin??30),pack=+(cs.packaging??0),minP=+(cs.minPrice??25);
-        qty=Math.max(1,qty||1);const area=(m.w*m.h/100);const matCost=area*((th/3)*matRate)*qty;
+        th=Math.round(th)||3;if(th<3)th=3;if(th>10)th=10;
+        const laserRate=+(cs.laserRate??0.50),margin=+(cs.pubMargin??30),pack=+(cs.packaging??0),minP=+(cs.minPrice??25);
+        const rate=thRate(cs,th),cutSpeed=thSpeed(cs,th);
+        qty=Math.max(1,qty||1);const area=(m.w*m.h/100);const matCost=area*rate*qty;
         let tMin=cutSpeed>0?(m.cutLenMm/cutSpeed):0;if(m.hasEng&&m.engW>0&&m.engH>0){const dpi=254,ls=25.4/dpi,lines=Math.ceil(m.engH/ls),sp=cutSpeed*4;tMin+=(lines*(m.engW/sp))*1.2;}tMin*=qty;
         const net=matCost+tMin*laserRate+pack;return Math.max(net*(1+margin/100),minP);}
       function updatePrice(){const el=document.getElementById('pub3dPrice');if(!el)return;const m=CUR?CUR.metrics:null;if(!m){el.textContent='—';return;}const th=parseFloat(document.getElementById('pub3dThick').value)||4;const qty=Math.max(1,parseInt(document.getElementById('pub3dQty').value)||1);el.textContent=priceCompute(m,th,qty).toFixed(2)+' zł';}
