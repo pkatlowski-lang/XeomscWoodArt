@@ -1161,6 +1161,90 @@ function algoVectorEngTime(L_mm, v_mm_min) {
 }
 
 // ═══════════════════════════════════════════
+//  ALGORYTM 2b: CZAS GRAWERA z RZECZYWISTEJ GEOMETRII (skanowanie linii — jak LightBurn)
+//  Dla każdej linii skanowania liczy realną drogę głowicy po wypełnianych
+//  kształtach (pomija puste pasy i duże odstępy między literami/słowami).
+//  Zwraca SUMĘ drogi głowicy [mm] przy skali 1.
+// ═══════════════════════════════════════════
+function engScanForLayer(subsArray, lineSpacing){
+    // JEDEN przebieg po CAŁEJ geometrii warstwy (fizyczne linie skanowania).
+    // zwraca {len: droga głowicy [mm], lines: liczba fizycznych linii z treścią}
+    if(!subsArray || !subsArray.length || lineSpacing<=0) return {len:0, lines:0};
+    let yMin=Infinity, yMax=-Infinity;
+    for(const s of subsArray) for(const p of s){ if(p[1]<yMin)yMin=p[1]; if(p[1]>yMax)yMax=p[1]; }
+    if(!(yMax>yMin)) return {len:0, lines:0};
+    const joinGap=4;            // mm — przerwy mniejsze (wewnątrz liter) głowica pokonuje skanując
+    let len=0, lines=0;
+    let nLines=Math.ceil((yMax-yMin)/lineSpacing);
+    if(nLines<1) nLines=1;
+    if(nLines>20000) nLines=20000;   // zabezpieczenie wydajnościowe
+    const step=(yMax-yMin)/nLines;
+    const xs=[];
+    for(let i=0;i<nLines;i++){
+        const y=yMin+(i+0.5)*step;
+        xs.length=0;
+        for(const s of subsArray){
+            const n=s.length; if(n<2) continue;
+            for(let k=0;k<n;k++){
+                const a=s[k], b=s[(k+1)%n];
+                const y0=a[1], y1=b[1];
+                if((y0<=y)!==(y1<=y)){
+                    xs.push(a[0]+(b[0]-a[0])*(y-y0)/(y1-y0));
+                }
+            }
+        }
+        if(xs.length<2) continue;
+        xs.sort((u,v)=>u-v);
+        lines++;
+        let segS=xs[0], segE=xs[1];
+        for(let j=2;j+1<xs.length;j+=2){
+            if(xs[j]-segE<=joinGap){ segE=xs[j+1]; }
+            else { len+=segE-segS; segS=xs[j]; segE=xs[j+1]; }
+        }
+        len+=segE-segS;
+    }
+    return {len, lines};
+}
+// Droga grawera (per KSZTAŁT, by nie kasować nakładających się) + liczba FIZYCZNYCH linii
+// (przebieg łączony po warstwie). Z cache.
+function getEngScanByLayer(lineSpacing){
+    const c=IMPORT._engScanCache;
+    if(c && c.render===IMPORT.render && Math.abs(c.spacing-lineSpacing)<1e-9) return c.byLayer;
+    const layerShapes={};
+    if(IMPORT.render && IMPORT.render.shapes){
+        IMPORT.render.shapes.forEach(sh=>{
+            if(!sh.isEng) return;
+            const li=(sh.li!==undefined? sh.li : '_');
+            (layerShapes[li] || (layerShapes[li]=[])).push(sh.subs);
+        });
+    }
+    const byLayer={};
+    for(const li in layerShapes){
+        const shapesSubs=layerShapes[li];
+        let len=0;
+        for(const subs of shapesSubs) len += engScanForLayer(subs, lineSpacing).len;   // droga: suma per-kształt
+        const combined=[];
+        for(const subs of shapesSubs) for(const s of subs) combined.push(s);
+        const lines = engScanForLayer(combined, lineSpacing).lines;                     // fizyczne linie z treścią
+        byLayer[li]={len, lines};
+    }
+    IMPORT._engScanCache={render:IMPORT.render, spacing:lineSpacing, byLayer};
+    return byLayer;
+}
+// Czas grawera warstwy [min]: droga/prędkość + zawracanie głowicy na każdej linii (przyspieszenia).
+function engLayerTimeMin(L, speedMM, passes, lineSpacing, scale){
+    if(speedMM<=0) return 0;
+    const byLayer=getEngScanByLayer(lineSpacing);
+    const e=byLayer[L.index]||{len:0,lines:0};
+    const len   = e.len   * scale * scale;   // droga ∝ szerokość×liczba_linii ∝ skala²
+    const lines = e.lines * scale;           // liczba linii ∝ wysokość ∝ skala
+    const accel = 900;                       // mm/s² — przyspieszenie głowicy (zawracanie linii)
+    const tTurnMin = speedMM/(1800*accel);   // min na zawrócenie linii = 2·v/a  (v=speedMM/60, /60→min)
+    const fwdMin = len/speedMM;
+    return (fwdMin + lines*tTurnMin)*passes;
+}
+
+// ═══════════════════════════════════════════
 //  ALGORYTM 4: KOSZT MATERIAŁU (PODSTAWA) — cena za cm² wg grubości
 //  pole_cm² = projW × projH / 100 × ilość
 //  koszt    = pole_cm² × cena_za_cm²
@@ -1468,8 +1552,7 @@ function getBaseGeometry(){
             const isEng = isEngraveLayer(L);
             const sp = L._speedMMmin||1, ps = L._passes||1;
             if (isEng){
-                const w=Math.max(0,L.bbox.maxX-L.bbox.minX), h=Math.max(0,L.bbox.maxY-L.bbox.minY);
-                eng += algoRasterEngTime(w,h,sp,dpi,100,ps);
+                eng += engLayerTimeMin(L, sp, ps, interval, 1);
             } else cut += (L.length/sp)*ps;
         });
         return { cutMin:cut, engMin:eng, baseW:IMPORT.bbox.maxX-IMPORT.bbox.minX, baseH:IMPORT.bbox.maxY-IMPORT.bbox.minY };
@@ -2199,7 +2282,7 @@ function parseLBRN(xmlString){
             const subs = buildSubpaths(M, type, attrs, verts, prim);
             const isEng = (layer.type==='Scan'||layer.type==='Fill'||layer.type==='Image'||layer.hasArea);
             for(const s of subs){ expandBB(layer.bbox, s); expandBB(globalBB, s); }
-            if(subs.length) renderShapes.push({ subs, isEng });
+            if(subs.length) renderShapes.push({ subs, isEng, li: layer.index });
         }
     }
     walk(doc.querySelector('LightBurnProject') || doc, matIdentity());
@@ -2552,9 +2635,7 @@ function isEngraveLayer(layer){
 function layerPureTime(L, speedMM, passes, dpi){
     if(speedMM<=0) return 0;
     if(isEngraveLayer(L)){
-        const w=Math.max(0,(L.bbox.maxX-L.bbox.minX));
-        const h=Math.max(0,(L.bbox.maxY-L.bbox.minY));
-        return algoRasterEngTime(w,h,speedMM,dpi,100,passes);
+        return engLayerTimeMin(L, speedMM, passes, 25.4/dpi, 1);
     }
     return (L.length/speedMM)*passes;
 }
@@ -2606,9 +2687,7 @@ function updateImportTotals(){
         // skala: długość ×scale, pole ×scale²
         let pure;
         if(isEng){
-            const w=Math.max(0,(L.bbox.maxX-L.bbox.minX))*scale;
-            const h=Math.max(0,(L.bbox.maxY-L.bbox.minY))*scale;
-            pure=algoRasterEngTime(w,h,speedMM,dpi,100,passes);
+            pure=engLayerTimeMin(L, speedMM, passes, interval, scale);
         } else {
             pure=(L.length*scale/speedMM)*passes;
         }
