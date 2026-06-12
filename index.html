@@ -30,7 +30,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Three.js (wizualizator 3D) -->
+    <!-- Three.js (wizualizator 3D) -->
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -3244,6 +3244,18 @@
             } catch(e) {}
         };
         // Funkcja pobierania załącznika — zachowuje ORYGINALNY format pliku
+        // Pobieranie pliku SVG z wiadomości edytora (treść trzymana w window._svgf_<id>)
+        window.downloadSvgText = (msgId, filename) => {
+            const svg = window[`_svgf_${msgId}`];
+            if (!svg) { showToast('Brak pliku SVG w tej wiadomości.', 'error'); return; }
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename || 'projekt.svg';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
         window.downloadAttachment = (encodedUrl, baseFilename) => {
             const url = encodedUrl;
             // Mapa MIME → rozszerzenie (każdy format zachowany 1:1)
@@ -3339,12 +3351,18 @@
                          const hasAttachment  = !!m.attachment;
                          // Przechowujemy załącznik w window żeby nie wbudowywać base64 w HTML
                          if (hasAttachment) window[`_att_${m.id}`] = m.attachment;
+                         // Projekt z edytora wyceny: wizualizacja + plik SVG
+                         const hasViz = !!m.vizImg;
+                         const hasSvg = !!m.svgFile;
+                         if (hasViz) window[`_viz_${m.id}`] = m.vizImg;
+                         if (hasSvg) window[`_svgf_${m.id}`] = m.svgFile;
+                         const isEditorMsg = m.source === 'edytor';
 
                          return `
                          <div class="message-row-wrapper">
                              <div class="message-row-header ${unreadClass}" onclick="window.toggleMessageBody('${m.id}')">
                                  <div><span class="status-badge ${statusData.class}">${statusData.label}</span></div>
-                                 <div class="font-medium truncate">${safeName}</div>
+                                 <div class="font-medium truncate">${safeName}${isEditorMsg ? ' <span class="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-bold align-middle ml-1">PROJEKT Z EDYTORA</span>' : ''}</div>
                                  <div class="text-sm text-stone-400 truncate">${safeEmail}</div>
                                  <div class="text-right text-xs text-stone-500">${new Date(m.date).toLocaleString('pl-PL')}</div>
                                  <div class="text-right flex items-center justify-end gap-3">
@@ -3362,7 +3380,7 @@
 
                                      ${hasAttachment ? `
                                      <div>
-                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Załącznik klienta:</p>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">${isEditorMsg ? 'Grafika projektu (linie produkcyjne):' : 'Załącznik klienta:'}</p>
                                          <div class="flex flex-wrap items-end gap-4">
                                              <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(window['_att_${m.id}'])">
                                                  <img src="${m.attachment && m.attachment.startsWith('data:') ? m.attachment.substring(0,50)+'...' : ''}" data-attid="${m.id}" class="msg-att-img w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20" loading="lazy" alt="Załącznik">
@@ -3373,6 +3391,41 @@
                                              <button onclick="window.downloadAttachment(window['_att_${m.id}'], 'zalacznik_${m.id}')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
                                                  <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz plik
                                              </button>
+                                         </div>
+                                     </div>` : ''}
+
+                                     ${hasViz ? `
+                                     <div>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Wizualizacja projektu:</p>
+                                         <div class="flex flex-wrap items-end gap-4">
+                                             <div class="relative group cursor-zoom-in max-w-xs" onclick="window.openMessageLightbox(window['_viz_${m.id}'])">
+                                                 <img src="" data-vizid="${m.id}" class="msg-viz-img w-full max-h-64 object-contain rounded-lg border border-white/10 hover:opacity-90 transition bg-black/20" loading="lazy" alt="Wizualizacja projektu">
+                                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
+                                                     <span class="bg-black/60 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Powiększ</span>
+                                                 </div>
+                                             </div>
+                                             <button onclick="window.downloadAttachment(window['_viz_${m.id}'], 'wizualizacja_${m.id}')" class="flex items-center gap-2 px-4 py-3 bg-stone-700 hover:bg-wood-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                                 <i class="fa-solid fa-download group-hover:animate-bounce"></i> Pobierz plik
+                                             </button>
+                                         </div>
+                                     </div>` : ''}
+
+                                     ${hasSvg ? `
+                                     <div>
+                                         <p class="text-xs font-bold text-stone-500 uppercase mb-2">Plik produkcyjny SVG:</p>
+                                         <button onclick="window.downloadSvgText('${m.id}', '${escapeHTML(m.svgName || ('projekt_' + m.id + '.svg'))}')" class="flex items-center gap-2 px-4 py-3 bg-sky-700 hover:bg-sky-600 text-white rounded-xl transition text-xs font-bold shadow-md group">
+                                             <i class="fa-solid fa-file-arrow-down group-hover:animate-bounce"></i> Pobierz SVG do lasera
+                                         </button>
+                                     </div>` : ''}
+
+                                     ${m.quote ? `
+                                     <div class="bg-sky-500/5 border border-sky-500/20 rounded-xl p-4">
+                                         <p class="text-xs font-bold text-sky-400 uppercase mb-2"><i class="fa-solid fa-calculator mr-1"></i> Wycena z edytora:</p>
+                                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                                             <div><p class="text-[10px] text-stone-500 uppercase">Materiał</p><p class="text-white font-semibold">${escapeHTML(m.quote.material || '—')}</p></div>
+                                             <div><p class="text-[10px] text-stone-500 uppercase">Cena</p><p class="text-emerald-400 font-bold">${m.quote.price != null ? String(m.quote.price).replace('.', ',') + ' zł' : '—'}</p></div>
+                                             <div><p class="text-[10px] text-stone-500 uppercase">Czas lasera</p><p class="text-white">${m.quote.timeMin != null ? m.quote.timeMin + ' min' : '—'}</p></div>
+                                             <div><p class="text-[10px] text-stone-500 uppercase">Materiał (pow.)</p><p class="text-white">${m.quote.areaCm2 != null ? m.quote.areaCm2 + ' cm²' : '—'}</p></div>
                                          </div>
                                      </div>` : ''}
 
@@ -3415,6 +3468,11 @@
                      list.querySelectorAll('.msg-att-img[data-attid]').forEach(img => {
                          const att = window[`_att_${img.dataset.attid}`];
                          if (att) img.src = att;
+                     });
+                     // Miniatury wizualizacji z edytora wyceny
+                     list.querySelectorAll('.msg-viz-img[data-vizid]').forEach(img => {
+                         const viz = window[`_viz_${img.dataset.vizid}`];
+                         if (viz) img.src = viz;
                      });
                  }
              }, (error) => {

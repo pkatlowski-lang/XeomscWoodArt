@@ -667,6 +667,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="sum-stats" id="quoteStats"></div>
     <div class="quote-price" id="quotePrice">–</div>
     <p style="font-size:.74rem;color:var(--muted);margin:10px 0 0;line-height:1.5">Cena końcowa za wykonanie projektu z wybranego materiału — obejmuje materiał, pracę lasera i pakowanie.</p>
+    <div class="field" style="padding:14px 0 0">
+      <button type="button" class="tbtn" id="sendQuoteOpenBtn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📨 Wyślij projekt do wyceny</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modalSendQuote">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" id="modalSendQuoteClose" title="Zamknij">✕</button>
+    <h3>📨 Wyślij projekt do pracowni</h3>
+    <p style="font-size:.78rem;color:var(--muted);margin:0 0 6px;line-height:1.5">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
+    <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
+    <div class="field"><label>Twój e-mail *</label><input type="email" id="sendQuoteEmail" maxlength="120" placeholder="adres@email.pl" required></div>
+    <div class="field"><label>Wiadomość (opcjonalnie)</label><textarea id="sendQuoteMsg" rows="3" maxlength="1500" placeholder="Uwagi do projektu, termin, ilość sztuk…"></textarea></div>
+    <div id="sendQuoteStatus" style="font-size:.78rem;min-height:18px;margin:2px 0 6px;color:var(--muted)"></div>
+    <div class="field" style="padding:6px 0 0;display:flex;justify-content:flex-end;gap:8px">
+      <button type="button" class="tbtn" id="sendQuoteCancel">Anuluj</button>
+      <button type="button" class="tbtn" id="sendQuoteSubmit" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">Wyślij projekt</button>
+    </div>
   </div>
 </div>
 
@@ -4289,7 +4308,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // programie. Kształty cięcia/nacięcia (oraz tekst w tych trybach) tej samej warstwy
   // głębokości są scalane przez mergeLayerRings — usuwa to zduplikowane/wspólne linie
   // obrysu tam, gdzie elementy się stykają lub nakładają.
-  function exportSVG(){
+  function buildExportSvgString(){
     const W=state.docW,H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image');
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
@@ -4318,11 +4337,73 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       // je niezależnie, jak dotychczas, przerywaną fioletową linią
       if(!holesUsed) body+=holes.map(o=>objMarkup(o,true)).join('');
     });
-    const svg=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm">\n${body}\n</svg>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm">\n${body}\n</svg>`;
+  }
+  function exportSVG(){
+    const svg=buildExportSvgString();
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
+
+  /* ---------------- Wysyłka projektu do wyceny (panel administratora) ---------------- */
+  // Kolorowy podgląd projektu (jak na ekranie) — do grafiki wizualizacji w wiadomości
+  function buildPreviewSvgString(){
+    const W=state.docW,H=state.docH;
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image');
+    const body=vis.map(o=>objMarkup(o,false)).join('');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm"><rect x="0" y="0" width="${W}" height="${H}" fill="#f6ecd9" stroke="#c9b48a" stroke-width="0.4"/>\n${body}\n</svg>`;
+  }
+  // Rasteryzacja SVG → JPEG dataURL (bez zewnętrznych zasobów ⇒ canvas nie jest "tainted")
+  function svgToJpeg(svgStr, maxPx){
+    return new Promise((resolve,reject)=>{
+      const blob=new Blob([svgStr],{type:'image/svg+xml'});
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          const ratio=state.docW/state.docH;
+          const w=ratio>=1?maxPx:Math.round(maxPx*ratio);
+          const h=ratio>=1?Math.round(maxPx/ratio):maxPx;
+          const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+          const cx=cv.getContext('2d');
+          cx.fillStyle='#ffffff'; cx.fillRect(0,0,w,h);
+          cx.drawImage(img,0,0,w,h);
+          URL.revokeObjectURL(url);
+          resolve(cv.toDataURL('image/jpeg',0.82));
+        }catch(e){ URL.revokeObjectURL(url); reject(e); }
+      };
+      img.onerror=()=>{ URL.revokeObjectURL(url); reject(new Error('Nie udało się zrenderować podglądu')); };
+      img.src=url;
+    });
+  }
+  // Komplet danych do wysyłki: SVG produkcyjny, 2 grafiki, wycena. Pilnuje limitu
+  // dokumentu Firestore (1 MB): przy dużych projektach zmniejsza grafiki, w skrajnym
+  // razie pomija wizualizację lub plik SVG (z adnotacją w treści wiadomości).
+  async function buildQuotePayload(){
+    const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
+    if(!hasWork) return null;
+    const matKey=quoteMatSel.value;
+    const mat=QUOTE_MATERIALS[matKey];
+    const price=computeQuote(matKey);
+    const timeMin=quotePathLen()/mat.speed;
+    const areaCm2=quoteMaterialArea();
+    const svgStr=buildExportSvgString();
+    const prevStr=buildPreviewSvgString();
+    let size=1000, projImg=await svgToJpeg(svgStr,size), vizImg=await svgToJpeg(prevStr,size);
+    const LIMIT=880000; let note='';
+    if(projImg.length+vizImg.length+svgStr.length>LIMIT){
+      size=640; projImg=await svgToJpeg(svgStr,size); vizImg=await svgToJpeg(prevStr,size);
+    }
+    if(projImg.length+vizImg.length+svgStr.length>LIMIT){ vizImg=null; note='(duży projekt: pominięto grafikę wizualizacji)'; }
+    let svgOut=svgStr;
+    if(projImg.length+(vizImg?vizImg.length:0)+svgStr.length>LIMIT){ svgOut=null; note='(bardzo duży projekt: plik SVG nie zmieścił się w wiadomości — poproś klienta o eksport)'; }
+    return {
+      svgFile:svgOut, projImg, vizImg, note,
+      quote:{ material:mat.label, price:+price.toFixed(2), timeMin:+timeMin.toFixed(1), areaCm2:+areaCm2.toFixed(1) }
+    };
+  }
+  window.XEO_BUILD_QUOTE_PAYLOAD=buildQuotePayload;
 
   /* ---------------- Eksport DXF (dla programów CNC/laser: LightBurn, AutoCAD, itp.) ---------------- */
   // Kody grup DXF: para (kod, wartość), każdy w osobnej linii. Oś Y w DXF rośnie w górę,
@@ -5208,6 +5289,81 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Hak debugowy do testów (Playwright) — bez wpływu na działanie edytora
   window.__lzr={state, buildSeparatedSVG, buildLayerScene, mergeLayerRings, unionAll, objSubPolys, objSubPolysLocal, objSubPolysRepeated, textOutlinePolys, objBBox, rotatedBBox, selBBox, polyArea, polyPerimeter, objInkArea, computeProjectStats, computeQuote, quotePathLen, quoteMaterialArea, polysBBoxMulti, polyToPathD, polyToSmoothPathD, renderAll, updateLive3D, renderProps, select, defaultsFor, zoomFit, repeatTransforms, exportSVG, buildGearPoints, simplifyRing, rasterizeTextOutlines, textNaturalBox, getTextRaster};
 })();
+</script>
+
+<script type="module">
+/* Wysyłka projektu do panelu administratora (kolekcja messages — ta sama, którą
+   czyta panel wiadomości na stronie głównej). Logowanie anonimowe, jak strona. */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
+  authDomain:"xeomsc-a8edd.firebaseapp.com",
+  projectId:"xeomsc-a8edd",
+  storageBucket:"xeomsc-a8edd.firebasestorage.app",
+  messagingSenderId:"43822805612",
+  appId:"1:43822805612:web:d343653e47777d8ebf5e49"
+};
+const APP_ID='xeomsc-fusionart';
+let _db=null;
+async function ensureDb(){
+  if(_db) return _db;
+  const app=initializeApp(firebaseConfig);
+  const auth=getAuth(app);
+  await signInAnonymously(auth);
+  _db=getFirestore(app);
+  return _db;
+}
+
+const ov=document.getElementById('modalSendQuote');
+const statusEl=document.getElementById('sendQuoteStatus');
+const submitBtn=document.getElementById('sendQuoteSubmit');
+const openBtn=document.getElementById('sendQuoteOpenBtn');
+const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'#ff7b7b':'var(--muted)'; };
+
+openBtn.addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
+document.getElementById('modalSendQuoteClose').addEventListener('click',()=>ov.classList.remove('open'));
+document.getElementById('sendQuoteCancel').addEventListener('click',()=>ov.classList.remove('open'));
+ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); });
+
+submitBtn.addEventListener('click', async ()=>{
+  const email=document.getElementById('sendQuoteEmail').value.trim();
+  const name=document.getElementById('sendQuoteName').value.trim();
+  const userMsg=document.getElementById('sendQuoteMsg').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ setStatus('Podaj poprawny adres e-mail.',true); return; }
+  submitBtn.disabled=true; setStatus('Przygotowuję projekt…');
+  try{
+    const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
+    if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
+    const q=payload.quote;
+    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera: ${q.timeMin} min\nZużycie materiału: ${q.areaCm2} cm²`;
+    setStatus('Wysyłam do pracowni…');
+    const db=await ensureDb();
+    await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
+      name: name||'Klient edytora wyceny',
+      email,
+      message:(userMsg?userMsg+'\n\n':'')+quoteTxt+(payload.note?'\n'+payload.note:''),
+      attachment: payload.projImg,
+      vizImg: payload.vizImg||null,
+      svgFile: payload.svgFile||null,
+      svgName: 'projekt-laser-'+Date.now()+'.svg',
+      source:'edytor',
+      quote:q,
+      date:new Date().toISOString(),
+      status:'new',
+      read:false
+    });
+    setStatus('✅ Wysłano! Odpowiemy na '+email);
+    submitBtn.textContent='Wysłano ✓';
+    setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.textContent='Wyślij projekt'; },2500);
+  }catch(err){
+    console.error('Send quote error',err);
+    setStatus('Błąd wysyłki: '+(err?.message||'spróbuj ponownie'),true);
+    submitBtn.disabled=false;
+  }
+});
 </script>
 </body>
 </html>
