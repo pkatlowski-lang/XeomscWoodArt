@@ -242,6 +242,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .quote-price{margin-top:14px;padding:20px 12px;text-align:center;font-size:1.9rem;font-weight:800;color:var(--accent);background:var(--surface2);border:1px solid var(--border);border-radius:10px;letter-spacing:.5px}
 .quote-price.quote-empty{font-size:.86rem;font-weight:500;color:var(--muted)}
 
+/* ---- Wycena na żywo (widget na scenie) ---- */
+.live-quote{position:absolute;right:16px;bottom:16px;z-index:6;display:flex;flex-direction:column;gap:6px;min-width:200px;padding:11px 13px;background:rgba(13,22,36,.92);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+.live-quote .lq-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.live-quote select{padding:3px 5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.72rem;max-width:120px}
+.live-quote .lq-price{font-size:1.45rem;font-weight:800;color:var(--accent);letter-spacing:.4px;line-height:1.1}
+.live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
+.live-quote .lq-time{font-size:.72rem;color:var(--muted)}
+.live-quote .lq-send{width:100%;height:32px;font-size:.76rem;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700}
+
 /* ---- Skróty klawiszowe (modal) ---- */
 .shortcuts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 28px;margin-top:16px}
 .sc-group h4{margin:0 0 8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
@@ -443,6 +452,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="ruler ruler-v" id="rulerV" title="Przeciągnij w prawo, aby utworzyć linię pomocniczą"></div>
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
       <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt na płycie — albo kliknij szablon po lewej</div>
+      <div class="live-quote" id="liveQuote">
+        <div class="lq-head"><span>💰 Wycena</span><select id="lqMat" title="Materiał"></select></div>
+        <div class="lq-price lq-empty" id="lqPrice">narysuj projekt…</div>
+        <div class="lq-time" id="lqTime"></div>
+        <button type="button" class="tbtn lq-send" id="lqSend">📨 Wyślij do wyceny</button>
+      </div>
     </section>
 
     <aside class="panel right">
@@ -716,7 +731,29 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ['"Satisfy", cursive','Satisfy'],
     ['"Lobster", cursive','Lobster'],
     ['"Caveat", cursive','Caveat'],
-    ['"Amatic SC", cursive','Amatic SC']
+    ['"Amatic SC", cursive','Amatic SC'],
+    // Czcionki systemowe (PC) — renderowane z czcionek zainstalowanych u użytkownika,
+    // bez pobierania i bez uprawnień; gdy brak na urządzeniu, użyta zostanie zastępcza.
+    ['"Arial", sans-serif','Arial (PC)'],
+    ['"Segoe UI", sans-serif','Segoe UI (PC)'],
+    ['"Calibri", sans-serif','Calibri (PC)'],
+    ['"Verdana", sans-serif','Verdana (PC)'],
+    ['"Tahoma", sans-serif','Tahoma (PC)'],
+    ['"Trebuchet MS", sans-serif','Trebuchet MS (PC)'],
+    ['"Century Gothic", "Questrial", sans-serif','Century Gothic (PC)'],
+    ['"Impact", sans-serif','Impact (PC)'],
+    ['"Times New Roman", serif','Times New Roman (PC)'],
+    ['"Georgia", serif','Georgia (PC)'],
+    ['"Garamond", "EB Garamond", serif','Garamond (PC)'],
+    ['"Cambria", serif','Cambria (PC)'],
+    ['"Book Antiqua", "Palatino Linotype", serif','Book Antiqua (PC)'],
+    ['"Courier New", monospace','Courier New (PC)'],
+    ['"Comic Sans MS", cursive','Comic Sans MS (PC)'],
+    ['"Brush Script MT", cursive','Brush Script MT (PC)'],
+    ['"Monotype Corsiva", cursive','Monotype Corsiva (PC)'],
+    ['"Lucida Handwriting", cursive','Lucida Handwriting (PC)'],
+    ['"Segoe Script", cursive','Segoe Script (PC)'],
+    ['"Segoe Print", cursive','Segoe Print (PC)']
   ];
   let localFonts=[];                       // czcionki zainstalowane na komputerze
   function availableFonts(){ return FONTS.concat(localFonts); }
@@ -1096,6 +1133,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(state.hiddenDepths.length && state.hiddenDepths.includes(o.depth||1)) return '';
       return objMarkup(o,false);
     }).join('');
+    scheduleLiveQuote();
   }
   // Szybka aktualizacja podczas przeciągania: podmienia zawartość <g data-id> tylko dla
   // jednego obiektu zamiast renderować od nowa cały dokument — eliminuje "zacinanie się"
@@ -1105,6 +1143,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!el || !o.visible || (state.hiddenDepths.length && state.hiddenDepths.includes(o.depth||1))){ renderObjects(); return; }
     const inner=innerGeometry(o,false);
     el.innerHTML=repeatTransforms(o).map(t=> t? `<g transform="${t}">${inner}</g>` : inner).join('');
+    scheduleLiveQuote();
   }
 
   // Wielowierszowy tekst: o.y to "środek" całego bloku tekstu (jak dotychczas dla 1 linii),
@@ -3772,7 +3811,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   };
   const QUOTE_LASER_PER_MIN=1.5;  // koszt minuty pracy lasera (zł)
   const QUOTE_PACKAGING=2.5;      // pakowanie (zł)
-  const QUOTE_MARGIN=0.30;        // marża (30%)
+  const QUOTE_MARGIN=0.50;        // marża (50%)
   const QUOTE_TIME_BUFFER=1.15;   // +15% czasu jako tolerancja błędowa (przejazdy, przyspieszenia, powtórzenia)
   // Łączna długość trasy lasera po projekcie (mm) — kontury WSZYSTKICH widocznych
   // elementów (cięcie, nacięcie i grawer liniowy) z powieleniami; obrazy pomocnicze pomijane.
@@ -3835,6 +3874,23 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   document.getElementById('modalQuoteClose').addEventListener('click',()=>modalQuote.classList.remove('open'));
   modalQuote.addEventListener('click',e=>{ if(e.target===modalQuote) modalQuote.classList.remove('open'); });
   quoteMatSel.addEventListener('change',renderQuote);
+
+  /* ---- Wycena na żywo: stały widget w rogu sceny, odświeżany przy każdej edycji ---- */
+  const lqMat=document.getElementById('lqMat'), lqPrice=document.getElementById('lqPrice'), lqTime=document.getElementById('lqTime');
+  lqMat.innerHTML=quoteMatSel.innerHTML;
+  function renderLiveQuote(){
+    const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
+    if(!hasWork){ lqPrice.textContent='narysuj projekt…'; lqPrice.classList.add('lq-empty'); lqTime.textContent=''; return; }
+    lqPrice.classList.remove('lq-empty');
+    const mat=QUOTE_MATERIALS[quoteMatSel.value];
+    lqPrice.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
+    lqTime.textContent='⏱ '+formatQuoteTime(quoteTimeMin(mat))+' (min:sek pracy lasera)';
+  }
+  var _lqTimer=null;
+  function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderLiveQuote,200); }
+  lqMat.addEventListener('change',()=>{ quoteMatSel.value=lqMat.value; renderLiveQuote(); });
+  quoteMatSel.addEventListener('change',()=>{ lqMat.value=quoteMatSel.value; renderLiveQuote(); });
+  renderLiveQuote();
 
   /* ---------------- Manager warstw 3D ---------------- */
   function renderDepthLegend(){
@@ -5350,6 +5406,7 @@ const openBtn=document.getElementById('sendQuoteOpenBtn');
 const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'#ff7b7b':'var(--muted)'; };
 
 openBtn.addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
+document.getElementById('lqSend').addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
 document.getElementById('modalSendQuoteClose').addEventListener('click',()=>ov.classList.remove('open'));
 document.getElementById('sendQuoteCancel').addEventListener('click',()=>ov.classList.remove('open'));
 ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); });
