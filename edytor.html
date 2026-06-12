@@ -6,7 +6,7 @@
 <title>Edytor projektów do lasera — interaktywny edytor parametryczny</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Montserrat:wght@500;700&family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Montserrat:wght@500;700&family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Cinzel:wght@600;700&family=Marcellus&family=Pacifico&family=Sacramento&family=Allura&family=Parisienne&family=Tangerine:wght@400;700&family=Satisfy&family=Lobster&family=Caveat:wght@500;700&family=Amatic+SC:wght@400;700&family=Raleway:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -698,10 +698,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const COLORS={cut:'#ff2d2d',engrave:'#1c1c1c',score:'#2f7bd8',hole:'#9b5de5'};
   const FONTS=[
     ['"Playfair Display", serif','Playfair Display'],
+    ['"Cormorant Garamond", serif','Cormorant Garamond'],
+    ['"Cinzel", serif','Cinzel'],
+    ['"Marcellus", serif','Marcellus'],
+    ['"Montserrat", sans-serif','Montserrat'],
+    ['"Poppins", sans-serif','Poppins'],
+    ['"Raleway", sans-serif','Raleway'],
+    ['"Quicksand", sans-serif','Quicksand'],
+    ['"Inter", sans-serif','Inter'],
     ['"Dancing Script", cursive','Dancing Script'],
     ['"Great Vibes", cursive','Great Vibes'],
-    ['"Montserrat", sans-serif','Montserrat'],
-    ['"Inter", sans-serif','Inter']
+    ['"Pacifico", cursive','Pacifico'],
+    ['"Sacramento", cursive','Sacramento'],
+    ['"Allura", cursive','Allura'],
+    ['"Parisienne", cursive','Parisienne'],
+    ['"Tangerine", cursive','Tangerine'],
+    ['"Satisfy", cursive','Satisfy'],
+    ['"Lobster", cursive','Lobster'],
+    ['"Caveat", cursive','Caveat'],
+    ['"Amatic SC", cursive','Amatic SC']
   ];
   let localFonts=[];                       // czcionki zainstalowane na komputerze
   function availableFonts(){ return FONTS.concat(localFonts); }
@@ -3758,6 +3773,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const QUOTE_LASER_PER_MIN=1.5;  // koszt minuty pracy lasera (zł)
   const QUOTE_PACKAGING=2.5;      // pakowanie (zł)
   const QUOTE_MARGIN=0.30;        // marża (30%)
+  const QUOTE_TIME_BUFFER=1.15;   // +15% czasu jako tolerancja błędowa (przejazdy, przyspieszenia, powtórzenia)
   // Łączna długość trasy lasera po projekcie (mm) — kontury WSZYSTKICH widocznych
   // elementów (cięcie, nacięcie i grawer liniowy) z powieleniami; obrazy pomocnicze pomijane.
   function quotePathLen(){
@@ -3780,9 +3796,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     });
     return mm2/100;
   }
+  // Czas cyklu lasera + 15% bufora (tolerancja błędowa: przejazdy, przyspieszenia, powtórzenia).
+  function quoteTimeMin(mat){
+    return quotePathLen()/mat.speed*QUOTE_TIME_BUFFER;
+  }
+  // Format "min.sek" np. 4.34 = 4 min 34 s (sekundy 00-59, NIE część dziesiętna minuty).
+  function formatQuoteTime(min){
+    const totalSec=Math.round(min*60);
+    const m=Math.floor(totalSec/60), s=totalSec%60;
+    return `${m}.${String(s).padStart(2,'0')}`;
+  }
   function computeQuote(matKey){
     const mat=QUOTE_MATERIALS[matKey]; if(!mat) return null;
-    const timeMin=quotePathLen()/mat.speed;
+    const timeMin=quoteTimeMin(mat);
     const laserCost=timeMin*QUOTE_LASER_PER_MIN;
     const materialCost=quoteMaterialArea()*mat.pricePerCm2;
     const total=(laserCost+materialCost+QUOTE_PACKAGING)*(1+QUOTE_MARGIN);
@@ -3798,7 +3824,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!hasWork){ priceEl.textContent='Brak elementów do wyceny — narysuj projekt na płycie.'; priceEl.classList.add('quote-empty'); statsEl.innerHTML=''; return; }
     priceEl.classList.remove('quote-empty');
     const mat=QUOTE_MATERIALS[quoteMatSel.value];
-    const timeMin=quotePathLen()/mat.speed;
+    const timeMin=quoteTimeMin(mat);
     const areaCm2=quoteMaterialArea();
     statsEl.innerHTML=
       `<div class="sum-row"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(timeMin)}</span></div>`
@@ -4386,7 +4412,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const matKey=quoteMatSel.value;
     const mat=QUOTE_MATERIALS[matKey];
     const price=computeQuote(matKey);
-    const timeMin=quotePathLen()/mat.speed;
+    const timeMin=quoteTimeMin(mat);
     const areaCm2=quoteMaterialArea();
     const svgStr=buildExportSvgString();
     const prevStr=buildPreviewSvgString();
@@ -4400,7 +4426,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(projImg.length+(vizImg?vizImg.length:0)+svgStr.length>LIMIT){ svgOut=null; note='(bardzo duży projekt: plik SVG nie zmieścił się w wiadomości — poproś klienta o eksport)'; }
     return {
       svgFile:svgOut, projImg, vizImg, note,
-      quote:{ material:mat.label, price:+price.toFixed(2), timeMin:+timeMin.toFixed(1), areaCm2:+areaCm2.toFixed(1) }
+      quote:{ material:mat.label, price:+price.toFixed(2), timeMin:formatQuoteTime(timeMin), areaCm2:+areaCm2.toFixed(1) }
     };
   }
   window.XEO_BUILD_QUOTE_PAYLOAD=buildQuotePayload;
@@ -5338,7 +5364,7 @@ submitBtn.addEventListener('click', async ()=>{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
     if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
     const q=payload.quote;
-    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera: ${q.timeMin} min\nZużycie materiału: ${q.areaCm2} cm²`;
+    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera (min:sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
     setStatus('Wysyłam do pracowni…');
     const db=await ensureDb();
     await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{

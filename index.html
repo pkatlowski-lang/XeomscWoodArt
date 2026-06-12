@@ -3424,7 +3424,7 @@
                                          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                                              <div><p class="text-[10px] text-stone-500 uppercase">Materiał</p><p class="text-white font-semibold">${escapeHTML(m.quote.material || '—')}</p></div>
                                              <div><p class="text-[10px] text-stone-500 uppercase">Cena</p><p class="text-emerald-400 font-bold">${m.quote.price != null ? String(m.quote.price).replace('.', ',') + ' zł' : '—'}</p></div>
-                                             <div><p class="text-[10px] text-stone-500 uppercase">Czas lasera</p><p class="text-white">${m.quote.timeMin != null ? m.quote.timeMin + ' min' : '—'}</p></div>
+                                             <div><p class="text-[10px] text-stone-500 uppercase">Czas lasera (min:sek)</p><p class="text-white">${m.quote.timeMin != null ? m.quote.timeMin : '—'}</p></div>
                                              <div><p class="text-[10px] text-stone-500 uppercase">Materiał (pow.)</p><p class="text-white">${m.quote.areaCm2 != null ? m.quote.areaCm2 + ' cm²' : '—'}</p></div>
                                          </div>
                                      </div>` : ''}
