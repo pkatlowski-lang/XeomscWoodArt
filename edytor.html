@@ -1568,14 +1568,42 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(!rawPolys.length){ alert('Nie udało się znaleźć konturu na tym obrazie.\nNajlepiej działa to dla prostych, kontrastowych grafik (logo, sylwetka) — najlepiej z przezroczystym tłem.'); return; }
       const sx=(o.w||1)/W, sy=(o.h||1)/H;
       const localPolys=rawPolys.map(poly=>smoothRingToPolyline(poly,50).map(([px,py])=>[px*sx, py*sy]));
-      const conv={...defaultsFor('path'),
-        d: localPolys.map(polyToPathD).join(' '),
-        fillRule:'evenodd',
-        name:(o.name||'Obraz')+' (obrys)',
-        x:o.x, y:o.y, bx:0, by:0, bw:Math.max(0.01,o.w), bh:Math.max(0.01,o.h),
-        rotation:o.rotation||0, depth:o.depth||1
+      // Grupujemy pierścienie w ODDZIELNE kształty: każdy kontur najwyższego poziomu (nie
+      // zawarty w żadnym innym) wraz ze swoimi dziurami/zagnieżdżeniami staje się osobnym
+      // obiektem 'path'. Dzięki temu dwa rozłączne elementy obrazu NIE są jednym evenodd-
+      // -kształtem, w którym jeden bywa błędnie traktowany jak otwór w sylwetce 3D.
+      const meta=localPolys.map(p=>({pts:p, area:Math.abs(polyArea(p)), c:polyCentroid(p)}));
+      // głębokość zagnieżdżenia = liczba innych konturów, w których leży środek danego konturu
+      meta.forEach(m=>{ m.depth=meta.reduce((n,o2)=>n+((o2!==m && o2.area>m.area && pointInPoly(m.c,o2.pts))?1:0),0); });
+      const roots=meta.filter(m=>m.depth===0);
+      // każdy kontur przypisz do najmniejszego korzenia (depth 0), który go obejmuje
+      const groups=roots.map(r=>({rings:[], rootArea:r.area, root:r}));
+      const groupOf=m=>{
+        if(m.depth===0) return groups.find(g=>g.root===m);
+        let best=null;
+        for(const g of groups){ if(g.root.area>m.area && pointInPoly(m.c,g.root.pts)){ if(!best||g.root.area<best.root.area) best=g; } }
+        return best||groups[0];
       };
-      addObject(conv);
+      meta.forEach(m=>{ const g=groupOf(m); if(g) g.rings.push(m.pts); });
+      const useGroups=groups.filter(g=>g.rings.length);
+      const baseName=(o.name||'Obraz')+' (obrys)';
+      const gid=useGroups.length>1?uid():null;
+      const newObjs=useGroups.map((g,idx)=>{
+        const bb=polysBBoxMulti(g.rings);
+        const conv={...defaultsFor('path'),
+          d: g.rings.map(polyToPathD).join(' '),
+          fillRule:'evenodd',
+          name: useGroups.length>1 ? baseName+' '+(idx+1) : baseName,
+          x:o.x, y:o.y,
+          bx:bb.minx, by:bb.miny, bw:Math.max(0.01,bb.maxx-bb.minx), bh:Math.max(0.01,bb.maxy-bb.miny),
+          rotation:o.rotation||0, depth:o.depth||1
+        };
+        if(gid) conv.groupId=gid;
+        return conv;
+      });
+      newObjs.forEach(c=>state.objects.push(c));
+      state.selectedIds=newObjs.map(c=>c.id);
+      pushHistory(); renderAll(); renderProps(); scheduleLive3D();
     };
     img.onerror=()=>alert('Nie udało się wczytać obrazu do obrysowania.');
     img.src=o.src;
