@@ -1094,24 +1094,30 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const r=canvasRect();
     return e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom;
   }
-  // Keep the viewBox aspect ratio equal to the on-screen canvas aspect ratio so
-  // there is no letterboxing — this makes pan/zoom/pinch math exact and removes
-  // "dead zones" where clicks landed outside the drawing area.
-  function syncViewAspect(){ const r=canvasRect(); if(r.width>0&&r.height>0) state.view.h=state.view.w*(r.height/r.width); }
+  // Rzeczywisty, wyrenderowany obszar arkusza w pikselach ekranu — przy
+  // preserveAspectRatio="xMidYMid meet" SVG może być węższe/niższe niż
+  // canvasRect(), gdy proporcje pola edycji różnią się od proporcji arkusza
+  // (treść jest wtedy wycentrowana, z pustym pasem z boku / góry-dołu).
+  function renderedRect(){
+    const r=canvasRect(), v=state.view;
+    if(!(r.width>0)||!(r.height>0)||!(v.w>0)||!(v.h>0)) return r;
+    const scale=Math.min(r.width/v.w, r.height/v.h);
+    const w=v.w*scale, h=v.h*scale;
+    const left=r.left+(r.width-w)/2, top=r.top+(r.height-h)/2;
+    return {left, top, width:w, height:h, right:left+w, bottom:top+h};
+  }
   // Ogranicza widok do arkusza (maks. 760×760 mm) + margines maks. 50 mm z każdej strony:
   // nie można oddalić tak, by widać było więcej niż arkusz + margines, ani przesunąć (pan)
-  // poza krawędź marginesu. Wołane w applyView(), więc dotyczy każdej zmiany widoku (zoom/pan/fit).
+  // poza krawędź marginesu. Proporcje widoku (zoomFit = proporcje arkusza) są zawsze
+  // zachowane. Wołane w applyView(), więc dotyczy każdej zmiany widoku (zoom/pan/fit).
   const VIEW_MARGIN_MM=50;
   function clampView(){
     const M=VIEW_MARGIN_MM, v=state.view;
-    const r=canvasRect();
-    const aspect=(r.width>0&&r.height>0)?(r.width/r.height):(v.w/(v.h||1));
-    const fullW=state.docW+2*M, fullH=state.docH+2*M;
-    // maksymalne oddalenie: cały arkusz + margines mieści się w kadrze (z zachowaniem proporcji płótna)
-    const maxW=Math.max(fullW, fullH*aspect);
-    if(v.w>maxW) v.w=maxW;
-    if(v.w<2) v.w=2;
-    v.h=v.w/aspect;                       // proporcje widoku = proporcje płótna (bez letterboxingu w mapowaniu)
+    const maxW=state.docW+2*M, maxH=state.docH+2*M;
+    let s=Math.min(maxW/v.w, maxH/v.h, 1);
+    if(s<1){ v.w*=s; v.h*=s; }
+    s=Math.max(2/v.w, 2/v.h, 1);
+    if(s>1){ v.w*=s; v.h*=s; }
     // granice przesuwania: nie odsłaniać niczego poza [-M, doc+M]; gdy widok szerszy niż ten zakres na danej osi — wyśrodkuj
     const x0=-M, x1=state.docW+M, y0=-M, y1=state.docH+M, spanX=x1-x0, spanY=y1-y0;
     v.x = (v.w>=spanX) ? x0+(spanX-v.w)/2 : clamp(v.x, x0, x1-v.w);
@@ -1136,19 +1142,21 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function renderRulers(){
     if(!rulerH||!rulerV) return;
     const r=canvasRect(); if(!(r.width>0)||!(r.height>0)) return;
+    const rr=renderedRect();
     const v=state.view;
-    const pxX=r.width/v.w, pxY=r.height/v.h;
+    const offX=rr.left-r.left, offY=rr.top-r.top;
+    const pxX=rr.width/v.w, pxY=rr.height/v.h;
     const stepX=rulerStep(pxX,55), stepY=rulerStep(pxY,55);
     let hHtml='';
     for(let x=Math.floor(v.x/stepX)*stepX; x<=v.x+v.w; x+=stepX){
-      const px=(x-v.x)*pxX;
+      const px=offX+(x-v.x)*pxX;
       if(px<0||px>r.width) continue;
       hHtml+=`<div class="ruler-tick" style="left:${px}px"><span class="rt-label">${Math.round(x)}</span></div>`;
     }
     rulerH.innerHTML=hHtml;
     let vHtml='';
     for(let y=Math.floor(v.y/stepY)*stepY; y<=v.y+v.h; y+=stepY){
-      const py=(y-v.y)*pxY;
+      const py=offY+(y-v.y)*pxY;
       if(py<0||py>r.height) continue;
       vHtml+=`<div class="ruler-tick" style="top:${py}px"><span class="rt-label">${Math.round(y)}</span></div>`;
     }
@@ -2326,13 +2334,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function setCapture(e){ try{ canvas.setPointerCapture(e.pointerId); }catch(_){} }
 
   function startPan(e){ setCapture(e); canvas.style.cursor='grabbing';
-    drag={mode:'pan', r:canvasRect(), sx:e.clientX, sy:e.clientY, vx:state.view.x, vy:state.view.y, vw:state.view.w, vh:state.view.h}; }
+    drag={mode:'pan', r:renderedRect(), sx:e.clientX, sy:e.clientY, vx:state.view.x, vy:state.view.y, vw:state.view.w, vh:state.view.h}; }
 
   /* ---- two-finger pan + pinch zoom (touch) ---- */
   function beginPinch(){
     drag=null;
     const ps=[...pointers.values()]; if(ps.length<2) return; const a=ps[0], b=ps[1];
-    pinch={ r:canvasRect(), dist:Math.hypot(a.x-b.x,a.y-b.y)||1, mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},
+    pinch={ r:renderedRect(), dist:Math.hypot(a.x-b.x,a.y-b.y)||1, mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},
             vx:state.view.x, vy:state.view.y, vw:state.view.w, vh:state.view.h };
   }
   function updatePinch(){
@@ -2673,11 +2681,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   /* zoom via wheel — anchored to the cursor */
   canvas.addEventListener('wheel', e=>{
     e.preventDefault();
-    const r=canvasRect(); const fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
+    const r=renderedRect(); const fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
     const v=state.view; const docX=v.x+fx*v.w, docY=v.y+fy*v.h;
     const factor=e.deltaY<0?0.85:1/0.85;
-    const nw=clamp(v.w*factor,20,4000), nh=nw*(v.h/v.w);
-    v.w=nw; v.h=nh; v.x=docX-fx*nw; v.y=docY-fy*nh;
+    v.w*=factor; v.h*=factor;
+    v.x=docX-fx*v.w; v.y=docY-fy*v.h;
     applyView(); renderOverlay();
   },{passive:false});
 
@@ -3493,7 +3501,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     docWInput.value=nw; docHInput.value=nh;
     if(nw===state.docW && nh===state.docH) return;
     state.docW=nw; state.docH=nh;
-    syncViewAspect(); zoomFit(); renderGrid(); renderAll(); pushHistory();
+    zoomFit(); renderGrid(); renderAll(); pushHistory();
   }
   docWInput.addEventListener('change',()=>applyDocSize(docWInput.value,docHInput.value));
   docHInput.addEventListener('change',()=>applyDocSize(docWInput.value,docHInput.value));
@@ -3548,7 +3556,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     state.selectedIds=[]; state.history=[]; state.hIndex=-1;
     docWInput.value=state.docW; docHInput.value=state.docH;
     depthViewBtn.classList.toggle('active',state.depthView);
-    syncViewAspect(); zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
+    zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
     pushHistory();
   }
   function downloadJSON(obj,filename){
@@ -3601,14 +3609,15 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       return c; });
     clipboard=copies.map(c=>JSON.parse(JSON.stringify(c))); // kolejne Ctrl+V odsuwa dalej, jak w Illustratorze/Cuttle
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
-  function zoomBy(f){ const r=canvasRect(); const aspect=(r.width&&r.height)?r.width/r.height:state.view.w/state.view.h;
-    const v=state.view; const cx=v.x+v.w/2, cy=v.y+v.h/2;
-    v.w=clamp(v.w*f,20,4000); v.h=v.w/aspect; v.x=cx-v.w/2; v.y=cy-v.h/2; applyView(); renderOverlay(); }
+  function zoomBy(f){ const v=state.view; const cx=v.x+v.w/2, cy=v.y+v.h/2;
+    v.w*=f; v.h*=f; v.x=cx-v.w/2; v.y=cy-v.h/2; applyView(); renderOverlay(); }
+  // Domyślny widok: arkusz wypełnia pole edycji maksymalnie, wycentrowany,
+  // z minimalnym marginesem wokół (tylko na tyle, by widać brzeg i linijki).
+  // Proporcje widoku = proporcje arkusza; preserveAspectRatio="xMidYMid meet"
+  // dopasowuje go do pola edycji bez rozciągania.
   function zoomFit(){
-    const r=canvasRect(); const aspect=(r.width&&r.height)? r.width/r.height : (state.docW+40)/(state.docH+40);
-    const m=20, dw=state.docW+2*m, dh=state.docH+2*m;
-    let vw=Math.max(dw, dh*aspect), vh=vw/aspect;
-    state.view={ x:-m-(vw-dw)/2, y:-m-(vh-dh)/2, w:vw, h:vh };
+    const m=4;
+    state.view={ x:-m, y:-m, w:state.docW+2*m, h:state.docH+2*m };
     applyView(); renderOverlay();
   }
   // przybliż widok tak, by mieściło całe zaznaczenie (z marginesem); brak zaznaczenia -> jak "Dopasuj"
@@ -3616,10 +3625,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const sel=getSelected(); if(!sel.length){ zoomFit(); return; }
     let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
     sel.forEach(o=>{ const bb=rotatedBBox(o); minx=Math.min(minx,bb.minx); miny=Math.min(miny,bb.miny); maxx=Math.max(maxx,bb.maxx); maxy=Math.max(maxy,bb.maxy); });
-    const r=canvasRect(); const aspect=(r.width&&r.height)? r.width/r.height : state.view.w/state.view.h;
     const m=Math.max(4, (maxx-minx)*0.12, (maxy-miny)*0.12);
-    const dw=Math.max(1,maxx-minx)+2*m, dh=Math.max(1,maxy-miny)+2*m;
-    let vw=Math.max(dw, dh*aspect), vh=vw/aspect;
+    const vw=Math.max(1,maxx-minx)+2*m, vh=Math.max(1,maxy-miny)+2*m;
     const cx=(minx+maxx)/2, cy=(miny+maxy)/2;
     state.view={ x:cx-vw/2, y:cy-vh/2, w:vw, h:vh };
     applyView(); renderOverlay();
@@ -5544,7 +5551,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
 
   /* ---------------- Init ---------------- */
-  buildCanvasSkeleton(); syncViewAspect();
+  buildCanvasSkeleton();
   restoreAutosave();
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView);
@@ -5552,7 +5559,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
-  window.addEventListener('resize',()=>{ syncViewAspect(); applyView(); renderOverlay(); });
+  window.addEventListener('resize',()=>{ applyView(); renderOverlay(); });
 
   // Czcionki z Google Fonts wczytują się asynchronicznie - jeśli wektoryzacja tekstu
   // (rasteryzacja na <canvas>, patrz rasterizeTextOutlines) zdarzy się WCZEŚNIEJ,
