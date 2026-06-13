@@ -97,6 +97,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .geo-cut-txt{fill:transparent;stroke:var(--cut);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-score-txt{fill:transparent;stroke:var(--score);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-hole{fill:rgba(155,93,229,.22);stroke:#9b5de5;stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
+.geo-hole-txt{fill:rgba(155,93,229,.30);stroke:#9b5de5;stroke-width:0.8px;vector-effect:non-scaling-stroke}
 .sel-box{fill:none;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:5 3}
 .sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
 .sel-rot-line{stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
@@ -1013,7 +1014,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(_silFill) styleCss=`fill:${_silFill};stroke:${_silFill};stroke-width:0.6px;`;
       else if(forExport) styleCss=exportTextStyle(o);
       else if(state.depthView) styleCss=`fill:${depthColor(o.depth||1)};`;
-      else cls=o.mode==='engrave'?'geo-engrave-txt':o.mode==='score'?'geo-score-txt':'geo-cut-txt';
+      else cls=o.role==='hole'?'geo-hole-txt':o.mode==='engrave'?'geo-engrave-txt':o.mode==='score'?'geo-score-txt':'geo-cut-txt';
       styleCss+=deco;
       const clsAttr=cls?` class="${cls}"`:'';
       const styleAttr=styleCss?` style="${styleCss}"`:'';
@@ -1046,6 +1047,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     return ` fill="none" stroke="${COLORS.cut}" stroke-width="0.12"`;
   }
   function exportTextStyle(o){
+    if(o.role==='hole') return `fill:none;stroke:${COLORS.hole};stroke-width:0.12px;stroke-dasharray:1.2 0.9;`;
     if(o.mode==='engrave') return `fill:${COLORS.engrave};stroke:none;`;
     if(o.mode==='score') return `fill:none;stroke:${COLORS.score};stroke-width:0.12px;stroke-dasharray:1.2 0.9;`;
     return `fill:none;stroke:${COLORS.cut};stroke-width:0.12px;`;
@@ -2701,12 +2703,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="cut ${o.mode==='cut'?'on':''}" data-mode="cut">Cięcie</button>
       <button class="engrave ${o.mode==='engrave'?'on':''}" data-mode="engrave">Grawer</button>
       <button class="score ${o.mode==='score'?'on':''}" data-mode="score">Nacięcie</button></div></div>`;
-    // role: pełny kształt vs otwór (wycięcie odejmowane od sylwetki warstwy)
-    if(BOOL_TYPES.includes(o.type)){
+    // role: pełny kształt vs otwór (wycięcie odejmowane od sylwetki warstwy) — kształty ORAZ tekst
+    if(BOOL_TYPES.includes(o.type) || o.type==='text'){
+      const _isTxt=o.type==='text';
       h+=`<div class="field"><label>Rola w warstwie</label><div class="seg" data-seg="role">
-        <button class="${o.role==='hole'?'':'on'}" data-role="fill" title="Element jest pełnym, wypełnionym kształtem warstwy">⬛ Pełny kształt</button>
-        <button class="${o.role==='hole'?'on':''}" data-role="hole" title="Kontur tego elementu zostanie wycięty (odjęty) z sylwetki warstwy 3D - np. otwór montażowy">◯ Otwór (wycięcie)</button></div>
-        ${o.role==='hole'?'<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) - sam nie jest wyświetlany jako odrębny element.</p>':''}</div>`;
+        <button class="${o.role==='hole'?'':'on'}" data-role="fill" title="Element jest pełnym, wypełnionym kształtem warstwy">${_isTxt?'⬛ Pełny napis':'⬛ Pełny kształt'}</button>
+        <button class="${o.role==='hole'?'on':''}" data-role="hole" title="Kontur tego elementu zostanie wycięty (odjęty) z sylwetki warstwy 3D">◯ Otwór (wycięcie)</button></div>
+        ${o.role==='hole'?`<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
     }
     // position/size
     if(o.type==='text'||o.type==='path'){
@@ -4411,7 +4414,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const cutPaths=rings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${COLORS.cut}" stroke-width="0.3"/>`).join('');
       // tekst tej warstwy w trybie "grawer" — wypełniona zwektoryzowana sylwetka liter (do grawerowania).
       // Kontur do CIĘCIA liter jest już częścią cutPaths (cutObjs zawiera cały tekst niezależnie od trybu).
-      const textEngrave=vis.filter(o=>o.type==='text' && (o.depth||1)===dep && o.mode==='engrave')
+      const textEngrave=vis.filter(o=>o.type==='text' && (o.depth||1)===dep && o.mode==='engrave' && o.role!=='hole')
         .map(o=>{ const polys=objSubPolysRepeated(o);
           return polys.length ? `<path d="${polys.map(p=>polyToSmoothPathD(p,50)).join(' ')}" fill="${COLORS.engrave}" fill-rule="evenodd"/>` : objMarkup({...o,mode:'cut'},true); }).join('');
       // dekoracje (grawer) kształtów z tej warstwy — rysowane na wierzchu obrysu cięcia
@@ -4446,7 +4449,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const layer=vis.filter(o=>(o.depth||1)===dep);
       // grawer: kształty jako wypełniona sylwetka, tekst jako zwektoryzowane litery (bez fontu)
       body+=layer.filter(o=>o.mode==='engrave' && o.type!=='text' && o.role!=='hole').map(o=>objMarkup(o,true)).join('');
-      body+=layer.filter(o=>o.type==='text' && o.mode==='engrave').map(o=>{
+      body+=layer.filter(o=>o.type==='text' && o.mode==='engrave' && o.role!=='hole').map(o=>{
         const polys=objSubPolysRepeated(o);
         return polys.length ? `<path d="${polys.map(p=>polyToSmoothPathD(p,50)).join(' ')}" fill="${COLORS.engrave}" fill-rule="evenodd"/>` : objMarkup({...o,mode:'cut'},true);
       }).join('');
