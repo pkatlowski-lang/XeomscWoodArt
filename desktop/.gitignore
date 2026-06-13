@@ -4,10 +4,9 @@ node_modules/
 # Wynik buildu instalatorów
 dist/
 
-# Wygenerowana kopia edytora + licencji (tworzona przez copy-app.js)
-app/edytor.html
-app/license.html
-app/license.txt
+# Wygenerowana zawartość app/ (tworzona przez copy-app.js) — oprócz .gitkeep
+app/*
+!app/.gitkeep
 
 # System
 .DS_Store

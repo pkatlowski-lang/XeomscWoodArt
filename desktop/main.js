@@ -3,7 +3,7 @@
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
 
-const APP_TITLE = 'Edytor Laser XEOMSC';
+const APP_TITLE = 'Xeomsc-Laser';
 const WEBSITE_URL = 'https://xeomsc-laser.pl';
 const EDITOR_FILE = path.join(__dirname, 'app', 'edytor.html');
 const LICENSE_FILE = path.join(__dirname, 'app', 'license.html');

@@ -120,6 +120,17 @@ function main() {
 
   fs.writeFileSync(OUT_EDITOR, html, 'utf8');
 
+  // Logo do brandingu w aplikacji (edytor.html odwołuje się do assets/logo.png)
+  try{
+    const logoSrc=path.join(ROOT,'assets','logo.png');
+    if(fs.existsSync(logoSrc)){
+      fs.mkdirSync(path.join(APP_DIR,'assets'),{recursive:true});
+      fs.copyFileSync(logoSrc, path.join(APP_DIR,'assets','logo.png'));
+    }else{
+      console.warn('[copy-app] UWAGA: brak ../assets/logo.png — logo nie zostanie dołączone.');
+    }
+  }catch(e){ console.warn('[copy-app] logo nieskopiowane:', e.message); }
+
   // licencja → app/
   const licText = fs.readFileSync(LICENSE_SRC, 'utf8');
   fs.writeFileSync(OUT_LICENSE_TXT, licText, 'utf8');

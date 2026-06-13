@@ -1,18 +1,18 @@
 UMOWA LICENCYJNA UŻYTKOWNIKA KOŃCOWEGO (EULA)
-Edytor Laser XEOMSC
+Xeomsc-Laser
 Wersja dokumentu: 1.0 — 2026
 
 WAŻNE — PRZECZYTAJ UWAŻNIE. Niniejsza Umowa Licencyjna Użytkownika Końcowego
 („Umowa") stanowi prawnie wiążące porozumienie pomiędzy Tobą (osobą fizyczną
 lub podmiotem, „Licencjobiorca") a Xeomsc Laser (xeomsc-laser.pl, „Licencjodawca")
-dotyczące oprogramowania „Edytor Laser XEOMSC" wraz z dołączonymi materiałami
+dotyczące oprogramowania „Xeomsc-Laser" wraz z dołączonymi materiałami
 („Oprogramowanie"). Instalując, kopiując lub w jakikolwiek sposób korzystając z
 Oprogramowania, akceptujesz warunki niniejszej Umowy. Jeżeli nie akceptujesz
 warunków — nie instaluj i nie używaj Oprogramowania.
 
 
 1. DEFINICJE
-   1.1. „Oprogramowanie" — program „Edytor Laser XEOMSC", jego pliki wykonywalne,
+   1.1. „Oprogramowanie" — program „Xeomsc-Laser", jego pliki wykonywalne,
         biblioteki, zasoby, dokumentacja oraz ewentualne aktualizacje.
    1.2. „Licencjodawca" — Xeomsc Laser, właściciel praw do Oprogramowania.
    1.3. „Licencjobiorca" — podmiot korzystający z Oprogramowania na podstawie

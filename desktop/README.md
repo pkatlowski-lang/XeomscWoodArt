@@ -1,4 +1,4 @@
-# Edytor Laser XEOMSC — wersja desktop (do instalacji)
+# Xeomsc-Laser — wersja desktop (do instalacji)
 
 Aplikacja desktopowa (Electron) opakowująca interaktywny edytor projektów
 laserowych (`edytor.html`) w program instalowalny na **Windows** i **macOS**,

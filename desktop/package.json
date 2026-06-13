@@ -1,7 +1,7 @@
 {
   "name": "edytor-laser-xeomsc",
-  "productName": "Edytor Laser XEOMSC",
-  "version": "1.0.0",
+  "productName": "Xeomsc-Laser",
+  "version": "1.1.0",
   "description": "Interaktywny, parametryczny edytor projektów do cięcia i grawerowania laserowego — XeomscWoodArt / Xeomsc Laser.",
   "author": {
     "name": "Xeomsc Laser",
@@ -26,7 +26,7 @@
   },
   "build": {
     "appId": "pl.xeomsc.edytor",
-    "productName": "Edytor Laser XEOMSC",
+    "productName": "Xeomsc-Laser",
     "copyright": "Copyright © 2026 Xeomsc Laser",
     "directories": {
       "output": "dist",
@@ -47,7 +47,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "Edytor-Laser-XEOMSC-Setup-${version}.${ext}"
+      "artifactName": "Xeomsc-Laser-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -57,7 +57,7 @@
       "license": "LICENSE.txt",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Edytor Laser XEOMSC",
+      "shortcutName": "Xeomsc-Laser",
       "installerLanguages": ["pl_PL", "en_US"],
       "language": "1045",
       "deleteAppDataOnUninstall": false
@@ -76,16 +76,16 @@
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "artifactName": "Edytor-Laser-XEOMSC-${version}-${arch}.${ext}"
+      "artifactName": "Xeomsc-Laser-${version}-${arch}.${ext}"
     },
     "dmg": {
-      "title": "Edytor Laser XEOMSC ${version}"
+      "title": "Xeomsc-Laser ${version}"
     },
     "linux": {
       "target": ["AppImage"],
       "icon": "build/icon.png",
       "category": "Graphics",
-      "artifactName": "Edytor-Laser-XEOMSC-${version}.${ext}"
+      "artifactName": "Xeomsc-Laser-${version}.${ext}"
     }
   }
 }
