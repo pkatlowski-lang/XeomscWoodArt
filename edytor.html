@@ -1533,8 +1533,55 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
   }
 
-  // Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst z literami
-  // i otworami) na osobne obiekty path - każdy z własną bx/by/bw/bh, dzięki czemu
+  /* ---- Obrysuj obraz: rasteryzacja + śledzenie konturów (Moore-Neighbor), ta sama technika
+     co wektoryzacja tekstu (traceMaskPolys). Z wgranego obrazu (PNG/JPG) tworzy NOWY obiekt
+     'path' z konturami gotowymi do cięcia/grawerowania — sam obraz zostaje bez zmian jako
+     podgląd/szablon. Dla obrazów z przezroczystością "atramentem" są piksele nieprzezroczyste;
+     dla zdjęć/obrazów bez alfa — piksele ciemniejsze niż średnia jasność (prosty próg Otsu-lite). */
+  function traceImageToPath(o){
+    if(!o || o.type!=='image' || !o.src) return;
+    const img=new Image();
+    img.onload=()=>{
+      const MAXDIM=400;
+      const nw=img.naturalWidth||1, nh=img.naturalHeight||1;
+      const sc=Math.min(1, MAXDIM/Math.max(nw,nh));
+      const W=Math.max(1,Math.round(nw*sc)), H=Math.max(1,Math.round(nh*sc));
+      const cnv=document.createElement('canvas'); cnv.width=W; cnv.height=H;
+      const ctx=cnv.getContext('2d');
+      ctx.drawImage(img,0,0,W,H);
+      let data; try{ data=ctx.getImageData(0,0,W,H).data; }catch(e){ alert('Nie udało się przetworzyć tego obrazu.'); return; }
+      let hasAlpha=false;
+      for(let p=3;p<data.length;p+=4){ if(data[p]<250){ hasAlpha=true; break; } }
+      const mask=new Uint8Array(W*H);
+      if(hasAlpha){
+        for(let p=0;p<W*H;p++) mask[p]=data[p*4+3]>=128?1:0;
+      } else {
+        let sum=0;
+        for(let p=0;p<W*H;p++) sum+=0.299*data[p*4]+0.587*data[p*4+1]+0.114*data[p*4+2];
+        const thresh=sum/(W*H);
+        for(let p=0;p<W*H;p++){
+          const lum=0.299*data[p*4]+0.587*data[p*4+1]+0.114*data[p*4+2];
+          mask[p]=lum<thresh?1:0;
+        }
+      }
+      const rawPolys=traceMaskPolys(mask,W,H).map(p=>simplifyRing(p,1.2)).filter(r=>r.length>=3);
+      if(!rawPolys.length){ alert('Nie udało się znaleźć konturu na tym obrazie.\nNajlepiej działa to dla prostych, kontrastowych grafik (logo, sylwetka) — najlepiej z przezroczystym tłem.'); return; }
+      const sx=(o.w||1)/W, sy=(o.h||1)/H;
+      const localPolys=rawPolys.map(poly=>smoothRingToPolyline(poly,50).map(([px,py])=>[px*sx, py*sy]));
+      const conv={...defaultsFor('path'),
+        d: localPolys.map(polyToPathD).join(' '),
+        fillRule:'evenodd',
+        name:(o.name||'Obraz')+' (obrys)',
+        x:o.x, y:o.y, bx:0, by:0, bw:Math.max(0.01,o.w), bh:Math.max(0.01,o.h),
+        rotation:o.rotation||0, depth:o.depth||1
+      };
+      addObject(conv);
+    };
+    img.onerror=()=>alert('Nie udało się wczytać obrazu do obrysowania.');
+    img.src=o.src;
+  }
+
+
   // pojedyncze pierścienie (M/L/Z) stają się edytowalne węzłami, mają własną
   // obwódkę itd. Pozycja x/y każdego kawałka jest skorygowana o przesunięcie
   // środka obrotu/skalowania (z centrum całej bbox na centrum bbox kawałka), tak
@@ -2842,7 +2889,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   /* ---- Właściwości obrazu pomocniczego (kalka do przerysowania) ---- */
   function renderImageProps(o){
     let h='';
-    h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — widoczny tylko w edytorze, nie jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D.</div>`;
+    h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz”, aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
     h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1"></div>`;
     h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1"></div>`;
@@ -2852,6 +2899,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=rangeField('Przezroczystość (%)','opacity',o.opacity??100,0,100,1);
     h+=`<div class="field"><button type="button" id="imgReplaceBtn" class="tbtn" style="width:100%;justify-content:center">🔄 Zamień obraz</button></div>`;
+    h+=`<div class="field"><button type="button" id="imgTraceBtn" class="tbtn" style="width:100%;justify-content:center" title="Tworzy nowy element 'ścieżka' z konturu obrazu — do cięcia lub grawerowania. Najlepiej działa dla prostych, kontrastowych grafik (logo, sylwetka), najlepiej z przezroczystym tłem.">🪄 Obrysuj obraz → ścieżka do cięcia</button></div>`;
     propsEl.innerHTML=lockedWrap(h,o);
     bindProps();
     bindImageProps(o);
@@ -2874,6 +2922,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       pendingImageReplaceId=o.id;
       const inp=document.getElementById('importImageInput'); inp.value=''; inp.click();
     });
+    const traceBtn=propsEl.querySelector('#imgTraceBtn');
+    if(traceBtn) traceBtn.addEventListener('click',()=>traceImageToPath(o));
   }
   /* Wczytuje plik obrazu (PNG/JPG/...) jako nowy obiekt typu 'image' (lub podmienia istniejący, gdy podano replaceId).
      Obraz jest skalowany do max. 1600px po dłuższym boku i re-kompresowany, by nie rozdmuchać
