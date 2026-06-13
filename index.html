@@ -46,6 +46,9 @@
                     colors: {
                         wood: {
                             100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
                             500: '#38bdf8',
                             600: '#0284c7',
                             700: '#0369a1',
@@ -56,6 +59,7 @@
                             50: '#f8fafc',
                             100: '#f1f5f9',
                             200: '#e2e8f0',
+                            300: '#cbd5e1',
                             400: '#94a3b8',
                             500: '#64748b',
                             600: '#475569',
@@ -178,7 +182,7 @@
             border-radius: 0.5rem; width: 100%; outline: none; transition: border-color 0.2s, background 0.2s;
             font-size: 0.9rem;
         }
-        .calc-input:focus { border-color: #d97706; background: #292524; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
+        .calc-input:focus { border-color: #38bdf8; background: #292524; box-shadow: 0 0 0 3px rgba(56,189,248,0.12); }
         
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
@@ -201,7 +205,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .thumb-active { border: 2px solid #b45309; opacity: 1; transform: scale(1.05); }
+        .thumb-active { border: 2px solid #38bdf8; opacity: 1; transform: scale(1.05); }
 
         /* STYL WIADOMOŚCI */
         .message-row-wrapper {
@@ -282,7 +286,7 @@
         /* SCROLL-TO-TOP BUTTON */
         #scroll-top-btn {
             position: fixed;
-            bottom: 90px;
+            bottom: 150px;
             right: 22px;
             width: 42px;
             height: 42px;
@@ -825,7 +829,7 @@
                             <i class="fa-solid fa-phone"></i>
                         </div>
                         <span class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Zadzwoń</span>
-                        <span id="contact-phone" class="font-bold text-2xl text-white">+48 123 456 789</span>
+                        <a id="contact-phone" href="tel:+48537191717" class="font-bold text-2xl text-white hover:text-sky-400 transition">+48 537 191 717</a>
                     </div>
                  </div>
             </div>
@@ -1169,11 +1173,12 @@
                     <h3 class="text-3xl font-bold">Skrzynka Odbiorcza</h3>
                     <div class="bg-black/20 rounded-xl overflow-hidden border border-white/10 min-h-[200px]">
                         <!-- Header tabeli -->
-                        <div class="grid grid-cols-12 gap-2 p-4 bg-white/5 text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-white/5">
-                            <div class="col-span-2">Status</div>
-                            <div class="col-span-3">Nadawca</div>
-                            <div class="col-span-4">Email</div>
-                            <div class="col-span-3 text-right">Data/Akcje</div>
+                        <div class="p-4 bg-white/5 text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-white/5" style="display:grid; grid-template-columns:2fr 3fr 4fr 3fr 1fr; gap:10px; align-items:center;">
+                            <div>Status</div>
+                            <div>Nadawca</div>
+                            <div>Email</div>
+                            <div class="text-right">Data</div>
+                            <div class="text-right">Akcje</div>
                         </div>
                         <div id="messages-list" class="divide-y divide-white/5"></div>
                     </div>
@@ -1803,7 +1808,7 @@
             }
             if(document.getElementById('hero-desc')) document.getElementById('hero-desc').textContent = t.hero.desc;
             if(document.getElementById('contact-email')) document.getElementById('contact-email').textContent = t.contact.email;
-            if(document.getElementById('contact-phone')) document.getElementById('contact-phone').textContent = t.contact.phone;
+            if(document.getElementById('contact-phone') && t.contact.phone){ const _ph = document.getElementById('contact-phone'); _ph.textContent = t.contact.phone; if(_ph.tagName === 'A') _ph.setAttribute('href', 'tel:' + String(t.contact.phone).replace(/[^0-9+]/g, '')); }
             if(document.getElementById('contact-desc')) document.getElementById('contact-desc').textContent = t.contact.desc;
 
             // Render Stopki
