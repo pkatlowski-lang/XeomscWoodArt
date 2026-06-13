@@ -1,0 +1,89 @@
+UMOWA LICENCYJNA UŻYTKOWNIKA KOŃCOWEGO (EULA)
+Edytor Laser XEOMSC
+Wersja dokumentu: 1.0 — 2026
+
+WAŻNE — PRZECZYTAJ UWAŻNIE. Niniejsza Umowa Licencyjna Użytkownika Końcowego
+(„Umowa") stanowi prawnie wiążące porozumienie pomiędzy Tobą (osobą fizyczną
+lub podmiotem, „Licencjobiorca") a Xeomsc Laser (xeomsc-laser.pl, „Licencjodawca")
+dotyczące oprogramowania „Edytor Laser XEOMSC" wraz z dołączonymi materiałami
+(„Oprogramowanie"). Instalując, kopiując lub w jakikolwiek sposób korzystając z
+Oprogramowania, akceptujesz warunki niniejszej Umowy. Jeżeli nie akceptujesz
+warunków — nie instaluj i nie używaj Oprogramowania.
+
+
+1. DEFINICJE
+   1.1. „Oprogramowanie" — program „Edytor Laser XEOMSC", jego pliki wykonywalne,
+        biblioteki, zasoby, dokumentacja oraz ewentualne aktualizacje.
+   1.2. „Licencjodawca" — Xeomsc Laser, właściciel praw do Oprogramowania.
+   1.3. „Licencjobiorca" — podmiot korzystający z Oprogramowania na podstawie
+        niniejszej Umowy.
+
+2. UDZIELENIE LICENCJI
+   2.1. Licencjodawca udziela Licencjobiorcy niewyłącznej, nieprzenoszalnej,
+        odwołalnej licencji na instalację i korzystanie z Oprogramowania na
+        komputerach będących w posiadaniu lub pod kontrolą Licencjobiorcy.
+   2.2. Licencja obejmuje korzystanie z Oprogramowania zgodnie z jego
+        przeznaczeniem — tworzenie projektów do cięcia i grawerowania laserowego.
+
+3. OGRANICZENIA
+   Licencjobiorca nie jest uprawniony, bez uprzedniej pisemnej zgody
+   Licencjodawcy, do:
+   3.1. odsprzedaży, wynajmu, użyczania, dzierżawy ani udostępniania
+        Oprogramowania osobom trzecim;
+   3.2. dekompilacji, deasemblacji ani innej formy inżynierii wstecznej,
+        z wyjątkiem zakresu wyraźnie dozwolonego przez bezwzględnie obowiązujące
+        przepisy prawa;
+   3.3. usuwania lub zmieniania informacji o prawach autorskich, znakach
+        towarowych i innych oznaczeniach Licencjodawcy;
+   3.4. wykorzystywania Oprogramowania w sposób naruszający obowiązujące prawo.
+
+4. WŁASNOŚĆ INTELEKTUALNA
+   4.1. Oprogramowanie jest chronione prawem autorskim oraz innymi przepisami
+        dotyczącymi własności intelektualnej. Licencjodawca zachowuje wszelkie
+        prawa, które nie zostały wyraźnie udzielone w niniejszej Umowie.
+   4.2. Projekty, pliki i dane utworzone przez Licencjobiorcę przy użyciu
+        Oprogramowania pozostają własnością Licencjobiorcy.
+
+5. DANE I PRYWATNOŚĆ
+   5.1. Oprogramowanie przetwarza projekty użytkownika lokalnie na jego
+        urządzeniu.
+   5.2. Do poprawnego wyświetlania niektórych krojów pisma Oprogramowanie może
+        pobierać zasoby (np. czcionki) z Internetu. Korzystanie offline jest
+        możliwe — wówczas stosowane są zastępcze kroje systemowe.
+
+6. AKTUALIZACJE
+   Licencjodawca może, lecz nie jest zobowiązany, udostępniać aktualizacje
+   Oprogramowania. Do aktualizacji stosuje się warunki niniejszej Umowy, o ile
+   nie dołączono do nich odrębnych warunków.
+
+7. WYŁĄCZENIE GWARANCJI
+   OPROGRAMOWANIE DOSTARCZANE JEST „TAKIE, JAKIE JEST" („AS IS"), BEZ
+   JAKICHKOLWIEK GWARANCJI WYRAŹNYCH LUB DOROZUMIANYCH, W TYM GWARANCJI
+   PRZYDATNOŚCI HANDLOWEJ, PRZYDATNOŚCI DO OKREŚLONEGO CELU ORAZ NIENARUSZANIA
+   PRAW OSÓB TRZECICH. LICENCJOBIORCA KORZYSTA Z OPROGRAMOWANIA NA WŁASNE RYZYKO.
+   W SZCZEGÓLNOŚCI WYCENY, CZASY PRACY I PARAMETRY PRODUKCYJNE GENEROWANE PRZEZ
+   OPROGRAMOWANIE MAJĄ CHARAKTER SZACUNKOWY I WYMAGAJĄ WERYFIKACJI.
+
+8. OGRANICZENIE ODPOWIEDZIALNOŚCI
+   W MAKSYMALNYM ZAKRESIE DOZWOLONYM PRZEZ PRAWO LICENCJODAWCA NIE PONOSI
+   ODPOWIEDZIALNOŚCI ZA JAKIEKOLWIEK SZKODY POŚREDNIE, PRZYPADKOWE, WTÓRNE,
+   UTRATĘ ZYSKÓW, DANYCH LUB PRZERWY W DZIAŁALNOŚCI WYNIKAJĄCE Z KORZYSTANIA
+   LUB NIEMOŻNOŚCI KORZYSTANIA Z OPROGRAMOWANIA.
+
+9. CZAS TRWANIA I WYPOWIEDZENIE
+   9.1. Umowa obowiązuje do czasu jej rozwiązania.
+   9.2. Licencja wygasa automatycznie w przypadku naruszenia przez
+        Licencjobiorcę któregokolwiek z jej postanowień. Po wygaśnięciu
+        Licencjobiorca zobowiązany jest zaprzestać korzystania z Oprogramowania
+        i usunąć wszystkie jego kopie.
+
+10. PRAWO WŁAŚCIWE
+   Umowa podlega prawu polskiemu. Ewentualne spory rozstrzygane będą przez sąd
+   właściwy miejscowo dla siedziby Licencjodawcy.
+
+11. KONTAKT
+   Xeomsc Laser
+   https://xeomsc-laser.pl
+
+UWAGA: Niniejszy dokument stanowi wzór umowy licencyjnej i powinien zostać
+zweryfikowany przez radcę prawnego / adwokata przed komercyjnym wykorzystaniem.

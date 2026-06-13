@@ -1,0 +1,14 @@
+# Zależności
+node_modules/
+
+# Wynik buildu instalatorów
+dist/
+
+# Wygenerowana kopia edytora + licencji (tworzona przez copy-app.js)
+app/edytor.html
+app/license.html
+app/license.txt
+
+# System
+.DS_Store
+Thumbs.db

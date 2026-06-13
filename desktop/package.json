@@ -1,0 +1,91 @@
+{
+  "name": "edytor-laser-xeomsc",
+  "productName": "Edytor Laser XEOMSC",
+  "version": "1.0.0",
+  "description": "Interaktywny, parametryczny edytor projektów do cięcia i grawerowania laserowego — XeomscWoodArt / Xeomsc Laser.",
+  "author": {
+    "name": "Xeomsc Laser",
+    "url": "https://xeomsc-laser.pl"
+  },
+  "homepage": "https://xeomsc-laser.pl",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare:app": "node copy-app.js",
+    "start": "npm run prepare:app && electron .",
+    "smoke": "npm run prepare:app && electron smoke-main.cjs",
+    "dist:win": "npm run prepare:app && electron-builder --win --x64 -p never",
+    "dist:mac": "npm run prepare:app && electron-builder --mac -p never",
+    "dist:linux": "npm run prepare:app && electron-builder --linux -p never",
+    "pack:linux": "npm run prepare:app && electron-builder --linux dir"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "pl.xeomsc.edytor",
+    "productName": "Edytor Laser XEOMSC",
+    "copyright": "Copyright © 2026 Xeomsc Laser",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*",
+      "!**/*.map",
+      "!**/.DS_Store"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Edytor-Laser-XEOMSC-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE.txt",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Edytor Laser XEOMSC",
+      "installerLanguages": ["pl_PL", "en_US"],
+      "language": "1045",
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.graphics-design",
+      "identity": null,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "Edytor-Laser-XEOMSC-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "Edytor Laser XEOMSC ${version}"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "build/icon.png",
+      "category": "Graphics",
+      "artifactName": "Edytor-Laser-XEOMSC-${version}.${ext}"
+    }
+  }
+}
