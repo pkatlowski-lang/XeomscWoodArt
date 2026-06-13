@@ -67,6 +67,38 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  collect:
+    name: Push installers to retrieval branch
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: _dl
+
+      - name: Push installers to temporary branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          mkdir -p _out
+          find _dl -type f -name '*.exe' -exec cp {} _out/ \;
+          echo "--- pliki do przekazania ---"; ls -la _out
+          WORK="$(mktemp -d)"
+          cp _out/* "$WORK"/
+          cd "$WORK"
+          git init -q
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout -q -b installers-dist
+          git add -f .
+          git commit -q -m "installers from run ${{ github.run_id }}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push -f origin installers-dist
+
   release:
     name: Publish release
     needs: build
