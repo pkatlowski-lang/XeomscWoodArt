@@ -3839,6 +3839,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const QUOTE_PACKAGING=2.5;      // pakowanie (zł)
   const QUOTE_MARGIN=0.50;        // marża (50%)
   const QUOTE_TIME_BUFFER=1.15;   // +15% czasu jako tolerancja błędowa (przejazdy, przyspieszenia, powtórzenia)
+  // Parametry grawerowania (wypełnienia) — odwzorowują realne ustawienia grawera:
+  // prędkość 8000 mm/min, interwał linii 0,1 mm (254 linii/cal), wypełnianie
+  // dwukierunkowe + nadmiarowe skanowanie 2,5% z każdej strony linii.
+  const QUOTE_ENGRAVE_SPEED=8000;     // mm/min
+  const QUOTE_ENGRAVE_SPACING=0.1;    // mm — odstęp między liniami skanowania
+  const QUOTE_ENGRAVE_OVERSCAN=0.025; // 2,5% nadmiarowego skanowania z każdej strony linii
   // Łączna długość trasy lasera po projekcie (mm) — kontury WSZYSTKICH widocznych
   // elementów (cięcie, nacięcie i grawer liniowy) z powieleniami; obrazy pomocnicze pomijane.
   function quotePathLen(){
@@ -3861,9 +3867,22 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     });
     return mm2/100;
   }
+  // Czas grawerowania (wypełnienia) z pola w mm² — trasa skanowania to pole/odstęp linii,
+  // plus nadmiarowe skanowanie po obu stronach każdej linii.
+  function quoteEngraveTimeMin(areaMm2){
+    return (areaMm2/QUOTE_ENGRAVE_SPACING)/QUOTE_ENGRAVE_SPEED*(1+2*QUOTE_ENGRAVE_OVERSCAN);
+  }
+  // Rozbicie czasu cyklu lasera: cięcie/nacięcie wg prędkości materiału + grawerowanie
+  // (wypełnienie) wg parametrów grawera, razem +15% bufora (tolerancja błędowa).
+  function quoteTimeBreakdown(mat){
+    const s=computeProjectStats();
+    const cutTime=(s.cutLen+s.scoreLen)/mat.speed;
+    const engraveTime=quoteEngraveTimeMin(s.engraveArea);
+    return {cutTime, engraveTime, total:(cutTime+engraveTime)*QUOTE_TIME_BUFFER};
+  }
   // Czas cyklu lasera + 15% bufora (tolerancja błędowa: przejazdy, przyspieszenia, powtórzenia).
   function quoteTimeMin(mat){
-    return quotePathLen()/mat.speed*QUOTE_TIME_BUFFER;
+    return quoteTimeBreakdown(mat).total;
   }
   // Format "min.sek" np. 4.34 = 4 min 34 s (sekundy 00-59, NIE część dziesiętna minuty).
   function formatQuoteTime(min){
@@ -3889,10 +3908,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!hasWork){ priceEl.textContent='Brak elementów do wyceny — narysuj projekt na płycie.'; priceEl.classList.add('quote-empty'); statsEl.innerHTML=''; return; }
     priceEl.classList.remove('quote-empty');
     const mat=QUOTE_MATERIALS[quoteMatSel.value];
-    const timeMin=quoteTimeMin(mat);
+    const tb=quoteTimeBreakdown(mat);
     const areaCm2=quoteMaterialArea();
     statsEl.innerHTML=
-      `<div class="sum-row"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(timeMin)}</span></div>`
+      `<div class="sum-row"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(tb.total)}</span></div>`
+      +(tb.engraveTime>0 ? `<div class="sum-row"><span>　✂ w tym cięcie/nacięcie</span><span class="sum-val">${formatTime(tb.cutTime*QUOTE_TIME_BUFFER)}</span></div>`
+        +`<div class="sum-row"><span>　▦ w tym grawerowanie</span><span class="sum-val">${formatTime(tb.engraveTime*QUOTE_TIME_BUFFER)}</span></div>` : '')
       +`<div class="sum-row"><span>📐 Powierzchnia materiału</span><span class="sum-val">${String(fmt(areaCm2)).replace('.',',')} cm² (${String(fmt(areaCm2/10000)).replace('.',',')} m²)</span></div>`;
     priceEl.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
   }
@@ -5395,7 +5416,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   document.fonts.ready.then(()=>{ _textOutlineCache.clear(); renderAll(); });
 
   // Hak debugowy do testów (Playwright) — bez wpływu na działanie edytora
-  window.__lzr={state, buildSeparatedSVG, buildLayerScene, mergeLayerRings, unionAll, objSubPolys, objSubPolysLocal, objSubPolysRepeated, textOutlinePolys, objBBox, rotatedBBox, selBBox, polyArea, polyPerimeter, objInkArea, computeProjectStats, computeQuote, quotePathLen, quoteMaterialArea, polysBBoxMulti, polyToPathD, polyToSmoothPathD, renderAll, updateLive3D, renderProps, select, defaultsFor, zoomFit, repeatTransforms, exportSVG, buildGearPoints, simplifyRing, rasterizeTextOutlines, textNaturalBox, getTextRaster};
+  window.__lzr={state, buildSeparatedSVG, buildLayerScene, mergeLayerRings, unionAll, objSubPolys, objSubPolysLocal, objSubPolysRepeated, textOutlinePolys, objBBox, rotatedBBox, selBBox, polyArea, polyPerimeter, objInkArea, computeProjectStats, computeQuote, quotePathLen, quoteMaterialArea, quoteTimeBreakdown, quoteEngraveTimeMin, polysBBoxMulti, polyToPathD, polyToSmoothPathD, renderAll, updateLive3D, renderProps, select, defaultsFor, zoomFit, repeatTransforms, exportSVG, buildGearPoints, simplifyRing, rasterizeTextOutlines, textNaturalBox, getTextRaster};
 })();
 </script>
 
