@@ -2347,9 +2347,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function startDraw(e,docP){
     setCapture(e);
     const o=defaultsFor(state.tool);
-    if(state.tool==='text'){ // text: click places, no drag-size
-      o.x=snap(docP.x); o.y=snap(docP.y); addObject(o); state.tool='select'; syncToolButtons();
-      drag=null; setTimeout(()=>{ const inp=document.querySelector('#props [data-prop="text"]'); if(inp){inp.focus(); inp.select && inp.select();} },30);
+    if(state.tool==='text'){ // text: click places domyślny rozmiar, przeciągnięcie ustawia rozmiar od razu
+      o.x=snap(docP.x); o.y=snap(docP.y);
+      state.objects.push(o); state.selectedIds=[o.id]; renderAll();
+      drag={mode:'drawText',o,ax:docP.x,ay:docP.y,startFont:o.fontSize};
       return;
     }
     o.x=snap(docP.x); o.y=snap(docP.y); o.w=0; o.h=0;
@@ -2460,6 +2461,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const dw=o.type==='line'?Math.abs(o.w):o.w, dh=o.type==='line'?Math.abs(o.h):o.h;
       state.dragLabel={text:`${fmt(dw)} × ${fmt(dh)} mm`, x:docP.x, y:docP.y};
       renderObjectEl(o); renderOverlay();
+    } else if(drag.mode==='drawText'){
+      const o=drag.o, dist=Math.hypot(docP.x-drag.ax,docP.y-drag.ay);
+      if(dist>2){ drag.moved=true; o.fontSize=clamp(Math.round(dist),4,400); }
+      state.dragLabel={text:`Wielkość czcionki: ${fmt(o.fontSize)} mm`, x:docP.x, y:docP.y};
+      renderObjectEl(o); renderOverlay(); syncPropsLive();
     } else if(drag.mode==='rotate'){
       const ang=Math.atan2(docP.y-drag.c.y,docP.x-drag.c.x);
       let deg=drag.startAng+(ang-drag.startMouse)*180/Math.PI;
@@ -2524,6 +2530,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(o.type==='line' && Math.abs(o.w)<2 && Math.abs(o.h)<2){ o.w=40; o.h=0; }
       state.tool='select'; syncToolButtons();
       renderAll(); pushHistory(); renderProps();
+    } else if(m==='drawText'){
+      state.tool='select'; syncToolButtons();
+      renderAll(); pushHistory(); renderProps(); scheduleLive3D();
+      setTimeout(()=>{ const inp=document.querySelector('#props [data-prop="text"]'); if(inp){inp.focus(); inp.select && inp.select();} },30);
     } else if(m==='move'||m==='resize'||m==='rotate'||m==='mresize'){
       state.guideLines=null; renderOverlay();
       pushHistory(); renderProps(); scheduleLive3D();
