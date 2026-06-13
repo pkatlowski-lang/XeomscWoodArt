@@ -5552,7 +5552,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Init ---------------- */
   buildCanvasSkeleton();
-  restoreAutosave();
+  // Każde wejście do edytora zaczyna NOWĄ, pustą sesję — świadomie NIE przywracamy
+  // poprzedniego projektu z autozapisu. Czyścimy też stary autozapis, żeby nie został
+  // przypadkowo wczytany. (Zapis projektu do pliku: przycisk „Zapisz projekt".)
+  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView);
   zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams(); renderGallery();
