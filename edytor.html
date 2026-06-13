@@ -397,20 +397,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <aside class="panel left">
       <h2>Arkusz roboczy</h2>
       <div class="field">
-        <label>Rozmiar arkusza (mm) — szer. × wys.</label>
-        <div class="row2">
-          <input type="number" id="docWInput" min="10" max="760" step="1" title="Szerokość arkusza (mm) — maks. 760">
-          <input type="number" id="docHInput" min="10" max="760" step="1" title="Wysokość arkusza (mm) — maks. 760">
+        <label>Arkusz roboczy (mm)</label>
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.35);border-radius:8px">
+          <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
+          <span style="font-size:.72rem;color:var(--muted)">— rozmiar stały</span>
         </div>
-        <select id="docPreset" class="bind-sel">
-          <option value="">— gotowe rozmiary —</option>
-          <option value="300x200">300 × 200 mm</option>
-          <option value="400x300">400 × 300 mm</option>
-          <option value="600x400">600 × 400 mm</option>
-          <option value="760x760">760 × 760 mm (maks.)</option>
-          <option value="297x210">A4 — 297 × 210 mm</option>
-          <option value="420x297">A3 — 420 × 297 mm</option>
-        </select>
+        <!-- Rozmiar arkusza jest stały (760×760 mm). Pola pozostają ukryte, aby
+             reszta logiki edytora działała bez zmian. -->
+        <input type="hidden" id="docWInput" value="760">
+        <input type="hidden" id="docHInput" value="760">
+        <select id="docPreset" style="display:none"><option value=""></option></select>
       </div>
       <div class="field">
         <label>Siatka (mm)</label>
@@ -889,7 +885,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- State ---------------- */
   const state={
-    docW:300, docH:200,
+    docW:760, docH:760,
     objects:[],
     selectedIds:[],
     tool:'select',
@@ -3496,8 +3492,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Rozmiar arkusza roboczego ---------------- */
   const docWInput=document.getElementById('docWInput'), docHInput=document.getElementById('docHInput'), docPreset=document.getElementById('docPreset');
-  function applyDocSize(w,h){
-    const nw=clamp(Math.round(Number(w))||state.docW,10,760), nh=clamp(Math.round(Number(h))||state.docH,10,760); // maksymalny obszar roboczy: 760 × 760 mm
+  function applyDocSize(){
+    // Arkusz roboczy ma jeden, stały rozmiar: 760 × 760 mm — nie można wybrać innego.
+    const nw=760, nh=760;
     docWInput.value=nw; docHInput.value=nh;
     if(nw===state.docW && nh===state.docH) return;
     state.docW=nw; state.docH=nh;
@@ -3542,7 +3539,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }catch(e){}
   }
   function applyProjectData(d){
-    state.docW=clamp(d.docW||300,10,760); state.docH=clamp(d.docH||200,10,760);
+    state.docW=760; state.docH=760; // arkusz roboczy ma stały rozmiar 760 × 760 mm
     state.objects=d.objects||[];
     state.params=d.params||state.params;
     state.layerMM=d.layerMM||{};
@@ -3586,7 +3583,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
   document.getElementById('newProjectBtn').addEventListener('click',()=>{
     if(state.objects.length && !confirm('Wyczyścić bieżący projekt i zacząć od nowa? Niezapisane zmiany zostaną utracone.')) return;
-    applyProjectData({docW:300,docH:200,objects:[],params:[{id:'p_grubosc',name:'grubość_materiału',value:3,min:1,max:12,step:0.5}],layerMM:{},hiddenDepths:[],depthView:true});
+    applyProjectData({docW:760,docH:760,objects:[],params:[{id:'p_grubosc',name:'grubość_materiału',value:3,min:1,max:12,step:0.5}],layerMM:{},hiddenDepths:[],depthView:true});
   });
 
   function duplicateSel(){ const sel=getSelected(); if(!sel.length) return;
