@@ -2344,6 +2344,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!e.shiftKey){ state.selectedIds=[]; renderLayers(); renderProps(); }
     gOverlay.innerHTML='';
   }
+  // Ustawia kursor w polu treści napisu i zaznacza tekst. Wołane SYNCHRONICZNIE w obrębie
+  // gestu (pointerup / dblclick), dzięki czemu na urządzeniach dotykowych otwiera się
+  // klawiatura ekranowa (programowy focus z setTimeout jej NIE otwiera). Drugie wywołanie
+  // w setTimeout to zapas, gdyby panel właściwości jeszcze się nie odświeżył.
+  function focusTextEditor(){
+    const grab=()=>{ const inp=document.querySelector('#props [data-prop="text"]'); if(inp){ inp.focus(); if(inp.select) inp.select(); return true; } return false; };
+    if(!grab()) setTimeout(grab,30);
+  }
   function startDraw(e,docP){
     setCapture(e);
     const o=defaultsFor(state.tool);
@@ -2533,7 +2541,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     } else if(m==='drawText'){
       state.tool='select'; syncToolButtons();
       renderAll(); pushHistory(); renderProps(); scheduleLive3D();
-      setTimeout(()=>{ const inp=document.querySelector('#props [data-prop="text"]'); if(inp){inp.focus(); inp.select && inp.select();} },30);
+      focusTextEditor(); // synchronicznie w obrębie gestu — na dotyku otwiera klawiaturę
     } else if(m==='move'||m==='resize'||m==='rotate'||m==='mresize'){
       state.guideLines=null; renderOverlay();
       pushHistory(); renderProps(); scheduleLive3D();
@@ -2844,7 +2852,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(o.type==='line') h+=`<div class="field"><label>Kierunek</label><div class="seg" data-seg="flip"><button class="${!o.flip?'on':''}" data-flip="0">↘ ukośna</button><button class="${o.flip?'on':''}" data-flip="1">↗ ukośna</button></div></div>`;
     if(o.type==='text'){
-      h+=`<div class="field"><label>Treść napisu (Enter = nowa linia)</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit">${escapeXml(o.text||'')}</textarea></div>`;
+      h+=`<div class="field"><label>Treść napisu (Enter = nowa linia · dwuklik na napisie = szybka edycja)</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit">${escapeXml(o.text||'')}</textarea></div>`;
       h+=`<div class="field"><label>Czcionka (najedź na nazwę = podgląd)</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
       h+=`<div class="field"><label>Styl</label><div class="seg" data-seg="textstyle">
         <button class="${o.bold?'on':''}" data-tstyle="bold" style="font-weight:700">B</button>
@@ -3590,6 +3598,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   canvas.addEventListener('dblclick', e=>{
     if(state.tool==='pen' && state.penDraft){ penFinish(); return; }
+    // dwuklik / dwukrotne dotknięcie napisu -> od razu edycja jego treści (kursor w polu tekstu)
+    const tgrp = e.target.closest && e.target.closest('[data-id]');
+    if(tgrp){
+      const to=state.objects.find(x=>x.id===tgrp.getAttribute('data-id'));
+      if(to && to.type==='text' && !to.locked){
+        if(!state.selectedIds.includes(to.id) || state.selectedIds.length!==1){ select(to.id); }
+        else { renderProps(); }
+        focusTextEditor(); // w obrębie gestu dblclick -> klawiatura na dotyku
+        return;
+      }
+    }
     // edycja punktów: dwuklik na krawędzi -> dodaj nowy punkt w tym miejscu
     if(state.editingPathId && !(e.target.closest && e.target.closest('.node-handle'))){
       const o=state.objects.find(x=>x.id===state.editingPathId);
