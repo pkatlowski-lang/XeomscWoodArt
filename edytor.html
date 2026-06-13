@@ -6,7 +6,7 @@
 <title>Edytor projektów do lasera — interaktywny edytor parametryczny</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=EB+Garamond:wght@400;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700&family=Cardo:wght@400;700&family=Cinzel:wght@400;700&family=Marcellus&family=Spectral:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Quicksand:wght@400;600;700&family=Inter:wght@400;600;700&family=Josefin+Sans:wght@400;600;700&family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Archivo:wght@400;600;700&family=Comfortaa:wght@400;600;700&family=Nunito:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Great+Vibes&family=Pacifico&family=Sacramento&family=Allura&family=Parisienne&family=Tangerine:wght@400;700&family=Satisfy&family=Lobster&family=Caveat:wght@400;600;700&family=Amatic+SC:wght@400;700&family=Kaushan+Script&family=Yellowtail&family=Courgette&family=Abril+Fatface&family=Alfa+Slab+One&family=Righteous&family=Cinzel+Decorative:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=EB+Garamond:wght@400;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700&family=Cardo:wght@400;700&family=Cinzel:wght@400;700&family=Marcellus&family=Spectral:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Quicksand:wght@400;600;700&family=Inter:wght@400;600;700&family=Josefin+Sans:wght@400;600;700&family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Archivo:wght@400;600;700&family=Comfortaa:wght@400;600;700&family=Nunito:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Great+Vibes&family=Pacifico&family=Sacramento&family=Allura&family=Parisienne&family=Tangerine:wght@400;700&family=Satisfy&family=Lobster&family=Caveat:wght@400;600;700&family=Amatic+SC:wght@400;700&family=Kaushan+Script&family=Yellowtail&family=Courgette&family=Abril+Fatface&family=Alfa+Slab+One&family=Righteous&family=Cinzel+Decorative:wght@400;700&family=Permanent+Marker&family=Big+Shoulders+Stencil:wght@100;300;400;600;700;900&family=Saira+Stencil+One&family=New+Rocker&family=Nosifer&family=Monte+Carlo&family=Pinyon+Script&family=Lovers+Quarrel&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -713,7 +713,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const WALL_OVERLAP=0.75;
   const COLORS={cut:'#ff2d2d',engrave:'#1c1c1c',score:'#2f7bd8',hole:'#9b5de5'};
   const FONTS=[
-    // 40 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
+    // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
     // bez instalowania czegokolwiek; wyglądają identycznie na PC, telefonie i Macu.
     // — Szeryfowe / eleganckie —
     ['"Playfair Display", serif','Playfair Display'],
@@ -759,6 +759,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ['"Righteous", sans-serif','Righteous'],
     ['"Cinzel Decorative", serif','Cinzel Decorative'],
     ['"Permanent Marker", cursive','Permanent Marker'],
+    // — Szablonowe / gotyckie (litery z mostkami — środki nie wypadają po wycięciu) —
+    ['"Big Shoulders Stencil", sans-serif','Big Shoulders Stencil'],
+    ['"Saira Stencil One", sans-serif','Saira Stencil One'],
+    ['"New Rocker", cursive','New Rocker'],
+    ['"Nosifer", cursive','Nosifer'],
+    ['"Monte Carlo", cursive','Monte Carlo'],
+    ['"Pinyon Script", cursive','Pinyon Script'],
+    ['"Lovers Quarrel", cursive','Lovers Quarrel'],
     // Czcionki systemowe (PC) — renderowane z czcionek zainstalowanych u użytkownika,
     // bez pobierania i bez uprawnień; gdy brak na urządzeniu, użyta zostanie zastępcza.
     ['"Arial", sans-serif','Arial (PC)'],
