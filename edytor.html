@@ -5103,25 +5103,48 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Wzór "living hinge" zorientowany POZIOMO (oś zgięcia pozioma): nacięcia biegną wzdłuż
   // osi X, ułożone w rzędach (oś Y), naprzemiennie przesunięte (cegiełki). Lustrzane
   // odbicie buildLivingHingePattern z zamienionymi osiami. ox/oy = przesunięcie w układzie rozkroju.
+  // Dla jednej linii zawiasu o długości użytkowej L liczy dwa warianty rozkładu nacięć:
+  //  • touch  – kolumna/rząd "styczny": pierwsze i ostatnie nacięcie dotykają krawędzi (luz 0),
+  //  • offset – kolumna/rząd "przesunięty": z obu stron stały luz g w zakresie 2–3 mm
+  //    (nigdy nie dotyka krawędzi, ale i nie oddala się dalej niż 3 mm).
+  // Długość nacięć jest w razie potrzeby dopasowywana (nie muszą być identyczne jak zadana
+  // slitLen), aby wzór równo wypełniał całą wysokość/szerokość. Zwraca {touch:[[a,b]...], offset:[...]}.
+  function hingeLineSegments(L, slitLen, bridge){
+    const out={touch:[], offset:[]};
+    const p=slitLen+bridge;
+    if(L<=0) return out;
+    // — wariant styczny: n nacięć + (n-1) mostków = L (skraja dotykają obu krawędzi) —
+    let nT=Math.max(1, Math.round((L+bridge)/p));
+    let sT=(L-(nT-1)*bridge)/nT;
+    if(sT<=0){ nT=1; sT=L; }
+    for(let i=0,y=0;i<nT;i++,y+=sT+bridge) out.touch.push([y, y+sT]);
+    // — wariant przesunięty: stały luz g∈[2,3] z obu stron —
+    const GMIN=2, GMAX=3;
+    let nO=Math.max(1, Math.round((L-2*((GMIN+GMAX)/2)+bridge)/p));
+    // przy nO nacięciach o pełnej długości slitLen policz wynikowy luz przy każdej krawędzi
+    let g=(L-(nO*slitLen+(nO-1)*bridge))/2;
+    let sO;
+    if(g>=GMIN && g<=GMAX){ sO=slitLen; }            // mieści się — używamy zadanej długości
+    else { g=Math.min(GMAX, Math.max(GMIN,g)); sO=(L-2*g-(nO-1)*bridge)/nO; } // dopasuj długość
+    if(sO<=0){ nO=1; g=Math.min(GMAX, Math.max(GMIN,(L-2)/2)); sO=Math.max(1, L-2*g); }
+    for(let i=0,y=g;i<nO;i++,y+=sO+bridge) out.offset.push([y, y+sO]);
+    return out;
+  }
   function livingHingeHorizontal(W,band,slitLen,kerf,pitchY,bridge,margin,ox,oy){
     let d='', count=0;
-    const period=slitLen+bridge;
     const x0=margin, x1=W-margin, y1=band-margin;
+    const L=x1-x0;
     const usableY=y1-margin-kerf;
-    if(usableY<0) return {d:'',count:0};
+    if(usableY<0 || L<=0) return {d:'',count:0};
     const nRows=Math.max(1, Math.round(usableY/pitchY)+1);
     const pitchYEff=nRows>1 ? usableY/(nRows-1) : 0;
-    const edgeGap=Math.min(2,period/2);
+    const segs=hingeLineSegments(L, slitLen, bridge);
     for(let row=0; row<nRows; row++){
-      // wzór "w cegiełkę": rzędy parzyste mają nacięcia styczne z lewą/prawą krawędzią (0 mm),
-      // nieparzyste są przesunięte o max. edgeGap (≤2 mm) — blisko krawędzi, ale nie identycznie
-      const off=(row%2===0)?0:edgeGap;
+      // rzędy parzyste = styczne z krawędziami, nieparzyste = z luzem 2–3 mm po obu stronach
       const cy=margin+kerf/2+row*pitchYEff;
-      for(let x=x0+off; x<x1-1e-9; x+=period){
-        const a=Math.max(x0,x), b=Math.min(x1,x+slitLen);
-        if(b-a>=Math.min(2,slitLen)){
-          d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++;
-        }
+      const list=(row%2===0)?segs.touch:segs.offset;
+      for(const seg of list){
+        d+=`M${fmt(x0+seg[0]+ox)} ${fmt(cy+oy)}L${fmt(x0+seg[1]+ox)} ${fmt(cy+oy)}`; count++;
       }
     }
     return {d,count};
@@ -5232,29 +5255,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function buildLivingHingePattern(W,H,slitLen,kerf,pitchX,bridge,margin,ox,oy){
     ox=ox||0; oy=oy||0;
     let d='', count=0;
-    const period=slitLen+bridge;
     const y0=margin, y1=H-margin, x1=W-margin;
+    const L=y1-y0;
     // Kolumny nacięć rozmieszczamy RÓWNOMIERNIE na całej dostępnej szerokości
-    // (od margin do W-margin), tak aby pierwsza i ostatnia linia nacięcia były
-    // styczne z lewą/prawą krawędzią ramy — bez "zgubionego" luzu wynikającego
-    // z zaokrąglenia liczby kolumn przy podziale przez pitchX.
+    // (od margin do W-margin). Wzór "w cegiełkę": kolumny parzyste są styczne z górną
+    // i dolną krawędzią, nieparzyste mają stały luz 2–3 mm po obu stronach — długość
+    // nacięć jest dopasowywana, aby równo wypełnić wysokość (patrz hingeLineSegments).
     const usableX=x1-margin-kerf;
-    if(usableX<0) return {d:'',count:0};
+    if(usableX<0 || L<=0) return {d:'',count:0};
     const nCols=Math.max(1, Math.round(usableX/pitchX)+1);
     const pitchXEff=nCols>1 ? usableX/(nCols-1) : 0;
-    const edgeGap=Math.min(2,period/2);
+    const segs=hingeLineSegments(L, slitLen, bridge);
     for(let col=0; col<nCols; col++){
       // każde nacięcie = pojedyncza linia (kerf to fizyczna szerokość rzazu lasera, nie
-      // rysowany prostokąt) — bez łączących krótkich odcinków poziomych/pionowych,
-      // dzięki czemu wzór wygląda jak linie z przerwami, a nie ząbkowane "klocki"
-      const off=(col%2===0)?0:edgeGap;
+      // rysowany prostokąt) — wzór wygląda jak linie z przerwami, a nie ząbkowane "klocki"
       const cx=margin+kerf/2+col*pitchXEff;
-      for(let y=y0+off; y<y1-1e-9; y+=period){
-        const a=Math.max(y0,y), b=Math.min(y1,y+slitLen);
-        if(b-a>=Math.min(2,slitLen)){
-          d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
-          count++;
-        }
+      const list=(col%2===0)?segs.touch:segs.offset;
+      for(const seg of list){
+        d+=`M${fmt(cx+ox)} ${fmt(y0+seg[0]+oy)}L${fmt(cx+ox)} ${fmt(y0+seg[1]+oy)}`;
+        count++;
       }
     }
     return {d,count};
