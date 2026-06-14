@@ -1,22 +1,34 @@
 'use strict';
 
-const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
+const { app, BrowserWindow, Menu, shell, dialog, ipcMain } = require('electron');
 const path = require('path');
 const trial = require('./trial');
+const license = require('./license');
+const updateCheck = require('./update-check');
 
 const APP_TITLE = 'Xeomsc-Laser';
 const WEBSITE_URL = 'https://xeomsc-laser.pl';
+const DOWNLOADS_URL = 'https://xeomsc-laser.pl/downloads.html';
 const EDITOR_FILE = path.join(__dirname, 'app', 'edytor.html');
 const LICENSE_FILE = path.join(__dirname, 'app', 'license.html');
 const EXPIRED_FILE = path.join(__dirname, 'trial-expired.html');
+const ACTIVATE_FILE = path.join(__dirname, 'activate.html');
 
 // Konfiguracja wersji próbnej — generowana przy buildzie przez set-trial.js.
-// { trial:true, days:7 } = wersja próbna; brak pliku / {trial:false} = pełna wersja.
+// { trial:true, days:7 } = okres próbny; { requireActivation:true } = po jego
+// zakończeniu program wymaga kodu aktywacyjnego (ekran activate.html); w
+// przeciwnym razie pokazuje ekran trial-expired.html (wersja demo).
 const TRIAL = trial.loadConfig(__dirname);
 let TRIAL_STATUS = { expired: false, daysLeft: null };
+let ACTIVATION = { activated: false, code: null };
 
 let mainWindow = null;
 let licenseWindow = null;
+
+function targetFile() {
+  if (!TRIAL.trial || !TRIAL_STATUS.expired || ACTIVATION.activated) return EDITOR_FILE;
+  return TRIAL.requireActivation ? ACTIVATE_FILE : EXPIRED_FILE;
+}
 
 // Pojedyncza instancja — kolejne uruchomienia tylko aktywują istniejące okno.
 const gotLock = app.requestSingleInstanceLock();
@@ -53,7 +65,7 @@ function createMainWindow() {
     }
   });
 
-  mainWindow.loadFile(TRIAL_STATUS.expired ? EXPIRED_FILE : EDITOR_FILE);
+  mainWindow.loadFile(targetFile());
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -103,9 +115,15 @@ function showLicenseWindow() {
 function showAbout() {
   let trialLine = '';
   if (TRIAL.trial) {
-    trialLine = TRIAL_STATUS.expired
-      ? '\n\nWersja próbna — okres testowy zakończony.'
-      : '\n\nWersja próbna — pozostało dni: ' + TRIAL_STATUS.daysLeft + ' z ' + TRIAL.days + '.';
+    if (ACTIVATION.activated) {
+      trialLine = '\n\nLicencja aktywowana — kod: ' + ACTIVATION.code;
+    } else if (TRIAL_STATUS.expired) {
+      trialLine = TRIAL.requireActivation
+        ? '\n\nOkres próbny zakończony — wymagany kod aktywacyjny.'
+        : '\n\nWersja próbna — okres testowy zakończony.';
+    } else {
+      trialLine = '\n\nWersja próbna — pozostało dni: ' + TRIAL_STATUS.daysLeft + ' z ' + TRIAL.days + '.';
+    }
   }
   const detail =
     'Wersja ' + app.getVersion() + '\n' +
@@ -199,14 +217,41 @@ function buildMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
+ipcMain.handle('license:activate', async (_event, code) => {
+  const result = await license.verifyAndActivate(code, app.getPath('userData'));
+  if (result.ok) {
+    ACTIVATION = license.getActivation(app.getPath('userData'));
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadFile(EDITOR_FILE);
+  }
+  return result;
+});
+
 app.whenReady().then(() => {
   TRIAL_STATUS = trial.getStatus(app.getPath('userData'), TRIAL, Date.now());
+  ACTIVATION = license.getActivation(app.getPath('userData'));
   buildMenu();
   createMainWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
+
+  // Sprawdzenie nowej wersji w tle — błędy/sieć brak nie blokują programu.
+  updateCheck.checkForUpdate(app.getVersion()).then((latest) => {
+    if (!latest || !mainWindow || mainWindow.isDestroyed()) return;
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Nowa wersja dostępna',
+      message: APP_TITLE + ' ' + latest.version + ' jest już dostępny.',
+      detail: (latest.notes ? latest.notes + '\n\n' : '') + 'Aktualna wersja zainstalowana: ' + app.getVersion(),
+      buttons: ['Pobierz', 'Później'],
+      defaultId: 0,
+      cancelId: 1,
+      noLink: true
+    }).then(({ response }) => {
+      if (response === 0) shell.openExternal(latest.url || DOWNLOADS_URL);
+    });
+  }).catch(() => {});
 });
 
 app.on('window-all-closed', () => {

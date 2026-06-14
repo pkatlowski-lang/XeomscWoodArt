@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel administracyjny — Xeomsc-Laser</title>
+<style>
+  :root{color-scheme:dark;--accent:#7dd3fc;--gold:#f7b733;--bg:#0b1220;--panel:#0f1830;--border:#1e2b48;--text:#e6edf6;--muted:#9fb0c9}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+    font:15px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-size:22px;margin:0 0 6px;color:var(--gold)}
+  h2{font-size:17px;margin:32px 0 12px;color:var(--accent)}
+  .muted{color:var(--muted)}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-top:14px}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input,textarea{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);
+    background:var(--bg);color:var(--text);font:14px/1.4 -apple-system,Segoe UI,Roboto,sans-serif}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  button{cursor:pointer;border:none;border-radius:8px;padding:10px 20px;font-weight:700;font-size:14px}
+  .btn-primary{background:linear-gradient(135deg,var(--gold),#e0892a);color:#1a1304}
+  .btn-secondary{background:var(--border);color:var(--text)}
+  .btn-danger{background:#7a2230;color:#ffd9dc}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+  th{color:var(--muted);font-weight:600}
+  td.code{font:13px/1.4 ui-monospace,Consolas,monospace;letter-spacing:1px}
+  .status-unused{color:var(--accent)}
+  .status-activated{color:#5fd38a}
+  .msg{margin-top:10px;font-size:13px;min-height:18px}
+  .msg.error{color:#f88}
+  .msg.ok{color:#5fd38a}
+  #loginCard{max-width:380px;margin:80px auto 0}
+  #app{display:none}
+  .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .row > div{flex:1;min-width:160px}
+  .table-wrap{overflow-x:auto}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>Panel administracyjny — Xeomsc-Laser</h1>
+  <p class="muted">Generowanie kodów aktywacyjnych i informacja o najnowszej wersji programu.</p>
+
+  <div id="loginCard" class="panel">
+    <h2 style="margin-top:0">Logowanie</h2>
+    <label for="loginEmail">E-mail</label>
+    <input type="email" id="loginEmail" autocomplete="username">
+    <label for="loginPass">Hasło</label>
+    <input type="password" id="loginPass" autocomplete="current-password">
+    <div style="margin-top:14px"><button class="btn-primary" id="loginBtn">Zaloguj</button></div>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="app">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="muted" id="whoami"></div>
+      <button class="btn-secondary" id="logoutBtn">Wyloguj</button>
+    </div>
+
+    <h2>Kody aktywacyjne</h2>
+    <div class="panel">
+      <div class="row">
+        <div>
+          <label for="newCodeNote">Notatka (opcjonalnie — np. nazwa klienta)</label>
+          <input type="text" id="newCodeNote" placeholder="np. Jan Kowalski — zamówienie #123">
+        </div>
+        <div style="flex:0 0 auto">
+          <button class="btn-primary" id="genCodeBtn">+ Wygeneruj kod</button>
+        </div>
+      </div>
+      <div class="msg" id="codeMsg"></div>
+
+      <div class="table-wrap">
+        <table id="codesTable">
+          <thead>
+            <tr><th>Kod</th><th>Status</th><th>Notatka</th><th>Utworzono</th><th>Aktywowano</th><th>Urządzenie</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px"><button class="btn-secondary" id="refreshBtn">Odśwież listę</button></div>
+    </div>
+
+    <h2>Najnowsza wersja programu</h2>
+    <div class="panel">
+      <p class="muted">Te dane wykorzystuje strona Downloads oraz mechanizm powiadomień o aktualizacji w programie.</p>
+      <div class="row">
+        <div>
+          <label for="verVersion">Numer wersji (np. 1.2.0)</label>
+          <input type="text" id="verVersion" placeholder="1.2.0">
+        </div>
+        <div>
+          <label for="verUrl">Link do pobrania (wersja demo / instalator)</label>
+          <input type="text" id="verUrl" placeholder="https://...">
+        </div>
+      </div>
+      <label for="verNotes">Informacje o wersji (opcjonalnie)</label>
+      <textarea id="verNotes" rows="3" placeholder="Co nowego w tej wersji…"></textarea>
+      <div style="margin-top:14px"><button class="btn-primary" id="saveVerBtn">Zapisz</button></div>
+      <div class="msg" id="verMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
+  authDomain: "xeomsc-a8edd.firebaseapp.com",
+  projectId: "xeomsc-a8edd",
+  storageBucket: "xeomsc-a8edd.firebasestorage.app",
+  messagingSenderId: "43822805612",
+  appId: "1:43822805612:web:d343653e47777d8ebf5e49"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const loginCard = document.getElementById('loginCard');
+const appEl = document.getElementById('app');
+const loginMsg = document.getElementById('loginMsg');
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  loginMsg.textContent = 'Logowanie…'; loginMsg.className = 'msg';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    loginMsg.textContent = 'Błąd logowania: ' + (e.code || e.message);
+    loginMsg.className = 'msg error';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loginCard.style.display = 'none';
+    appEl.style.display = '';
+    document.getElementById('whoami').textContent = 'Zalogowano jako: ' + user.email;
+    loadCodes();
+    loadVersion();
+  } else {
+    loginCard.style.display = '';
+    appEl.style.display = 'none';
+    loginMsg.textContent = '';
+  }
+});
+
+/* ---------------- Kody aktywacyjne ---------------- */
+
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // bez 0/O i 1/I — łatwiejsze do przepisania
+
+function randomSegment(len) {
+  let out = '';
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < len; i++) out += CODE_CHARS[arr[i] % CODE_CHARS.length];
+  return out;
+}
+
+function generateCode() {
+  return `XEOMSC-${randomSegment(4)}-${randomSegment(4)}-${randomSegment(4)}`;
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('pl-PL');
+}
+
+document.getElementById('genCodeBtn').addEventListener('click', async () => {
+  const note = document.getElementById('newCodeNote').value.trim();
+  const codeMsg = document.getElementById('codeMsg');
+  const code = generateCode();
+  codeMsg.textContent = 'Zapisywanie…'; codeMsg.className = 'msg';
+  try {
+    await setDoc(doc(db, 'licenses', code), {
+      status: 'unused',
+      note: note || null,
+      createdAt: serverTimestamp(),
+      activatedAt: null,
+      deviceId: null
+    });
+    document.getElementById('newCodeNote').value = '';
+    codeMsg.textContent = 'Wygenerowano kod: ' + code;
+    codeMsg.className = 'msg ok';
+    loadCodes();
+  } catch (e) {
+    codeMsg.textContent = 'Błąd: ' + (e.code || e.message);
+    codeMsg.className = 'msg error';
+  }
+});
+
+document.getElementById('refreshBtn').addEventListener('click', loadCodes);
+
+async function loadCodes() {
+  const tbody = document.querySelector('#codesTable tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="muted">Wczytywanie…</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db, 'licenses'), orderBy('createdAt', 'desc')));
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="7" class="muted">Brak kodów.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    snap.forEach((d) => {
+      const v = d.data();
+      const tr = document.createElement('tr');
+      const statusCls = v.status === 'activated' ? 'status-activated' : 'status-unused';
+      const statusTxt = v.status === 'activated' ? 'aktywowany' : 'nieużyty';
+      tr.innerHTML = `
+        <td class="code">${d.id}</td>
+        <td class="${statusCls}">${statusTxt}</td>
+        <td>${v.note ? escapeHtml(v.note) : '—'}</td>
+        <td>${fmtDate(v.createdAt)}</td>
+        <td>${fmtDate(v.activatedAt)}</td>
+        <td>${v.deviceId ? escapeHtml(v.deviceId) : '—'}</td>
+        <td><button class="btn-danger" data-code="${d.id}">Usuń</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button[data-code]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Usunąć kod ' + btn.dataset.code + '?')) return;
+        await deleteDoc(doc(db, 'licenses', btn.dataset.code));
+        loadCodes();
+      });
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" class="msg error">Błąd: ' + escapeHtml(e.code || e.message) + '</td></tr>';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+/* ---------------- Wersja programu ---------------- */
+
+async function loadVersion() {
+  try {
+    const snap = await getDoc(doc(db, 'app_config', 'latest'));
+    if (snap.exists()) {
+      const v = snap.data();
+      document.getElementById('verVersion').value = v.version || '';
+      document.getElementById('verUrl').value = v.downloadUrl || '';
+      document.getElementById('verNotes').value = v.notes || '';
+    }
+  } catch (e) {}
+}
+
+document.getElementById('saveVerBtn').addEventListener('click', async () => {
+  const verMsg = document.getElementById('verMsg');
+  const version = document.getElementById('verVersion').value.trim();
+  const downloadUrl = document.getElementById('verUrl').value.trim();
+  const notes = document.getElementById('verNotes').value.trim();
+  if (!version) { verMsg.textContent = 'Podaj numer wersji.'; verMsg.className = 'msg error'; return; }
+  verMsg.textContent = 'Zapisywanie…'; verMsg.className = 'msg';
+  try {
+    await setDoc(doc(db, 'app_config', 'latest'), {
+      version, downloadUrl: downloadUrl || null, notes: notes || null, updatedAt: serverTimestamp()
+    }, { merge: true });
+    verMsg.textContent = 'Zapisano.';
+    verMsg.className = 'msg ok';
+  } catch (e) {
+    verMsg.textContent = 'Błąd: ' + (e.code || e.message);
+    verMsg.className = 'msg error';
+  }
+});
+</script>
+</body></html>

@@ -15,9 +15,9 @@ const STATE_FILE = 'trial-state.json';
 function loadConfig(dir) {
   try {
     const cfg = require(path.join(dir, 'trial.config.json'));
-    return { trial: !!cfg.trial, days: Number(cfg.days) || 7 };
+    return { trial: !!cfg.trial, days: Number(cfg.days) || 7, requireActivation: !!cfg.requireActivation };
   } catch (e) {
-    return { trial: false, days: 7 };
+    return { trial: false, days: 7, requireActivation: false };
   }
 }
 

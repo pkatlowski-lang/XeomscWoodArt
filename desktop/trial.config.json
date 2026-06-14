@@ -1,4 +1,5 @@
 {
   "trial": false,
-  "days": 7
+  "days": 7,
+  "requireActivation": false
 }

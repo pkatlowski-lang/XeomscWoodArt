@@ -14,15 +14,17 @@
   "scripts": {
     "prepare:app": "node copy-app.js",
     "start": "npm run prepare:app && node set-trial.js off && electron .",
-    "start:trial": "npm run prepare:app && node set-trial.js on && electron .",
+    "start:trial": "npm run prepare:app && node set-trial.js demo && electron .",
+    "start:licensed": "npm run prepare:app && node set-trial.js licensed && electron .",
     "smoke": "npm run prepare:app && node set-trial.js off && electron smoke-main.cjs",
-    "dist:win": "npm run prepare:app && node set-trial.js off && electron-builder --win --x64 -p never",
-    "dist:win:trial": "npm run prepare:app && node set-trial.js on && electron-builder --win --x64 -p never -c electron-builder.trial.json",
-    "dist:mac": "npm run prepare:app && node set-trial.js off && electron-builder --mac -p never",
-    "dist:mac:trial": "npm run prepare:app && node set-trial.js on && electron-builder --mac -p never -c electron-builder.trial.json",
+    "dist:win": "npm run prepare:app && node set-trial.js licensed && electron-builder --win --x64 -p never",
+    "dist:win:trial": "npm run prepare:app && node set-trial.js demo && electron-builder --win --x64 -p never -c electron-builder.trial.json",
+    "dist:mac": "npm run prepare:app && node set-trial.js licensed && electron-builder --mac -p never",
+    "dist:mac:trial": "npm run prepare:app && node set-trial.js demo && electron-builder --mac -p never -c electron-builder.trial.json",
     "dist:linux": "npm run prepare:app && node set-trial.js off && electron-builder --linux -p never",
     "pack:linux": "npm run prepare:app && node set-trial.js off && electron-builder --linux dir",
-    "pack:linux:trial": "npm run prepare:app && node set-trial.js on && electron-builder --linux dir"
+    "pack:linux:trial": "npm run prepare:app && node set-trial.js demo && electron-builder --linux dir",
+    "pack:linux:licensed": "npm run prepare:app && node set-trial.js licensed && electron-builder --linux dir"
   },
   "devDependencies": {
     "electron": "^33.2.1",
@@ -41,6 +43,9 @@
       "trial.js",
       "trial.config.json",
       "trial-expired.html",
+      "license.js",
+      "activate.html",
+      "update-check.js",
       "preload.js",
       "app/**/*",
       "!**/*.map",

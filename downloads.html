@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pobierz program — Xeomsc-Laser</title>
+<meta name="description" content="Pobierz darmową, 7-dniową wersję demo programu Xeomsc-Laser — edytora do cięcia i grawerowania laserowego.">
+<link rel="icon" href="assets/logo.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{font-family:'Poppins',sans-serif}
+  body{background:#0b1220}
+</style>
+</head>
+<body class="text-slate-100">
+
+  <nav class="fixed w-full z-50 bg-slate-950/95 backdrop-blur-md shadow-lg top-0 h-20 flex items-center border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 w-full flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <img src="assets/logo.png" alt="Xeomsc Laser" class="h-10 w-auto" onerror="this.style.display='none'">
+        <span class="text-lg font-bold text-white">Xeomsc-Laser</span>
+      </a>
+      <a href="index.html" class="text-sm text-slate-400 hover:text-sky-400 transition">&larr; Strona główna</a>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-6 pt-36 pb-24">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">Pobierz Xeomsc-Laser</h1>
+    <p class="text-slate-400 mb-10 max-w-2xl">
+      Interaktywny, parametryczny edytor projektów do cięcia i grawerowania laserowego —
+      do pobrania jako program na komputer (Windows).
+    </p>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <div class="bg-slate-900/70 border border-white/10 rounded-2xl p-7">
+        <div class="inline-block px-3 py-1 rounded-full bg-sky-500/15 text-sky-400 text-xs font-bold mb-4">
+          WERSJA DEMO
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Bezpłatna wersja demo</h2>
+        <p class="text-slate-400 text-sm mb-1">
+          Pełna funkcjonalność edytora przez <strong class="text-slate-200">7 dni</strong> od pierwszego
+          uruchomienia. Po tym czasie program wyświetli ekran informacyjny — projektowanie offline,
+          podgląd 3D i eksport SVG/DXF działają bez ograniczeń w okresie próbnym.
+        </p>
+        <p class="text-slate-500 text-xs mb-5">Windows 10/11 (64-bit) · wersja <span id="demoVersion">—</span></p>
+        <a id="demoDownloadBtn" href="#" class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-sky-500/20">
+          <i class="fa-solid fa-download"></i> Pobierz wersję demo (.exe)
+        </a>
+        <div id="demoFallbackMsg" class="text-xs text-slate-500 mt-3 hidden">
+          Link do pobrania jest aktualizowany — w razie problemu skontaktuj się z nami.
+        </div>
+      </div>
+
+      <div class="bg-slate-900/70 border border-white/10 rounded-2xl p-7">
+        <div class="inline-block px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 text-xs font-bold mb-4">
+          WERSJA Z LICENCJĄ
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Pełna wersja na kod aktywacyjny</h2>
+        <p class="text-slate-400 text-sm mb-5">
+          Program działa <strong class="text-slate-200">7 dni</strong> jak wersja demo, a następnie wymaga
+          wpisania kodu aktywacyjnego, który otrzymasz po zakupie licencji. Po aktywacji program
+          działa już bez ograniczeń, w pełni offline.
+        </p>
+        <a href="#contact" onclick="window.location='index.html#contact'" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-envelope"></i> Zapytaj o licencję
+        </a>
+      </div>
+
+    </div>
+
+    <div id="updateNotes" class="mt-10 text-sm text-slate-400 hidden">
+      <h3 class="text-slate-200 font-semibold mb-1">Informacje o najnowszej wersji</h3>
+      <p id="updateNotesText"></p>
+    </div>
+  </main>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script>
+  // Domyślny (statyczny) link — używany, jeśli odczyt z Firestore się nie powiedzie.
+  const FALLBACK_VERSION = '1.1.0';
+  const FALLBACK_URL = 'https://raw.githubusercontent.com/pkatlowski-lang/XeomscWoodArt/pobierz/Xeomsc-Laser-PROBA-7dni-1.1.0.exe';
+
+  const btn = document.getElementById('demoDownloadBtn');
+  const verEl = document.getElementById('demoVersion');
+  btn.href = FALLBACK_URL;
+  verEl.textContent = FALLBACK_VERSION;
+
+  // Dane o najnowszej wersji aktualizowane z panelu administracyjnego (admin.html)
+  // w Firestore: app_config/latest { version, downloadUrl, notes }. Odczyt publiczny.
+  fetch('https://firestore.googleapis.com/v1/projects/xeomsc-a8edd/databases/(default)/documents/app_config/latest')
+    .then(r => r.ok ? r.json() : null)
+    .then(doc => {
+      if (!doc || !doc.fields) return;
+      const f = doc.fields;
+      if (f.version && f.version.stringValue) verEl.textContent = f.version.stringValue;
+      if (f.downloadUrl && f.downloadUrl.stringValue) btn.href = f.downloadUrl.stringValue;
+      if (f.notes && f.notes.stringValue) {
+        document.getElementById('updateNotesText').textContent = f.notes.stringValue;
+        document.getElementById('updateNotes').classList.remove('hidden');
+      }
+    })
+    .catch(() => {
+      document.getElementById('demoFallbackMsg').classList.remove('hidden');
+    });
+</script>
+</body></html>

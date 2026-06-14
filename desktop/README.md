@@ -60,27 +60,58 @@ npm run dist:mac      # → dist/Xeomsc-Laser-<wersja>-<arch>.dmg
 npm run dist:linux
 ```
 
-## Wersja próbna (7 dni)
+## Wersje budowy (demo / z licencją)
 
-Oprócz wersji pełnej można zbudować wersję próbną, która działa **7 dni od
-pierwszego uruchomienia** — po tym czasie edytor jest zastępowany ekranem
-informacyjnym (`trial-expired.html`) z odnośnikiem do strony WWW.
+Program buduje się w dwóch wariantach, oba z **7-dniowym okresem próbnym od
+pierwszego uruchomienia**:
 
 ```bash
-npm run dist:win:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>.exe
-npm run dist:mac:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>-<arch>.dmg
+npm run dist:win          # → dist/Xeomsc-Laser-Setup-<wersja>.exe          (z licencją)
+npm run dist:mac          # → dist/Xeomsc-Laser-<wersja>-<arch>.dmg         (z licencją)
+
+npm run dist:win:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>.exe     (demo)
+npm run dist:mac:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>-<arch>.dmg (demo)
 ```
+
+- **Demo** (`dist:win:trial` / `dist:mac:trial`) — po 7 dniach edytor jest
+  zastępowany ekranem informacyjnym (`trial-expired.html`) z odnośnikiem do
+  strony WWW. Ta wersja jest do pobrania na stronie (`downloads.html`).
+- **Z licencją** (`dist:win` / `dist:mac`) — po 7 dniach pojawia się ekran
+  aktywacji (`activate.html`), w którym klient wpisuje kod aktywacyjny
+  otrzymany po zakupie. Po poprawnej aktywacji program działa już bez
+  ograniczeń, w pełni offline.
 
 Mechanizm:
 
-- `set-trial.js on|off` zapisuje `trial.config.json` (`{ "trial": true, "days": 7 }`
-  dla wersji próbnej, `{ "trial": false }` dla pełnej — wersja pełna jest
-  domyślna).
+- `set-trial.js off|demo|licensed` zapisuje `trial.config.json`:
+  `{ trial, days, requireActivation }`. `off` = bez ograniczeń (development),
+  `demo` = 7 dni bez aktywacji, `licensed` = 7 dni + ekran aktywacji.
 - `trial.js` przy starcie programu zapisuje datę pierwszego uruchomienia w
   katalogu danych użytkownika (niezależnie od localStorage edytora) i sprawdza,
   czy minęło więcej niż `days` dni.
+- `license.js` weryfikuje kod aktywacyjny przez REST API Firestore (projekt
+  `xeomsc-a8edd`, kolekcja `licenses`) — wymaga internetu tylko przy
+  aktywacji; stan aktywacji zapisywany jest lokalnie i działa potem offline.
+- `update-check.js` przy starcie sprawdza dokument `app_config/latest` w
+  Firestore i — jeśli dostępna jest nowsza wersja — pokazuje komunikat z
+  linkiem do pobrania.
 - Workflow GitHub Actions (`build-desktop.yml`) buduje automatycznie obie
-  wersje (pełną i próbną) dla Windows i macOS.
+  wersje dla Windows i macOS.
+
+## Panel administracyjny i kody aktywacyjne
+
+Plik `admin.html` (w głównym repo, publikowany na stronie) to panel do:
+
+- generowania kodów aktywacyjnych (zapisywanych w Firestore, kolekcja
+  `licenses`) — kody mają format `XEOMSC-XXXX-XXXX-XXXX`,
+- ustawiania najnowszej wersji programu (`app_config/latest`) — wykorzystywane
+  przez stronę `downloads.html` i `update-check.js`.
+
+Logowanie do panelu odbywa się przez Firebase Authentication (e-mail/hasło).
+Wymagana jednorazowa konfiguracja w konsoli Firebase (projekt `xeomsc-a8edd`)
+— zobacz komentarze w `firestore.rules` w głównym katalogu repo: włączenie
+logowania e-mail/hasło, utworzenie konta administratora i dopisanie reguł
+dostępu do kolekcji `licenses` i `app_config`.
 
 ## Budowanie w chmurze (GitHub Actions) — zalecane
 
