@@ -152,13 +152,13 @@ const verifyBanner = document.getElementById('verifyBanner');
 onAuthStateChanged(auth, (user) => {
   if (user) {
     loginCard.style.display = 'none';
-    appEl.style.display = '';
+    appEl.style.display = 'block';
     document.getElementById('whoami').textContent = 'Zalogowano jako: ' + user.email + (user.emailVerified ? '' : ' (e-mail niezweryfikowany)');
-    verifyBanner.style.display = user.emailVerified ? 'none' : '';
+    verifyBanner.style.display = user.emailVerified ? 'none' : 'block';
     loadCodes();
     loadVersion();
   } else {
-    loginCard.style.display = '';
+    loginCard.style.display = 'block';
     appEl.style.display = 'none';
     loginMsg.textContent = '';
   }
