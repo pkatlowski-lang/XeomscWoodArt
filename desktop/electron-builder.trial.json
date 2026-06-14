@@ -1,0 +1,11 @@
+{
+  "win": {
+    "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}.${ext}"
+  },
+  "dmg": {
+    "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}-${arch}.${ext}"
+  },
+  "linux": {
+    "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}.${ext}"
+  }
+}
