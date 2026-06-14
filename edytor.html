@@ -614,7 +614,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
     </div>
-    <label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych:</label>
+    <label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabLeft"> Lewa</label>
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabRight"> Prawa</label>
@@ -5162,6 +5162,35 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     return {d,count};
   }
+  // Obrys panelu zawiasu: prostokąt totalW×H, gdzie zaczepy „na palec" pojawiają się WYŁĄCZNIE
+  // na litych polach bocznych (na lewo/prawo od strefy zawiasu). Górna i dolna krawędź STREFY
+  // ZAWIASU [L..L+Z] są zawsze proste — nacięcia dochodzą do nich stycznie i nic nie blokuje
+  // zginania (żadnych zaczepów na zawiasie). Zęby są „licem" na końcach (tabsFirst=false),
+  // więc czysto łączą się z prostymi odcinkami i narożnikami.
+  function hingePanelOutline(totalW,H,L,Z,T,F,tabs){
+    const pts=[];
+    const add=(x,y)=>{ const last=pts[pts.length-1]; if(!last||Math.abs(last[0]-x)>1e-6||Math.abs(last[1]-y)>1e-6) pts.push([x,y]); };
+    const zoneA=L, zoneB=L+Z, MINSEG=Math.max(F*1.5,3);
+    const fp=(len)=>fingerEdgePoints(len,T,F,false);   // zęby licem na obu końcach odcinka
+    // GÓRA: lewo→prawo, zęby w górę (y-=off); strefa zawiasu prosto
+    add(0,0);
+    if(tabs.top && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(al,-off));
+    add(zoneA,0); add(zoneB,0);
+    if(tabs.top && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(zoneB+al,-off));
+    add(totalW,0);
+    // PRAWA: góra→dół, zęby w prawo (x+=off)
+    if(tabs.right && H>=MINSEG) fp(H).forEach(([al,off])=>add(totalW+off,al));
+    add(totalW,H);
+    // DÓŁ: prawo→lewo, zęby w dół (y+=off); strefa zawiasu prosto
+    if(tabs.bottom && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(totalW-al,H+off));
+    add(zoneB,H); add(zoneA,H);
+    if(tabs.bottom && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(zoneA-al,H+off));
+    add(0,H);
+    // LEWA: dół→góra, zęby w lewo (x-=off)
+    if(tabs.left && H>=MINSEG) fp(H).forEach(([al,off])=>add(-off,H-al));
+    add(0,0);
+    return pts;
+  }
   const modalHinge=document.getElementById('modalHinge');
   document.getElementById('hingeGenBtn').addEventListener('click',()=>modalHinge.classList.add('open'));
   document.getElementById('modalHingeClose').addEventListener('click',()=>modalHinge.classList.remove('open'));
@@ -5188,9 +5217,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     // nacięcia tylko w STREFIE ZAWIASU (przesunięte o pole lewe), styczne z górą/dołem
     const {d:slitD,count}=buildLivingHingePattern(zoneW,H,slitLen,kerf,pitchX,pitchY,0, leftW, 0);
     if(!count){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
-    // obrys panelu = prostokąt totalW×H z opcjonalnymi zaczepami „na palec” na wybranych krawędziach
-    const edges={ top:tabs.top?true:null, right:tabs.right?true:null, bottom:tabs.bottom?true:null, left:tabs.left?true:null };
-    const outlinePts=boxPanelPoints(totalW,H,T,F,edges);
+    // obrys panelu — zaczepy „na palec" tylko na litych polach bocznych; strefa zawiasu zawsze prosta
+    const outlinePts=hingePanelOutline(totalW,H,leftW,zoneW,T,F,tabs);
     const obb=polysBBoxMulti([outlinePts]);
     const px=20, py=20, gid=uid();
     const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs}};
