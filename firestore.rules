@@ -21,8 +21,9 @@
 //  1) Authentication -> Sign-in method -> włącz "Email/Password".
 //  2) Authentication -> Sign-in method -> włącz "Anonymous".
 //  3) Authentication -> Users -> Dodaj użytkownika -> pkatlowski@gmail.com
-//     (ustaw hasło), a potem zweryfikuj ten e-mail (link weryfikacyjny),
-//     bo isAdmin() wymaga email_verified == true.
+//     (ustaw hasło). Weryfikacja e-maila NIE jest wymagana — administratorem
+//     jest tylko konto o tym adresie (zabezpieczone hasłem), a adres jest
+//     już zajęty, więc nikt inny go nie przejmie.
 //  4) Firestore Database -> Reguły -> wklej całość poniżej -> Publish.
 
 rules_version = '2';
@@ -32,8 +33,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email == "pkatlowski@gmail.com"
-        && request.auth.token.email_verified == true;
+        && request.auth.token.email == "pkatlowski@gmail.com";
     }
 
     function isAnon() {

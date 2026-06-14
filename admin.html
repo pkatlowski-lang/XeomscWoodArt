@@ -58,13 +58,6 @@
       <button class="btn-secondary" id="logoutBtn">Wyloguj</button>
     </div>
 
-    <div id="verifyBanner" class="panel" style="display:none;border-color:#f7b733">
-      <strong style="color:#f7b733">E-mail niezweryfikowany.</strong>
-      <p class="muted">Aby panel mógł zapisywać kody i wersję programu, musisz zweryfikować adres e-mail tego konta.</p>
-      <button class="btn-primary" id="sendVerifyBtn" style="margin-right:8px">Wyślij link weryfikacyjny</button>
-      <button class="btn-secondary" id="refreshVerifyBtn">Sprawdź ponownie</button>
-      <div class="msg" id="verifyMsg"></div>
-    </div>
 
     <h2>Kody aktywacyjne</h2>
     <div class="panel">
@@ -113,7 +106,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -147,45 +140,17 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-const verifyBanner = document.getElementById('verifyBanner');
-
 onAuthStateChanged(auth, (user) => {
   if (user) {
     loginCard.style.display = 'none';
     appEl.style.display = 'block';
-    document.getElementById('whoami').textContent = 'Zalogowano jako: ' + user.email + (user.emailVerified ? '' : ' (e-mail niezweryfikowany)');
-    verifyBanner.style.display = user.emailVerified ? 'none' : 'block';
+    document.getElementById('whoami').textContent = 'Zalogowano jako: ' + user.email;
     loadCodes();
     loadVersion();
   } else {
     loginCard.style.display = 'block';
     appEl.style.display = 'none';
     loginMsg.textContent = '';
-  }
-});
-
-document.getElementById('sendVerifyBtn').addEventListener('click', async () => {
-  const verifyMsg = document.getElementById('verifyMsg');
-  verifyMsg.textContent = 'Wysyłanie…'; verifyMsg.className = 'msg';
-  try {
-    await sendEmailVerification(auth.currentUser);
-    verifyMsg.textContent = 'Wysłano link weryfikacyjny na ' + auth.currentUser.email + '. Otwórz e-mail, kliknij link, a potem kliknij „Sprawdź ponownie".';
-    verifyMsg.className = 'msg ok';
-  } catch (e) {
-    verifyMsg.textContent = 'Błąd: ' + (e.code || e.message);
-    verifyMsg.className = 'msg error';
-  }
-});
-
-document.getElementById('refreshVerifyBtn').addEventListener('click', async () => {
-  const verifyMsg = document.getElementById('verifyMsg');
-  await auth.currentUser.reload();
-  if (auth.currentUser.emailVerified) {
-    verifyBanner.style.display = 'none';
-    document.getElementById('whoami').textContent = 'Zalogowano jako: ' + auth.currentUser.email;
-  } else {
-    verifyMsg.textContent = 'E-mail wciąż niezweryfikowany — sprawdź skrzynkę i kliknij link.';
-    verifyMsg.className = 'msg error';
   }
 });
 
