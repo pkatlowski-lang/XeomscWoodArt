@@ -3,14 +3,14 @@
 /*
  * Sprawdzanie dostępności nowej wersji programu.
  *
- * Numer najnowszej wersji jest publikowany w Firestore (projekt xeomsc-a8edd,
+ * Numer najnowszej wersji jest publikowany w Firestore (projekt xeomsc-licencje,
  * dokument app_config/latest, pole "version" + "downloadUrl") z panelu
  * administracyjnego (admin.html). Odczyt tego dokumentu jest publiczny
  * (reguły Firestore: allow get: if true), więc sprawdzenie nie wymaga
  * logowania. Błędy sieci są wyciszane — brak internetu nie blokuje programu.
  */
 
-const FIREBASE_PROJECT = 'xeomsc-a8edd';
+const FIREBASE_PROJECT = 'xeomsc-licencje';
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
 
 function parseVersion(v) {

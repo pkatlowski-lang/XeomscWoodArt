@@ -1,14 +1,11 @@
-// Reguły Firestore dla systemu licencji Xeomsc-Laser (projekt xeomsc-a8edd).
+// Reguły Firestore dla systemu licencji Xeomsc-Laser (projekt xeomsc-licencje).
 //
-// To NIE jest kompletny plik reguł — Twój projekt już ma reguły dla innych
-// kolekcji (np. artifacts/.../messages, artifacts/.../siteConfig używane
-// przez index.html). NIE zastępuj nimi całych reguł w konsoli Firebase —
-// dopisz poniższe bloki "match" do istniejącej sekcji
-// `service cloud.firestore { match /databases/{database}/documents { ... } }`
-// oraz dopisz funkcje isAdmin()/isAnon() na początku tej sekcji (jeśli ich
-// jeszcze nie masz).
+// To jest KOMPLETNY plik reguł — projekt xeomsc-licencje jest dedykowany
+// tylko systemowi licencji, więc możesz skopiować całą zawartość poniżej
+// i wkleić ją w konsoli Firebase:
+//   Firestore Database -> Rules (Reguły) -> zaznacz wszystko, wklej, Publish.
 //
-// Nowe kolekcje:
+// Kolekcje:
 //  - licenses    — kody aktywacyjne programu.
 //                   Dokument: licenses/{KOD}
 //                     { status: "unused"|"activated", createdAt, note,
@@ -18,49 +15,57 @@
 //                     { version, downloadUrl, notes, updatedAt }
 //
 // Panel admina (admin.html) loguje się przez Firebase Auth (e-mail/hasło).
-// Program desktopowy loguje się anonimowo (signInAnonymously) — tak jak
-// edytor WWW przy wysyłce wyceny.
+// Program desktopowy loguje się anonimowo (signInAnonymously).
 //
 // Konfiguracja w konsoli Firebase (jednorazowo):
 //  1) Authentication -> Sign-in method -> włącz "Email/Password".
-//  2) Authentication -> Users -> Dodaj użytkownika -> pkatlowski@gmail.com
+//  2) Authentication -> Sign-in method -> włącz "Anonymous".
+//  3) Authentication -> Users -> Dodaj użytkownika -> pkatlowski@gmail.com
 //     (ustaw hasło), a potem zweryfikuj ten e-mail (link weryfikacyjny),
 //     bo isAdmin() wymaga email_verified == true.
-//  3) Firestore Database -> Reguły -> dopisz funkcje + blok match poniżej.
+//  4) Firestore Database -> Reguły -> wklej całość poniżej -> Publish.
 
-// --- funkcje pomocnicze (dopisać raz, na początku sekcji documents) ---
-//
-// function isAdmin() {
-//   return request.auth != null
-//     && request.auth.token.email == "pkatlowski@gmail.com"
-//     && request.auth.token.email_verified == true;
-// }
-//
-// function isAnon() {
-//   return request.auth != null
-//     && request.auth.token.firebase.sign_in_provider == "anonymous";
-// }
+rules_version = '2';
 
-// --- nowe kolekcje (dopisać w sekcji documents, obok istniejących match) ---
+service cloud.firestore {
+  match /databases/{database}/documents {
 
-match /licenses/{code} {
-  allow get: if isAdmin() || isAnon();
-  allow list: if isAdmin();
-  allow create, delete: if isAdmin();
-  // Program desktopowy może oznaczyć nieużyty kod jako aktywowany na swoim
-  // urządzeniu — ale nie może zmienić niczego innego.
-  allow update: if isAdmin() || (
-    isAnon()
-    && resource.data.status == "unused"
-    && request.resource.data.status == "activated"
-    && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "activatedAt", "deviceId"])
-  );
-}
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "pkatlowski@gmail.com"
+        && request.auth.token.email_verified == true;
+    }
 
-match /app_config/{id} {
-  // Odczyt publiczny — strona Downloads i sprawdzanie aktualizacji w
-  // programie nie wymagają logowania.
-  allow get: if true;
-  allow list: if isAdmin();
-  allow write: if isAdmin();
+    function isAnon() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == "anonymous";
+    }
+
+    match /licenses/{code} {
+      allow get: if isAdmin() || isAnon();
+      allow list: if isAdmin();
+      allow create, delete: if isAdmin();
+      // Program desktopowy może oznaczyć nieużyty kod jako aktywowany na swoim
+      // urządzeniu — ale nie może zmienić niczego innego.
+      allow update: if isAdmin() || (
+        isAnon()
+        && resource.data.status == "unused"
+        && request.resource.data.status == "activated"
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "activatedAt", "deviceId"])
+      );
+    }
+
+    match /app_config/{id} {
+      // Odczyt publiczny — strona Downloads i sprawdzanie aktualizacji w
+      // programie nie wymagają logowania.
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Wszystko inne — zablokowane.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
 }

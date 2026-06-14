@@ -88,7 +88,7 @@
 
   // Dane o najnowszej wersji aktualizowane z panelu administracyjnego (admin.html)
   // w Firestore: app_config/latest { version, downloadUrl, notes }. Odczyt publiczny.
-  fetch('https://firestore.googleapis.com/v1/projects/xeomsc-a8edd/databases/(default)/documents/app_config/latest')
+  fetch('https://firestore.googleapis.com/v1/projects/xeomsc-licencje/databases/(default)/documents/app_config/latest')
     .then(r => r.ok ? r.json() : null)
     .then(doc => {
       if (!doc || !doc.fields) return;

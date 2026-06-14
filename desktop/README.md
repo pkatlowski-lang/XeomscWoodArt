@@ -90,7 +90,7 @@ Mechanizm:
   katalogu danych użytkownika (niezależnie od localStorage edytora) i sprawdza,
   czy minęło więcej niż `days` dni.
 - `license.js` weryfikuje kod aktywacyjny przez REST API Firestore (projekt
-  `xeomsc-a8edd`, kolekcja `licenses`) — wymaga internetu tylko przy
+  `xeomsc-licencje`, kolekcja `licenses`) — wymaga internetu tylko przy
   aktywacji; stan aktywacji zapisywany jest lokalnie i działa potem offline.
 - `update-check.js` przy starcie sprawdza dokument `app_config/latest` w
   Firestore i — jeśli dostępna jest nowsza wersja — pokazuje komunikat z
@@ -108,10 +108,11 @@ Plik `admin.html` (w głównym repo, publikowany na stronie) to panel do:
   przez stronę `downloads.html` i `update-check.js`.
 
 Logowanie do panelu odbywa się przez Firebase Authentication (e-mail/hasło).
-Wymagana jednorazowa konfiguracja w konsoli Firebase (projekt `xeomsc-a8edd`)
+Wymagana jednorazowa konfiguracja w konsoli Firebase (projekt `xeomsc-licencje`)
 — zobacz komentarze w `firestore.rules` w głównym katalogu repo: włączenie
-logowania e-mail/hasło, utworzenie konta administratora i dopisanie reguł
-dostępu do kolekcji `licenses` i `app_config`.
+logowania e-mail/hasło oraz anonimowego, utworzenie i weryfikacja konta
+administratora, a następnie wklejenie reguł dostępu do kolekcji `licenses`
+i `app_config`.
 
 ## Budowanie w chmurze (GitHub Actions) — zalecane
 

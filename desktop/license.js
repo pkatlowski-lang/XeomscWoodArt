@@ -3,9 +3,9 @@
 /*
  * Aktywacja kodem licencyjnym po zakończeniu okresu próbnego.
  *
- * Weryfikacja i aktywacja kodu odbywa się przez REST API Firestore (ten sam
- * projekt Firebase co edytor WWW: xeomsc-a8edd) — wymaga to internetu tylko
- * raz, przy aktywacji. Po udanej aktywacji stan zapisywany jest lokalnie
+ * Weryfikacja i aktywacja kodu odbywa się przez REST API Firestore (projekt
+ * Firebase przeznaczony na licencje: xeomsc-licencje) — wymaga to internetu
+ * tylko raz, przy aktywacji. Po udanej aktywacji stan zapisywany jest lokalnie
  * (license-state.json w katalogu danych użytkownika) i program działa dalej
  * w pełni offline.
  *
@@ -23,8 +23,8 @@ const crypto = require('crypto');
 const STATE_FILE = 'license-state.json';
 const DEVICE_FILE = 'device-id.json';
 
-const FIREBASE_API_KEY = 'AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw';
-const FIREBASE_PROJECT = 'xeomsc-a8edd';
+const FIREBASE_API_KEY = 'AIzaSyDQ6MNw43dm-zp9WH3dFYisqpQr3vcT5Go';
+const FIREBASE_PROJECT = 'xeomsc-licencje';
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
 const IDENTITY_BASE = 'https://identitytoolkit.googleapis.com/v1';
 
