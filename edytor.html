@@ -3534,7 +3534,15 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   document.getElementById('zoomFit').addEventListener('click',zoomFit);
   document.getElementById('zoomSelBtn').addEventListener('click',zoomToSelection);
   const snapBtn=document.getElementById('snapBtn');
-  document.getElementById('exportBtn').addEventListener('click',exportSVG);
+  const exportBtn=document.getElementById('exportBtn');
+  if(window.xeoDesktop && window.xeoDesktop.isDesktop){
+    exportBtn.addEventListener('click',exportSVG);
+  }else{
+    // Pobieranie SVG wstrzymane w wersji online — przycisk nieaktywny, bez akcji po kliknięciu.
+    exportBtn.disabled=true;
+    exportBtn.removeAttribute('style');
+    exportBtn.title='Pobieranie SVG jest tymczasowo niedostępne.';
+  }
   document.getElementById('exportDxfBtn').addEventListener('click',exportDXF);
 
   /* ---------------- Ustawienia siatki ---------------- */
