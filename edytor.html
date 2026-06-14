@@ -572,12 +572,21 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" id="modalBoxClose" title="Zamknij">✕</button>
     <h3>📦 Generator pudełka</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj 5 ścianek pudełka (otwartego od góry) z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem.</p>
+    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Wszystkie panele są zgrupowane i oznaczone (góra/podstawa), a podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
     <div class="field"><label>Szerokość — W (mm)</label><input type="number" id="boxW" min="10" max="2000" step="1" value="120"></div>
     <div class="field"><label>Głębokość — D (mm)</label><input type="number" id="boxD" min="10" max="2000" step="1" value="80"></div>
     <div class="field"><label>Wysokość — H (mm)</label><input type="number" id="boxH" min="10" max="2000" step="1" value="60"></div>
     <div class="field"><label>Grubość materiału — T (mm)</label><input type="number" id="boxT" min="0.5" max="20" step="0.5" value="3"></div>
     <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="boxF" min="2" max="100" step="1" value="15"></div>
+    <div class="field"><label>Zamknięcie pudełka</label>
+      <select id="boxClosure">
+        <option value="open">Otwarte (bez wieczka)</option>
+        <option value="lid">Wieczko nakładane (luźne)</option>
+        <option value="lid-lip">Wieczko z kołnierzem (chwyt — nie spada)</option>
+        <option value="hinged">Wieczko na zawiasie żywym (flex — uchylne)</option>
+      </select>
+    </div>
+    <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 8px"></p>
     <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj pudełko</button>
   </div>
 </div>
@@ -585,16 +594,33 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 <div class="modal-ov" id="modalHinge">
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" id="modalHingeClose" title="Zamknij">✕</button>
-    <h3>🪗 Generator zawiasu (living hinge)</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj panel z siatką krótkich nacięć w układzie cegiełek — pozwala wygiąć sztywny materiał (sklejkę, akryl) w łuk.</p>
-    <div class="field"><label>Szerokość panelu (mm)</label><input type="number" id="hingeW" min="10" max="760" step="1" value="100"></div>
-    <div class="field"><label>Wysokość panelu (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
-    <div class="field"><label>Długość nacięcia (mm)</label><input type="number" id="hingeLen" min="5" max="200" step="1" value="20"></div>
-    <div class="field"><label>Szerokość nacięcia — kerf (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
-    <div class="field"><label>Odstęp między kolumnami nacięć (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
-    <div class="field"><label>Mostek — przerwa między nacięciami w kolumnie (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
-    <div class="field"><label>Margines — sztywny pas wokół nacięć (mm)</label><input type="number" id="hingeMargin" min="0" max="100" step="1" value="0"></div>
-    <p style="font-size:.75rem;color:var(--muted);margin:-4px 0 8px">0 mm = nacięcia sięgają do samej krawędzi panelu (rama jest styczna z zewnętrznymi nacięciami) — zawias wygina się na całej szerokości/wysokości. Wartość &gt; 0 zostawia sztywny pas materiału na obwodzie (np. do wklejenia w korpus).</p>
+    <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
+    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec” (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
+    <div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="field"><label>Pole lewe (mm)</label><input type="number" id="hingeLeft" min="0" max="700" step="1" value="70"></div>
+      <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
+      <div class="field"><label>Pole prawe (mm)</label><input type="number" id="hingeRight" min="0" max="700" step="1" value="90"></div>
+    </div>
+    <div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Nacięcia</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Długość nacięcia (mm)</label><input type="number" id="hingeLen" min="5" max="200" step="1" value="20"></div>
+      <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
+      <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
+      <div class="field"><label>Mostek (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
+    </div>
+    <div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Łączenie — zaczepy „na palec”</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
+      <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
+    </div>
+    <label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych:</label>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabLeft"> Lewa</label>
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabRight"> Prawa</label>
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabTop"> Górna</label>
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabBottom"> Dolna</label>
+    </div>
     <button type="button" class="tbtn" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj zawias</button>
   </div>
 </div>
@@ -4984,24 +5010,97 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(edges.left==null){ add(0,h); add(0,0); } else fingerEdgePoints(h,t,f,edges.left).forEach(([al,off])=>add(-off,h-al));
     return pts;
   }
-  // 5 ścianek pudełka (otwartego od góry) ułożonych obok siebie w gotowym do cięcia rozkroju.
-  function buildFingerBox(W,D,H,T,F){
+  // Wzór "living hinge" zorientowany POZIOMO (oś zgięcia pozioma): nacięcia biegną wzdłuż
+  // osi X, ułożone w rzędach (oś Y), naprzemiennie przesunięte (cegiełki). Lustrzane
+  // odbicie buildLivingHingePattern z zamienionymi osiami. ox/oy = przesunięcie w układzie rozkroju.
+  function livingHingeHorizontal(W,band,slitLen,kerf,pitchY,bridge,margin,ox,oy){
+    let d='', count=0;
+    const period=slitLen+bridge;
+    const x0=margin, x1=W-margin, y1=band-margin;
+    const usableY=y1-margin-kerf;
+    if(usableY<0) return {d:'',count:0};
+    const nRows=Math.max(1, Math.round(usableY/pitchY)+1);
+    const pitchYEff=nRows>1 ? usableY/(nRows-1) : 0;
+    for(let row=0; row<nRows; row++){
+      const off=(row%2===0)?0:-period/2;
+      const cy=margin+kerf/2+row*pitchYEff;
+      for(let x=x0+off; x<x1-1e-9; x+=period){
+        const a=Math.max(x0,x), b=Math.min(x1,x+slitLen);
+        if(b-a>=Math.min(2,slitLen)){ d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++; }
+      }
+    }
+    return {d,count};
+  }
+  // Ścianki pudełka (łączenia „na palec”) ułożone obok siebie w gotowym do cięcia rozkroju.
+  // closure: 'open' (5 ścianek), 'lid' (+ luźne wieczko), 'lid-lip' (+ wieczko z kołnierzem
+  // wpasowującym się w otwór — chwyt, nie spada), 'hinged' (+ wieczko na zawiasie żywym, uchylne).
+  // Każdy panel ma `role` (back/front/left/right/bottom/lid/lip/hinge/fold) do oznaczeń i wizualizacji 3D.
+  function buildFingerBox(W,D,H,T,F,closure){
     const g=Math.max(T*2,5);
-    const x0=0, x1=H+g, x2=H+g+W+g, y0=0, y1=H+g, y2=H+g+D+g;
-    const panels=[
-      {name:'Tył',   w:W,h:H, x:x1,y:y0, edges:{top:null,  right:true,  bottom:false, left:true }},
-      {name:'Lewa',  w:H,h:D, x:x0,y:y1, edges:{top:false, right:false, bottom:false, left:null }},
-      {name:'Dół',   w:W,h:D, x:x1,y:y1, edges:{top:true,  right:true,  bottom:true,  left:true }},
-      {name:'Prawa', w:H,h:D, x:x2,y:y1, edges:{top:false, right:null,  bottom:false, left:false}},
-      {name:'Przód', w:W,h:H, x:x1,y:y2, edges:{top:false, right:true,  bottom:null,  left:true }}
+    const x1=H+g, x2=H+g+W+g, y0=0, y1=H+g, y2=H+g+D+g;
+    const base=[
+      {name:'Tył',          role:'back',   w:W,h:H, x:x1,y:y0, edges:{top:null,  right:true,  bottom:false, left:true }},
+      {name:'Lewa',         role:'left',   w:H,h:D, x:0, y:y1, edges:{top:false, right:false, bottom:false, left:null }},
+      {name:'Dół (podstawa)',role:'bottom',w:W,h:D, x:x1,y:y1, edges:{top:true,  right:true,  bottom:true,  left:true }},
+      {name:'Prawa',        role:'right',  w:H,h:D, x:x2,y:y1, edges:{top:false, right:null,  bottom:false, left:false}},
+      {name:'Przód',        role:'front',  w:W,h:H, x:x1,y:y2, edges:{top:false, right:true,  bottom:null,  left:true }}
     ];
-    return panels.map(p=>{
+    const panels=base.map(p=>{
       const pts=boxPanelPoints(p.w,p.h,T,F,p.edges).map(([x,y])=>[x+p.x,y+p.y]);
       const bb=polysBBoxMulti([pts]);
-      return {name:p.name, d:polyToPathD(pts), bx:bb.minx, by:bb.miny, bw:Math.max(1,bb.maxx-bb.minx), bh:Math.max(1,bb.maxy-bb.miny)};
+      return {name:p.name, role:p.role, mode:'cut', d:polyToPathD(pts), bx:bb.minx, by:bb.miny, bw:Math.max(1,bb.maxx-bb.minx), bh:Math.max(1,bb.maxy-bb.miny)};
     });
+    // --- elementy zamknięcia ustawiamy w nowym rzędzie poniżej rozkroju 5 ścianek ---
+    if(closure && closure!=='open'){
+      const bb=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
+      let ex=0; const ey=bb.maxy+g;
+      const place=(w)=>{ const px=ex; ex+=w+g; return px; };
+      const rectPanel=(name,role,w,h,mode)=>{
+        const px=place(w);
+        const pts=[[px,ey],[px+w,ey],[px+w,ey+h],[px,ey+h]];
+        panels.push({name,role,mode:mode||'cut',d:polyToPathD(pts),bx:px,by:ey,bw:w,bh:h});
+      };
+      if(closure==='lid' || closure==='lid-lip'){
+        rectPanel('Wieczko (góra)','lid', W, D);
+        if(closure==='lid-lip'){
+          // kołnierz = ramka wpasowująca się w otwór pudełka (luz 0.3 mm); wkleja się pod wieczko
+          const c=0.3, lw=Math.max(6, Math.min(F, Math.min(W,D)/2-2*T-1));
+          const ow=Math.max(4, W-2*T-2*c), oh=Math.max(4, D-2*T-2*c);
+          const px=place(ow);
+          const outer=[[px,ey],[px+ow,ey],[px+ow,ey+oh],[px,ey+oh]];
+          const inner=[[px+lw,ey+lw],[px+ow-lw,ey+lw],[px+ow-lw,ey+oh-lw],[px+lw,ey+oh-lw]];
+          panels.push({name:'Kołnierz wieczka (chwyt)',role:'lip',mode:'cut',fillRule:'evenodd',
+            d:polyToPathD(outer)+polyToPathD(inner),bx:px,by:ey,bw:ow,bh:oh});
+        }
+      } else if(closure==='hinged'){
+        // jednoczęściowe wieczko: [klapka klejona do tyłu] + [pasek zawiasu żywego] + [wieczko]
+        const mountH=clamp(Math.min(H,30),8,60);
+        const band=clamp(Math.max(8,6*T),6,25);
+        const totalH=mountH+band+D;
+        const px=place(W);
+        const plate=[[px,ey],[px+W,ey],[px+W,ey+totalH],[px,ey+totalH]];
+        panels.push({name:'Wieczko z zawiasem (flex)',role:'lid',mode:'cut',d:polyToPathD(plate),bx:px,by:ey,bw:W,bh:totalH});
+        const slitLen=Math.min(20, Math.max(6, W/5));
+        const hb=livingHingeHorizontal(W,band,slitLen,0.5,3,3,0, px, ey+mountH);
+        if(hb.count) panels.push({name:'Nacięcia zawiasu wieczka',role:'hinge',mode:'cut',d:hb.d,bx:px,by:ey+mountH,bw:W,bh:band});
+        const f1=ey+mountH, f2=ey+mountH+band;
+        const fd=`M${fmt(px)} ${fmt(f1)}L${fmt(px+W)} ${fmt(f1)}M${fmt(px)} ${fmt(f2)}L${fmt(px+W)} ${fmt(f2)}`;
+        panels.push({name:'Linie zgięcia wieczka',role:'fold',mode:'score',d:fd,bx:px,by:f1,bw:W,bh:band});
+      }
+    }
+    return panels;
   }
   const modalBox=document.getElementById('modalBox');
+  const BOX_CLOSURE_NOTES={
+    open:'Pudełko otwarte od góry — 5 ścianek.',
+    lid:'Dodatkowe płaskie wieczko leżące luźno na otworze.',
+    'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
+    hinged:'Jednoczęściowe wieczko na zawiasie żywym (flex): klapka klei się do tyłu, pasek nacięć wygina się, a płyta zamyka pudełko od góry.'
+  };
+  const boxClosureSel=document.getElementById('boxClosure');
+  const boxClosureNote=document.getElementById('boxClosureNote');
+  const updateBoxClosureNote=()=>{ boxClosureNote.textContent=BOX_CLOSURE_NOTES[boxClosureSel.value]||''; };
+  boxClosureSel.addEventListener('change',updateBoxClosureNote); updateBoxClosureNote();
   document.getElementById('boxGenBtn').addEventListener('click',()=>modalBox.classList.add('open'));
   document.getElementById('modalBoxClose').addEventListener('click',()=>modalBox.classList.remove('open'));
   modalBox.addEventListener('click',e=>{ if(e.target===modalBox) modalBox.classList.remove('open'); });
@@ -5011,9 +5110,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const H=clamp(Number(document.getElementById('boxH').value)||60,10,2000);
     const T=clamp(Number(document.getElementById('boxT').value)||3,0.5,20);
     const F=clamp(Number(document.getElementById('boxF').value)||15,2,100);
-    const panels=buildFingerBox(W,D,H,T,F);
-    const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:'nonzero',
-      bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'}}));
+    const closure=boxClosureSel.value||'open';
+    const panels=buildFingerBox(W,D,H,T,F,closure);
+    const gid=uid();
+    const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:p.fillRule||'nonzero',
+      bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
+      depth:state.depth||1,repeat:{type:'none'},groupId:gid,box:{gid,role:p.role,W,D,H,T,F,closure}}));
     const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
     if(totalBB.maxx>state.docW || totalBB.maxy>state.docH){
       applyDocSize(Math.max(state.docW,Math.ceil(totalBB.maxx+5)), Math.max(state.docH,Math.ceil(totalBB.maxy+5)));
@@ -5031,7 +5133,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // końcami sąsiednich szczelin zostaje mostek materiału, a kolumny parzyste/nieparzyste
   // są przesunięte o pół okresu — mostki jednej kolumny wypadają na środku szczelin
   // sąsiedniej. Dzięki temu panel daje się wyginać, ale NIE rozpada się na paski.
-  function buildLivingHingePattern(W,H,slitLen,kerf,pitchX,bridge,margin){
+  function buildLivingHingePattern(W,H,slitLen,kerf,pitchX,bridge,margin,ox,oy){
+    ox=ox||0; oy=oy||0;
     let d='', count=0;
     const period=slitLen+bridge;
     const y0=margin, y1=H-margin, x1=W-margin;
@@ -5052,7 +5155,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       for(let y=y0+off; y<y1-1e-9; y+=period){
         const a=Math.max(y0,y), b=Math.min(y1,y+slitLen);
         if(b-a>=Math.min(2,slitLen)){
-          d+=`M${fmt(cx)} ${fmt(a)}L${fmt(cx)} ${fmt(b)}`;
+          d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
           count++;
         }
       }
@@ -5064,23 +5167,46 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   document.getElementById('modalHingeClose').addEventListener('click',()=>modalHinge.classList.remove('open'));
   modalHinge.addEventListener('click',e=>{ if(e.target===modalHinge) modalHinge.classList.remove('open'); });
   document.getElementById('hingeGenerateBtn').addEventListener('click',()=>{
-    const W=clamp(Number(document.getElementById('hingeW').value)||100,10,760);
-    const H=clamp(Number(document.getElementById('hingeH').value)||60,10,760);
-    const slitLen=clamp(Number(document.getElementById('hingeLen').value)||20,5,200);
-    const kerf=clamp(Number(document.getElementById('hingeKerf').value)||0.5,0.2,5);
-    const pitchX=clamp(Number(document.getElementById('hingePitchX').value)||3,1,100);
-    const pitchY=clamp(Number(document.getElementById('hingePitchY').value)||3,1,100);
-    const margin=clamp(Number(document.getElementById('hingeMargin').value)||5,0,100);
-    const {d,count}=buildLivingHingePattern(W,H,slitLen,kerf,pitchX,pitchY,margin);
-    if(!count){ alert('Przy tych parametrach nie zmieści się ani jedno nacięcie — zmniejsz margines, długość nacięcia lub odstępy.'); return; }
-    const px=20, py=20;
-    const panel={...defaultsFor('rect'),x:px,y:py,w:W,h:H,rx:0,mode:'cut',name:'Panel z zawiasem'};
-    const slits={id:uid(),type:'path',name:'Nacięcia zawiasu',d,
-      bx:0,by:0,bw:W,bh:H,x:px,y:py,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'}};
-    if(px+W>state.docW || py+H>state.docH){
-      applyDocSize(Math.max(state.docW,Math.ceil(px+W+5)), Math.max(state.docH,Math.ceil(py+H+5)));
+    const num=(id,def)=>Number(document.getElementById(id).value)||def;
+    const H=clamp(num('hingeH',60),10,760);
+    const leftW=clamp(num('hingeLeft',0),0,700);
+    const zoneW=clamp(num('hingeZone',60),5,700);
+    const rightW=clamp(num('hingeRight',0),0,700);
+    const slitLen=clamp(num('hingeLen',20),5,200);
+    const kerf=clamp(num('hingeKerf',0.5),0.2,5);
+    const pitchX=clamp(num('hingePitchX',3),1,100);
+    const pitchY=clamp(num('hingePitchY',3),1,100);
+    const T=clamp(num('hingeT',3),0.5,20);
+    const F=clamp(num('hingeF',12),2,100);
+    const tabs={
+      left:document.getElementById('hingeTabLeft').checked,
+      right:document.getElementById('hingeTabRight').checked,
+      top:document.getElementById('hingeTabTop').checked,
+      bottom:document.getElementById('hingeTabBottom').checked
+    };
+    const totalW=leftW+zoneW+rightW;
+    // nacięcia tylko w STREFIE ZAWIASU (przesunięte o pole lewe), styczne z górą/dołem
+    const {d:slitD,count}=buildLivingHingePattern(zoneW,H,slitLen,kerf,pitchX,pitchY,0, leftW, 0);
+    if(!count){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
+    // obrys panelu = prostokąt totalW×H z opcjonalnymi zaczepami „na palec” na wybranych krawędziach
+    const edges={ top:tabs.top?true:null, right:tabs.right?true:null, bottom:tabs.bottom?true:null, left:tabs.left?true:null };
+    const outlinePts=boxPanelPoints(totalW,H,T,F,edges);
+    const obb=polysBBoxMulti([outlinePts]);
+    const px=20, py=20, gid=uid();
+    const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs}};
+    const outline={id:uid(),type:'path',name:'Panel zawiasu (obrys)',d:polyToPathD(outlinePts),fillRule:'nonzero',
+      bx:obb.minx,by:obb.miny,bw:Math.max(1,obb.maxx-obb.minx),bh:Math.max(1,obb.maxy-obb.miny),
+      x:px,y:py,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'},
+      groupId:gid,hinge:{...meta,role:'outline'}};
+    const slits={id:uid(),type:'path',name:'Nacięcia zawiasu',d:slitD,fillRule:'nonzero',
+      bx:leftW,by:0,bw:zoneW,bh:H,
+      x:px,y:py,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'},
+      groupId:gid,hinge:{...meta,role:'slits'}};
+    const maxx=px+obb.maxx, maxy=py+obb.maxy;
+    if(maxx>state.docW || maxy>state.docH){
+      applyDocSize(Math.max(state.docW,Math.ceil(maxx+5)), Math.max(state.docH,Math.ceil(maxy+5)));
     }
-    state.objects.push(panel,slits); state.selectedIds=[panel.id,slits.id];
+    state.objects.push(outline,slits); state.selectedIds=[outline.id,slits.id];
     pushHistory(); renderAll(); renderProps(); zoomFit();
     modalHinge.classList.remove('open');
   });
