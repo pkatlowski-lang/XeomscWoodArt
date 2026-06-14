@@ -33,13 +33,16 @@
   <div class="card">
     <img class="logo" src="app/assets/logo.png" alt="Xeomsc-Laser" onerror="this.style.display='none'">
     <h1>Aktywacja programu</h1>
-    <p>7-dniowy okres próbny programu <span class="accent">Xeomsc-Laser</span> dobiegł końca.</p>
+    <p id="intro">7-dniowy okres próbny programu <span class="accent">Xeomsc-Laser</span> dobiegł końca.</p>
     <div class="box">
-      <p>Aby kontynuować pracę, wpisz kod aktywacyjny otrzymany po zakupie licencji.</p>
+      <p>Aby aktywować program na stałe, wpisz kod aktywacyjny otrzymany po zakupie licencji.</p>
       <input type="text" id="codeInput" placeholder="XEOMSC-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
       <button class="btn" id="activateBtn">Aktywuj</button>
       <div class="msg" id="msg"></div>
     </div>
+    <p id="backRow" style="margin-top:18px;display:none">
+      <a class="link" href="#" id="backLink">← Wróć do edytora (kontynuuj okres próbny)</a>
+    </p>
     <p style="margin-top:22px">Nie masz jeszcze kodu? Zamów licencję na stronie:</p>
     <a class="link" href="https://xeomsc-laser.pl">xeomsc-laser.pl</a>
     <p class="foot">Xeomsc Laser · <a class="link" href="https://xeomsc-laser.pl/downloads.html">xeomsc-laser.pl/downloads</a></p>
@@ -74,5 +77,25 @@
   btn.addEventListener('click', tryActivate);
   input.addEventListener('keydown', e => { if(e.key==='Enter') tryActivate(); });
   input.addEventListener('input', () => { input.value = input.value.toUpperCase(); });
+
+  // Jeśli okres próbny jeszcze trwa — pozwól wrócić do edytora i dostosuj tekst.
+  (async () => {
+    try {
+      const st = await window.xeoDesktop.trialStatus();
+      if (st && st.trial && !st.expired && !st.activated) {
+        const d = st.daysLeft, word = d === 1 ? 'dzień' : 'dni';
+        document.getElementById('intro').innerHTML =
+          'Wersja próbna programu <span class="accent">Xeomsc-Laser</span> — pozostało ' +
+          d + ' ' + word + '. Możesz aktywować program już teraz.';
+        const backRow = document.getElementById('backRow');
+        backRow.style.display = '';
+        document.getElementById('backLink').addEventListener('click', (e) => {
+          e.preventDefault();
+          window.xeoDesktop.backToEditor();
+        });
+      }
+    } catch (e) {}
+    input.focus();
+  })();
 </script>
 </body></html>

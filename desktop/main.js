@@ -30,6 +30,20 @@ function targetFile() {
   return TRIAL.requireActivation ? ACTIVATE_FILE : EXPIRED_FILE;
 }
 
+// Tytuł okna (górna część ramy) z widocznym odliczaniem wersji demo.
+function computeTitle() {
+  if (TRIAL.trial && !ACTIVATION.activated && !TRIAL_STATUS.expired) {
+    const d = TRIAL_STATUS.daysLeft;
+    const word = d === 1 ? 'dzień' : 'dni';
+    return APP_TITLE + ' — wersja demo: pozostało ' + d + ' ' + word;
+  }
+  return APP_TITLE;
+}
+
+function applyTitle() {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.setTitle(computeTitle());
+}
+
 // Pojedyncza instancja — kolejne uruchomienia tylko aktywują istniejące okno.
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -68,7 +82,15 @@ function createMainWindow() {
   mainWindow.loadFile(targetFile());
 
   mainWindow.once('ready-to-show', () => {
+    applyTitle();
     mainWindow.show();
+  });
+
+  // Strona edytora ustawia własny document.title — utrzymujemy nasz tytuł
+  // z odliczaniem wersji demo w pasku okna.
+  mainWindow.webContents.on('page-title-updated', (event) => {
+    event.preventDefault();
+    applyTitle();
   });
 
   // Linki zewnętrzne (target=_blank / window.open) otwieraj w przeglądarce systemowej.
@@ -203,15 +225,24 @@ function buildMenu() {
     ]
   });
 
+  const helpSubmenu = [
+    { label: 'Strona WWW (xeomsc-laser.pl)', click: () => shell.openExternal(WEBSITE_URL) },
+    { label: 'Umowa licencyjna…', click: showLicenseWindow }
+  ];
+  if (TRIAL.trial && TRIAL.requireActivation && !ACTIVATION.activated) {
+    helpSubmenu.push({ type: 'separator' });
+    helpSubmenu.push({
+      label: 'Aktywuj kod…',
+      click: () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadFile(ACTIVATE_FILE); }
+    });
+  }
+  helpSubmenu.push({ type: 'separator' });
+  helpSubmenu.push({ label: 'O programie', click: showAbout });
+
   template.push({
     label: 'Pomoc',
     role: 'help',
-    submenu: [
-      { label: 'Strona WWW (xeomsc-laser.pl)', click: () => shell.openExternal(WEBSITE_URL) },
-      { label: 'Umowa licencyjna…', click: showLicenseWindow },
-      { type: 'separator' },
-      { label: 'O programie', click: showAbout }
-    ]
+    submenu: helpSubmenu
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -222,8 +253,32 @@ ipcMain.handle('license:activate', async (_event, code) => {
   if (result.ok) {
     ACTIVATION = license.getActivation(app.getPath('userData'));
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadFile(EDITOR_FILE);
+    applyTitle();
   }
   return result;
+});
+
+// Status wersji próbnej — używany przez pasek demo i ekran aktywacji.
+ipcMain.handle('trial:status', () => ({
+  trial: TRIAL.trial,
+  requireActivation: TRIAL.requireActivation,
+  expired: TRIAL_STATUS.expired,
+  daysLeft: TRIAL_STATUS.daysLeft,
+  days: TRIAL.days,
+  activated: ACTIVATION.activated
+}));
+
+// Otwórz ekran aktywacji (można wpisać kod w dowolnym momencie).
+ipcMain.handle('nav:activate', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadFile(ACTIVATE_FILE);
+});
+
+// Powrót do edytora z ekranu aktywacji — dozwolony, gdy okres próbny trwa
+// (lub program został już aktywowany).
+ipcMain.handle('nav:editor', () => {
+  if (mainWindow && !mainWindow.isDestroyed() && (!TRIAL_STATUS.expired || ACTIVATION.activated)) {
+    mainWindow.loadFile(EDITOR_FILE);
+  }
 });
 
 app.whenReady().then(() => {
