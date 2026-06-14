@@ -30,9 +30,21 @@ jobs:
             files: |
               desktop/dist/*.exe
               desktop/dist/*.blockmap
+          - os: windows-latest
+            build: npm run dist:win:trial
+            artifact: edytor-laser-xeomsc-windows-trial
+            files: |
+              desktop/dist/*.exe
+              desktop/dist/*.blockmap
           - os: macos-latest
             build: npm run dist:mac
             artifact: edytor-laser-xeomsc-macos
+            files: |
+              desktop/dist/*.dmg
+              desktop/dist/*.blockmap
+          - os: macos-latest
+            build: npm run dist:mac:trial
+            artifact: edytor-laser-xeomsc-macos-trial
             files: |
               desktop/dist/*.dmg
               desktop/dist/*.blockmap

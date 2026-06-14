@@ -2,11 +2,18 @@
 
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
+const trial = require('./trial');
 
 const APP_TITLE = 'Xeomsc-Laser';
 const WEBSITE_URL = 'https://xeomsc-laser.pl';
 const EDITOR_FILE = path.join(__dirname, 'app', 'edytor.html');
 const LICENSE_FILE = path.join(__dirname, 'app', 'license.html');
+const EXPIRED_FILE = path.join(__dirname, 'trial-expired.html');
+
+// Konfiguracja wersji próbnej — generowana przy buildzie przez set-trial.js.
+// { trial:true, days:7 } = wersja próbna; brak pliku / {trial:false} = pełna wersja.
+const TRIAL = trial.loadConfig(__dirname);
+let TRIAL_STATUS = { expired: false, daysLeft: null };
 
 let mainWindow = null;
 let licenseWindow = null;
@@ -46,7 +53,7 @@ function createMainWindow() {
     }
   });
 
-  mainWindow.loadFile(EDITOR_FILE);
+  mainWindow.loadFile(TRIAL_STATUS.expired ? EXPIRED_FILE : EDITOR_FILE);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -94,9 +101,16 @@ function showLicenseWindow() {
 }
 
 function showAbout() {
+  let trialLine = '';
+  if (TRIAL.trial) {
+    trialLine = TRIAL_STATUS.expired
+      ? '\n\nWersja próbna — okres testowy zakończony.'
+      : '\n\nWersja próbna — pozostało dni: ' + TRIAL_STATUS.daysLeft + ' z ' + TRIAL.days + '.';
+  }
   const detail =
     'Wersja ' + app.getVersion() + '\n' +
-    'Interaktywny edytor projektów do cięcia i grawerowania laserowego.\n\n' +
+    'Interaktywny edytor projektów do cięcia i grawerowania laserowego.' +
+    trialLine + '\n\n' +
     'Copyright © 2026 Xeomsc Laser\n' +
     WEBSITE_URL;
   dialog.showMessageBox(mainWindow, {
@@ -186,6 +200,7 @@ function buildMenu() {
 }
 
 app.whenReady().then(() => {
+  TRIAL_STATUS = trial.getStatus(app.getPath('userData'), TRIAL, Date.now());
   buildMenu();
   createMainWindow();
 

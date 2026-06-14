@@ -51,14 +51,36 @@ npm start
 
 ```bash
 # Na Windows:
-npm run dist:win      # → dist/Edytor-Laser-XEOMSC-Setup-<wersja>.exe
+npm run dist:win      # → dist/Xeomsc-Laser-Setup-<wersja>.exe
 
 # Na macOS:
-npm run dist:mac      # → dist/Edytor-Laser-XEOMSC-<wersja>-<arch>.dmg
+npm run dist:mac      # → dist/Xeomsc-Laser-<wersja>-<arch>.dmg
 
 # Na Linux (pomocniczo, AppImage):
 npm run dist:linux
 ```
+
+## Wersja próbna (7 dni)
+
+Oprócz wersji pełnej można zbudować wersję próbną, która działa **7 dni od
+pierwszego uruchomienia** — po tym czasie edytor jest zastępowany ekranem
+informacyjnym (`trial-expired.html`) z odnośnikiem do strony WWW.
+
+```bash
+npm run dist:win:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>.exe
+npm run dist:mac:trial    # → dist/Xeomsc-Laser-PROBA-7dni-<wersja>-<arch>.dmg
+```
+
+Mechanizm:
+
+- `set-trial.js on|off` zapisuje `trial.config.json` (`{ "trial": true, "days": 7 }`
+  dla wersji próbnej, `{ "trial": false }` dla pełnej — wersja pełna jest
+  domyślna).
+- `trial.js` przy starcie programu zapisuje datę pierwszego uruchomienia w
+  katalogu danych użytkownika (niezależnie od localStorage edytora) i sprawdza,
+  czy minęło więcej niż `days` dni.
+- Workflow GitHub Actions (`build-desktop.yml`) buduje automatycznie obie
+  wersje (pełną i próbną) dla Windows i macOS.
 
 ## Budowanie w chmurze (GitHub Actions) — zalecane
 

@@ -80,7 +80,7 @@ function buildLicenseHtml(text) {
     .replace(/>/g, '&gt;');
   return `<!doctype html>
 <html lang="pl"><head><meta charset="utf-8">
-<title>Umowa licencyjna — Edytor Laser XEOMSC</title>
+<title>Umowa licencyjna — Xeomsc-Laser</title>
 <style>
   :root{color-scheme:dark}
   html,body{margin:0;background:#0b1220;color:#e6edf6;
