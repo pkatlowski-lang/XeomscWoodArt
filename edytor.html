@@ -614,6 +614,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
     </div>
+    <div class="field"><label>Kierunek zaczepów</label>
+      <select id="hingeTabDir">
+        <option value="out">Na zewnątrz — wystają poza obrys panelu</option>
+        <option value="in">Do wewnątrz — wycięcia w obrysie panelu</option>
+      </select>
+    </div>
     <label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabLeft"> Lewa</label>
@@ -5022,11 +5028,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const nRows=Math.max(1, Math.round(usableY/pitchY)+1);
     const pitchYEff=nRows>1 ? usableY/(nRows-1) : 0;
     for(let row=0; row<nRows; row++){
-      const off=(row%2===0)?0:-period/2;
+      // tylko co 2. rząd (parzysty) ma nacięcia styczne z lewą/prawą krawędzią —
+      // pozostałe są przesunięte o pół okresu i zostają w środku (mostek na całej szerokości)
+      const touch=(row%2===0);
+      const off=touch?0:-period/2;
       const cy=margin+kerf/2+row*pitchYEff;
       for(let x=x0+off; x<x1-1e-9; x+=period){
-        const a=Math.max(x0,x), b=Math.min(x1,x+slitLen);
-        if(b-a>=Math.min(2,slitLen)){ d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++; }
+        let a=x, b=x+slitLen;
+        if(touch){
+          a=Math.max(x0,a); b=Math.min(x1,b);
+          if(b-a<Math.min(2,slitLen)) continue;
+        } else if(a<x0-1e-9 || b>x1+1e-9){
+          continue;
+        }
+        d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++;
       }
     }
     return {d,count};
@@ -5147,17 +5162,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const nCols=Math.max(1, Math.round(usableX/pitchX)+1);
     const pitchXEff=nCols>1 ? usableX/(nCols-1) : 0;
     for(let col=0; col<nCols; col++){
-      const off=(col%2===0)?0:-period/2;
+      // Wzór "w cegiełkę": tylko co 2. kolumna (parzysta) ma nacięcia STYCZNE z górną
+      // i dolną krawędzią; kolumny nieparzyste są przesunięte o pół okresu i ich
+      // nacięcia zostają w środku — nie dotykają krawędzi (mostek na całej wysokości).
+      const touch=(col%2===0);
+      const off=touch?0:-period/2;
       // każde nacięcie = pojedyncza linia (kerf to fizyczna szerokość rzazu lasera, nie
       // rysowany prostokąt) — bez łączących krótkich odcinków poziomych/pionowych,
       // dzięki czemu wzór wygląda jak linie z przerwami, a nie ząbkowane "klocki"
       const cx=margin+kerf/2+col*pitchXEff;
       for(let y=y0+off; y<y1-1e-9; y+=period){
-        const a=Math.max(y0,y), b=Math.min(y1,y+slitLen);
-        if(b-a>=Math.min(2,slitLen)){
-          d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
-          count++;
+        let a=y, b=y+slitLen;
+        if(touch){
+          a=Math.max(y0,a); b=Math.min(y1,b);
+          if(b-a<Math.min(2,slitLen)) continue;
+        } else if(a<y0-1e-9 || b>y1+1e-9){
+          continue;
         }
+        d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
+        count++;
       }
     }
     return {d,count};
@@ -5167,27 +5190,30 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // ZAWIASU [L..L+Z] są zawsze proste — nacięcia dochodzą do nich stycznie i nic nie blokuje
   // zginania (żadnych zaczepów na zawiasie). Zęby są „licem" na końcach (tabsFirst=false),
   // więc czysto łączą się z prostymi odcinkami i narożnikami.
-  function hingePanelOutline(totalW,H,L,Z,T,F,tabs){
+  // tabDir: 'out' — zaczepy wystają poza prostokąt totalW×H (domyślnie), 'in' — zaczepy są
+  // wycięciami WEWNĄTRZ obrysu (panel pozostaje w granicach totalW×H).
+  function hingePanelOutline(totalW,H,L,Z,T,F,tabs,tabDir){
     const pts=[];
     const add=(x,y)=>{ const last=pts[pts.length-1]; if(!last||Math.abs(last[0]-x)>1e-6||Math.abs(last[1]-y)>1e-6) pts.push([x,y]); };
     const zoneA=L, zoneB=L+Z, MINSEG=Math.max(F*1.5,3);
+    const s=(tabDir==='in')?-1:1;   // znak przesunięcia zębów: +1 = na zewnątrz, -1 = wgłąb obrysu
     const fp=(len)=>fingerEdgePoints(len,T,F,false);   // zęby licem na obu końcach odcinka
     // GÓRA: lewo→prawo, zęby w górę (y-=off); strefa zawiasu prosto
     add(0,0);
-    if(tabs.top && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(al,-off));
+    if(tabs.top && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(al,-off*s));
     add(zoneA,0); add(zoneB,0);
-    if(tabs.top && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(zoneB+al,-off));
+    if(tabs.top && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(zoneB+al,-off*s));
     add(totalW,0);
     // PRAWA: góra→dół, zęby w prawo (x+=off)
-    if(tabs.right && H>=MINSEG) fp(H).forEach(([al,off])=>add(totalW+off,al));
+    if(tabs.right && H>=MINSEG) fp(H).forEach(([al,off])=>add(totalW+off*s,al));
     add(totalW,H);
     // DÓŁ: prawo→lewo, zęby w dół (y+=off); strefa zawiasu prosto
-    if(tabs.bottom && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(totalW-al,H+off));
+    if(tabs.bottom && (totalW-zoneB)>=MINSEG) fp(totalW-zoneB).forEach(([al,off])=>add(totalW-al,H+off*s));
     add(zoneB,H); add(zoneA,H);
-    if(tabs.bottom && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(zoneA-al,H+off));
+    if(tabs.bottom && zoneA>=MINSEG) fp(zoneA).forEach(([al,off])=>add(zoneA-al,H+off*s));
     add(0,H);
     // LEWA: dół→góra, zęby w lewo (x-=off)
-    if(tabs.left && H>=MINSEG) fp(H).forEach(([al,off])=>add(-off,H-al));
+    if(tabs.left && H>=MINSEG) fp(H).forEach(([al,off])=>add(-off*s,H-al));
     add(0,0);
     return pts;
   }
@@ -5213,15 +5239,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       top:document.getElementById('hingeTabTop').checked,
       bottom:document.getElementById('hingeTabBottom').checked
     };
+    const tabDir=document.getElementById('hingeTabDir').value||'out';
     const totalW=leftW+zoneW+rightW;
     // nacięcia tylko w STREFIE ZAWIASU (przesunięte o pole lewe), styczne z górą/dołem
     const {d:slitD,count}=buildLivingHingePattern(zoneW,H,slitLen,kerf,pitchX,pitchY,0, leftW, 0);
     if(!count){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
     // obrys panelu — zaczepy „na palec" tylko na litych polach bocznych; strefa zawiasu zawsze prosta
-    const outlinePts=hingePanelOutline(totalW,H,leftW,zoneW,T,F,tabs);
+    const outlinePts=hingePanelOutline(totalW,H,leftW,zoneW,T,F,tabs,tabDir);
     const obb=polysBBoxMulti([outlinePts]);
     const px=20, py=20, gid=uid();
-    const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs}};
+    const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs},tabDir};
     const outline={id:uid(),type:'path',name:'Panel zawiasu (obrys)',d:polyToPathD(outlinePts),fillRule:'nonzero',
       bx:obb.minx,by:obb.miny,bw:Math.max(1,obb.maxx-obb.minx),bh:Math.max(1,obb.maxy-obb.miny),
       x:px,y:py,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'},
