@@ -2925,9 +2925,93 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(mbW) mbW.addEventListener('change',()=>{ scaleSelTo('w',Number(mbW.value)); renderAll(); renderProps(); pushHistory(); });
     if(mbH) mbH.addEventListener('change',()=>{ scaleSelTo('h',Number(mbH.value)); renderAll(); renderProps(); pushHistory(); });
   }
+  /* ---- Panel edycji zawiasu (living hinge) "na żywo" — te same parametry co generator,
+     ale zmieniają ISTNIEJĄCĄ parę obiektów (obrys+nacięcia) bez tworzenia nowych ---- */
+  function renderHingeProps(outline,slits){
+    const m=outline.hinge;
+    let h=`<div class="empty-note" style="padding-bottom:4px">🪗 Zawias (living hinge) — zmiany od razu przeliczają obrys i nacięcia, bez tworzenia nowej kopii.</div>`;
+    h+=`<div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" data-hinge="H" value="${fmt(m.H)}" min="10" max="760" step="1" title="${WHEEL_HINT}"></div>`;
+    h+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="field"><label>Pole lewe (mm)</label><input type="number" data-hinge="leftW" value="${fmt(m.leftW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" data-hinge="zoneW" value="${fmt(m.zoneW)}" min="5" max="700" step="1" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Pole prawe (mm)</label><input type="number" data-hinge="rightW" value="${fmt(m.rightW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
+    </div>`;
+    h+=`<div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Nacięcia</div>`;
+    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Długość nacięcia (mm)</label><input type="number" data-hinge="slitLen" value="${fmt(m.slitLen)}" min="5" max="200" step="1" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" data-hinge="kerf" value="${fmt(m.kerf)}" min="0.2" max="5" step="0.1" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" data-hinge="pitchX" value="${fmt(m.pitchX)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Mostek (mm)</label><input type="number" data-hinge="bridge" value="${fmt(m.bridge)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
+    </div>`;
+    h+=`<div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Łączenie — zaczepy „na palec”</div>`;
+    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" data-hinge="T" value="${fmt(m.T)}" min="0.5" max="20" step="0.5" title="${WHEEL_HINT}"></div>
+      <div class="field"><label>Rozmiar palca (mm)</label><input type="number" data-hinge="F" value="${fmt(m.F)}" min="2" max="100" step="1" title="${WHEEL_HINT}"></div>
+    </div>`;
+    h+=`<div class="field"><label>Kierunek zaczepów</label>
+      <select data-hinge="tabDir">
+        <option value="out" ${(m.tabDir||'out')==='out'?'selected':''}>Na zewnątrz — wystają poza obrys panelu</option>
+        <option value="in" ${m.tabDir==='in'?'selected':''}>Do wewnątrz — wycięcia w obrysie panelu</option>
+      </select></div>`;
+    h+=`<label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
+        <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" data-hinge-tab="left" ${m.tabs.left?'checked':''}> Lewa</label>
+        <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" data-hinge-tab="right" ${m.tabs.right?'checked':''}> Prawa</label>
+        <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" data-hinge-tab="top" ${m.tabs.top?'checked':''}> Górna</label>
+        <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" data-hinge-tab="bottom" ${m.tabs.bottom?'checked':''}> Dolna</label>
+      </div>`;
+    h+=`<div class="empty-note">Przeciągnij obrys na płycie, aby przesunąć cały zawias (obrys + nacięcia razem).</div>`;
+    propsEl.innerHTML=h;
+    bindHingeProps(outline,slits);
+  }
+  function bindHingeProps(outline,slits){
+    const readMeta=()=>{
+      const m={...outline.hinge, tabs:{...outline.hinge.tabs}};
+      propsEl.querySelectorAll('[data-hinge]').forEach(inp=>{
+        const k=inp.getAttribute('data-hinge');
+        m[k]= inp.tagName==='SELECT' ? inp.value : Number(inp.value);
+      });
+      propsEl.querySelectorAll('[data-hinge-tab]').forEach(inp=>{
+        m.tabs[inp.getAttribute('data-hinge-tab')]=inp.checked;
+      });
+      return m;
+    };
+    const apply=(commit)=>{
+      const m=readMeta();
+      m.H=clamp(m.H,10,760); m.leftW=clamp(m.leftW,0,700); m.zoneW=clamp(m.zoneW,5,700);
+      m.rightW=clamp(m.rightW,0,700); m.slitLen=clamp(m.slitLen,5,200); m.kerf=clamp(m.kerf,0.2,5);
+      m.pitchX=clamp(m.pitchX,1,100); m.bridge=clamp(m.bridge,1,100);
+      m.T=clamp(m.T,0.5,20); m.F=clamp(m.F,2,100);
+      const ok=regenerateHingeGroup(outline,slits,m);
+      if(!ok){
+        if(commit) alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość, zmniejsz długość nacięcia albo odstępy.');
+        return false;
+      }
+      renderAll();
+      if(commit) pushHistory();
+      return true;
+    };
+    propsEl.querySelectorAll('[data-hinge]').forEach(inp=>{
+      const liveEv=inp.tagName==='SELECT'?'change':'input';
+      inp.addEventListener(liveEv, ()=>apply(false));
+      inp.addEventListener('change', ()=>apply(true));
+    });
+    propsEl.querySelectorAll('[data-hinge-tab]').forEach(inp=>{
+      inp.addEventListener('change', ()=>apply(true));
+    });
+  }
   function renderProps(){
     updateTextToolbar();
     const selArr=getSelected();
+    // grupa "zawias" (obrys + nacięcia) — niezależnie od tego, czy zaznaczono jedną czy obie
+    // części, pokazujemy dedykowany panel edycji parametrów na żywo (bez generowania nowych obiektów)
+    if(selArr.length>=1 && selArr.length<=2 && selArr.every(o=>o.hinge) && new Set(selArr.map(o=>o.hinge.gid)).size===1){
+      const gid=selArr[0].hinge.gid;
+      const group=state.objects.filter(o=>o.hinge && o.hinge.gid===gid);
+      const outline=group.find(o=>o.hinge.role==='outline');
+      const slits=group.find(o=>o.hinge.role==='slits');
+      if(outline && slits){ renderHingeProps(outline,slits); return; }
+    }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
     if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
@@ -5027,21 +5111,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(usableY<0) return {d:'',count:0};
     const nRows=Math.max(1, Math.round(usableY/pitchY)+1);
     const pitchYEff=nRows>1 ? usableY/(nRows-1) : 0;
+    const edgeGap=Math.min(2,period/2);
     for(let row=0; row<nRows; row++){
-      // tylko co 2. rząd (parzysty) ma nacięcia styczne z lewą/prawą krawędzią —
-      // pozostałe są przesunięte o pół okresu i zostają w środku (mostek na całej szerokości)
-      const touch=(row%2===0);
-      const off=touch?0:-period/2;
+      // wzór "w cegiełkę": rzędy parzyste mają nacięcia styczne z lewą/prawą krawędzią (0 mm),
+      // nieparzyste są przesunięte o max. edgeGap (≤2 mm) — blisko krawędzi, ale nie identycznie
+      const off=(row%2===0)?0:edgeGap;
       const cy=margin+kerf/2+row*pitchYEff;
       for(let x=x0+off; x<x1-1e-9; x+=period){
-        let a=x, b=x+slitLen;
-        if(touch){
-          a=Math.max(x0,a); b=Math.min(x1,b);
-          if(b-a<Math.min(2,slitLen)) continue;
-        } else if(a<x0-1e-9 || b>x1+1e-9){
-          continue;
+        const a=Math.max(x0,x), b=Math.min(x1,x+slitLen);
+        if(b-a>=Math.min(2,slitLen)){
+          d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++;
         }
-        d+=`M${fmt(a+ox)} ${fmt(cy+oy)}L${fmt(b+ox)} ${fmt(cy+oy)}`; count++;
       }
     }
     return {d,count};
@@ -5144,10 +5224,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
 
   /* ---------------- Generator zawiasu (living hinge) ---------------- */
-  // Klasyczny wzór "living hinge": KOLUMNY pionowych szczelin. W każdej kolumnie między
-  // końcami sąsiednich szczelin zostaje mostek materiału, a kolumny parzyste/nieparzyste
-  // są przesunięte o pół okresu — mostki jednej kolumny wypadają na środku szczelin
-  // sąsiedniej. Dzięki temu panel daje się wyginać, ale NIE rozpada się na paski.
+  // Klasyczny wzór "living hinge": KOLUMNY pionowych szczelin. Kolumny parzyste/nieparzyste
+  // są lekko przesunięte względem siebie (wzór "w cegiełkę"), ale OBIE sięgają blisko górnej
+  // i dolnej krawędzi ramy: kolumny parzyste są STYCZNE (0 mm), kolumny nieparzyste mają
+  // przesunięcie max. EDGE_GAP (≤2 mm) — dzięki temu żadne nacięcie nie "wisi" daleko od
+  // krawędzi, a mostki sąsiednich kolumn nie wypadają w tym samym miejscu.
   function buildLivingHingePattern(W,H,slitLen,kerf,pitchX,bridge,margin,ox,oy){
     ox=ox||0; oy=oy||0;
     let d='', count=0;
@@ -5161,26 +5242,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(usableX<0) return {d:'',count:0};
     const nCols=Math.max(1, Math.round(usableX/pitchX)+1);
     const pitchXEff=nCols>1 ? usableX/(nCols-1) : 0;
+    const edgeGap=Math.min(2,period/2);
     for(let col=0; col<nCols; col++){
-      // Wzór "w cegiełkę": tylko co 2. kolumna (parzysta) ma nacięcia STYCZNE z górną
-      // i dolną krawędzią; kolumny nieparzyste są przesunięte o pół okresu i ich
-      // nacięcia zostają w środku — nie dotykają krawędzi (mostek na całej wysokości).
-      const touch=(col%2===0);
-      const off=touch?0:-period/2;
       // każde nacięcie = pojedyncza linia (kerf to fizyczna szerokość rzazu lasera, nie
       // rysowany prostokąt) — bez łączących krótkich odcinków poziomych/pionowych,
       // dzięki czemu wzór wygląda jak linie z przerwami, a nie ząbkowane "klocki"
+      const off=(col%2===0)?0:edgeGap;
       const cx=margin+kerf/2+col*pitchXEff;
       for(let y=y0+off; y<y1-1e-9; y+=period){
-        let a=y, b=y+slitLen;
-        if(touch){
-          a=Math.max(y0,a); b=Math.min(y1,b);
-          if(b-a<Math.min(2,slitLen)) continue;
-        } else if(a<y0-1e-9 || b>y1+1e-9){
-          continue;
+        const a=Math.max(y0,y), b=Math.min(y1,y+slitLen);
+        if(b-a>=Math.min(2,slitLen)){
+          d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
+          count++;
         }
-        d+=`M${fmt(cx+ox)} ${fmt(a+oy)}L${fmt(cx+ox)} ${fmt(b+oy)}`;
-        count++;
       }
     }
     return {d,count};
@@ -5217,6 +5291,36 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     add(0,0);
     return pts;
   }
+  // Przelicza geometrię panelu zawiasu (obrys + nacięcia) na podstawie parametrów `meta`.
+  // Współdzielone przez generator (tworzenie) i panel edycji w Właściwościach (zmiana na żywo).
+  // Zwraca null, gdy strefa zawiasu jest za mała na choćby jedno nacięcie.
+  function buildHingeGeometry(meta){
+    const {leftW,zoneW,rightW,H,T,F,tabs,tabDir,slitLen,kerf,pitchX,bridge}=meta;
+    const totalW=leftW+zoneW+rightW;
+    // nacięcia tylko w STREFIE ZAWIASU (przesunięte o pole lewe), styczne z górą/dołem
+    const {d:slitD,count}=buildLivingHingePattern(zoneW,H,slitLen,kerf,pitchX,bridge,0,leftW,0);
+    if(!count) return null;
+    // obrys panelu — zaczepy „na palec" tylko na litych polach bocznych; strefa zawiasu zawsze prosta
+    const outlinePts=hingePanelOutline(totalW,H,leftW,zoneW,T,F,tabs,tabDir);
+    const obb=polysBBoxMulti([outlinePts]);
+    return {outlinePts,slitD,obb,totalW};
+  }
+  // Aktualizuje istniejącą parę obiektów zawiasu (obrys + nacięcia) wg nowych parametrów —
+  // używane przez panel edycji "na żywo" we Właściwościach. Zwraca false, gdy parametry
+  // są nieprawidłowe (np. strefa zawiasu za mała na nacięcia) — wtedy nic nie zmienia.
+  function regenerateHingeGroup(outline,slits,meta){
+    const geo=buildHingeGeometry(meta);
+    if(!geo) return false;
+    const {outlinePts,slitD,obb}=geo;
+    outline.d=polyToPathD(outlinePts);
+    outline.bx=obb.minx; outline.by=obb.miny;
+    outline.bw=Math.max(1,obb.maxx-obb.minx); outline.bh=Math.max(1,obb.maxy-obb.miny);
+    outline.hinge={...meta,role:'outline'};
+    slits.d=slitD;
+    slits.bx=meta.leftW; slits.by=0; slits.bw=meta.zoneW; slits.bh=meta.H;
+    slits.hinge={...meta,role:'slits'};
+    return true;
+  }
   const modalHinge=document.getElementById('modalHinge');
   document.getElementById('hingeGenBtn').addEventListener('click',()=>modalHinge.classList.add('open'));
   document.getElementById('modalHingeClose').addEventListener('click',()=>modalHinge.classList.remove('open'));
@@ -5230,7 +5334,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const slitLen=clamp(num('hingeLen',20),5,200);
     const kerf=clamp(num('hingeKerf',0.5),0.2,5);
     const pitchX=clamp(num('hingePitchX',3),1,100);
-    const pitchY=clamp(num('hingePitchY',3),1,100);
+    const bridge=clamp(num('hingePitchY',3),1,100);
     const T=clamp(num('hingeT',3),0.5,20);
     const F=clamp(num('hingeF',12),2,100);
     const tabs={
@@ -5240,15 +5344,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       bottom:document.getElementById('hingeTabBottom').checked
     };
     const tabDir=document.getElementById('hingeTabDir').value||'out';
-    const totalW=leftW+zoneW+rightW;
-    // nacięcia tylko w STREFIE ZAWIASU (przesunięte o pole lewe), styczne z górą/dołem
-    const {d:slitD,count}=buildLivingHingePattern(zoneW,H,slitLen,kerf,pitchX,pitchY,0, leftW, 0);
-    if(!count){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
-    // obrys panelu — zaczepy „na palec" tylko na litych polach bocznych; strefa zawiasu zawsze prosta
-    const outlinePts=hingePanelOutline(totalW,H,leftW,zoneW,T,F,tabs,tabDir);
-    const obb=polysBBoxMulti([outlinePts]);
-    const px=20, py=20, gid=uid();
-    const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs},tabDir};
+    const gid=uid();
+    const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs},tabDir,slitLen,kerf,pitchX,bridge};
+    const geo=buildHingeGeometry(meta);
+    if(!geo){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
+    const {outlinePts,slitD,obb}=geo;
+    const px=20, py=20;
     const outline={id:uid(),type:'path',name:'Panel zawiasu (obrys)',d:polyToPathD(outlinePts),fillRule:'nonzero',
       bx:obb.minx,by:obb.miny,bw:Math.max(1,obb.maxx-obb.minx),bh:Math.max(1,obb.maxy-obb.miny),
       x:px,y:py,rotation:0,mode:'cut',visible:true,locked:false,depth:state.depth||1,repeat:{type:'none'},
