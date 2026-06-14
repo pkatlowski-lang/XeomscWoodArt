@@ -593,7 +593,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="field"><label>Szerokość nacięcia — kerf (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
     <div class="field"><label>Odstęp między kolumnami nacięć (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
     <div class="field"><label>Mostek — przerwa między nacięciami w kolumnie (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
-    <div class="field"><label>Margines (mm)</label><input type="number" id="hingeMargin" min="0" max="100" step="1" value="5"></div>
+    <div class="field"><label>Margines — sztywny pas wokół nacięć (mm)</label><input type="number" id="hingeMargin" min="0" max="100" step="1" value="0"></div>
+    <p style="font-size:.75rem;color:var(--muted);margin:-4px 0 8px">0 mm = nacięcia sięgają do samej krawędzi panelu (rama jest styczna z zewnętrznymi nacięciami) — zawias wygina się na całej szerokości/wysokości. Wartość &gt; 0 zostawia sztywny pas materiału na obwodzie (np. do wklejenia w korpus).</p>
     <button type="button" class="tbtn" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj zawias</button>
   </div>
 </div>
@@ -5034,13 +5035,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     let d='', count=0;
     const period=slitLen+bridge;
     const y0=margin, y1=H-margin, x1=W-margin;
-    let col=0;
-    for(let x=margin; x+kerf<=x1+1e-9; x+=pitchX, col++){
+    // Kolumny nacięć rozmieszczamy RÓWNOMIERNIE na całej dostępnej szerokości
+    // (od margin do W-margin), tak aby pierwsza i ostatnia linia nacięcia były
+    // styczne z lewą/prawą krawędzią ramy — bez "zgubionego" luzu wynikającego
+    // z zaokrąglenia liczby kolumn przy podziale przez pitchX.
+    const usableX=x1-margin-kerf;
+    if(usableX<0) return {d:'',count:0};
+    const nCols=Math.max(1, Math.round(usableX/pitchX)+1);
+    const pitchXEff=nCols>1 ? usableX/(nCols-1) : 0;
+    for(let col=0; col<nCols; col++){
       const off=(col%2===0)?0:-period/2;
       // każde nacięcie = pojedyncza linia (kerf to fizyczna szerokość rzazu lasera, nie
       // rysowany prostokąt) — bez łączących krótkich odcinków poziomych/pionowych,
       // dzięki czemu wzór wygląda jak linie z przerwami, a nie ząbkowane "klocki"
-      const cx=x+kerf/2;
+      const cx=margin+kerf/2+col*pitchXEff;
       for(let y=y0+off; y<y1-1e-9; y+=period){
         const a=Math.max(y0,y), b=Math.min(y1,y+slitLen);
         if(b-a>=Math.min(2,slitLen)){
