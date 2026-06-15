@@ -5103,31 +5103,33 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Wzór "living hinge" zorientowany POZIOMO (oś zgięcia pozioma): nacięcia biegną wzdłuż
   // osi X, ułożone w rzędach (oś Y), naprzemiennie przesunięte (cegiełki). Lustrzane
   // odbicie buildLivingHingePattern z zamienionymi osiami. ox/oy = przesunięcie w układzie rozkroju.
-  // Dla jednej linii zawiasu o długości użytkowej L liczy dwa warianty rozkładu nacięć:
-  //  • touch  – kolumna/rząd "styczny": pierwsze i ostatnie nacięcie dotykają krawędzi (luz 0),
-  //  • offset – kolumna/rząd "przesunięty": z obu stron stały luz g w zakresie 2–3 mm
-  //    (nigdy nie dotyka krawędzi, ale i nie oddala się dalej niż 3 mm).
-  // Długość nacięć jest w razie potrzeby dopasowywana (nie muszą być identyczne jak zadana
-  // slitLen), aby wzór równo wypełniał całą wysokość/szerokość. Zwraca {touch:[[a,b]...], offset:[...]}.
+  // Dla jednej linii zawiasu o długości użytkowej L liczy układ "na zakładkę" (cegiełka):
+  //  • touch  – kolumna/rząd "styczny": nacięcia dokładnie wypełniają L, pierwsze i ostatnie
+  //    dotykają krawędzi (luz 0), mostki (nieprzecięte odstępy) mają długość `bridge`,
+  //  • offset – kolumna/rząd "przesunięty" o pół okresu względem touch — każdy mostek
+  //    wiersza touch jest w całości przykryty nacięciem offset (z zakładką po obu stronach)
+  //    I ODWROTNIE, więc mostki parzystych i nieparzystych kolumn NIGDY nie wypadają
+  //    w tej samej linii — zawsze nacięcie jednej zakłada się na mostek drugiej.
+  // Zwraca {touch:[[a,b]...], offset:[...]}.
   function hingeLineSegments(L, slitLen, bridge){
     const out={touch:[], offset:[]};
-    const p=slitLen+bridge;
     if(L<=0) return out;
+    const p=slitLen+bridge;
     // — wariant styczny: n nacięć + (n-1) mostków = L (skraja dotykają obu krawędzi) —
-    let nT=Math.max(1, Math.round((L+bridge)/p));
-    let sT=(L-(nT-1)*bridge)/nT;
-    if(sT<=0){ nT=1; sT=L; }
-    for(let i=0,y=0;i<nT;i++,y+=sT+bridge) out.touch.push([y, y+sT]);
-    // — wariant przesunięty: stały luz g∈[2,3] z obu stron —
-    const GMIN=2, GMAX=3;
-    let nO=Math.max(1, Math.round((L-2*((GMIN+GMAX)/2)+bridge)/p));
-    // przy nO nacięciach o pełnej długości slitLen policz wynikowy luz przy każdej krawędzi
-    let g=(L-(nO*slitLen+(nO-1)*bridge))/2;
-    let sO;
-    if(g>=GMIN && g<=GMAX){ sO=slitLen; }            // mieści się — używamy zadanej długości
-    else { g=Math.min(GMAX, Math.max(GMIN,g)); sO=(L-2*g-(nO-1)*bridge)/nO; } // dopasuj długość
-    if(sO<=0){ nO=1; g=Math.min(GMAX, Math.max(GMIN,(L-2)/2)); sO=Math.max(1, L-2*g); }
-    for(let i=0,y=g;i<nO;i++,y+=sO+bridge) out.offset.push([y, y+sO]);
+    let n=Math.max(1, Math.round((L+bridge)/p));
+    let sT=(L-(n-1)*bridge)/n;
+    // sT musi być > bridge, aby zakładka (lap) mogła w pełni przykryć mostek z obu stron —
+    // jeśli nie, zmniejszamy liczbę nacięć (wydłużając je), aż warunek będzie spełniony
+    while(n>1 && sT<=bridge){ n--; sT=(L-(n-1)*bridge)/n; }
+    if(sT<=0){ n=1; sT=L; }
+    for(let i=0,y=0;i<n;i++,y+=sT+bridge) out.touch.push([y, y+sT]);
+    // — wariant przesunięty: touch przesunięte o pół okresu (sT+bridge)/2 —
+    const shift=(sT+bridge)/2;
+    for(let i=-1;i<n;i++){
+      const a=i*(sT+bridge)+shift, b=a+sT;
+      const ca=Math.max(0,a), cb=Math.min(L,b);
+      if(cb-ca>0.5) out.offset.push([ca,cb]);
+    }
     return out;
   }
   function livingHingeHorizontal(W,band,slitLen,kerf,pitchY,bridge,margin,ox,oy){
