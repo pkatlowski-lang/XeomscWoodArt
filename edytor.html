@@ -5123,11 +5123,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     while(n>1 && sT<=bridge){ n--; sT=(L-(n-1)*bridge)/n; }
     if(sT<=0){ n=1; sT=L; }
     for(let i=0,y=0;i<n;i++,y+=sT+bridge) out.touch.push([y, y+sT]);
-    // — wariant przesunięty: touch przesunięte o pół okresu (sT+bridge)/2 —
+    // — wariant przesunięty: touch przesunięte o pół okresu (sT+bridge)/2, ALE przycięte
+    //   do [edgeGap, L-edgeGap] — kolumny przesunięte (parzyste) NIE dotykają krawędzi,
+    //   tylko zachowują luz edgeGap (2–3 mm). Skrajne pasy [0,edgeGap] oraz [L-edgeGap,L]
+    //   i tak przecina kolumna styczna, więc zakładka pozostaje w pełni zachowana
+    //   (mostek jednej kolumny zawsze przykryty nacięciem drugiej). —
     const shift=(sT+bridge)/2;
+    const edgeGap=Math.min(2.5,(L-1)/2);
     for(let i=-1;i<n;i++){
       const a=i*(sT+bridge)+shift, b=a+sT;
-      const ca=Math.max(0,a), cb=Math.min(L,b);
+      const ca=Math.max(edgeGap,a), cb=Math.min(L-edgeGap,b);
       if(cb-ca>0.5) out.offset.push([ca,cb]);
     }
     return out;
