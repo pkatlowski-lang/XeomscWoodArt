@@ -212,9 +212,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .modal-ov.open{opacity:1;pointer-events:auto}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;transform:scale(.97) translateY(-10px);transition:transform .2s ease,opacity .18s ease;opacity:0}
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
-.modal-box h3{margin:0 0 6px;font-size:1.05rem}
-.modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.15rem;line-height:1}
-.modal-close:hover{color:var(--text)}
+.modal-box h3{margin:0 0 14px;font-size:1.08rem;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s}
+.modal-close:hover{background:rgba(255,90,90,.18);border-color:rgba(255,90,90,.5);color:#ff8a8a}
 .layers3d-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
 .layer3d-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px}
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700}
@@ -235,16 +235,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .fields2 .field{flex:1;min-width:0}
 
 /* ---- Podsumowanie projektu (modal) ---- */
-.sum-stats{display:flex;flex-direction:column;gap:6px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);font-size:.82rem}
+.sum-stats{display:flex;flex-direction:column;gap:5px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);font-size:.82rem;border-left-width:3px}
+.sum-row.sum-cut{border-left-color:#ff4444}
+.sum-row.sum-score{border-left-color:#3b9eff}
+.sum-row.sum-engrave{border-left-color:#9b5de5}
 .sum-row .sum-val{color:var(--accent);font-weight:600}
-.sum-time{display:flex;flex-direction:column;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.sum-time-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
-.sum-time-row.total{color:var(--text);font-weight:700;font-size:.88rem;margin-top:4px;padding-top:6px;border-top:1px solid var(--border)}
+.sum-time{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.sum-time-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);padding:3px 2px;border-radius:5px}
+.sum-time-row.total{color:var(--text);font-weight:700;font-size:.9rem;margin-top:6px;padding:7px 10px;border-radius:7px;background:rgba(202,160,108,.1);border:1px solid rgba(202,160,108,.2)}
 
 /* ---- Wycena projektu (modal) ---- */
-.quote-price{margin-top:14px;padding:20px 12px;text-align:center;font-size:1.9rem;font-weight:800;color:var(--accent);background:var(--surface2);border:1px solid var(--border);border-radius:10px;letter-spacing:.5px}
+.quote-price{margin-top:14px;padding:22px 12px 18px;text-align:center;font-size:2rem;font-weight:800;color:var(--accent);background:linear-gradient(135deg,rgba(202,160,108,.08),rgba(56,189,248,.06));border:1px solid rgba(202,160,108,.3);border-radius:12px;letter-spacing:.5px;position:relative}
+.quote-price::before{content:'Łączna cena';display:block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
 .quote-price.quote-empty{font-size:.86rem;font-weight:500;color:var(--muted)}
+.quote-price.quote-empty::before{display:none}
 
 /* ---- Wycena na żywo (widget na scenie) ---- */
 .live-quote{position:absolute;right:10px;bottom:10px;z-index:6;display:flex;flex-direction:column;gap:5px;min-width:172px;max-width:210px;padding:9px 11px;background:rgba(13,22,36,.94);border:1.5px solid var(--border);border-radius:11px;box-shadow:0 8px 26px rgba(0,0,0,.5);backdrop-filter:blur(4px)}
@@ -257,10 +262,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Skróty klawiszowe (modal) ---- */
 .shortcuts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 28px;margin-top:16px}
-.sc-group h4{margin:0 0 8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
-.sc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;font-size:.84rem}
-.sc-row .sc-keys{display:flex;gap:4px;flex-shrink:0}
+.sc-group h4{margin:0 0 6px;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);padding-bottom:5px;border-bottom:1px solid var(--border)}
+.sc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px;font-size:.84rem;border-radius:5px;transition:background .12s}
+.sc-row:hover{background:var(--surface2)}
+.sc-row .sc-keys{display:flex;gap:3px;flex-shrink:0;align-items:center}
 kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;font:600 .76rem var(--font-b);color:var(--text)}
+/* sekcja nagłówka w formularzu (zawias, inne modala) */
+.form-sec{margin:12px 0 6px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;gap:8px}
+.form-sec::before,.form-sec::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* ---- 3D Preview modal ---- */
 .preview3d-wrap{perspective:1200px;background:radial-gradient(ellipse 70% 58% at 50% 62%,#1e1608 0%,#060402 100%);border-radius:12px;height:430px;display:flex;align-items:center;justify-content:center;cursor:grab;overflow:hidden;user-select:none;margin:12px 0}
@@ -614,14 +623,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" id="hingeRight" min="0" max="700" step="1" value="90"></div>
     </div>
-    <div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Nacięcia</div>
+    <div class="form-sec">Nacięcia</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" id="hingeLen" min="5" max="200" step="1" value="20"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
     </div>
-    <div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Łączenie — zaczepy „na palec”</div>
+    <div class=”form-sec”>Łączenie — zaczepy „na palec”</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
@@ -766,14 +775,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 </div>
 
 <div class="modal-ov" id="modalQuote">
-  <div class="modal-box" style="max-width:400px">
+  <div class="modal-box" style="max-width:420px">
     <button class="modal-close" id="modalQuoteClose" title="Zamknij">✕</button>
     <h3>💰 Wycena projektu</h3>
     <div class="field"><label>Materiał</label><select id="quoteMat"></select></div>
-    <div class="sum-stats" id="quoteStats"></div>
+    <div class="sum-stats" id="quoteStats" style="margin-top:8px"></div>
     <div class="quote-price" id="quotePrice">–</div>
-    <p style="font-size:.74rem;color:var(--muted);margin:10px 0 0;line-height:1.5">Cena końcowa za wykonanie projektu z wybranego materiału — obejmuje materiał, pracę lasera i pakowanie.</p>
-    <div class="field" style="padding:14px 0 0">
+    <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie. Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
+    <div class="field" style="padding:12px 0 0">
       <button type="button" class="tbtn" id="sendQuoteOpenBtn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📨 Wyślij projekt do wyceny</button>
     </div>
   </div>
@@ -1136,13 +1145,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       else { const cls=o.role==='hole'?'geo-hole':(o.mode==='engrave'?'geo-engrave':o.mode==='score'?'geo-score':'geo-cut'); geo=`<path d="${o.d}" class="${cls}"${fr}/>`; }
       // Etykieta roli panelu pudełka (widoczna tylko w edytorze, nie w eksporcie)
       let boxLabel='';
-      if(o.box && !forExport && !_silFill && !state.depthView && o.box.role!=='hinge' && o.box.role!=='fold'){
+      if(o.box && !forExport && !_silFill && o.box.role!=='hinge' && o.box.role!=='fold'){
         const rln={back:'Tył',front:'Przód',left:'Lewo',right:'Prawo',bottom:'Dno',
           lid:'Wieczko',lip:'Kołnierz'}[o.box.role]||'';
         if(rln){
           const lx=(o.bx||0)+(o.bw||0)/2, ly=(o.by||0)+(o.bh||0)/2;
-          const fs=Math.max(4.5, Math.min(10, Math.min(o.bw||10, o.bh||10)*0.11));
-          boxLabel=`<text x="${fmt(lx)}" y="${fmt(ly)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="${fmt(fs)}" font-weight="600" fill="rgba(56,189,248,0.52)" pointer-events="none">${rln}</text>`;
+          const fs=Math.max(5, Math.min(12, Math.min(o.bw||10, o.bh||10)*0.13));
+          boxLabel=`<text x="${fmt(lx)}" y="${fmt(ly)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="${fmt(fs)}" font-weight="700" fill="rgba(255,255,255,0.7)" stroke="rgba(0,80,60,0.5)" stroke-width="${fmt(fs*0.12)}" paint-order="stroke" pointer-events="none">${rln}</text>`;
         }
       }
       return `<g transform="${t}">${geo}${boxLabel}</g>`;
@@ -3312,7 +3321,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!state.params.length) return '';
     const bound=(o.bindings&&o.bindings[prop])||'';
     return `<select class="bind-sel" data-bind="${prop}" title="Połącz tę wartość z parametrem globalnym — zmiana suwaka parametru będzie ją automatycznie zmieniać">
-      <option value="">🔗 brak powiązania — wartość stała</option>
+      <option value="">🔗 stała wartość (bez powiązania)</option>
       ${state.params.map(p=>`<option value="${p.id}" ${bound===p.id?'selected':''}>🔗 powiąż z: ${escapeXml(p.name)}</option>`).join('')}
     </select>`;
   }
@@ -4199,9 +4208,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function renderSummary(){
     const s=computeProjectStats();
     document.getElementById('summaryStats').innerHTML=
-      `<div class="sum-row"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm</span></div>`
-      +`<div class="sum-row"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm</span></div>`
-      +`<div class="sum-row"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`;
+      `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm</span></div>`
+      +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm</span></div>`
+      +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`;
     const cutSpeed=Math.max(1,Number(sumCutSpeed.value)||1);
     const scoreSpeed=Math.max(1,Number(sumScoreSpeed.value)||1);
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
@@ -4322,9 +4331,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const tb=quoteTimeBreakdown(mat);
     const areaCm2=quoteMaterialArea();
     statsEl.innerHTML=
-      `<div class="sum-row"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(tb.total)}</span></div>`
-      +(tb.engraveTime>0 ? `<div class="sum-row"><span>　✂ w tym cięcie/nacięcie</span><span class="sum-val">${formatTime(tb.cutTime*PRICING.timeBuffer)}</span></div>`
-        +`<div class="sum-row"><span>　▦ w tym grawerowanie</span><span class="sum-val">${formatTime(tb.engraveTime*PRICING.timeBuffer)}</span></div>` : '')
+      `<div class="sum-row sum-cut"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(tb.total)}</span></div>`
+      +(tb.engraveTime>0 ? `<div class="sum-row sum-score"><span>　✂ w tym cięcie/nacięcie</span><span class="sum-val">${formatTime(tb.cutTime*PRICING.timeBuffer)}</span></div>`
+        +`<div class="sum-row sum-engrave"><span>　▦ w tym grawerowanie</span><span class="sum-val">${formatTime(tb.engraveTime*PRICING.timeBuffer)}</span></div>` : '')
       +`<div class="sum-row"><span>📐 Powierzchnia materiału</span><span class="sum-val">${String(fmt(areaCm2)).replace('.',',')} cm² (${String(fmt(areaCm2/10000)).replace('.',',')} m²)</span></div>`;
     priceEl.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
   }
