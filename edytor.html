@@ -138,7 +138,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .range-wrap input[type=range]{flex:1;accent-color:var(--accent)}
 .range-val{font-weight:700;color:var(--accent);min-width:40px;text-align:right;font-size:.82rem}
 .seg{display:flex;gap:4px}
-.seg button{flex:1;padding:8px 4px;border-radius:6px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.74rem;font-weight:600;cursor:pointer}
+.seg button{flex:1;padding:8px 4px;border-radius:6px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.74rem;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s}
+.seg button:hover:not(.on){border-color:rgba(125,211,252,.35);color:var(--text)}
 .seg button.on{border-color:var(--accent);color:#04101e;background:var(--accent)}
 .seg button.cut.on{background:var(--cut);border-color:var(--cut);color:#fff}
 .seg button.engrave.on{background:var(--engrave);border-color:var(--engrave);color:#fff}
@@ -3134,7 +3135,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         const bb=objBBox(o);
         h+=`<div class=”field”><label>Szerokość (mm)</label><input type=”number” id=”pathW” value=”${fmt(bb.w)}” min=”1” step=”1”></div>`;
         h+=`<div class=”field”><label>Wysokość (mm)</label><input type=”number” id=”pathH” value=”${fmt(bb.h)}” min=”1” step=”1”></div>`;
-        h+=`<div class=”field”><button type=”button” id=”pathReset” class=”tbtn” style=”width:100%;justify-content:center”>↺ Przywróć proporcje 1:1</button></div>`;
+        h+=`<div class=”field”><button type=”button” id=”pathReset” class=”tbtn” style=”width:100%;justify-content:center” title=”Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości ścieżki”>↺ Przywróć proporcje 1:1</button></div>`;
       }
     } else {
       h+=numField('Pozycja X (mm)','x',o,{step:1});
@@ -3175,7 +3176,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const tbb=objBBox(o);
       h+=`<div class=”field”><label>Szerokość napisu (mm)</label><input type=”number” id=”textW” value=”${fmt(tbb.w)}” min=”1” step=”1”></div>`;
       h+=`<div class=”field”><label>Wysokość napisu (mm)</label><input type=”number” id=”textH” value=”${fmt(tbb.h)}” min=”1” step=”1”></div>`;
-      h+=`<div class=”field”><button type=”button” id=”textReset” class=”tbtn” style=”width:100%;justify-content:center”>↺ Przywróć proporcje 1:1</button></div>`;
+      h+=`<div class=”field”><button type=”button” id=”textReset” class=”tbtn” style=”width:100%;justify-content:center” title=”Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości napisu”>↺ Przywróć proporcje 1:1</button></div>`;
     }
     // ---- sekcja: powielanie ----
     h+=`<div class=”form-sec”>Powielanie</div>`;
@@ -3231,7 +3232,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       </div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length===1){
-      h+=`<div class=”field”><button type=”button” id=”smoothBtn” class=”tbtn” style=”width:100%;justify-content:center”>〰 Wygładź w krzywe Béziera</button></div>`;
+      h+=`<div class=”field”><button type=”button” id=”smoothBtn” class=”tbtn” style=”width:100%;justify-content:center” title=”Zamienia prostoliniowe krawędzie ścieżki na gładkie krzywe Béziera — efekt miękkiego, organicznego kształtu zamiast kanciastego wielokąta”>〰 Wygładź w krzywe Béziera</button></div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length>1){
       h+=`<div class=”field”><button type=”button” id=”breakApartBtn” class=”tbtn” style=”width:100%;justify-content:center” title=”Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie”>✂ Rozdziel na podścieżki <span class=”ctx-key”>Ctrl+Shift+B</span></button></div>`;
@@ -4514,7 +4515,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <span class="lyr-cnt">${cnt} el.</span>
         <select class="lyr-mat" data-mat="${dep}" title="Wybierz materiał z biblioteki">${matOptions}</select>
         <input class="lyr-mm" type="number" data-mm="${dep}" value="${fmt(layerMM(dep))}" min="0.5" step="0.5" title="Grubość materiału tej warstwy (mm)"><span class="lyr-unit">mm</span>
-        <button class="lyr-eye" data-eye="${dep}" title="Pokaż / ukryj warstwę">${hidden?'◎':'◉'}</button>
+        <button class="lyr-eye" data-eye="${dep}" title="${hidden?'Pokaż warstwę':'Ukryj warstwę'}">${hidden?'◎':'◉'}</button>
       </div>`;
     }).join('');
     dlEl.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{
