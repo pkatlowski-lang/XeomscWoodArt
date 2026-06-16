@@ -1128,7 +1128,18 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       else if(forExport){ geo=`<path d="${o.d}"${exportShapeStyle(o)}${fr}/>`; }
       else if(state.depthView){ const dc=depthColor(o.depth||1); geo=`<path d="${o.d}" fill="${dc}" fill-opacity=".38" stroke="${dc}" stroke-width=".8" vector-effect="non-scaling-stroke"${fr}/>`; }
       else { const cls=o.role==='hole'?'geo-hole':(o.mode==='engrave'?'geo-engrave':o.mode==='score'?'geo-score':'geo-cut'); geo=`<path d="${o.d}" class="${cls}"${fr}/>`; }
-      return `<g transform="${t}">${geo}</g>`;
+      // Etykieta roli panelu pudełka (widoczna tylko w edytorze, nie w eksporcie)
+      let boxLabel='';
+      if(o.box && !forExport && !_silFill && !state.depthView && o.box.role!=='hinge' && o.box.role!=='fold'){
+        const rln={back:'Tył',front:'Przód',left:'Lewo',right:'Prawo',bottom:'Dno',
+          lid:'Wieczko',lip:'Kołnierz'}[o.box.role]||'';
+        if(rln){
+          const lx=(o.bx||0)+(o.bw||0)/2, ly=(o.by||0)+(o.bh||0)/2;
+          const fs=Math.max(4.5, Math.min(10, Math.min(o.bw||10, o.bh||10)*0.11));
+          boxLabel=`<text x="${fmt(lx)}" y="${fmt(ly)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="${fmt(fs)}" font-weight="600" fill="rgba(56,189,248,0.52)" pointer-events="none">${rln}</text>`;
+        }
+      }
+      return `<g transform="${t}">${geo}${boxLabel}</g>`;
     }
     const cx=o.x+o.w/2, cy=o.y+o.h/2;
     const rot=o.rotation? ` transform="rotate(${fmt(o.rotation)} ${fmt(cx)} ${fmt(cy)})"`:'';
@@ -4807,7 +4818,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     live3dViewToggle.style.display=hasBox?'':'none';
     let n=0;
     if(hasBox && live3dMode==='assembled'){
-      live3dTitle.textContent='📦 Wizualizacja 3D — złożone pudełko';
+      // Pobierz wymiary pierwszego pudełka do tytułu
+      const firstBox=state.objects.find(o=>o.box && o.visible);
+      const bm=firstBox?firstBox.box:null;
+      live3dTitle.textContent=bm
+        ? `📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm`
+        : '📦 Wizualizacja 3D — złożone pudełko';
       n=buildAssembledBoxScene(live3dScene, sw0*0.85, sh*0.85);
     }
     if(!n){
@@ -4874,7 +4890,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     p3dViewToggle.style.display=hasBox?'':'none';
     let n=0;
     if(hasBox && p3dMode==='assembled'){
-      p3dHint.textContent=P3D_HINT_BOX;
+      const firstBox2=state.objects.find(o=>o.box && o.visible);
+      const bm2=firstBox2?firstBox2.box:null;
+      p3dHint.textContent=bm2
+        ? `Złożone pudełko ${bm2.W}×${bm2.D}×${bm2.H} mm, T=${bm2.T} mm — widok gotowego produktu po sklejeniu.`
+        : P3D_HINT_BOX;
       n=buildAssembledBoxScene(p3dScene, (p3dWrap0.clientWidth||320)*0.8, (p3dWrap0.clientHeight||320)*0.8);
     }
     if(!n){
