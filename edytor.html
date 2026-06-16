@@ -127,8 +127,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field .row2{display:flex;gap:8px}
 .field input[type=number],.field input[type=text],.field select{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem}
 .field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
-.bind-sel{font-size:.72rem!important;padding:4px 6px!important;color:var(--muted)!important;background:rgba(0,0,0,.2)!important;border-color:rgba(255,255,255,.08)!important;margin-top:3px}
-.bind-sel:focus{color:var(--text)!important;border-color:var(--accent)!important}
+#props .bind-sel{font-size:.72rem;padding:4px 6px;color:var(--muted);background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.08);margin-top:3px}
+#props .bind-sel:focus{color:var(--text);border-color:var(--accent)}
+#props .form-sec{padding:0 16px}
 #props fieldset:disabled{opacity:.5}
 #props fieldset:disabled,#props fieldset:disabled *{cursor:not-allowed}
 .field .check-label{display:flex;align-items:flex-start;gap:6px;font-size:.78rem;font-weight:500;text-transform:none;letter-spacing:normal;color:var(--text);line-height:1.4}
@@ -183,8 +184,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .param-card .pdel{flex:0 0 auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:3px 6px;border-radius:5px;line-height:1}
 .param-card .pdel:hover{color:var(--cut);background:rgba(255,255,255,.08)}
 .addparam{margin:0 14px 16px;width:calc(100% - 28px);justify-content:center}
-.bind-sel{margin-top:6px;width:100%;padding:6px 8px;background:var(--surface2);border:1px dashed var(--border);border-radius:6px;color:var(--accent);font-size:.7rem;font-family:inherit;cursor:pointer}
-.bind-sel:focus{outline:none;border-color:var(--accent)}
+.params .bind-sel{margin-top:6px;width:100%;padding:6px 8px;background:var(--surface2);border:1px dashed var(--border);border-radius:6px;color:var(--accent);font-size:.7rem;font-family:inherit;cursor:pointer}
+.params .bind-sel:focus{outline:none;border-color:var(--accent)}
 .params-empty{padding:2px 2px 6px;font-size:.78rem;color:var(--muted);line-height:1.55}
 
 /* ---- Templates ---- */
@@ -344,7 +345,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;flex:0 0 auto;transition:filter .1s}
 .lyr-pick:hover{filter:brightness(1.25)}
 .lyr-cnt{font-size:.66rem;color:var(--muted);flex:1;white-space:nowrap}
-.lyr-mat{width:72px;flex:0 0 72px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.68rem;font-family:inherit}
+.lyr-mat{width:88px;flex:0 0 88px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.68rem;font-family:inherit}
 .lyr-mm{width:46px;flex:0 0 46px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.72rem;font-family:inherit;text-align:center}
 .lyr-unit{font-size:.64rem;color:var(--muted);flex-shrink:0}
 .lyr-eye{background:none;border:none;cursor:pointer;font-size:.75rem;padding:2px 4px;line-height:1;color:var(--muted);border-radius:4px;transition:background .1s,color .1s}
@@ -3002,14 +3003,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" data-hinge="zoneW" value="${fmt(m.zoneW)}" min="5" max="700" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" data-hinge="rightW" value="${fmt(m.rightW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
     </div>`;
-    h+=`<div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Nacięcia</div>`;
+    h+=`<div class="form-sec">Nacięcia</div>`;
     h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" data-hinge="slitLen" value="${fmt(m.slitLen)}" min="5" max="200" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" data-hinge="kerf" value="${fmt(m.kerf)}" min="0.2" max="5" step="0.1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" data-hinge="pitchX" value="${fmt(m.pitchX)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" data-hinge="bridge" value="${fmt(m.bridge)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
     </div>`;
-    h+=`<div style="border-top:1px solid var(--line,#333);margin:8px 0 4px;padding-top:6px;font-size:.78rem;color:var(--muted)">Łączenie — zaczepy „na palec”</div>`;
+    h+=`<div class=”form-sec”>Łączenie — zaczepy „na palec”</div>`;
     h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" data-hinge="T" value="${fmt(m.T)}" min="0.5" max="20" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" data-hinge="F" value="${fmt(m.F)}" min="2" max="100" step="1" title="${WHEEL_HINT}"></div>
@@ -3107,30 +3108,29 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <div style=”margin-top:5px;color:var(--muted);font-size:.75rem”>Zamknięcie: <strong style=”color:var(--text)”>${cln}${bClasp?' + zapięcie':''}</strong></div>
       </div></div>`;
     }
-    // nazwa elementu (widoczna też w panelu „Warstwy”)
+    // ---- nazwa + operacja ----
     h+=`<div class=”field”><label>Nazwa</label><input type=”text” data-prop=”name” value=”${escapeXml(o.name||'')}” placeholder=”${escapeXml(autoName(o))}”></div>`;
-    // mode
-    h+=`<div class="field"><label>Tryb (operacja lasera)</label><div class="seg" data-seg="mode">
-      <button class="cut ${o.mode==='cut'?'on':''}" data-mode="cut">Cięcie</button>
-      <button class="engrave ${o.mode==='engrave'?'on':''}" data-mode="engrave">Grawer</button>
-      <button class="score ${o.mode==='score'?'on':''}" data-mode="score">Nacięcie</button></div></div>`;
-    // role: pełny kształt vs otwór (wycięcie odejmowane od sylwetki warstwy) — kształty ORAZ tekst
+    h+=`<div class=”field”><label>Operacja lasera</label><div class=”seg” data-seg=”mode”>
+      <button class=”cut ${o.mode==='cut'?'on':''}” data-mode=”cut”>Cięcie</button>
+      <button class=”engrave ${o.mode==='engrave'?'on':''}” data-mode=”engrave”>Grawer</button>
+      <button class=”score ${o.mode==='score'?'on':''}” data-mode=”score”>Nacięcie</button></div></div>`;
     if(BOOL_TYPES.includes(o.type) || o.type==='text'){
       const _isTxt=o.type==='text';
-      h+=`<div class="field"><label>Rola w warstwie</label><div class="seg" data-seg="role">
-        <button class="${o.role==='hole'?'':'on'}" data-role="fill" title="Element jest pełnym, wypełnionym kształtem warstwy">${_isTxt?'⬛ Pełny napis':'⬛ Pełny kształt'}</button>
-        <button class="${o.role==='hole'?'on':''}" data-role="hole" title="Kontur tego elementu zostanie wycięty (odjęty) z sylwetki warstwy 3D">◯ Otwór (wycięcie)</button></div>
-        ${o.role==='hole'?`<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
+      h+=`<div class=”field”><label>Rola w warstwie</label><div class=”seg” data-seg=”role”>
+        <button class=”${o.role==='hole'?'':'on'}” data-role=”fill” title=”Element jest pełnym, wypełnionym kształtem warstwy”>${_isTxt?'⬛ Pełny napis':'⬛ Pełny kształt'}</button>
+        <button class=”${o.role==='hole'?'on':''}” data-role=”hole” title=”Kontur tego elementu zostanie wycięty (odjęty) z sylwetki warstwy 3D”>◯ Otwór (wycięcie)</button></div>
+        ${o.role==='hole'?`<p style=”font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5”>${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
     }
-    // position/size
+    // ---- sekcja: pozycja i rozmiar ----
+    h+=`<div class=”form-sec”>Pozycja i rozmiar</div>`;
     if(o.type==='text'||o.type==='path'){
       h+=numField('Pozycja X (mm)','x',o,{step:1});
       h+=numField('Pozycja Y (mm)','y',o,{step:1});
       if(o.type==='path'){
         const bb=objBBox(o);
-        h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="pathW" value="${fmt(bb.w)}" min="1" step="1"></div>`;
-        h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="pathH" value="${fmt(bb.h)}" min="1" step="1"></div>`;
-        h+=`<div class="field"><button type="button" id="pathReset" class="tbtn" style="width:100%;justify-content:center">↺ Przywróć proporcje 1:1</button></div>`;
+        h+=`<div class=”field”><label>Szerokość (mm)</label><input type=”number” id=”pathW” value=”${fmt(bb.w)}” min=”1” step=”1”></div>`;
+        h+=`<div class=”field”><label>Wysokość (mm)</label><input type=”number” id=”pathH” value=”${fmt(bb.h)}” min=”1” step=”1”></div>`;
+        h+=`<div class=”field”><button type=”button” id=”pathReset” class=”tbtn” style=”width:100%;justify-content:center”>↺ Przywróć proporcje 1:1</button></div>`;
       }
     } else {
       h+=numField('Pozycja X (mm)','x',o,{step:1});
@@ -3138,105 +3138,115 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       h+=numField('Szerokość (mm)','w',o,{step:1,min:1});
       h+=numField('Wysokość (mm)','h',o,{step:1,min:1});
       if(['rect','ellipse','polygon','star'].includes(o.type)){
-        h+=`<div class="field" style="margin-top:-6px"><label class="check-label"><input type="checkbox" id="shapeLockRatio" ${o.lockRatio?'checked':''}> 🔗 Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
+        h+=`<div class=”field” style=”margin-top:-6px”><label class=”check-label”><input type=”checkbox” id=”shapeLockRatio” ${o.lockRatio?'checked':''}> 🔗 Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
       }
     }
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
-    h+=`<div class="field" style="margin-top:-6px"><div class="seg">
-      <button type="button" data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° lewo</button>
-      <button type="button" data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° prawo</button>
+    h+=`<div class=”field” style=”margin-top:-6px”><div class=”seg”>
+      <button type=”button” data-rot90=”-1” title=”Obróć o 90° w lewo (CCW)”>↺ 90° w lewo</button>
+      <button type=”button” data-rot90=”1” title=”Obróć o 90° w prawo (CW)”>↻ 90° w prawo</button>
     </div></div>`;
-    h+=rangeField('Przezroczystość w edytorze (%)','opacity',o.opacity??100,0,100,1,o);
+    h+=rangeField('Krycie w edytorze (%)','opacity',o.opacity??100,0,100,1,o);
     if(o.type==='path'||o.type==='text'){
-      h+=`<div class="field"><label>Odbicie lustrzane</label><div class="seg" data-seg="flipaxis">
-        <button class="${o.flipX?'on':''}" data-flipaxis="x">↔ Poziomo</button>
-        <button class="${o.flipY?'on':''}" data-flipaxis="y">↕ Pionowo</button>
+      h+=`<div class=”field”><label>Odbicie lustrzane</label><div class=”seg” data-seg=”flipaxis”>
+        <button class=”${o.flipX?'on':''}” data-flipaxis=”x”>↔ Poziomo</button>
+        <button class=”${o.flipY?'on':''}” data-flipaxis=”y”>↕ Pionowo</button>
       </div></div>`;
     }
-    // type-specific
     if(o.type==='rect') h+=rangeField('Zaokrąglenie rogów (mm)','rx',o.rx||0,0,Math.min(o.w,o.h)/2,1,o);
     if(o.type==='polygon') h+=rangeField('Liczba boków','sides',o.sides||6,3,16,1,o);
     if(o.type==='star'){ h+=rangeField('Liczba ramion','points',o.points||5,3,16,1,o); h+=rangeField('Wcięcie ramion','inner',o.inner||0.5,0.05,0.95,0.01,o); }
-    if(['rect','ellipse','polygon','star'].includes(o.type)){
-      h+=`<div class="field"><button type="button" id="convertPathBtn" class="tbtn" style="width:100%;justify-content:center" title="Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać">✎ Konwertuj na ścieżkę</button></div>`;
-    }
-    if(o.type==='line') h+=`<div class="field"><label>Kierunek</label><div class="seg" data-seg="flip"><button class="${!o.flip?'on':''}" data-flip="0">↘ ukośna</button><button class="${o.flip?'on':''}" data-flip="1">↗ ukośna</button></div></div>`;
+    if(o.type==='line') h+=`<div class=”field”><label>Kierunek linii</label><div class=”seg” data-seg=”flip”><button class=”${!o.flip?'on':''}” data-flip=”0”>↘ prawy dół</button><button class=”${o.flip?'on':''}” data-flip=”1”>↗ prawy góra</button></div></div>`;
+    // ---- sekcja: treść tekstu ----
     if(o.type==='text'){
-      h+=`<div class="field"><label>Treść napisu</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p style="font-size:.7rem;color:var(--muted);margin:3px 0 0;line-height:1.4">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
-      h+=`<div class="field"><label>Czcionka (najedź na nazwę = podgląd)</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
-      h+=`<div class="field"><label>Styl</label><div class="seg" data-seg="textstyle">
-        <button class="${o.bold?'on':''}" data-tstyle="bold" style="font-weight:700">B</button>
-        <button class="${o.italic?'on':''}" data-tstyle="italic" style="font-style:italic">I</button>
-        <button class="${o.underline?'on':''}" data-tstyle="underline" style="text-decoration:underline">U</button>
+      h+=`<div class=”form-sec”>Treść i wygląd</div>`;
+      h+=`<div class=”field”><label>Tekst</label><textarea data-prop=”text” maxlength=”240” rows=”${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}” style=”resize:vertical;font-family:inherit” title=”Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja”>${escapeXml(o.text||'')}</textarea><p style=”font-size:.7rem;color:var(--muted);margin:3px 0 0;line-height:1.4”>Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
+      h+=`<div class=”field”><label>Czcionka</label><div class=”font-dd” id=”propsFontDD”>${fontDDMarkup(o.font)}</div></div>`;
+      h+=`<div class=”field”><label>Styl pisma</label><div class=”seg” data-seg=”textstyle”>
+        <button class=”${o.bold?'on':''}” data-tstyle=”bold” style=”font-weight:700;font-size:.88rem” title=”Pogrubienie”>B</button>
+        <button class=”${o.italic?'on':''}” data-tstyle=”italic” style=”font-style:italic;font-size:.88rem” title=”Kursywa”>I</button>
+        <button class=”${o.underline?'on':''}” data-tstyle=”underline” style=”text-decoration:underline;font-size:.88rem” title=”Podkreślenie”>U</button>
       </div></div>`;
       h+=rangeField('Wielkość (mm)','fontSize',o.fontSize||24,4,160,1,o);
       const tbb=objBBox(o);
-      h+=`<div class="field"><label>Szerokość napisu (mm)</label><input type="number" id="textW" value="${fmt(tbb.w)}" min="1" step="1"></div>`;
-      h+=`<div class="field"><label>Wysokość napisu (mm)</label><input type="number" id="textH" value="${fmt(tbb.h)}" min="1" step="1"></div>`;
-      h+=`<div class="field"><button type="button" id="textReset" class="tbtn" style="width:100%;justify-content:center">↺ Przywróć proporcje 1:1</button></div>`;
-      h+=`<div class="field"><button type="button" id="convertTextPathBtn" class="tbtn" style="width:100%;justify-content:center" title="Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi">✎ Konwertuj na ścieżkę (kontury liter)</button></div>`;
+      h+=`<div class=”field”><label>Szerokość napisu (mm)</label><input type=”number” id=”textW” value=”${fmt(tbb.w)}” min=”1” step=”1”></div>`;
+      h+=`<div class=”field”><label>Wysokość napisu (mm)</label><input type=”number” id=”textH” value=”${fmt(tbb.h)}” min=”1” step=”1”></div>`;
+      h+=`<div class=”field”><button type=”button” id=”textReset” class=”tbtn” style=”width:100%;justify-content:center”>↺ Przywróć proporcje 1:1</button></div>`;
     }
-    // repeat modifier
+    // ---- sekcja: powielanie ----
+    h+=`<div class=”form-sec”>Powielanie</div>`;
     const r=o.repeat||{type:'none'};
-    h+=`<div class="field"><label>Powielanie (modyfikator)</label><select data-prop="repeat.type">
-      ${[['none','Brak'],['linear','Liniowe'],['grid','Siatka'],['circular','Wokół środka'],['mirror','Lustro']].map(([v,l])=>`<option value="${v}" ${r.type===v?'selected':''}>${l}</option>`).join('')}
+    h+=`<div class=”field”><label>Typ powielania</label><select data-prop=”repeat.type”>
+      ${[['none','Brak (pojedynczy element)'],['linear','Liniowe (rząd)'],['grid','Siatka (kolumny × wiersze)'],['circular','Okrągłe (wokół środka)'],['mirror','Lustro (odbicie)']].map(([v,l])=>`<option value=”${v}” ${r.type===v?'selected':''}>${l}</option>`).join('')}
       </select></div>`;
     if(r.type==='linear'){
       h+=rangeField('Liczba kopii','repeat.count',r.count||3,1,40,1);
-      h+=`<div class="field"><label>Odstęp X / Y (mm)</label><div class="row2"><input type="number" data-prop="repeat.dx" value="${fmt(r.dx??30)}" step="1"><input type="number" data-prop="repeat.dy" value="${fmt(r.dy??0)}" step="1"></div></div>`;
+      h+=`<div class=”field”><label>Odstęp X / Y (mm)</label><div class=”row2”><input type=”number” data-prop=”repeat.dx” value=”${fmt(r.dx??30)}” step=”1” title=”${WHEEL_HINT}”><input type=”number” data-prop=”repeat.dy” value=”${fmt(r.dy??0)}” step=”1” title=”${WHEEL_HINT}”></div></div>`;
     } else if(r.type==='grid'){
-      h+=`<div class="field"><label>Kolumny / Wiersze</label><div class="row2"><input type="number" data-prop="repeat.cols" value="${r.cols||3}" min="1" max="20" step="1"><input type="number" data-prop="repeat.rows" value="${r.rows||3}" min="1" max="20" step="1"></div></div>`;
-      h+=`<div class="field"><label>Odstęp X / Y (mm)</label><div class="row2"><input type="number" data-prop="repeat.dx" value="${fmt(r.dx??30)}" step="1"><input type="number" data-prop="repeat.dy" value="${fmt(r.dy??30)}" step="1"></div></div>`;
+      h+=`<div class=”field”><label>Kolumny / Wiersze</label><div class=”row2”><input type=”number” data-prop=”repeat.cols” value=”${r.cols||3}” min=”1” max=”20” step=”1” title=”${WHEEL_HINT}”><input type=”number” data-prop=”repeat.rows” value=”${r.rows||3}” min=”1” max=”20” step=”1” title=”${WHEEL_HINT}”></div></div>`;
+      h+=`<div class=”field”><label>Odstęp X / Y (mm)</label><div class=”row2”><input type=”number” data-prop=”repeat.dx” value=”${fmt(r.dx??30)}” step=”1” title=”${WHEEL_HINT}”><input type=”number” data-prop=”repeat.dy” value=”${fmt(r.dy??30)}” step=”1” title=”${WHEEL_HINT}”></div></div>`;
     } else if(r.type==='circular'){
       h+=rangeField('Liczba kopii','repeat.count',r.count||6,2,40,1);
       h+=rangeField('Kąt całkowity (°)','repeat.angle',r.angle??360,30,360,5);
       h+=rangeField('Promień (mm)','repeat.radius',r.radius??40,0,200,1);
     } else if(r.type==='mirror'){
-      h+=`<div class="field"><label>Oś lustra</label><select data-prop="repeat.axis">
-        ${[['vertical','Pionowa'],['horizontal','Pozioma'],['both','Obie']].map(([v,l])=>`<option value="${v}" ${ (r.axis||'vertical')===v?'selected':''}>${l}</option>`).join('')}</select></div>`;
+      h+=`<div class=”field”><label>Oś odbicia</label><div class=”seg” data-seg=”maxis”>
+        <button class=”${(r.axis||'vertical')==='vertical'?'on':''}” data-maxis=”vertical”>↕ Pionowa</button>
+        <button class=”${(r.axis||'vertical')==='horizontal'?'on':''}” data-maxis=”horizontal”>↔ Pozioma</button>
+        <button class=”${(r.axis||'vertical')==='both'?'on':''}” data-maxis=”both”>✕ Obie osie</button>
+      </div></div>`;
     }
-    // text frame — dedicated UI for text objects
+    // ---- sekcja: narzędzia ----
+    const hasTools=(o.type==='text')||(['rect','ellipse','polygon','star','path'].includes(o.type));
+    if(hasTools) h+=`<div class=”form-sec”>Narzędzia</div>`;
     if(o.type==='text'){
-      h+=`<div class="field"><label>🖼 Obramowanie tekstu (ramka cięcia)</label>
-        <div class="frame-ctrl">
-          <input type="number" id="frameOffsetVal" value="3" min="0.5" step="0.5" title="Powiększenie ramki od krawędzi tekstu (mm)">
-          <span style="font-size:.75rem;color:var(--muted)">mm</span>
-          <button type="button" id="frameAddBtn" class="tbtn" style="flex:1;justify-content:center;min-width:0">✂ Dodaj ramkę</button>
+      h+=`<div class=”field”><label>Ramka cięcia wokół tekstu</label>
+        <div class=”frame-ctrl”>
+          <input type=”number” id=”frameOffsetVal” value=”3” min=”0.5” step=”0.5” title=”Powiększenie ramki od krawędzi tekstu (mm)”>
+          <span style=”font-size:.75rem;color:var(--muted)”>mm odstępu</span>
+          <button type=”button” id=”frameAddBtn” class=”tbtn” style=”flex:1;justify-content:center;min-width:0”>✂ Dodaj</button>
         </div>
-        <p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
+        <p style=”font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5”>Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
+      h+=`<div class=”field”><button type=”button” id=”convertTextPathBtn” class=”tbtn” style=”width:100%;justify-content:center” title=”Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi”>✏ Konwertuj na ścieżkę (kontury liter)</button></div>`;
     }
-    // offset / obwódka (nie dla linii i textu — tekst ma dedykowaną ramkę powyżej)
-    if(o.type!=='line' && o.type!=='text'){
-      h+=`<div class="field"><label>Obwódka / offset (mm)</label><div class="row2">
-        <input type="number" id="offsetVal" value="5" step="1" style="flex:0 0 90px">
-        <button type="button" id="offsetBtn" class="tbtn" style="flex:1;justify-content:center">+ Utwórz obwódkę</button></div></div>`;
+    if(['rect','ellipse','polygon','star'].includes(o.type)){
+      h+=`<div class=”field”><button type=”button” id=”convertPathBtn” class=”tbtn” style=”width:100%;justify-content:center” title=”Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać”>✏ Konwertuj na ścieżkę</button></div>`;
+      h+=`<div class=”field”><label>Obwódka (mm)</label><div class=”row2”>
+        <input type=”number” id=”offsetVal” value=”5” step=”1” style=”flex:0 0 90px” title=”Odległość obwódki od krawędzi kształtu (mm)”>
+        <button type=”button” id=”offsetBtn” class=”tbtn” style=”flex:1;justify-content:center”>+ Utwórz obwódkę</button></div></div>`;
+    }
+    if(o.type==='path'){
+      h+=`<div class=”field”><label>Obwódka (mm)</label><div class=”row2”>
+        <input type=”number” id=”offsetVal” value=”5” step=”1” style=”flex:0 0 90px” title=”Odległość obwódki od krawędzi kształtu (mm)”>
+        <button type=”button” id=”offsetBtn” class=”tbtn” style=”flex:1;justify-content:center”>+ Utwórz obwódkę</button></div></div>`;
     }
     if(o.type==='path' && isEditablePolygonPath(o)){
       const editing=state.editingPathId===o.id;
-      h+=`<div class="field"><button type="button" id="nodeEditBtn" class="tbtn ${editing?'active':''}" style="width:100%;justify-content:center">${editing?'✓ Zakończ edycję punktów':'✏ Edytuj punkty'}</button>
-        ${editing?`<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Przeciągnij punkt, aby zmienić kształt. Dwuklik na punkcie usuwa go (min. 3). Dwuklik na krawędzi dodaje nowy punkt. <kbd>Esc</kbd> kończy edycję.</p>`:''}
+      h+=`<div class=”field”><button type=”button” id=”nodeEditBtn” class=”tbtn ${editing?'active':''}” style=”width:100%;justify-content:center”>${editing?'✓ Zakończ edycję punktów':'✏ Edytuj punkty ścieżki'}</button>
+        ${editing?`<p style=”font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5”>Przeciągnij punkt, aby zmienić kształt. Dwuklik na punkcie usuwa go (min. 3). Dwuklik na krawędzi dodaje nowy punkt. <kbd>Esc</kbd> kończy edycję.</p>`:''}
       </div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length===1){
-      h+=`<div class="field"><button type="button" id="smoothBtn" class="tbtn" style="width:100%;justify-content:center">〰 Wygładź w krzywe</button></div>`;
+      h+=`<div class=”field”><button type=”button” id=”smoothBtn” class=”tbtn” style=”width:100%;justify-content:center”>〰 Wygładź w krzywe Béziera</button></div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length>1){
-      h+=`<div class="field"><button type="button" id="breakApartBtn" class="tbtn" style="width:100%;justify-content:center" title="Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie">✂ Rozdziel na podścieżki <span class="ctx-key">Ctrl+Shift+B</span></button></div>`;
+      h+=`<div class=”field”><button type=”button” id=”breakApartBtn” class=”tbtn” style=”width:100%;justify-content:center” title=”Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie”>✂ Rozdziel na podścieżki <span class=”ctx-key”>Ctrl+Shift+B</span></button></div>`;
     }
-    // depth / 3D layer selector
+    // ---- sekcja: warstwa 3D ----
+    h+=`<div class=”form-sec”>Warstwa 3D</div>`;
     const dep = o.depth||1; const dc2=dep<=6?`d${dep}`:'dN';
     const maxDep=Math.max(1,...state.objects.map(x=>x.depth||1));
     let laBtns='';
-    for(let dd=1; dd<=maxDep; dd++){ laBtns+=`<button type="button" class="la-btn${dd===dep?' on':''}" data-setdepth="${dd}" style="background:${depthColor(dd)}" title="Przenieś na warstwę ${dd}">W${dd}</button>`; }
-    laBtns+=`<button type="button" class="la-btn la-new" data-setdepth="${maxDep+1}" title="Nowa warstwa ${maxDep+1}">+ W${maxDep+1}</button>`;
-    h+=`<div class="field"><label>Warstwa 3D — kliknij, by przenieść element</label>
-      <div class="layer-assign">${laBtns}</div>
-      <div class="depth-ctrl" style="margin-top:7px">
-        <button type="button" class="dbtn" id="depthDown">−</button>
-        <span class="dval" id="depthVal">${dep}</span>
-        <button type="button" class="dbtn" id="depthUp">+</button>
-        <span class="d-badge ${dc2}" style="margin-left:4px">${dep}</span>
-        <span style="font-size:.7rem;color:var(--muted);margin-left:6px">${fmt(layerMM(dep))} mm grubości</span>
+    for(let dd=1; dd<=maxDep; dd++){ laBtns+=`<button type=”button” class=”la-btn${dd===dep?' on':''}” data-setdepth=”${dd}” style=”background:${depthColor(dd)}” title=”Przenieś na warstwę ${dd}”>W${dd}</button>`; }
+    laBtns+=`<button type=”button” class=”la-btn la-new” data-setdepth=”${maxDep+1}” title=”Nowa warstwa ${maxDep+1}”>+ W${maxDep+1}</button>`;
+    h+=`<div class=”field”><label>Kliknij, aby przenieść element na warstwę</label>
+      <div class=”layer-assign”>${laBtns}</div>
+      <div class=”depth-ctrl” style=”margin-top:7px”>
+        <button type=”button” class=”dbtn” id=”depthDown”>−</button>
+        <span class=”dval” id=”depthVal”>${dep}</span>
+        <button type=”button” class=”dbtn” id=”depthUp”>+</button>
+        <span class=”d-badge ${dc2}” style=”margin-left:4px”>${dep}</span>
+        <span style=”font-size:.7rem;color:var(--muted);margin-left:6px”>${fmt(layerMM(dep))} mm grubości</span>
       </div>
     </div>`;
     propsEl.innerHTML=lockedWrap(h,o);
@@ -3441,6 +3451,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     propsEl.querySelectorAll('[data-seg="mode"] button').forEach(b=>b.addEventListener('click',()=>{ o.mode=b.getAttribute('data-mode'); renderProps(); renderObjects(); scheduleLive3D(); pushHistory(); }));
     propsEl.querySelectorAll('[data-seg="role"] button').forEach(b=>b.addEventListener('click',()=>{ const r=b.getAttribute('data-role'); o.role=r==='hole'?'hole':undefined; renderProps(); renderAll(); scheduleLive3D(); pushHistory(); }));
     propsEl.querySelectorAll('[data-seg="flip"] button').forEach(b=>b.addEventListener('click',()=>{ o.flip=b.getAttribute('data-flip')==='1'; renderProps(); renderObjects(); scheduleLive3D(); pushHistory(); }));
+    propsEl.querySelectorAll('[data-seg="maxis"] button').forEach(b=>b.addEventListener('click',()=>{ o.repeat=o.repeat||{type:'mirror'}; o.repeat.axis=b.getAttribute('data-maxis'); renderProps(); renderObjects(); renderOverlay(); scheduleLive3D(); pushHistory(); }));
     propsEl.querySelectorAll('[data-seg="flipaxis"] button').forEach(b=>b.addEventListener('click',()=>{
       const ax=b.getAttribute('data-flipaxis');
       if(ax==='x') o.flipX=!o.flipX; else o.flipY=!o.flipY;
@@ -3645,7 +3656,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const modeCls=o.mode==='engrave'?'lyr-engrave':o.mode==='score'?'lyr-score':o.mode==='reference'?'':'lyr-cut';
       const d=o.depth||1; const dc=d<=6?`d${d}`:'dN';
       const dbadge=`<span class="d-badge ${dc}" title="Warstwa 3D ${d}">${d}</span>`;
-      const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'⊠':'◻';
+      const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'🔒':'🔓';
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
       return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls}" data-id="${o.id}">
         <span class="swatch ${sw}"></span>
