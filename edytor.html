@@ -585,6 +585,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <select id="boxClosure">
         <option value="open">Otwarte (bez wieczka)</option>
         <option value="lid">Wieczko nakładane (luźne)</option>
+        <option value="pull-slot">Wieczko z wyciągnięciem (rowek na palec)</option>
+        <option value="tab-latch">Zatrzask — wieczko z języczkiem (wcisk)</option>
+        <option value="slide">Wieczko wsuwane (skrzynka zapałkowa)</option>
         <option value="lid-lip">Wieczko z kołnierzem (chwyt — nie spada)</option>
         <option value="hinged">Wieczko na zawiasie żywym (flex — uchylne)</option>
       </select>
@@ -4588,7 +4591,15 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const outerCol=darkenHex(baseCol,shade);
     const innerCol=darkenHex(outerCol,0.78);
     const wallCol=darkenHex(BOX_EDGE_COL,shade);
+    // --- ścieżka twarzy + opcjonalne otwory/notche ---
     let faceD=`M0 0H${fmt(w)}V${fmt(h)}H0Z`, fr='nonzero', holeLocal=null;
+    // Rowek wyciągnięcia (pull-slot / slide): otwarta szczelina U przy y=0 (krawędź przednia wieczka)
+    if(o.pullSlot){
+      const {slotW:sw,slotH:sh,r:sr}=o.pullSlot;
+      const cx=w/2, sl=cx-sw/2, sr2=cx+sw/2, sb=sh;
+      const r2=Math.min(sr,sh-0.1,sw/2-0.1);
+      faceD=`M0 0L${fmt(sl)} 0L${fmt(sl)} ${fmt(sb-r2)}A${fmt(r2)} ${fmt(r2)} 0 0 0 ${fmt(sl+r2)} ${fmt(sb)}L${fmt(sr2-r2)} ${fmt(sb)}A${fmt(r2)} ${fmt(r2)} 0 0 0 ${fmt(sr2)} ${fmt(sb-r2)}L${fmt(sr2)} 0L${fmt(w)} 0L${fmt(w)} ${fmt(h)}L0 ${fmt(h)}Z`;
+    }
     if(o.hole){
       const lbb=polysBBoxMulti([boxPanelPoints(w,h,T,F,edges)]);
       const hcx=lbb.minx+(o.hole.cx-o.bx), hcy=lbb.miny+(o.hole.cy-o.by);
@@ -4596,18 +4607,37 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       fr='evenodd';
       holeLocal={cx:hcx,cy:hcy,rx:o.hole.rx,ry:o.hole.ry};
     }
-    const outer=`<svg viewBox="0 0 ${fmt(w)} ${fmt(h)}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="position:absolute;left:0;top:0;transform:translateZ(0px)"><path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/></svg>`;
-    const inner=`<svg viewBox="0 0 ${fmt(w)} ${fmt(h)}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="position:absolute;left:0;top:0;transform:translateZ(${fmt(Tpx)}px)"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
+    // --- generujemy SVG twarzy z viewBox dopasowanym do ew. wystającego języczka (pullTab) ---
+    let svgOffY=0, svgH=hpx;
+    if(o.pullTab){
+      const tabHpx=o.pullTab.tabH*scale;
+      svgOffY=-tabHpx; svgH=hpx+tabHpx;
+      // modyfikujemy faceD dla języczka: prostokąt + wysiągnięty prostokąt w -y
+      const {tabW:tw,tabH:th,r:rr}=o.pullTab;
+      const cx=w/2, tl=cx-tw/2, tr2=cx+tw/2, r3=Math.min(rr,th-0.1,tw/2-0.1);
+      faceD=`M0 0L${fmt(tl)} 0L${fmt(tl)} ${fmt(-th+r3)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tl+r3)} ${fmt(-th)}L${fmt(tr2-r3)} ${fmt(-th)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tr2)} ${fmt(-th+r3)}L${fmt(tr2)} 0L${fmt(w)} 0L${fmt(w)} ${fmt(h)}L0 ${fmt(h)}Z`;
+    }
+    const svgStyle=(z)=>`position:absolute;left:0;top:${fmt(svgOffY)}px;transform:translateZ(${fmt(z)}px)`;
+    const outer=`<svg viewBox="${fmt(-0)} ${fmt(-o.pullTab?o.pullTab.tabH:0)} ${fmt(w)} ${fmt(h+(o.pullTab?o.pullTab.tabH:0))}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(0)}"><path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/></svg>`;
+    const inner=`<svg viewBox="${fmt(-0)} ${fmt(-o.pullTab?o.pullTab.tabH:0)} ${fmt(w)} ${fmt(h+(o.pullTab?o.pullTab.tabH:0))}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
+    // --- ściany boczne (listwy grubości materiału wzdłuż krawędzi) ---
+    // Przy rowku wyciągnięcia (pull-slot) krawędź przednia (y=0) jest rozbita na dwa segmenty.
     let walls='';
-    const ring=[[0,0],[wpx,0],[wpx,hpx],[0,hpx]];
-    for(let i=0;i<4;i++){
-      const a=ring[i], b=ring[(i+1)%4];
-      const dx=b[0]-a[0], dy=b[1]-a[1], len=Math.hypot(dx,dy);
+    function addWall(ax,ay,bx2,by2){
+      const dx=bx2-ax, dy=by2-ay, len=Math.hypot(dx,dy);
+      if(len<0.5) return;
       const ang=Math.atan2(dy,dx)*180/Math.PI;
       const ux=dx/len, uy=dy/len;
-      const sx=a[0]-ux*WALL_OVERLAP, sy=a[1]-uy*WALL_OVERLAP;
-      const wlen=len+WALL_OVERLAP*2, wthick=Tpx+WALL_OVERLAP*2;
-      walls+=`<div class="l3d-wall" style="width:${fmt(wlen)}px;height:${fmt(wthick)}px;background:${wallCol};transform:translate3d(${fmt(sx)}px,${fmt(sy)}px,${fmt(-WALL_OVERLAP)}px) rotateZ(${fmt(ang)}deg) rotateX(90deg)"></div>`;
+      const sx=ax-ux*WALL_OVERLAP, sy=ay-uy*WALL_OVERLAP;
+      const wl=len+WALL_OVERLAP*2, wt=Tpx+WALL_OVERLAP*2;
+      walls+=`<div class="l3d-wall" style="width:${fmt(wl)}px;height:${fmt(wt)}px;background:${wallCol};transform:translate3d(${fmt(sx)}px,${fmt(sy)}px,${fmt(-WALL_OVERLAP)}px) rotateZ(${fmt(ang)}deg) rotateX(90deg)"></div>`;
+    }
+    if(o.pullSlot){
+      const sl=(w/2-o.pullSlot.slotW/2)*scale, sr2=(w/2+o.pullSlot.slotW/2)*scale;
+      addWall(0,0,sl,0); addWall(sr2,0,wpx,0); // krawędź przednia: lewa i prawa część (rowek pominięty)
+      addWall(wpx,0,wpx,hpx); addWall(wpx,hpx,0,hpx); addWall(0,hpx,0,0); // pozostałe 3 krawędzie
+    } else {
+      [[0,0,wpx,0],[wpx,0,wpx,hpx],[wpx,hpx,0,hpx],[0,hpx,0,0]].forEach(([ax,ay,bx2,by2])=>addWall(ax,ay,bx2,by2));
     }
     let hole='';
     if(holeLocal){
@@ -4636,12 +4666,22 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(!o||!ed) return;
       html+=buildBoxFace(o,ed,T,F,scale,Tpx,TR[role],BOX_FACE_COL,BOX_FACE_SHADE[role]);
     });
-    if((closure==='lid'||closure==='lid-lip') && g.panels.lid){
-      const ed={w:W,h:D,edges:{top:null,right:null,bottom:null,left:null}};
-      html+=buildBoxFace(g.panels.lid,ed,T,F,scale,Tpx,TR.lid,BOX_LID_COL,BOX_FACE_SHADE.lid);
+    // Wieczka flat (lid, lid-lip, pull-slot, tab-latch, slide) leżą na górze pudełka.
+    // Dla 'hinged' i 'open' pokazujemy zaciemnione wnętrze (brak wieczka w widoku).
+    const hasLid=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide') && g.panels.lid;
+    if(hasLid){
+      // Dla slide: wieczko wsuwane jest nieco węższe; ed używa rzeczywistych wymiarów panelu
+      const lidO=g.panels.lid;
+      let lidW=W, lidD3=D;
+      if(closure==='slide'){ lidW=Math.max(4,W-2*T-0.4); lidD3=D+2*T; }
+      const ed={w:lidW,h:lidD3,edges:{top:null,right:null,bottom:null,left:null}};
+      // Przesuń wsuwane wieczko tak, by wystawało o T mm poza przednią krawędź (widać rowek wyciągnięcia)
+      const lidTR=closure==='slide'
+        ? `translate3d(${fmt(xOff+(W-lidW)/2)}px,${fmt(Dpx-T*scale)}px,${fmt(Hpx)}px) rotateX(180deg)`
+        : TR.lid;
+      html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
     } else {
-      // Bez sztywnego wieczka (pudełko otwarte / z żywym zawiasem otwartym) —
-      // zamiast czarnej dziury pokazujemy zaciemnione wnętrze w otworze górnym.
+      // Pudełko otwarte / żywy zawias — zaciemnione wnętrze w otworze górnym.
       html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
     }
     return html;
@@ -5335,6 +5375,38 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; pts.push([cx+Math.cos(a)*rx, cy+Math.sin(a)*ry]); }
     return pts;
   }
+  // Punkty zaokrąglonego prostokąta (zgodnie z ruchem wskazówek zegara, n punktów per narożnik).
+  function roundedRectPoints(cx,cy,w,h,r,n){
+    n=n||5; r=Math.min(r||2, w/2-0.1, h/2-0.1);
+    const pts=[], corners=[
+      {ax:cx-w/2+r, ay:cy-h/2+r, a0:Math.PI,  a1:1.5*Math.PI},
+      {ax:cx+w/2-r, ay:cy-h/2+r, a0:1.5*Math.PI, a1:2*Math.PI},
+      {ax:cx+w/2-r, ay:cy+h/2-r, a0:0,        a1:0.5*Math.PI},
+      {ax:cx-w/2+r, ay:cy+h/2-r, a0:0.5*Math.PI, a1:Math.PI}
+    ];
+    for(const {ax,ay,a0,a1} of corners)
+      for(let i=0;i<=n;i++){ const a=a0+(a1-a0)*(i/n); pts.push([ax+r*Math.cos(a), ay+r*Math.sin(a)]); }
+    return pts;
+  }
+  // Dodaje prostokątny otwór jako dodatkową podścieżkę evenodd.
+  function addRectHole(panel,cx,cy,w,h,r){
+    panel.d+=polyToPathD(roundedRectPoints(cx,cy,w,h,r||2));
+    panel.fillRule='evenodd';
+    panel.hole={cx,cy,rx:w/2,ry:h/2};
+  }
+  // Generuje ścieżkę SVG prostokąta z otwartym rowkiem U na górnej krawędzi (y=y0).
+  // Rowek wyciągnięcia: centruję w cx, szerokość sw, głębokość sh, zaokrąglony narożnik r.
+  function lidPullSlotPath(x0,y0,w,d,sw,sh,r){
+    r=Math.min(r||3, sh-0.2, sw/2-0.2);
+    const cx=x0+w/2, sl=cx-sw/2, sr=cx+sw/2, sb=y0+sh;
+    return `M${fmt(x0)} ${fmt(y0)}L${fmt(sl)} ${fmt(y0)}L${fmt(sl)} ${fmt(sb-r)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sl+r)} ${fmt(sb)}L${fmt(sr-r)} ${fmt(sb)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sr)} ${fmt(sb-r)}L${fmt(sr)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0+d)}L${fmt(x0)} ${fmt(y0+d)}Z`;
+  }
+  // Generuje ścieżkę prostokąta z wysuniętym języczkiem na górnej krawędzi (y=y0, ku górze).
+  function lidTabPath(x0,y0,w,d,tw,th,r){
+    r=Math.min(r||2, th-0.2, tw/2-0.2);
+    const cx=x0+w/2, tl=cx-tw/2, tr2=cx+tw/2;
+    return `M${fmt(x0)} ${fmt(y0)}L${fmt(tl)} ${fmt(y0)}L${fmt(tl)} ${fmt(y0-th+r)}A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(tl+r)} ${fmt(y0-th)}L${fmt(tr2-r)} ${fmt(y0-th)}A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(tr2)} ${fmt(y0-th+r)}L${fmt(tr2)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0+d)}L${fmt(x0)} ${fmt(y0+d)}Z`;
+  }
   // Dodaje owalny otwór do istniejącego panelu jako dodatkową podścieżkę + fillRule:evenodd
   // (działa niezależnie od kierunku obrysu zewnętrznego — nie trzeba dopasowywać winding order).
   function addOvalHole(panel,cx,cy,rx,ry){
@@ -5377,7 +5449,46 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         panels.push(panel);
         return panel;
       };
-      if(closure==='lid' || closure==='lid-lip'){
+      if(closure==='pull-slot'){
+        // Wieczko z rowkiem wyciągnięcia na palec — otwarta szczelina U przy krawędzi przedniej wieczka.
+        const sw=clamp(W*0.28,18,70), sh=clamp(Math.max(H,D)*0.14,5,14), sr=clamp(sh*0.4,1.5,5);
+        const px=place(W);
+        const lidD=lidPullSlotPath(px,ey,W,D,sw,sh,sr);
+        const lid={name:'Wieczko z wyciągnięciem',role:'lid',mode:'cut',d:lidD,bx:px,by:ey,bw:W,bh:D,
+          pullSlot:{slotW:sw,slotH:sh,r:sr}};
+        panels.push(lid);
+        // otwór na zapięcie na środku wieczka — z dala od rowka wyciągnięcia
+        if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
+      } else if(closure==='tab-latch'){
+        // Zatrzask — języczek na wieczku + otwór w ściance przedniej blisko górnej krawędzi.
+        const tw=clamp(W*0.15,10,32), th=clamp(T*2.2+1,6,13), tr2=clamp(th*0.3,1.5,4);
+        const px=place(W);
+        const lidD=lidTabPath(px,ey,W,D,tw,th,tr2);
+        // bw=W, bh=D+th, by=ey-th (języczek wystaje powyżej prostokąta D)
+        const lid={name:'Wieczko z języczkiem',role:'lid',mode:'cut',d:lidD,bx:px,by:ey-th,bw:W,bh:D+th,
+          pullTab:{tabW:tw,tabH:th,r:tr2}};
+        panels.push(lid);
+        // Otwór (wcisk) w ściance przedniej — blisko górnej krawędzi skrzynki (local y=H ściany przedniej)
+        const frontP=panels.find(p=>p.role==='front');
+        if(frontP) addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-1-th/2, tw+0.5, th+0.4, tr2);
+        if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
+      } else if(closure==='slide'){
+        // Wieczko wsuwane (matchbox): węższe wieczko wsuwane od przodu przez szczelinę w ściance przedniej.
+        const lidW=Math.max(4, W-2*T-0.4), lidD2=D+2*T;
+        const px=place(lidW);
+        const sw=clamp(lidW*0.35,12,50), sh=clamp(T*2+1,5,12), sr2=clamp(sh*0.35,1.5,4);
+        const lid={name:'Wieczko wsuwane',role:'lid',mode:'cut',
+          d:lidPullSlotPath(px,ey,lidW,lidD2,sw,sh,sr2),
+          bx:px,by:ey,bw:lidW,bh:lidD2,pullSlot:{slotW:sw,slotH:sh,r:sr2}};
+        panels.push(lid);
+        if(clasp) addOvalHole(lid, px+lidW/2, ey+lidD2/2, claspRx, claspRy);
+        // Ścianka przednia: szczelina wejściowa dla wieczka — przy górnej krawędzi
+        const frontP=panels.find(p=>p.role==='front');
+        if(frontP){
+          const slitW=Math.max(4,lidW+0.4), slitH=Math.max(2,T+0.4);
+          addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-slitH/2-0.5, slitW, slitH, 1.5);
+        }
+      } else if(closure==='lid' || closure==='lid-lip'){
         const lid=rectPanel('Wieczko (góra)','lid', W, D);
         // otwór na zapięcie na wieczku — przy odpowiadającej krawędzi (para z otworem na ściance przedniej)
         if(clasp) addOvalHole(lid, lid.bx+lid.bw/2, lid.by+claspRy+3, claspRx, claspRy);
@@ -5416,6 +5527,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const BOX_CLOSURE_NOTES={
     open:'Pudełko otwarte od góry — 5 ścianek.',
     lid:'Dodatkowe płaskie wieczko leżące luźno na otworze.',
+    'pull-slot':'Wieczko z rowkiem wyciągnięcia (jak na pudełkach ślubnych/prezentowych) — zaokrąglona szczelina przy przedniej krawędzi, chwyt dwoma palcami.',
+    'tab-latch':'Zatrzask na języczek — wieczko ma wystający języczek wsuwający się w otwór przy górnej krawędzi ścianki przedniej. Delikatny wcisk trzyma wieczko zamknięte.',
+    slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
     'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
     hinged:'Jednoczęściowe wieczko na zawiasie żywym (flex): klapka klei się do tyłu, pasek nacięć wygina się, a płyta zamyka pudełko od góry.'
   };
@@ -5438,7 +5552,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const gid=uid();
     const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:p.fillRule||'nonzero',
       bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
-      depth:state.depth||1,repeat:{type:'none'},groupId:gid,hole:p.hole||null,box:{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
+      depth:state.depth||1,repeat:{type:'none'},groupId:gid,hole:p.hole||null,
+      pullSlot:p.pullSlot||null,pullTab:p.pullTab||null,
+      box:{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
     const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
     if(totalBB.maxx>state.docW || totalBB.maxy>state.docH){
       applyDocSize(Math.max(state.docW,Math.ceil(totalBB.maxx+5)), Math.max(state.docH,Math.ceil(totalBB.maxy+5)));
