@@ -127,10 +127,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field .row2{display:flex;gap:8px}
 .field input[type=number],.field input[type=text],.field select{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem}
 .field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.bind-sel{font-size:.72rem!important;padding:4px 6px!important;color:var(--muted)!important;background:rgba(0,0,0,.2)!important;border-color:rgba(255,255,255,.08)!important;margin-top:3px}
+.bind-sel:focus{color:var(--text)!important;border-color:var(--accent)!important}
 #props fieldset:disabled{opacity:.5}
 #props fieldset:disabled,#props fieldset:disabled *{cursor:not-allowed}
-.field .check-label{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;text-transform:none;letter-spacing:normal;color:var(--text);white-space:nowrap}
-.field .check-label input[type=checkbox]{width:auto;accent-color:var(--accent)}
+.field .check-label{display:flex;align-items:flex-start;gap:6px;font-size:.78rem;font-weight:500;text-transform:none;letter-spacing:normal;color:var(--text);line-height:1.4}
+.field .check-label input[type=checkbox]{width:auto;accent-color:var(--accent);margin-top:2px;flex-shrink:0}
 .range-wrap{display:flex;align-items:center;gap:10px}
 .range-wrap input[type=range]{flex:1;accent-color:var(--accent)}
 .range-val{font-weight:700;color:var(--accent);min-width:40px;text-align:right;font-size:.82rem}
@@ -635,7 +637,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       4. Przepleć zakładki obu pasów (W↔T↔W...) i wsuń kołek drewniany ⌀3 mm przez otwory.<br>
       5. Możesz użyć grubej wykałaczki lub pałeczki bambusowej ⌀3 mm.
     </div>
-    <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj pudełko</button>
+    <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📦 Generuj pudełko</button>
   </div>
 </div>
 
@@ -675,7 +677,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabTop"> Górna</label>
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabBottom"> Dolna</label>
     </div>
-    <button type="button" class="tbtn" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj zawias</button>
+    <button type="button" class="tbtn" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">🪗 Generuj zawias</button>
   </div>
 </div>
 
@@ -694,7 +696,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"></div>
       <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
     </div>
-    <button type="button" class="tbtn" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj koło zębate</button>
+    <button type="button" class="tbtn" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">⚙ Generuj koło zębate</button>
   </div>
 </div>
 
@@ -2938,7 +2940,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(sel.length>=3) h+=`<div class="field"><label>Rozłóż równomiernie</label><div class="seg">
       <button data-dist="h">↔ Poziomo</button><button data-dist="v">↕ Pionowo</button></div></div>`;
     h+=`<div class="field"><label>Obróć każdy element</label><div class="seg">
-      <button data-rot90="-1">↺ Obróć 90°</button><button data-rot90="1">↻ Obróć 90°</button></div></div>`;
+      <button data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° lewo</button><button data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° prawo</button></div></div>`;
     const boolCount=sel.filter(o=>BOOL_TYPES.includes(o.type)).length;
     if(boolCount>=2){
       const xorBtn=boolCount===2?'<button data-bool="xor">Wyklucz</button>':'';
@@ -3096,11 +3098,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         'hinge-lid':'#caa06c','hinge-back':'#3b9eff'}[o.box.role]||'#caa06c';
       h+=`<div class=”field” style=”padding-bottom:8px”><div style=”background:var(--surface2);border:1.5px solid ${roleColor}44;border-radius:8px;padding:9px 11px;font-size:.78rem;border-left:3px solid ${roleColor}”>
         <div style=”font-weight:700;color:${roleColor};margin-bottom:5px;font-size:.76rem;letter-spacing:.03em;text-transform:uppercase”>📦 ${rn}</div>
-        <div style=”display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;color:var(--muted);font-size:.75rem”>
-          <span>Szer. W: <strong style=”color:var(--text)”>${bW}&nbsp;mm</strong></span>
-          <span>Głęb. D: <strong style=”color:var(--text)”>${bD}&nbsp;mm</strong></span>
-          <span>Wys. H: <strong style=”color:var(--text)”>${bH}&nbsp;mm</strong></span>
-          <span>Grub. T: <strong style=”color:var(--text)”>${bT}&nbsp;mm</strong></span>
+        <div style=”display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:.74rem;margin-top:2px”>
+          <span>W: <strong style=”color:var(--text)”>${bW}</strong></span>
+          <span>D: <strong style=”color:var(--text)”>${bD}</strong></span>
+          <span>H: <strong style=”color:var(--text)”>${bH}</strong></span>
+          <span>T: <strong style=”color:var(--text)”>${bT}&nbsp;mm</strong></span>
         </div>
         <div style=”margin-top:5px;color:var(--muted);font-size:.75rem”>Zamknięcie: <strong style=”color:var(--text)”>${cln}${bClasp?' + zapięcie':''}</strong></div>
       </div></div>`;
@@ -3122,8 +3124,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     // position/size
     if(o.type==='text'||o.type==='path'){
-      h+=numField('Przesunięcie X (mm)','x',o,{step:1});
-      h+=numField('Przesunięcie Y (mm)','y',o,{step:1});
+      h+=numField('Pozycja X (mm)','x',o,{step:1});
+      h+=numField('Pozycja Y (mm)','y',o,{step:1});
       if(o.type==='path'){
         const bb=objBBox(o);
         h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="pathW" value="${fmt(bb.w)}" min="1" step="1"></div>`;
@@ -3141,8 +3143,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=`<div class="field" style="margin-top:-6px"><div class="seg">
-      <button type="button" data-rot90="-1" title="Obróć o 90° w lewo">↺ Obróć 90°</button>
-      <button type="button" data-rot90="1" title="Obróć o 90° w prawo">↻ Obróć 90°</button>
+      <button type="button" data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° lewo</button>
+      <button type="button" data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° prawo</button>
     </div></div>`;
     h+=rangeField('Przezroczystość w edytorze (%)','opacity',o.opacity??100,0,100,1,o);
     if(o.type==='path'||o.type==='text'){
@@ -3160,7 +3162,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(o.type==='line') h+=`<div class="field"><label>Kierunek</label><div class="seg" data-seg="flip"><button class="${!o.flip?'on':''}" data-flip="0">↘ ukośna</button><button class="${o.flip?'on':''}" data-flip="1">↗ ukośna</button></div></div>`;
     if(o.type==='text'){
-      h+=`<div class="field"><label>Treść napisu (Enter = nowa linia · dwuklik na napisie = szybka edycja)</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit">${escapeXml(o.text||'')}</textarea></div>`;
+      h+=`<div class="field"><label>Treść napisu</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p style="font-size:.7rem;color:var(--muted);margin:3px 0 0;line-height:1.4">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
       h+=`<div class="field"><label>Czcionka (najedź na nazwę = podgląd)</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
       h+=`<div class="field"><label>Styl</label><div class="seg" data-seg="textstyle">
         <button class="${o.bold?'on':''}" data-tstyle="bold" style="font-weight:700">B</button>
@@ -3352,7 +3354,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!state.params.length) return '';
     const bound=(o.bindings&&o.bindings[prop])||'';
     return `<select class="bind-sel" data-bind="${prop}" title="Połącz tę wartość z parametrem globalnym — zmiana suwaka parametru będzie ją automatycznie zmieniać">
-      <option value="">🔗 stała wartość (bez powiązania)</option>
+      <option value="">— brak powiązania</option>
       ${state.params.map(p=>`<option value="${p.id}" ${bound===p.id?'selected':''}>🔗 powiąż z: ${escapeXml(p.name)}</option>`).join('')}
     </select>`;
   }
