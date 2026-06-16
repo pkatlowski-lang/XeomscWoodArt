@@ -608,7 +608,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" id="modalBoxClose" title="Zamknij">✕</button>
     <h3>📦 Generator pudełka</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Wszystkie panele są zgrupowane i oznaczone (góra/podstawa), a podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
+    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Każdy panel to <strong>osobny element</strong> (rozdzielone z odstępem, jak w boxes.py) — przesuniesz każdy oddzielnie. Podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
     <div class="field"><label>Szerokość — W (mm)</label><input type="number" id="boxW" min="10" max="2000" step="1" value="120"></div>
     <div class="field"><label>Głębokość — D (mm)</label><input type="number" id="boxD" min="10" max="2000" step="1" value="80"></div>
     <div class="field"><label>Wysokość — H (mm)</label><input type="number" id="boxH" min="10" max="2000" step="1" value="60"></div>
@@ -5564,10 +5564,21 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // (oraz na wieczku, jeśli istnieje) — para otworów do przewleczenia troczka/zapięcia.
   // Każdy panel ma `role` (back/front/left/right/bottom/lid/lip/hinge/fold) do oznaczeń i wizualizacji 3D.
   function buildFingerBox(W,D,H,T,F,closure,clasp){
-    const g=Math.max(T*2,5);
-    const x1=H+g, x2=H+g+W+g, y0=0, y1=H+g, y2=H+g+D+g;
-    const pos={back:{x:x1,y:y0}, left:{x:0,y:y1}, bottom:{x:x1,y:y1}, right:{x:x2,y:y1}, front:{x:x1,y:y2}};
-    const base=boxPanelEdgeDefs(W,D,H).map(p=>({...p, x:pos[p.role].x, y:pos[p.role].y}));
+    const g=Math.max(T*4,12);
+    // Rozkrój: każdy panel ODDZIELNIE, rozmieszczony w wierszach z wyraźnym odstępem
+    // (jak w boxes.py) — żaden panel nie nachodzi na inny i każdy da się osobno
+    // zaznaczyć oraz przesunąć. Pakowanie zachłanne: panele kładziemy w rzędzie,
+    // a gdy rząd przekroczy maxRowW, zawijamy do nowego wiersza.
+    const defs=boxPanelEdgeDefs(W,D,H);
+    const maxRowW=Math.max(W*2+g, H*3+2*g, W+H+g);
+    const pos={}; let cx=0, cy=0, rowH=0;
+    for(const d of defs){
+      const pw=d.w+2*T, ph=d.h+2*T;            // zapas na wystające palce łączeń
+      if(cx>0 && cx+pw>maxRowW){ cx=0; cy+=rowH+g; rowH=0; }
+      pos[d.role]={x:cx+T, y:cy+T};
+      cx+=pw+g; rowH=Math.max(rowH,ph);
+    }
+    const base=defs.map(p=>({...p, x:pos[p.role].x, y:pos[p.role].y}));
     const panels=base.map(p=>{
       const pts=boxPanelPoints(p.w,p.h,T,F,p.edges).map(([x,y])=>[x+p.x,y+p.y]);
       const bb=polysBBoxMulti([pts]);
@@ -5854,9 +5865,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const clasp=document.getElementById('boxClasp').checked;
     const panels=buildFingerBox(W,D,H,T,F,closure,clasp);
     const gid=uid();
+    // UWAGA: panele NIE są grupowane (brak groupId) — każdy jest osobnym, niezależnym
+    // elementem (można go zaznaczyć i przesunąć pojedynczo). Wspólne `box.gid` służy
+    // tylko do złożenia wizualizacji 3D, nie do grupowania zaznaczeniem.
     const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:p.fillRule||'nonzero',
       bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
-      depth:state.depth||1,repeat:{type:'none'},groupId:gid,hole:p.hole||null,
+      depth:state.depth||1,repeat:{type:'none'},hole:p.hole||null,
       pullSlot:p.pullSlot||null,pullTab:p.pullTab||null,
       box:{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
     const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
