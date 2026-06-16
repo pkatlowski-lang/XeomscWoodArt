@@ -4711,10 +4711,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(o.pullTab){
       const tabHpx=o.pullTab.tabH*scale;
       svgOffY=-tabHpx; svgH=hpx+tabHpx;
-      // modyfikujemy faceD dla języczka: prostokąt + wysiągnięty prostokąt w -y
-      const {tabW:tw,tabH:th,r:rr}=o.pullTab;
-      const cx=w/2, tl=cx-tw/2, tr2=cx+tw/2, r3=Math.min(rr,th-0.1,tw/2-0.1);
-      faceD=`M0 0L${fmt(tl)} 0L${fmt(tl)} ${fmt(-th+r3)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tl+r3)} ${fmt(-th)}L${fmt(tr2-r3)} ${fmt(-th)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tr2)} ${fmt(-th+r3)}L${fmt(tr2)} 0L${fmt(w)} 0L${fmt(w)} ${fmt(h)}L0 ${fmt(h)}Z`;
+      // faceD dla zatrzasku-grotu: prostokąt + grot z barkami na górnej krawędzi (ten sam kształt co w rozkroju)
+      const {tabW:tw,tabH:th,barb,neckH}=o.pullTab;
+      const tab=latchTabPts(w/2,0,tw,th,barb||2,neckH||(th*0.4));
+      faceD=polyToPathD([[0,0],...tab,[w,0],[w,h],[0,h]]);
     }
     const svgStyle=(z)=>`position:absolute;left:0;top:${fmt(svgOffY)}px;transform:translateZ(${fmt(z)}px)`;
     // Delikatny gradient "drewna": lekko jaśniejszy przy lewej-górnej krawędzi, ciemniejszy przy prawej-dolnej
@@ -5544,11 +5544,22 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const cx=x0+w/2, sl=cx-sw/2, sr=cx+sw/2, sb=y0+sh;
     return `M${fmt(x0)} ${fmt(y0)}L${fmt(sl)} ${fmt(y0)}L${fmt(sl)} ${fmt(sb-r)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sl+r)} ${fmt(sb)}L${fmt(sr-r)} ${fmt(sb)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sr)} ${fmt(sb-r)}L${fmt(sr)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0+d)}L${fmt(x0)} ${fmt(y0+d)}Z`;
   }
-  // Generuje ścieżkę prostokąta z wysuniętym języczkiem na górnej krawędzi (y=y0, ku górze).
-  function lidTabPath(x0,y0,w,d,tw,th,r){
-    r=Math.min(r||2, th-0.2, tw/2-0.2);
-    const cx=x0+w/2, tl=cx-tw/2, tr2=cx+tw/2;
-    return `M${fmt(x0)} ${fmt(y0)}L${fmt(tl)} ${fmt(y0)}L${fmt(tl)} ${fmt(y0-th+r)}A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(tl+r)} ${fmt(y0-th)}L${fmt(tr2-r)} ${fmt(y0-th)}A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(tr2)} ${fmt(y0-th+r)}L${fmt(tr2)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0+d)}L${fmt(x0)} ${fmt(y0+d)}Z`;
+  // Punkty grotu zatrzasku (barb) względem środka podstawy (cx,y0), grot wystaje ku górze (-y):
+  //   szyjka o szerokości tw przechodzi przez wąską szczelinę w ściance, a szersze barki
+  //   (tw+2*barb) zaczepiają od wewnątrz — wieczko wkłada się pod kątem i trzyma po dociśnięciu.
+  function latchTabPts(cx,y0,tw,th,barb,neckH){
+    const hw=tw/2, hb=hw+barb, sh=Math.min(neckH+1.6, th-0.6);
+    return [
+      [cx-hw,y0],[cx-hw,y0-neckH],[cx-hb,y0-neckH],[cx-hb,y0-sh],
+      [cx,y0-th],
+      [cx+hb,y0-sh],[cx+hb,y0-neckH],[cx+hw,y0-neckH],[cx+hw,y0]
+    ];
+  }
+  // Prostokąt wieczka (w×d) z zatrzaskiem-grotem na górnej krawędzi (y=y0, grot ku górze).
+  function lidTabPath(x0,y0,w,d,tw,th,barb,neckH){
+    const cx=x0+w/2;
+    const tab=latchTabPts(cx,y0,tw,th,barb,neckH);
+    return polyToPathD([[x0,y0],...tab,[x0+w,y0],[x0+w,y0+d],[x0,y0+d]]);
   }
   // Dodaje owalny otwór do istniejącego panelu jako dodatkową podścieżkę + fillRule:evenodd
   // (działa niezależnie od kierunku obrysu zewnętrznego — nie trzeba dopasowywać winding order).
@@ -5618,17 +5629,23 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         // otwór na zapięcie na środku wieczka — z dala od rowka wyciągnięcia
         if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
       } else if(closure==='tab-latch'){
-        // Zatrzask — języczek na wieczku + otwór w ściance przedniej blisko górnej krawędzi.
-        const tw=clamp(W*0.15,10,32), th=clamp(T*2.2+1,6,13), tr2=clamp(th*0.3,1.5,4);
+        // PRAWDZIWY zatrzask-grot: języczek wieczka ma wąską szyjkę (przechodzi przez szczelinę
+        // w ściance) i szersze barki (zaczepiają od wewnątrz). Wkłada się przechylając wieczko,
+        // a po dociśnięciu barki blokują wieczko przed podniesieniem (trzeba znów przechylić, by otworzyć).
+        const tw=clamp(W*0.13,9,28);            // szerokość szyjki
+        const barb=clamp(T*0.9,1.5,4);          // wysięg barków poza szyjkę
+        const neckH=T+0.6;                       // długość szyjki = grubość ścianki (przechodzi na wylot)
+        const th=clamp(neckH+T*2.2,8,18);        // całkowita wysokość grotu (barki + ostrze za ścianką)
         const px=place(W);
-        const lidD=lidTabPath(px,ey,W,D,tw,th,tr2);
-        // bw=W, bh=D+th, by=ey-th (języczek wystaje powyżej prostokąta D)
-        const lid={name:'Wieczko z języczkiem',role:'lid',mode:'cut',d:lidD,bx:px,by:ey-th,bw:W,bh:D+th,
-          pullTab:{tabW:tw,tabH:th,r:tr2}};
+        const lidD=lidTabPath(px,ey,W,D,tw,th,barb,neckH);
+        // bh=D+th, by=ey-th (grot wystaje powyżej prostokąta wieczka)
+        const lid={name:'Wieczko z zatrzaskiem (grot)',role:'lid',mode:'cut',d:lidD,bx:px,by:ey-th,bw:W,bh:D+th,
+          pullTab:{tabW:tw,tabH:th,barb,neckH}};
         panels.push(lid);
-        // Otwór (wcisk) w ściance przedniej — blisko górnej krawędzi skrzynki (local y=H ściany przedniej)
+        // Wąska SZCZELINA na szyjkę w ściance przedniej (tylko szyjka przechodzi; barki zaczepiają
+        // od wewnątrz). Blisko górnej krawędzi skrzynki (local y=H ściany przedniej).
         const frontP=panels.find(p=>p.role==='front');
-        if(frontP) addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-1-th/2, tw+0.5, th+0.4, tr2);
+        if(frontP) addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-1-neckH/2, tw+0.4, neckH+0.4, Math.min(1,neckH*0.3));
         if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
       } else if(closure==='slide'){
         // Wieczko wsuwane (matchbox): węższe wieczko wsuwane od przodu przez szczelinę w ściance przedniej.
@@ -5753,7 +5770,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     open:'Pudełko otwarte od góry — 5 ścianek.',
     lid:'Dodatkowe płaskie wieczko leżące luźno na otworze.',
     'pull-slot':'Wieczko z rowkiem wyciągnięcia (jak na pudełkach ślubnych/prezentowych) — zaokrąglona szczelina przy przedniej krawędzi, chwyt dwoma palcami.',
-    'tab-latch':'Zatrzask na języczek — wieczko ma wystający języczek wsuwający się w otwór przy górnej krawędzi ścianki przedniej. Delikatny wcisk trzyma wieczko zamknięte.',
+    'tab-latch':'Prawdziwy zatrzask-grot — języczek wieczka ma wąską szyjkę i szersze barki. Szyjka przechodzi przez szczelinę w ściance przedniej, a barki zaczepiają od wewnątrz. Wkładasz przechylając wieczko; po dociśnięciu barki blokują je przed podniesieniem (do otwarcia znów przechyl).',
     slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
     'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
     hinged:'Zintegrowane wieczko na zawiasie żywym (flex): tylna ścianka + strefa nacięć + wieczko to JEDEN ciągły element — nic nie trzeba doklejać. Tylna ścianka łączy się palcami z bokami i podstawą, a wieczko zgina się na zawiasie i nakrywa pudełko od góry.',
