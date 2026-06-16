@@ -624,6 +624,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <option value="lid-lip">Wieczko z kołnierzem (chwyt — nie spada)</option>
         <option value="hinged">Wieczko na zawiasie żywym (flex — uchylne)</option>
         <option value="hinged-tab">Wieczko na zawiasie zakładkowym (kołek — uchylne)</option>
+        <option value="drawer">Szuflada wysuwana (tuleja + szuflada)</option>
       </select>
     </div>
     <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 4px"></p>
@@ -4891,7 +4892,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const firstBox=state.objects.find(o=>o.box && o.visible);
       const bm=firstBox?firstBox.box:null;
       if(bm){
-        const clShort={open:'otwarte',lid:'+ wieczko','pull-slot':'+ rowek','tab-latch':'+ zatrzask',slide:'+ wsuwane','lid-lip':'+ kołnierz',hinged:'+ zawias','hinged-tab':'+ zawias kołek'}[bm.closure]||'';
+        const clShort={open:'otwarte',lid:'+ wieczko','pull-slot':'+ rowek','tab-latch':'+ zatrzask',slide:'+ wsuwane','lid-lip':'+ kołnierz',hinged:'+ zawias','hinged-tab':'+ zawias kołek',drawer:'szuflada'}[bm.closure]||'';
         live3dTitle.textContent=`📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm, T=${bm.T} mm${clShort?' · '+clShort:''}`;
       } else {
         live3dTitle.textContent='📦 Wizualizacja 3D — złożone pudełko';
@@ -5568,6 +5569,48 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     panel.fillRule='evenodd';
     panel.hole={cx,cy,rx,ry};
   }
+  // Pudełko z szufladą (SlidingDrawer z boxes.py): zewnętrzna TULEJA (otwarta z przodu)
+  // + wewnętrzna SZUFLADA (otwarta od góry) z luzem, wsuwana od przodu. Oba elementy to
+  // skrzynki łączone „na palec". Każdy panel to osobny element rozkroju (jak reszta).
+  // Tuleja = skrzynka „otwarta od góry" o przestawionych wymiarach (W,H,D) — po obróceniu
+  // otwór góry staje się otworem przodu. Szuflada = mniejsza skrzynka otwarta od góry.
+  function buildDrawerBox(W,D,H,T,F,g){
+    const play=clamp(T*0.12,0.2,0.5);              // luz między tuleją a szufladą
+    const panels=[];
+    let cx=0, cy=0, rowH=0;
+    const maxRowW=Math.max(W,H,D)*2.6+g*2;
+    function add(def,name,role,gid,meta){
+      const pw=def.w+2*T, ph=def.h+2*T;
+      if(cx>0 && cx+pw>maxRowW){ cx=0; cy+=rowH+g; rowH=0; }
+      const x=cx+T, y=cy+T; cx+=pw+g; rowH=Math.max(rowH,ph);
+      const pts=boxPanelPoints(def.w,def.h,T,F,def.edges).map(([px,py])=>[px+x,py+y]);
+      const bb=polysBBoxMulti([pts]);
+      const p={name,role,mode:'cut',d:polyToPathD(pts),bx:bb.minx,by:bb.miny,
+        bw:Math.max(1,bb.maxx-bb.minx),bh:Math.max(1,bb.maxy-bb.miny),box:{gid,...meta,role}};
+      panels.push(p); return p;
+    }
+    // --- TULEJA (otwarta z przodu) = skrzynka open-top o wymiarach (W, H, D) ---
+    const sGid=uid();
+    const sMeta={W,D:H,H:D,T,F,closure:'drawer',clasp:false};   // przestawione wymiary dla widoku 3D
+    const sName={bottom:'Tuleja — ścianka tylna',back:'Tuleja — góra',front:'Tuleja — dół',
+      left:'Tuleja — bok lewy',right:'Tuleja — bok prawy'};
+    boxPanelEdgeDefs(W,H,D).forEach(d=>add(d,sName[d.role]||('Tuleja '+d.role),d.role,sGid,sMeta));
+    // --- SZUFLADA (otwarta od góry), mniejsza o luz; front z otworem-uchwytem ---
+    const dW=Math.max(12,W-2*T-2*play), dH=Math.max(10,H-2*T-2*play), dD=Math.max(12,D-T-play);
+    const drGid=uid();
+    const drMeta={W:dW,D:dD,H:dH,T,F,closure:'drawer',clasp:false};
+    const drName={bottom:'Szuflada — dno',back:'Szuflada — ścianka tylna',front:'Szuflada — front (uchwyt)',
+      left:'Szuflada — bok lewy',right:'Szuflada — bok prawy'};
+    boxPanelEdgeDefs(dW,dD,dH).forEach(d=>{
+      const p=add(d,drName[d.role]||('Szuflada '+d.role),d.role,drGid,drMeta);
+      if(d.role==='front'){
+        // owalny otwór-uchwyt na palec, przy otwartej (górnej) krawędzi frontu szuflady
+        const fr=clamp(dW*0.18,10,30), frY=clamp(fr*0.4,4,9);
+        addOvalHole(p, p.bx+p.bw/2, p.by+p.bh-frY-4, fr, frY);
+      }
+    });
+    return panels;
+  }
   // Ścianki pudełka (łączenia „na palec”) ułożone obok siebie w gotowym do cięcia rozkroju.
   // closure: 'open' (5 ścianek), 'lid' (+ luźne wieczko), 'lid-lip' (+ wieczko z kołnierzem
   // wpasowującym się w otwór — chwyt, nie spada), 'hinged' (+ wieczko na zawiasie żywym, uchylne).
@@ -5576,6 +5619,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Każdy panel ma `role` (back/front/left/right/bottom/lid/lip/hinge/fold) do oznaczeń i wizualizacji 3D.
   function buildFingerBox(W,D,H,T,F,closure,clasp){
     const g=Math.max(T*4,12);
+    if(closure==='drawer') return buildDrawerBox(W,D,H,T,F,g);
     // Rozkrój: każdy panel ODDZIELNIE, rozmieszczony w wierszach z wyraźnym odstępem
     // (jak w boxes.py) — żaden panel nie nachodzi na inny i każdy da się osobno
     // zaznaczyć oraz przesunąć. Pakowanie zachłanne: panele kładziemy w rzędzie,
@@ -5774,7 +5818,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
     'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
     hinged:'Zintegrowane wieczko na zawiasie żywym (flex): tylna ścianka + strefa nacięć + wieczko to JEDEN ciągły element — nic nie trzeba doklejać. Tylna ścianka łączy się palcami z bokami i podstawą, a wieczko zgina się na zawiasie i nakrywa pudełko od góry.',
-    'hinged-tab':'Zintegrowany zawias kołkowy (jak HingeBox): knykcie zawiasu są wycięte bezpośrednio w krawędzi tylnej ścianki i wieczka — przeplatają się, a wspólny kołek ⌀3 mm (wykałaczka) tworzy oś obrotu. Nic nie trzeba doklejać. Klasyczny mechanizm skrzynek z drewna.'
+    'hinged-tab':'Zintegrowany zawias kołkowy (jak HingeBox): knykcie zawiasu są wycięte bezpośrednio w krawędzi tylnej ścianki i wieczka — przeplatają się, a wspólny kołek ⌀3 mm (wykałaczka) tworzy oś obrotu. Nic nie trzeba doklejać. Klasyczny mechanizm skrzynek z drewna.',
+    drawer:'Szuflada wysuwana (jak SlidingDrawer): zewnętrzna TULEJA (otwarta z przodu) + wewnętrzna SZUFLADA (otwarta od góry, z otworem-uchwytem na palec) — dwa osobne elementy łączone „na palec". Szuflada wsuwa się w tuleję od przodu z lekkim luzem. Łącznie 10 paneli.'
   };
   const boxClosureSel=document.getElementById('boxClosure');
   const boxClosureNote=document.getElementById('boxClosureNote');
@@ -5895,7 +5940,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
       depth:state.depth||1,repeat:{type:'none'},hole:p.hole||null,
       pullSlot:p.pullSlot||null,pullTab:p.pullTab||null,
-      box:{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
+      box:p.box||{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
     const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
     if(totalBB.maxx>state.docW || totalBB.maxy>state.docH){
       applyDocSize(Math.max(state.docW,Math.ceil(totalBB.maxx+5)), Math.max(state.docH,Math.ceil(totalBB.maxy+5)));
