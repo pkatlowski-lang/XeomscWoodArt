@@ -4802,13 +4802,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ${b2(0,lw,lw,Dpx-2*lw)}${b2(Wpx-lw,lw,lw,Dpx-2*lw)}
         </div>`;
       }
-    } else if(closure==='hinged' && g.panels.lid){
-      // Zawias żywy: klapa nachylona do tyłu ok. 110° od pozycji leżącej — otwarte pudełko
-      const lidO=g.panels.lid;
-      const lidH=lidO.bh; // totalH = mountH + band + D
-      const ed={w:W,h:lidH,edges:{top:null,right:null,bottom:null,left:null}};
+    } else if(closure==='hinged'){
+      // Zawias żywy ZINTEGROWANY: wieczko (D głębokie) zawiaszone na tylnej-górnej krawędzi,
+      // pokazane jako otwarta klapa nachylona do tyłu (~108°). Tylna ścianka jest rysowana
+      // osobno jako twarz 'back' (to ten sam, jeden fizyczny element ciągły w rozkroju).
+      const ed={w:W,h:D,edges:{top:null,right:null,bottom:null,left:null}};
       const lidTR=`translate3d(${fmt(xOff)}px,0px,${fmt(Hpx)}px) rotateX(-108deg)`;
-      html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
+      html+=buildBoxFace({},ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
       // Zaciemnione wnętrze — klapa jest otwarta, widać wnętrze pudełka
       html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
     } else {
@@ -5569,7 +5569,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     // (jak w boxes.py) — żaden panel nie nachodzi na inny i każdy da się osobno
     // zaznaczyć oraz przesunąć. Pakowanie zachłanne: panele kładziemy w rzędzie,
     // a gdy rząd przekroczy maxRowW, zawijamy do nowego wiersza.
-    const defs=boxPanelEdgeDefs(W,D,H);
+    const allDefs=boxPanelEdgeDefs(W,D,H);
+    // Dla zawiasu żywego (hinged) tylna ścianka jest częścią JEDNEGO ciągłego elementu
+    // (tył + strefa zawiasu + wieczko), więc NIE generujemy jej osobno tutaj.
+    const defs = closure==='hinged' ? allDefs.filter(d=>d.role!=='back') : allDefs;
     const maxRowW=Math.max(W*2+g, H*3+2*g, W+H+g);
     const pos={}; let cx=0, cy=0, rowH=0;
     for(const d of defs){
@@ -5657,22 +5660,37 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
             d:polyToPathD(outer)+polyToPathD(inner),bx:px,by:ey,bw:ow,bh:oh});
         }
       } else if(closure==='hinged'){
-        // jednoczęściowe wieczko: [klapka klejona do tyłu] + [pasek zawiasu żywego] + [wieczko]
-        const mountH=clamp(Math.min(H,30),8,60);
-        const band=clamp(Math.max(8,6*T),6,25);
-        const totalH=mountH+band+D;
-        const px=place(W);
-        const plate=[[px,ey],[px+W,ey],[px+W,ey+totalH],[px,ey+totalH]];
-        const plateP={name:'Wieczko z zawiasem (flex)',role:'lid',mode:'cut',d:polyToPathD(plate),bx:px,by:ey,bw:W,bh:totalH};
-        panels.push(plateP);
-        // otwór na zapięcie przy wolnym (dolnym) brzegu klapki — odpowiada otworowi na ściance przedniej
-        if(clasp) addOvalHole(plateP, px+W/2, ey+totalH-claspRy-3, claspRx, claspRy);
+        // ZINTEGROWANE wieczko na zawiasie żywym (jak FlexBook w boxes.py): tylna ścianka
+        // + strefa zawiasu (nacięcia flex) + wieczko to JEDEN ciągły element. Tylna ścianka
+        // łączy się palcami z bokami i podstawą (dokładnie jak zwykła tylna ścianka), a
+        // powyżej przechodzi przez zawias w wieczko, które po zgięciu nakrywa pudełko od góry.
+        // Nic nie trzeba doklejać — zawias jest częścią konstrukcji.
+        const band=clamp(Math.max(8,6*T),6,28);   // strefa zawiasu (flex)
+        const yB=D+band;                            // lokalne y: górna krawędź tylnej ścianki
+        const px=place(W), py=ey;
+        // Ciągły obrys (lokalnie 0,0 = lewy-górny róg wieczka, potem przesuwany o px,py):
+        //   wieczko (y 0..D) → strefa zawiasu (y D..D+band) → tylna ścianka (y yB..yB+H, z palcami)
+        const pts=[[0,0],[W,0],[W,yB]];
+        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>pts.push([W+off, yB+al]));    // prawa krawędź tylnej ścianki (palce → prawa ścianka)
+        fingerEdgePoints(W,T,F,false).forEach(([al,off])=>pts.push([W-al, yB+H+off]));  // dolna krawędź (palce → podstawa)
+        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>pts.push([-off, yB+H-al]));   // lewa krawędź tylnej ścianki (palce → lewa ścianka)
+        pts.push([0,yB]);
+        const opts=pts.map(([x,y])=>[x+px,y+py]);
+        const bb=polysBBoxMulti([opts]);
+        const backLid={name:'Tył + zawias + wieczko (1 element)',role:'back',mode:'cut',
+          d:polyToPathD(opts),bx:bb.minx,by:bb.miny,bw:Math.max(1,bb.maxx-bb.minx),bh:Math.max(1,bb.maxy-bb.miny)};
+        panels.push(backLid);
+        // Nacięcia living hinge w strefie zawiasu (lokalne y: D..D+band)
         const slitLen=Math.min(20, Math.max(6, W/5));
-        const hb=livingHingeHorizontal(W,band,slitLen,0.5,3,3,0, px, ey+mountH);
-        if(hb.count) panels.push({name:'Nacięcia zawiasu wieczka',role:'hinge',mode:'cut',d:hb.d,bx:px,by:ey+mountH,bw:W,bh:band});
-        const f1=ey+mountH, f2=ey+mountH+band;
-        const fd=`M${fmt(px)} ${fmt(f1)}L${fmt(px+W)} ${fmt(f1)}M${fmt(px)} ${fmt(f2)}L${fmt(px+W)} ${fmt(f2)}`;
-        panels.push({name:'Linie zgięcia wieczka',role:'fold',mode:'score',d:fd,bx:px,by:f1,bw:W,bh:band});
+        const hb=livingHingeHorizontal(W,band,slitLen,0.5,3,3,0, px, py+D);
+        if(hb.count) panels.push({name:'Nacięcia zawiasu (flex)',role:'hinge',mode:'cut',d:hb.d,bx:px,by:py+D,bw:W,bh:band});
+        // Linie zgięcia (score) na granicach strefy zawiasu — orientacyjnie gdzie się wygina
+        const f1=py+D, f2=py+D+band;
+        panels.push({name:'Linie zgięcia zawiasu',role:'fold',mode:'score',
+          d:`M${fmt(px)} ${fmt(f1)}L${fmt(px+W)} ${fmt(f1)}M${fmt(px)} ${fmt(f2)}L${fmt(px+W)} ${fmt(f2)}`,
+          bx:px,by:f1,bw:W,bh:band});
+        // Otwór na zapięcie przy wolnej (przedniej) krawędzi wieczka — para z otworem ściany przedniej
+        if(clasp) addOvalHole(backLid, px+W/2, py+claspRy+3, claspRx, claspRy);
       } else if(closure==='hinged-tab'){
         // Wieczko z zawiasem zakładkowym:
         //   1. Wieczko (płaskie, jak "lid") — klei zawias-lid od góry
@@ -5750,7 +5768,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     'tab-latch':'Zatrzask na języczek — wieczko ma wystający języczek wsuwający się w otwór przy górnej krawędzi ścianki przedniej. Delikatny wcisk trzyma wieczko zamknięte.',
     slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
     'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
-    hinged:'Jednoczęściowe wieczko na zawiasie żywym (flex): klapka klei się do tyłu, pasek nacięć wygina się, a płyta zamyka pudełko od góry.',
+    hinged:'Zintegrowane wieczko na zawiasie żywym (flex): tylna ścianka + strefa nacięć + wieczko to JEDEN ciągły element — nic nie trzeba doklejać. Tylna ścianka łączy się palcami z bokami i podstawą, a wieczko zgina się na zawiasie i nakrywa pudełko od góry.',
     'hinged-tab':'Wieczko na zawiasie zakładkowym: dwa paski z przeplecionymi zakładkami sklejone do wieczka i tylnej ścianki — kołek (wykałaczka ⌀3 mm) tworzy oś obrotu. Klasyczny mechanizm skrzynek z drewna.'
   };
   const boxClosureSel=document.getElementById('boxClosure');
