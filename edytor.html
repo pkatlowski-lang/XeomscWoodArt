@@ -262,7 +262,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;font:600 .76rem var(--font-b);color:var(--text)}
 
 /* ---- 3D Preview modal ---- */
-.preview3d-wrap{perspective:1200px;background:radial-gradient(ellipse 70% 55% at 50% 58%,#12122a 0%,#040408 100%);border-radius:12px;height:430px;display:flex;align-items:center;justify-content:center;cursor:grab;overflow:hidden;user-select:none;margin:12px 0}
+.preview3d-wrap{perspective:1200px;background:radial-gradient(ellipse 70% 58% at 50% 62%,#1e1608 0%,#060402 100%);border-radius:12px;height:430px;display:flex;align-items:center;justify-content:center;cursor:grab;overflow:hidden;user-select:none;margin:12px 0}
 .preview3d-wrap.p3d-dragging{cursor:grabbing}
 .preview3d-wrap.p3d-panning{cursor:move}
 .preview3d-scene{transform-style:preserve-3d;position:relative}
@@ -291,7 +291,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .bb-btn:hover{border-color:var(--accent);color:var(--accent)}
 .bb-btn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
 .zoom-badge{font-size:.7rem;font-weight:700;color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;min-width:42px;text-align:center}
-.live3d-stage{flex:1;perspective:1100px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 65% 60% at 50% 58%,#171738 0%,#05050b 100%);cursor:grab}
+.live3d-stage{flex:1;perspective:1100px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 68% 62% at 50% 62%,#1c1508 0%,#060402 100%);cursor:grab}
 .live3d-stage.l3d-dragging{cursor:grabbing}
 .live3d-stage.l3d-panning{cursor:move}
 .live3d-scene{transform-style:preserve-3d;position:relative}
@@ -592,7 +592,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <option value="hinged">Wieczko na zawiasie żywym (flex — uchylne)</option>
       </select>
     </div>
-    <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 8px"></p>
+    <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 4px"></p>
+    <div id="boxClosurePreview" style="display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;margin:0 0 10px;min-height:58px;overflow:hidden"></div>
     <div class="field" style="flex-direction:row;align-items:center;gap:8px">
       <input type="checkbox" id="boxClasp" style="width:auto">
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
@@ -3027,8 +3028,28 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
+    // Karta informacyjna dla paneli pudełka (gdy element ma box.role/W/D/H)
+    if(o.box){
+      const {W:bW,D:bD,H:bH,T:bT,closure:bCl,clasp:bClasp}=o.box;
+      const rn={back:'Ścianka tylna',front:'Ścianka przednia',left:'Ścianka lewa',
+        right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko',lip:'Kołnierz',
+        hinge:'Nacięcia zawiasu',fold:'Linie zgięcia'}[o.box.role]||o.box.role;
+      const cln={open:'Otwarte',lid:'Wieczko luźne','pull-slot':'Rowek na palec',
+        'tab-latch':'Zatrzask języczek',slide:'Wsuwane','lid-lip':'Kołnierz',
+        hinged:'Zawias żywy'}[bCl]||bCl;
+      h+=`<div class=”field” style=”padding-bottom:8px”><div style=”background:var(--surface2);border:1.5px solid var(--accent-dark);border-radius:8px;padding:9px 11px;font-size:.78rem”>
+        <div style=”font-weight:700;color:var(--accent);margin-bottom:6px”>📦 ${rn}</div>
+        <div style=”display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;color:var(--muted)”>
+          <span>Szer. W: <strong style=”color:var(--text)”>${bW} mm</strong></span>
+          <span>Głęb. D: <strong style=”color:var(--text)”>${bD} mm</strong></span>
+          <span>Wys. H: <strong style=”color:var(--text)”>${bH} mm</strong></span>
+          <span>Grub. T: <strong style=”color:var(--text)”>${bT} mm</strong></span>
+        </div>
+        <div style=”margin-top:5px;color:var(--muted)”>Zamknięcie: <strong style=”color:var(--text)”>${cln}${bClasp?' + zapięcie':''}</strong></div>
+      </div></div>`;
+    }
     // nazwa elementu (widoczna też w panelu „Warstwy”)
-    h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
+    h+=`<div class=”field”><label>Nazwa</label><input type=”text” data-prop=”name” value=”${escapeXml(o.name||'')}” placeholder=”${escapeXml(autoName(o))}”></div>`;
     // mode
     h+=`<div class="field"><label>Tryb (operacja lasera)</label><div class="seg" data-seg="mode">
       <button class="cut ${o.mode==='cut'?'on':''}" data-mode="cut">Cięcie</button>
@@ -4618,8 +4639,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       faceD=`M0 0L${fmt(tl)} 0L${fmt(tl)} ${fmt(-th+r3)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tl+r3)} ${fmt(-th)}L${fmt(tr2-r3)} ${fmt(-th)}A${fmt(r3)} ${fmt(r3)} 0 0 1 ${fmt(tr2)} ${fmt(-th+r3)}L${fmt(tr2)} 0L${fmt(w)} 0L${fmt(w)} ${fmt(h)}L0 ${fmt(h)}Z`;
     }
     const svgStyle=(z)=>`position:absolute;left:0;top:${fmt(svgOffY)}px;transform:translateZ(${fmt(z)}px)`;
-    const outer=`<svg viewBox="${fmt(-0)} ${fmt(-o.pullTab?o.pullTab.tabH:0)} ${fmt(w)} ${fmt(h+(o.pullTab?o.pullTab.tabH:0))}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(0)}"><path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/></svg>`;
-    const inner=`<svg viewBox="${fmt(-0)} ${fmt(-o.pullTab?o.pullTab.tabH:0)} ${fmt(w)} ${fmt(h+(o.pullTab?o.pullTab.tabH:0))}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
+    // Delikatny gradient "drewna": lekko jaśniejszy przy lewej-górnej krawędzi, ciemniejszy przy prawej-dolnej
+    const gfx=`fl${(Math.random()*1e9|0).toString(36)}`;
+    const tabHmm=o.pullTab?o.pullTab.tabH:0;
+    const vb2=`0 ${-tabHmm} ${w} ${h+tabHmm}`;
+    const grainDefs=`<defs><linearGradient id="${gfx}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity="0.13"/><stop offset="50%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.09"/></linearGradient></defs>`;
+    const outer=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(0)}">${grainDefs}<path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/><path d="${faceD}" fill="url(#${gfx})" fill-rule="${fr}"/></svg>`;
+    const inner=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
     // --- ściany boczne (listwy grubości materiału wzdłuż krawędzi) ---
     // Przy rowku wyciągnięcia (pull-slot) krawędź przednia (y=0) jest rozbita na dwa segmenty.
     let walls='';
@@ -4660,16 +4686,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       right: `translate3d(${fmt(xOff+Wpx)}px,0,0) rotateY(-90deg)`,
       lid:   `translate3d(${fmt(xOff)}px,${fmt(Dpx)}px,${fmt(Hpx)}px) rotateX(180deg)`
     };
-    let html='';
+    // Cień pod pudełkiem — elipsa radial-gradient poniżej dna
+    const shW=Wpx*1.25, shD=Dpx*0.6, shX=xOff-(shW-Wpx)/2, shY=Dpx*0.72;
+    let html=`<div style="position:absolute;left:${fmt(shX)}px;top:${fmt(shY)}px;width:${fmt(shW)}px;height:${fmt(shD)}px;transform-origin:0 0 0;transform:translate3d(0,0,-2px);background:radial-gradient(ellipse,rgba(0,0,0,0.38) 0%,transparent 72%);pointer-events:none"></div>`;
     ['bottom','back','left','right','front'].forEach(role=>{
       const o=g.panels[role], ed=edgeDefs[role];
       if(!o||!ed) return;
       html+=buildBoxFace(o,ed,T,F,scale,Tpx,TR[role],BOX_FACE_COL,BOX_FACE_SHADE[role]);
     });
     // Wieczka flat (lid, lid-lip, pull-slot, tab-latch, slide) leżą na górze pudełka.
-    // Dla 'hinged' i 'open' pokazujemy zaciemnione wnętrze (brak wieczka w widoku).
-    const hasLid=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide') && g.panels.lid;
-    if(hasLid){
+    // Zawias żywy (hinged) — wieczko widoczne jako otwarta klapa nachylona do tyłu.
+    // Dla 'open' pokazujemy zaciemnione wnętrze (pudełko bez wieczka).
+    const hasLidFlat=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide') && g.panels.lid;
+    if(hasLidFlat){
       // Dla slide: wieczko wsuwane jest nieco węższe; ed używa rzeczywistych wymiarów panelu
       const lidO=g.panels.lid;
       let lidW=W, lidD3=D;
@@ -4680,8 +4709,30 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         ? `translate3d(${fmt(xOff+(W-lidW)/2)}px,${fmt(Dpx-T*scale)}px,${fmt(Hpx)}px) rotateX(180deg)`
         : TR.lid;
       html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
+      // Dla lid-lip: kołnierz jako ramka CSS 4 pasków wewnątrz otworu pudełka (widoczny tuż pod wieczkiem)
+      if(closure==='lid-lip'){
+        const lw=clamp(Math.min(F,Math.min(W,D)/2-2*T-1),5,Math.min(W,D)/3);
+        const lW=Math.max(4,W-2*T-0.6), lD=Math.max(4,D-2*T-0.6);
+        const lWpx=lW*scale, lDpx=lD*scale, lwpx=lw*scale;
+        const lipCol=darkenHex(BOX_FACE_COL,0.60);
+        const lipTR=`translate3d(${fmt(xOff+T*scale)}px,${fmt(T*scale)}px,${fmt(Hpx-Tpx*0.5)}px) rotateX(180deg)`;
+        const bar=(l,t,w,h)=>`<div style="position:absolute;left:${fmt(l)}px;top:${fmt(t)}px;width:${fmt(w)}px;height:${fmt(h)}px;background:${lipCol}"></div>`;
+        html+=`<div class="l3d-layer" style="width:${fmt(lWpx)}px;height:${fmt(lDpx)}px;transform-origin:0 0 0;transform:${lipTR}">
+          ${bar(0,0,lWpx,lwpx)}${bar(0,lDpx-lwpx,lWpx,lwpx)}
+          ${bar(0,lwpx,lwpx,lDpx-2*lwpx)}${bar(lWpx-lwpx,lwpx,lwpx,lDpx-2*lwpx)}
+        </div>`;
+      }
+    } else if(closure==='hinged' && g.panels.lid){
+      // Zawias żywy: klapa nachylona do tyłu ok. 110° od pozycji leżącej — otwarte pudełko
+      const lidO=g.panels.lid;
+      const lidH=lidO.bh; // totalH = mountH + band + D
+      const ed={w:W,h:lidH,edges:{top:null,right:null,bottom:null,left:null}};
+      const lidTR=`translate3d(${fmt(xOff)}px,0px,${fmt(Hpx)}px) rotateX(-108deg)`;
+      html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
+      // Zaciemnione wnętrze — klapa jest otwarta, widać wnętrze pudełka
+      html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
     } else {
-      // Pudełko otwarte / żywy zawias — zaciemnione wnętrze w otworze górnym.
+      // Pudełko otwarte — zaciemnione wnętrze w otworze górnym.
       html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
     }
     return html;
@@ -5535,7 +5586,49 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   };
   const boxClosureSel=document.getElementById('boxClosure');
   const boxClosureNote=document.getElementById('boxClosureNote');
-  const updateBoxClosureNote=()=>{ boxClosureNote.textContent=BOX_CLOSURE_NOTES[boxClosureSel.value]||''; };
+  const boxClosurePrev=document.getElementById('boxClosurePreview');
+  // Rysuje schematyczny rzut z góry zamknięcia pudełka (uproszczona ikona SVG)
+  function drawClosurePreview(type){
+    const W=110,D=58,T=5,sw=34,sh=10,r=4,tw=18,th=10,lip=6;
+    const bg='#1e293b',bx='#38bdf8',lid='#caa06c',mark='#f0d6a8',cl='#94a3b8';
+    // Prostokąt pudełka + wieczko
+    const box=`<rect x="0" y="0" width="${W}" height="${D}" fill="${bg}" stroke="${bx}" stroke-width="2" rx="2"/>`;
+    const lidRect=`<rect x="0" y="0" width="${W}" height="${D}" fill="${lid}33" stroke="${lid}" stroke-width="2" rx="2"/>`;
+    let extra='', label='';
+    if(type==='open'){
+      extra=`<text x="${W/2}" y="${D/2+5}" text-anchor="middle" fill="${cl}" font-size="11" font-family="sans-serif">↑ otwarte</text>`;
+    } else if(type==='lid'){
+      extra=`${lidRect}<text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">wieczko luźne</text>`;
+    } else if(type==='pull-slot'){
+      // rowek U przy górnej krawędzi (front) wieczka
+      const cx=W/2, sl=cx-sw/2, sr=cx+sw/2;
+      extra=`${lidRect}<path d="M${sl} 0 A${r} ${r} 0 0 1 ${sl+r} ${sh} L${sr-r} ${sh} A${r} ${r} 0 0 1 ${sr} 0" fill="${bg}" stroke="${mark}" stroke-width="1.5"/>
+        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">rowek na palec</text>`;
+    } else if(type==='tab-latch'){
+      const cx=W/2, tl=cx-tw/2, tr2=cx+tw/2;
+      extra=`${lidRect}<rect x="${tl}" y="${-th}" width="${tw}" height="${th}" rx="${r}" fill="${mark}" stroke="${mark}" stroke-width="1.5"/>
+        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">języczek zatrzask</text>`;
+    } else if(type==='slide'){
+      const lw=W-2*T-1;
+      extra=`<rect x="${T}" y="${-T}" width="${lw}" height="${D+T}" fill="${lid}55" stroke="${lid}" stroke-width="1.5" rx="2"/>
+        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">wsuwane</text>`;
+    } else if(type==='lid-lip'){
+      extra=`${lidRect}<rect x="${lip}" y="${lip}" width="${W-2*lip}" height="${D-2*lip}" fill="none" stroke="${mark}" stroke-width="1.5" stroke-dasharray="4 2" rx="2"/>
+        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">kołnierz wpasowany</text>`;
+    } else if(type==='hinged'){
+      // klapa z tyłu (góra) nachylona
+      extra=`${lidRect}<path d="M0 0 L${W} 0" stroke="${mark}" stroke-width="2"/>
+        <rect x="0" y="${-D*0.55}" width="${W}" height="${D*0.55}" fill="${lid}88" stroke="${lid}" stroke-width="1.5" rx="2"/>
+        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">zawias żywy (flex)</text>`;
+    }
+    const vb=`-2 ${-th-2} ${W+4} ${D+th+4}`;
+    boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="54" style="max-width:200px">${box}${extra}</svg>`;
+  }
+  const updateBoxClosureNote=()=>{
+    const v=boxClosureSel.value;
+    boxClosureNote.textContent=BOX_CLOSURE_NOTES[v]||'';
+    drawClosurePreview(v);
+  };
   boxClosureSel.addEventListener('change',updateBoxClosureNote); updateBoxClosureNote();
   document.getElementById('boxGenBtn').addEventListener('click',()=>modalBox.classList.add('open'));
   document.getElementById('modalBoxClose').addEventListener('click',()=>modalBox.classList.remove('open'));
@@ -5561,6 +5654,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     state.objects.push(...newObjs); state.selectedIds=newObjs.map(o=>o.id);
     pushHistory();
+    // Po generowaniu pudełka: zawsze pokaż widok złożony w obu panelach 3D
+    live3dMode='assembled'; p3dMode='assembled';
+    live3dViewToggle.textContent='🗺 Siatka';
+    p3dViewToggle.textContent='🗺 Siatka';
     renderAll();
     renderProps();
     zoomFit();
