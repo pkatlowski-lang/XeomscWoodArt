@@ -127,8 +127,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field .row2{display:flex;gap:8px}
 .field input[type=number],.field input[type=text],.field select{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem}
 .field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
-#props .bind-sel{font-size:.72rem;padding:4px 6px;color:var(--muted);background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.08);margin-top:3px}
-#props .bind-sel:focus{color:var(--text);border-color:var(--accent)}
+#props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:rgba(255,255,255,.06);margin-top:2px;opacity:.55;transition:opacity .15s,border-color .12s}
+#props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
 #props .form-sec{padding:0 16px}
 #props fieldset:disabled{opacity:.5}
 #props fieldset:disabled,#props fieldset:disabled *{cursor:not-allowed}
@@ -221,6 +221,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu button:hover:not(:disabled){background:var(--accent);color:#04101e}
 .ctx-menu button:hover:not(:disabled) .ctx-key{color:#04101e;opacity:.7}
 .ctx-menu button:disabled{opacity:.4;cursor:not-allowed}
+.ctx-key{font-size:.7rem;color:var(--muted);opacity:.8}
 .ctx-menu .ctx-key{font-size:.7rem;color:var(--muted)}
 .ctx-menu hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
 
@@ -351,7 +352,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .lyr-eye{background:none;border:none;cursor:pointer;font-size:.75rem;padding:2px 4px;line-height:1;color:var(--muted);border-radius:4px;transition:background .1s,color .1s}
 .lyr-eye:hover{background:rgba(255,255,255,.1);color:var(--text)}
 .lyr-row.lyr-hidden .lyr-eye{color:var(--accent);opacity:1}
-.dl-note{padding:2px 14px 8px;font-size:.69rem;color:var(--muted);line-height:1.5}
+.dl-note{padding:2px 14px 8px;font-size:.73rem;color:var(--muted);line-height:1.5}
 .dl-note strong{color:var(--text);font-weight:600}
 .layer-assign{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .la-btn{border:1.5px solid var(--border);border-radius:6px;padding:4px 9px;font-size:.72rem;font-weight:700;color:#fff;cursor:pointer;line-height:1}
@@ -447,7 +448,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="tbtn" id="boxGenBtn" title="Generator pudełka — parametryczne pudełko z łączeniami „na palec”, gotowe do wycięcia laserem">📦 Generator pudełka</button>
       <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
       <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębatego (ewolwentowe) z otworem na oś, gotowe do wycięcia laserem">⚙ Koło zębate</button>
-      <button class="tbtn" id="exportBtn" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e">⬇ Pobierz SVG</button>
+      <button class="tbtn" id="exportBtn" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
       <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
       <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości i sklejaj je, by uzyskać efekt 3D">🧊 Eksport 3D</button>
     </div>
@@ -2928,12 +2929,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <input type="number" id="mbH" value="${fmt(mb.h)}" min="1" step="1" title="${WHEEL_HINT}"></div></div>`;
     const gids=[...new Set(sel.map(o=>o.groupId).filter(Boolean))];
     const isWholeGroup = gids.length===1 && sel.every(o=>o.groupId===gids[0]) && state.objects.filter(o=>o.groupId===gids[0]).length===sel.length;
+    h+=`<div class="form-sec">Grupowanie i tryb</div>`;
     h+=`<div class="field"><div class="seg">`;
     if(isWholeGroup) h+=`<button data-group="ungroup">⛓ Rozgrupuj (Ctrl+Shift+G)</button>`;
     else h+=`<button data-group="group">🔗 Grupuj (Ctrl+G)</button>`;
     h+=`</div></div>`;
-    h+=`<div class="field"><label>Tryb dla wszystkich</label><div class="seg" data-seg="mmode">
+    h+=`<div class="field"><label>Operacja lasera dla wszystkich</label><div class="seg" data-seg="mmode">
       <button class="cut" data-mode="cut">Cięcie</button><button class="engrave" data-mode="engrave">Grawer</button><button class="score" data-mode="score">Nacięcie</button></div></div>`;
+    h+=`<div class="form-sec">Wyrównanie i rozmieszczenie</div>`;
     h+=`<div class="field"><label>Wyrównaj w poziomie</label><div class="seg">
       <button data-align="left">⊣ Lewa</button><button data-align="hcenter">┼ Środek</button><button data-align="right">⊢ Prawa</button></div></div>`;
     h+=`<div class="field"><label>Wyrównaj w pionie</label><div class="seg">
@@ -2941,12 +2944,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(sel.length>=3) h+=`<div class="field"><label>Rozłóż równomiernie</label><div class="seg">
       <button data-dist="h">↔ Poziomo</button><button data-dist="v">↕ Pionowo</button></div></div>`;
     h+=`<div class="field"><label>Obróć każdy element</label><div class="seg">
-      <button data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° lewo</button><button data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° prawo</button></div></div>`;
+      <button data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° w lewo</button><button data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° w prawo</button></div></div>`;
     const boolCount=sel.filter(o=>BOOL_TYPES.includes(o.type)).length;
     if(boolCount>=2){
       const xorBtn=boolCount===2?'<button data-bool="xor" title="XOR — usuń część wspólną, zostaw resztę obu kształtów">⊕ XOR</button>':'';
       const xorInfo=boolCount===2?' · XOR = usuń część wspólną, zostaw resztę obu kształtów':'';
-      h+=`<div class="field"><label>Operacje na kształtach</label><div class="seg">
+      h+=`<div class="form-sec">Operacje na kształtach</div>`;
+      h+=`<div class="field"><div class="seg">
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
         <p style="font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.5">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
@@ -3081,7 +3085,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:#caa06c">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">7 typów zamknięcia · podgląd 3D · siatka rozkroju</span></div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:#caa06c">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">8 typów zamknięcia · podgląd 3D · siatka rozkroju</span></div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // Karta informacyjna dla paneli pudełka (gdy element ma box.role/W/D/H)
@@ -3257,10 +3261,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     let h='';
     h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz”, aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
-    h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1"></div>`;
-    h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1"></div>`;
-    h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="imgW" value="${fmt(o.w)}" min="1" step="1"></div>`;
-    h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="imgH" value="${fmt(o.h)}" min="1" step="1"></div>`;
+    h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1" title="${WHEEL_HINT}"></div>`;
+    h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1" title="${WHEEL_HINT}"></div>`;
+    h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="imgW" value="${fmt(o.w)}" min="1" step="1" title="${WHEEL_HINT}"></div>`;
+    h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="imgH" value="${fmt(o.h)}" min="1" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label class="check-label"><input type="checkbox" id="imgLockRatio" ${o.lockAspect?'checked':''}> Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=rangeField('Krycie (%)','opacity',o.opacity??100,0,100,1);
