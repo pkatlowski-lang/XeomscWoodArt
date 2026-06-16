@@ -188,9 +188,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .params-empty{padding:2px 2px 6px;font-size:.78rem;color:var(--muted);line-height:1.55}
 
 /* ---- Templates ---- */
-.tpl{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 14px 16px}
-.tpl button{padding:9px 6px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.76rem;font-weight:600;cursor:pointer}
-.tpl button:hover{border-color:var(--accent);color:var(--accent)}
+.tpl{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 14px 16px}
+.tpl button{padding:9px 6px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer;line-height:1.35;text-align:center;transition:border-color .12s,color .12s,background .12s}
+.tpl button:hover{border-color:var(--accent);color:var(--accent);background:rgba(202,160,108,.06)}
 
 /* ---- Gallery of bases ---- */
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 14px 10px}
@@ -5367,31 +5367,31 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Templates ---------------- */
   const TEMPLATES=[
-    {key:'tag',label:'Zawieszka z napisem',build(){
+    {key:'tag',label:'🏷 Zawieszka z napisem',build(){
       return [
         {...defaultsFor('rect'),x:90,y:75,w:120,h:55,rx:10,mode:'cut',name:'Baza zawieszki'},
         {...defaultsFor('ellipse'),x:96,y:88,w:14,h:14,mode:'cut',name:'Otwór'},
         {...defaultsFor('text'),x:155,y:103,text:'Anna',fontSize:26,mode:'engrave',name:'Napis'}
       ];
     }},
-    {key:'mandala',label:'Mandala (rozeta)',build(){
+    {key:'mandala',label:'🌸 Mandala (rozeta)',build(){
       const pet={...defaultsFor('ellipse'),x:142,y:40,w:16,h:48,mode:'cut',name:'Płatek',repeat:{type:'circular',count:12,angle:360,radius:60}};
       return [pet,{...defaultsFor('ellipse'),x:142,y:92,w:16,h:16,mode:'cut',name:'Środek'}];
     }},
-    {key:'star',label:'Gwiazda ozdobna',build(){
+    {key:'star',label:'⭐ Gwiazda ozdobna',build(){
       return [{...defaultsFor('star'),x:110,y:30,w:80,h:80,points:6,inner:0.45,mode:'cut',name:'Gwiazda'}];
     }},
-    {key:'grid',label:'Siatka kółek',build(){
+    {key:'grid',label:'🔵 Siatka kółek',build(){
       return [{...defaultsFor('ellipse'),x:60,y:50,w:20,h:20,mode:'cut',name:'Kółko',repeat:{type:'grid',cols:6,rows:4,dx:32,dy:32}}];
     }},
-    {key:'frame',label:'Ramka + napis',build(){
+    {key:'frame',label:'🖼 Ramka + napis',build(){
       return [
         {...defaultsFor('rect'),x:50,y:40,w:200,h:120,rx:14,mode:'cut',name:'Ramka zewn.'},
         {...defaultsFor('rect'),x:62,y:52,w:176,h:96,rx:9,mode:'score',name:'Linia ozdobna'},
         {...defaultsFor('text'),x:150,y:104,text:'Rodzina',fontSize:30,mode:'engrave',name:'Napis'}
       ];
     }},
-    {key:'mirror',label:'Ornament lustrzany',build(){
+    {key:'mirror',label:'✨ Ornament lustrzany',build(){
       return [{...defaultsFor('star'),x:120,y:60,w:60,h:80,points:5,inner:0.4,rotation:0,mode:'cut',name:'Ornament',repeat:{type:'mirror',axis:'both'}}];
     }}
   ];
