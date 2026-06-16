@@ -1610,7 +1610,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(type==='image') return {...base,mode:'reference',opacity:100,lockAspect:true};
     return base;
   }
-  const TYPE_NAMES={rect:'Prostokąt',ellipse:'Elipsa',polygon:'Wielokąt',star:'Gwiazda',line:'Linia',text:'Tekst',image:'Obraz'};
+  const TYPE_NAMES={rect:'Prostokąt',ellipse:'Elipsa',polygon:'Wielokąt',star:'Gwiazda',line:'Linia',text:'Tekst',image:'Obraz',path:'Ścieżka'};
   function autoName(o){ return o.name|| (TYPE_NAMES[o.type]||'Kształt'); }
 
   function addObject(o,{commit=true}={}){
@@ -2944,11 +2944,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° lewo</button><button data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° prawo</button></div></div>`;
     const boolCount=sel.filter(o=>BOOL_TYPES.includes(o.type)).length;
     if(boolCount>=2){
-      const xorBtn=boolCount===2?'<button data-bool="xor">Wyklucz</button>':'';
-      const xorInfo=boolCount===2?' · Wyklucz = usuń część wspólną, zostaw resztę obu kształtów':'';
+      const xorBtn=boolCount===2?'<button data-bool="xor" title="XOR — usuń część wspólną, zostaw resztę obu kształtów">⊕ XOR</button>':'';
+      const xorInfo=boolCount===2?' · XOR = usuń część wspólną, zostaw resztę obu kształtów':'';
       h+=`<div class="field"><label>Operacje na kształtach</label><div class="seg">
-        <button data-bool="union">Suma</button><button data-bool="difference">Różnica</button><button data-bool="intersection">Wspólne</button>${xorBtn}</div>
-        <p style="font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.5">Suma = scal w jeden kształt · Różnica = wytnij dziurę (góra w dół) · Wspólne = część wspólna${xorInfo}. Zamienia zaznaczone kształty w jeden wynik.</p></div>`;
+        <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
+        <p style="font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.5">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
     h+=`<div class="empty-note">Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę. Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
@@ -3565,7 +3565,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const paramsEl=document.getElementById('params');
   function renderParams(){
     if(!state.params.length){
-      paramsEl.innerHTML=`<div class="params-empty">Brak parametrów. Dodaj parametr (np. „grubość materiału” albo „rozmiar”), a potem w panelu właściwości elementu wybierz 🔗 powiązanie z nim — odtąd jeden suwak będzie sterował całym projektem naraz, tak jak Parameters w Cuttle.</div>`;
+      paramsEl.innerHTML=`<div class=”params-empty”>Brak parametrów. Dodaj parametr (np. „grubość materiału” albo „rozmiar”), a potem w panelu właściwości elementu wybierz 🔗 powiązanie z nim — jeden suwak będzie sterował całym projektem naraz.</div>`;
       return;
     }
     paramsEl.innerHTML=state.params.map(p=>`
