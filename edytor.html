@@ -633,12 +633,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
     </div>
     <div id="boxHingeTabNote" style="display:none;margin:0 0 8px;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.25);border-radius:8px;font-size:.73rem;color:var(--muted);line-height:1.6">
-      <strong style="color:var(--accent)">🪛 Montaż zawiasu zakładkowego:</strong><br>
-      1. Wytnij wszystkie elementy.<br>
-      2. Sklej <em>Zawias — pas do wieczka</em> do tyłu wieczka (zakładki do dołu).<br>
-      3. Sklej <em>Zawias — pas do tylnej ścianki</em> do góry tylnej ścianki (zakładki do góry).<br>
-      4. Przepleć zakładki obu pasów (W↔T↔W...) i wsuń kołek drewniany ⌀3 mm przez otwory.<br>
-      5. Możesz użyć grubej wykałaczki lub pałeczki bambusowej ⌀3 mm.
+      <strong style="color:var(--accent)">🪛 Montaż zawiasu kołkowego (knykcie zintegrowane):</strong><br>
+      1. Wytnij wszystkie elementy — knykcie zawiasu są już <em>częścią</em> tylnej ścianki i wieczka (nic nie klejisz).<br>
+      2. Złóż pudełko: tylna ścianka łączy się palcami z bokami i podstawą.<br>
+      3. Ustaw wieczko tak, by jego knykcie weszły w przerwy między knykciami ścianki (przeplot W↔T↔W…).<br>
+      4. Przesuń kołek ⌀3 mm przez otwory wszystkich knykci — to oś obrotu wieczka.<br>
+      5. Użyj drewnianego kołka, grubej wykałaczki lub pałeczki bambusowej ⌀3 mm.
     </div>
     <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📦 Generuj pudełko</button>
   </div>
@@ -5571,8 +5571,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     // a gdy rząd przekroczy maxRowW, zawijamy do nowego wiersza.
     const allDefs=boxPanelEdgeDefs(W,D,H);
     // Dla zawiasu żywego (hinged) tylna ścianka jest częścią JEDNEGO ciągłego elementu
-    // (tył + strefa zawiasu + wieczko), więc NIE generujemy jej osobno tutaj.
-    const defs = closure==='hinged' ? allDefs.filter(d=>d.role!=='back') : allDefs;
+    // (tył + strefa zawiasu + wieczko), a dla zawiasu kołkowego (hinged-tab) tylna ścianka
+    // ma wbudowane knykcie zawiasu — w obu przypadkach budujemy ją osobno w sekcji zamknięcia.
+    const defs = (closure==='hinged'||closure==='hinged-tab') ? allDefs.filter(d=>d.role!=='back') : allDefs;
     const maxRowW=Math.max(W*2+g, H*3+2*g, W+H+g);
     const pos={}; let cx=0, cy=0, rowH=0;
     for(const d of defs){
@@ -5692,70 +5693,57 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         // Otwór na zapięcie przy wolnej (przedniej) krawędzi wieczka — para z otworem ściany przedniej
         if(clasp) addOvalHole(backLid, px+W/2, py+claspRy+3, claspRx, claspRy);
       } else if(closure==='hinged-tab'){
-        // Wieczko z zawiasem zakładkowym:
-        //   1. Wieczko (płaskie, jak "lid") — klei zawias-lid od góry
-        //   2. Pas zawiasu do wieczka — interleaved zakładki z otworami (parzystymi)
-        //   3. Pas zawiasu do tylnej ścianki — interleaved zakładki z otworami (nieparzystymi)
-        // Kołek ⌀3mm (dowel / wykałaczka) łączy oba paski przez otwory.
-        const lid=rectPanel('Wieczko (góra)','lid',W,D);
-        if(clasp) addOvalHole(lid, lid.bx+lid.bw/2, lid.by+claspRy+3, claspRx, claspRy);
-        // Parametry zawiasu
-        const nK=W<=80?3:W<=170?5:7;             // liczba zakładek (nieparzysta)
-        const gapH=clamp(T+0.3,1.5,6);           // luz między zakładkami = grubość materiału + tolerancja
-        const kH=clamp(Math.min(30,W/(nK*1.2)),12,35); // wysokość zakładek
-        const glueH=clamp(T*3,10,22);             // strefa klejenia (prosta część paska)
-        const pinD=3.0;                           // średnica kołka [mm]
-        const kW=(W-(nK-1)*gapH)/nK;             // szerokość jednej zakładki
-        const hR=(pinD+0.3)/2;                    // promień otworu (z tolerancją)
-        const xK=Array.from({length:nK},(_,i)=>i*(kW+gapH));
-        // Buduje ścieżkę SVG jednego paska zawiasu (tabIdx: indeksy zakładek należących do tego paska)
-        function makeHingeStrip(ox,oy,tabIdx){
-          const pts=[[ox,oy],[ox+W,oy],[ox+W,oy+glueH]];
-          for(let i=nK-1;i>=0;i--){
-            const x0=ox+xK[i], x1=x0+kW;
-            if(tabIdx.includes(i)){
-              pts.push([x1,oy+glueH],[x1,oy+glueH+kH],[x0,oy+glueH+kH],[x0,oy+glueH]);
-            } else {
-              pts.push([x1,oy+glueH],[x0,oy+glueH]);
+        // ZINTEGROWANY zawias kołkowy (jak HingeBox w boxes.py): knykcie (człony zawiasu)
+        // są WYCIĘTE bezpośrednio w górnej krawędzi tylnej ścianki (kolumny parzyste) oraz
+        // w tylnej krawędzi wieczka (kolumny nieparzyste). Po złożeniu przeplatają się i
+        // mają otwory na wspólny kołek/sworzeń ⌀3 mm (drewniany kołek lub gwóźdź).
+        // Nic nie trzeba doklejać — zawias jest częścią ścianki i wieczka.
+        const nK=W<=80?5:W<=170?7:9;            // liczba knykci (nieparzysta → końce należą do ścianki)
+        const gap=clamp(T+0.4,1.6,5);           // luz między knykciami (grubość materiału + tolerancja)
+        const kp=clamp(T*4,9,18);               // jak daleko knykieć wystaje poza krawędź
+        const hR=(3.0+0.4)/2;                   // otwór na kołek ⌀3 mm (z tolerancją)
+        const kw=W/nK;
+        const evenIdx=[], oddIdx=[];
+        for(let i=0;i<nK;i++){ (i%2===0?evenIdx:oddIdx).push(i); }
+        // Górna krawędź (lewo→prawo) z knykciami wystającymi do -kp w kolumnach `mine`.
+        // Zwraca punkty krawędzi oraz środki otworów na kołek.
+        function knuckleTop(mine){
+          const pts=[[0,0]]; const holes=[];
+          for(let i=0;i<nK;i++){
+            const x0=i*kw+gap/2, x1=(i+1)*kw-gap/2;
+            if(mine.includes(i)){
+              pts.push([x0,0],[x0,-kp],[x1,-kp],[x1,0]);
+              holes.push([(x0+x1)/2,-kp*0.5]);
             }
           }
-          pts.push([ox,oy]);
-          // Usuń duplikaty sąsiednich punktów
-          const dp=pts.filter((p,i)=>i===0||Math.abs(p[0]-pts[i-1][0])>1e-6||Math.abs(p[1]-pts[i-1][1])>1e-6);
-          let d=polyToPathD(dp);
-          // Otwory na kołek w każdej zakładce
-          for(const i of tabIdx){
-            const cx=ox+xK[i]+kW/2, cy=oy+glueH+kH/2;
-            d+=`M${fmt(cx+hR)},${fmt(cy)} A${fmt(hR)},${fmt(hR)} 0 1 0 ${fmt(cx-hR)},${fmt(cy)} A${fmt(hR)},${fmt(hR)} 0 1 0 ${fmt(cx+hR)},${fmt(cy)}Z`;
-          }
-          return d;
+          pts.push([W,0]);
+          return {pts,holes};
         }
-        const lidTabIdx =Array.from({length:Math.ceil(nK/2)},(_,i)=>i*2);   // 0,2,4...
-        const backTabIdx=Array.from({length:Math.floor(nK/2)},(_,i)=>i*2+1);// 1,3,5...
-        // Pas zawiasu do wieczka
-        const stripLidPx=place(W), stripLidBH=glueH+kH;
-        const dSL=makeHingeStrip(stripLidPx,ey,lidTabIdx);
-        panels.push({name:'Zawias — pas do wieczka',role:'hinge-lid',mode:'cut',
-          d:dSL,fillRule:'evenodd',bx:stripLidPx,by:ey,bw:W,bh:stripLidBH});
-        // Pas zawiasu do tylnej ścianki
-        const stripBackPx=place(W), stripBackBH=glueH+kH;
-        const dSB=makeHingeStrip(stripBackPx,ey,backTabIdx);
-        panels.push({name:'Zawias — pas do tylnej ścianki',role:'hinge-back',mode:'cut',
-          d:dSB,fillRule:'evenodd',bx:stripBackPx,by:ey,bw:W,bh:stripBackBH});
-        // Linia montażowa (score) na tylnej ściance: oś kołka = górna krawędź ścianki
-        // (informacja wizualna — gdzie przykleić pas zawiasu)
-        const backP=panels.find(p=>p.role==='back');
-        if(backP){
-          const bsx=backP.bx, bsy=backP.by, bsw=backP.bw;
-          const scoreY=bsy+glueH; // linia klejenia pasa zawiasu
-          panels.push({name:'Linia klejenia zawiasu (tylna ścianka)',role:'fold',mode:'score',
-            d:`M${fmt(bsx)} ${fmt(scoreY)}L${fmt(bsx+bsw)} ${fmt(scoreY)}`,
-            bx:bsx,by:scoreY,bw:bsw,bh:0.5});
-          const scoreY2=bsy; // górna krawędź (gdzie przysuwa się wieczko)
-          panels.push({name:'Linia klejenia zawiasu (oś kołka)',role:'fold',mode:'score',
-            d:`M${fmt(bsx)} ${fmt(scoreY2)}L${fmt(bsx+bsw)} ${fmt(scoreY2)}`,
-            bx:bsx,by:scoreY2,bw:bsw,bh:0.5});
-        }
+        // --- TYLNA ŚCIANKA z knykciami (parzyste) na górnej krawędzi ---
+        const bkTop=knuckleTop(evenIdx);
+        const bpx=place(W), bpy=ey+kp+2;        // +kp+2: knykcie (-kp) nie wychodzą nad obszar
+        const bp=[...bkTop.pts];
+        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>bp.push([W+off, al]));    // prawa (palce → prawa ścianka)
+        fingerEdgePoints(W,T,F,false).forEach(([al,off])=>bp.push([W-al, H+off]));  // dół (palce → podstawa)
+        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>bp.push([-off, H-al]));   // lewa (palce → lewa ścianka)
+        const bpAbs=bp.map(([x,y])=>[x+bpx,y+bpy]);
+        let backD=polyToPathD(bpAbs);
+        bkTop.holes.forEach(([cx,cy])=>{ backD+=polyToPathD(ovalPoints(cx+bpx,cy+bpy,hR,hR)); });
+        const bbB=polysBBoxMulti([bpAbs]);
+        panels.push({name:'Tylna ścianka + zawias (knykcie)',role:'back',mode:'cut',fillRule:'evenodd',
+          d:backD,bx:bbB.minx,by:bbB.miny,bw:Math.max(1,bbB.maxx-bbB.minx),bh:Math.max(1,bbB.maxy-bbB.miny)});
+        // --- WIECZKO z knykciami (nieparzyste) na tylnej krawędzi ---
+        const ldTop=knuckleTop(oddIdx);
+        const lpx=place(W), lpy=ey+kp+2;
+        const lp=[...ldTop.pts]; lp.push([W,D],[0,D]);   // prawa/dół/lewa — proste (wieczko tylko nakrywa)
+        const lpAbs=lp.map(([x,y])=>[x+lpx,y+lpy]);
+        let lidD2=polyToPathD(lpAbs);
+        ldTop.holes.forEach(([cx,cy])=>{ lidD2+=polyToPathD(ovalPoints(cx+lpx,cy+lpy,hR,hR)); });
+        const bbL=polysBBoxMulti([lpAbs]);
+        const lidPanel={name:'Wieczko + zawias (knykcie)',role:'lid',mode:'cut',fillRule:'evenodd',
+          d:lidD2,bx:bbL.minx,by:bbL.miny,bw:Math.max(1,bbL.maxx-bbL.minx),bh:Math.max(1,bbL.maxy-bbL.miny)};
+        panels.push(lidPanel);
+        if(clasp) addOvalHole(lidPanel, lpx+W/2, lpy+D-claspRy-3, claspRx, claspRy);
       }
     }
     return panels;
@@ -5769,7 +5757,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
     'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
     hinged:'Zintegrowane wieczko na zawiasie żywym (flex): tylna ścianka + strefa nacięć + wieczko to JEDEN ciągły element — nic nie trzeba doklejać. Tylna ścianka łączy się palcami z bokami i podstawą, a wieczko zgina się na zawiasie i nakrywa pudełko od góry.',
-    'hinged-tab':'Wieczko na zawiasie zakładkowym: dwa paski z przeplecionymi zakładkami sklejone do wieczka i tylnej ścianki — kołek (wykałaczka ⌀3 mm) tworzy oś obrotu. Klasyczny mechanizm skrzynek z drewna.'
+    'hinged-tab':'Zintegrowany zawias kołkowy (jak HingeBox): knykcie zawiasu są wycięte bezpośrednio w krawędzi tylnej ścianki i wieczka — przeplatają się, a wspólny kołek ⌀3 mm (wykałaczka) tworzy oś obrotu. Nic nie trzeba doklejać. Klasyczny mechanizm skrzynek z drewna.'
   };
   const boxClosureSel=document.getElementById('boxClosure');
   const boxClosureNote=document.getElementById('boxClosureNote');
