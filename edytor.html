@@ -2918,7 +2918,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
   }
   function renderMultiProps(sel){
-    let h=`<div class="empty-note" style="padding-bottom:4px">Zaznaczono elementów: <strong style="color:var(--text)">${sel.length}</strong></div>`;
+    let h=`<div class="empty-note" style="padding-bottom:4px">Zaznaczono <strong style="color:var(--text)">${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}</div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
     // proporcjonalnie (Sz./Wys., zakotwiczone w lewym górnym rogu) całe zaznaczenie naraz
     const mb=selBBox(sel);
