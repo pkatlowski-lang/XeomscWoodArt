@@ -3263,7 +3263,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="imgH" value="${fmt(o.h)}" min="1" step="1"></div>`;
     h+=`<div class="field"><label class="check-label"><input type="checkbox" id="imgLockRatio" ${o.lockAspect?'checked':''}> Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
-    h+=rangeField('Przezroczystość (%)','opacity',o.opacity??100,0,100,1);
+    h+=rangeField('Krycie (%)','opacity',o.opacity??100,0,100,1);
     h+=`<div class="field"><button type="button" id="imgReplaceBtn" class="tbtn" style="width:100%;justify-content:center">🔄 Zamień obraz</button></div>`;
     h+=`<div class="field"><button type="button" id="imgTraceBtn" class="tbtn" style="width:100%;justify-content:center" title="Tworzy nowy element 'ścieżka' z konturu obrazu — do cięcia lub grawerowania. Najlepiej działa dla prostych, kontrastowych grafik (logo, sylwetka), najlepiej z przezroczystym tłem.">🪄 Obrysuj obraz → ścieżka do cięcia</button></div>`;
     propsEl.innerHTML=lockedWrap(h,o);
