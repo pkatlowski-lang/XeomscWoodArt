@@ -208,9 +208,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
 
 /* ---- 3D export modal ---- */
-.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto}
-.modal-ov.open{display:flex}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px}
+.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.modal-ov.open{opacity:1;pointer-events:auto}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;transform:scale(.97) translateY(-10px);transition:transform .2s ease,opacity .18s ease;opacity:0}
+.modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
 .modal-box h3{margin:0 0 6px;font-size:1.05rem}
 .modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.15rem;line-height:1}
 .modal-close:hover{color:var(--text)}
@@ -285,8 +286,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .bb-sec{flex:1;background:var(--surface);display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
 .bottombar>.bb-sec:first-child{flex:2}      /* wizualizacja 3D — większa, u góry (~2/3) */
 .bottombar>.bb-sec:last-child{flex:1}        /* plik SVG — mniejsze, niżej (~1/3) */
-.bb-head{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border)}
-.bb-spacer{flex:1}
+.bb-head{display:flex;align-items:center;gap:6px;padding:7px 10px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);overflow:hidden}
+.bb-head>span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1}
+.bb-spacer{flex:0;min-width:0}
 .bb-btn{border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer}
 .bb-btn:hover{border-color:var(--accent);color:var(--accent)}
 .bb-btn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
@@ -493,7 +495,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="ruler ruler-h" id="rulerH" title="Przeciągnij w dół, aby utworzyć linię pomocniczą"></div>
       <div class="ruler ruler-v" id="rulerV" title="Przeciągnij w prawo, aby utworzyć linię pomocniczą"></div>
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt na płycie — albo kliknij szablon po lewej</div>
+      <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt — kliknij szablon lub wygeneruj 📦 pudełko</div>
     </section>
 
   <div class="bottombar" id="bottombar">
@@ -509,9 +511,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     </div>
     <div class="bb-sec">
       <div class="bb-head"><span>📄 Plik SVG — warstwy rozdzielone (1 plik)</span>
-        <span class="bb-spacer"></span>
-        <button class="bb-btn" id="bbSvgExpand" title="Powiększ podgląd SVG">⛶ Powiększ</button>
-        <button class="bb-btn" id="bbDownload" title="Pobierz rozdzielony plik SVG">⬇ Pobierz SVG warstw</button>
+        <button class="bb-btn" id="bbSvgExpand" title="Powiększ podgląd SVG">⛶</button>
+        <button class="bb-btn" id="bbDownload" title="Pobierz rozdzielony plik SVG">⬇ Pobierz SVG</button>
       </div>
       <div class="bb-svg" id="bbSvg"></div>
       <div class="live-quote" id="liveQuote">
@@ -593,7 +594,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       </select>
     </div>
     <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 4px"></p>
-    <div id="boxClosurePreview" style="display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;margin:0 0 10px;min-height:58px;overflow:hidden"></div>
+    <div id="boxClosurePreview" style="display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin:0 0 10px;min-height:72px;overflow:hidden"></div>
     <div class="field" style="flex-direction:row;align-items:center;gap:8px">
       <input type="checkbox" id="boxClasp" style="width:auto">
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
@@ -647,11 +648,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <button class="modal-close" id="modalGearClose" title="Zamknij">✕</button>
     <h3>⚙ Generator koła zębatego</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
-    <div class="field"><label>Liczba zębów</label><input type="number" id="gearTeeth" min="6" max="200" step="1" value="20"></div>
-    <div class="field"><label>Moduł (mm)</label><input type="number" id="gearModule" min="0.2" max="20" step="0.1" value="2"></div>
-    <div class="field"><label>Kąt przyporu (°)</label><input type="number" id="gearPressure" min="10" max="30" step="1" value="20"></div>
-    <div class="field"><label>Średnica otworu osi (mm, 0 = brak)</label><input type="number" id="gearBore" min="0" max="200" step="0.5" value="6"></div>
-    <p id="gearInfo" style="font-size:.78rem;color:var(--muted);margin:0 0 8px"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="field"><label>Liczba zębów</label><input type="number" id="gearTeeth" min="6" max="200" step="1" value="20"></div>
+      <div class="field"><label>Moduł (mm)</label><input type="number" id="gearModule" min="0.2" max="20" step="0.1" value="2"></div>
+      <div class="field"><label>Kąt przyporu (°)</label><input type="number" id="gearPressure" min="10" max="30" step="1" value="20"></div>
+      <div class="field"><label>Otwór osi (mm, 0 = brak)</label><input type="number" id="gearBore" min="0" max="200" step="0.5" value="6"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px">
+      <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"></div>
+      <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
+    </div>
     <button type="button" class="tbtn" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj koło zębate</button>
   </div>
 </div>
@@ -3036,7 +3042,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:#caa06c">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">7 typów zamknięcia · podgląd 3D · siatka rozkroju</span></div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // Karta informacyjna dla paneli pudełka (gdy element ma box.role/W/D/H)
@@ -4720,17 +4726,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         ? `translate3d(${fmt(xOff+(W-lidW)/2)}px,${fmt(Dpx-T*scale)}px,${fmt(Hpx)}px) rotateX(180deg)`
         : TR.lid;
       html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
-      // Dla lid-lip: kołnierz jako ramka CSS 4 pasków wewnątrz otworu pudełka (widoczny tuż pod wieczkiem)
+      // Dla lid-lip: kołnierz jest wewnętrznym detalem niewidocznym z zewnątrz przy zamkniętym wieczku.
+      // W widoku 3D wystarczy lekka ramka na obwodzie wieczka, sygnalizująca wcisk — renderowana jako
+      // 4 cienkie paski na zewnętrznej krawędzi otworu pudełka, WYRAŹNIE poniżej wieczka (Hpx-Tpx*3)
+      // żeby nie powodowała CSS3D z-sorting z wieczkiem (które jest przy Hpx).
       if(closure==='lid-lip'){
-        const lw=clamp(Math.min(F,Math.min(W,D)/2-2*T-1),5,Math.min(W,D)/3);
-        const lW=Math.max(4,W-2*T-0.6), lD=Math.max(4,D-2*T-0.6);
-        const lWpx=lW*scale, lDpx=lD*scale, lwpx=lw*scale;
-        const lipCol=darkenHex(BOX_FACE_COL,0.60);
-        const lipTR=`translate3d(${fmt(xOff+T*scale)}px,${fmt(T*scale)}px,${fmt(Hpx-Tpx*0.5)}px) rotateX(180deg)`;
-        const bar=(l,t,w,h)=>`<div style="position:absolute;left:${fmt(l)}px;top:${fmt(t)}px;width:${fmt(w)}px;height:${fmt(h)}px;background:${lipCol}"></div>`;
-        html+=`<div class="l3d-layer" style="width:${fmt(lWpx)}px;height:${fmt(lDpx)}px;transform-origin:0 0 0;transform:${lipTR}">
-          ${bar(0,0,lWpx,lwpx)}${bar(0,lDpx-lwpx,lWpx,lwpx)}
-          ${bar(0,lwpx,lwpx,lDpx-2*lwpx)}${bar(lWpx-lwpx,lwpx,lwpx,lDpx-2*lwpx)}
+        const lw=Math.min(F*scale*0.28, Math.min(Wpx,Dpx)*0.12);
+        const lipCol=darkenHex(BOX_FACE_COL,0.55);
+        const lipZ=Hpx-Tpx*3;
+        const lipTR=`translate3d(${fmt(xOff)}px,0px,${fmt(lipZ)}px)`;
+        const b2=(l,t,w2,h2)=>`<div style="position:absolute;left:${fmt(l)}px;top:${fmt(t)}px;width:${fmt(w2)}px;height:${fmt(h2)}px;background:${lipCol};z-index:1"></div>`;
+        html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${lipTR}">
+          ${b2(0,0,Wpx,lw)}${b2(0,Dpx-lw,Wpx,lw)}
+          ${b2(0,lw,lw,Dpx-2*lw)}${b2(Wpx-lw,lw,lw,Dpx-2*lw)}
         </div>`;
       }
     } else if(closure==='hinged' && g.panels.lid){
@@ -4821,9 +4829,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       // Pobierz wymiary pierwszego pudełka do tytułu
       const firstBox=state.objects.find(o=>o.box && o.visible);
       const bm=firstBox?firstBox.box:null;
-      live3dTitle.textContent=bm
-        ? `📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm`
-        : '📦 Wizualizacja 3D — złożone pudełko';
+      if(bm){
+        const clShort={open:'otwarte',lid:'+ wieczko','pull-slot':'+ rowek','tab-latch':'+ zatrzask',slide:'+ wsuwane','lid-lip':'+ kołnierz',hinged:'+ zawias'}[bm.closure]||'';
+        live3dTitle.textContent=`📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm, T=${bm.T} mm${clShort?' · '+clShort:''}`;
+      } else {
+        live3dTitle.textContent='📦 Wizualizacja 3D — złożone pudełko';
+      }
       n=buildAssembledBoxScene(live3dScene, sw0*0.85, sh*0.85);
     }
     if(!n){
@@ -5609,40 +5620,68 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const boxClosurePrev=document.getElementById('boxClosurePreview');
   // Rysuje schematyczny rzut z góry zamknięcia pudełka (uproszczona ikona SVG)
   function drawClosurePreview(type){
-    const W=110,D=58,T=5,sw=34,sh=10,r=4,tw=18,th=10,lip=6;
-    const bg='#1e293b',bx='#38bdf8',lid='#caa06c',mark='#f0d6a8',cl='#94a3b8';
-    // Prostokąt pudełka + wieczko
-    const box=`<rect x="0" y="0" width="${W}" height="${D}" fill="${bg}" stroke="${bx}" stroke-width="2" rx="2"/>`;
-    const lidRect=`<rect x="0" y="0" width="${W}" height="${D}" fill="${lid}33" stroke="${lid}" stroke-width="2" rx="2"/>`;
-    let extra='', label='';
+    // Rysunek schematyczny z boku (cross-section) + rzut z góry wieczka
+    // Paleta: bg=ciemne tło, bx=kontur pudełka (niebieski), lid=kolor wieczka (drewno), mark=akcent/opis, cl=muted
+    const W=200,D=70,T=6,sw=52,sh=13,r=5,tw=26,th=13,lip=8;
+    const bg='#0f172a',bx='#38bdf8',lidC='#caa06c',mark='#f0d6a8',cl='#64748b',g1='#caa06c44',g2='#caa06c99';
+    const wall=`<rect x="0" y="0" width="${W}" height="${D}" fill="${bg}" stroke="${bx}" stroke-width="2" rx="2"/>`;
+    // Ścianki pudełka (grube kreski na obwodzie)
+    const walls=`<rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="${bx}" stroke-width="${T*0.9}" rx="2"/>`;
+    const inner=`<rect x="${T}" y="${T}" width="${W-2*T}" height="${D-2*T}" fill="${bg}" stroke="none"/>`;
+    const box=`${wall}${walls}${inner}`;
+    const lidBase=`<rect x="0" y="0" width="${W}" height="${D}" fill="${g1}" stroke="${lidC}" stroke-width="2" rx="2"/>`;
+    let extra='';
     if(type==='open'){
-      extra=`<text x="${W/2}" y="${D/2+5}" text-anchor="middle" fill="${cl}" font-size="11" font-family="sans-serif">↑ otwarte</text>`;
+      // Otwarte pudełko — strzałki wskazujące do góry i jasny "otwór"
+      extra=`<rect x="${T}" y="${T}" width="${W-2*T}" height="${D-2*T}" fill="${bg}"/>
+        <line x1="${W/2-24}" y1="${T+10}" x2="${W/2-24}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="${W/2}" y1="${T+10}" x2="${W/2}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="${W/2+24}" y1="${T+10}" x2="${W/2+24}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${cl}" font-size="11" font-family="sans-serif" font-style="italic">otwarte od góry</text>`;
     } else if(type==='lid'){
-      extra=`${lidRect}<text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">wieczko luźne</text>`;
+      // Wieczko luźne — unosi się nad pudełkiem
+      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
+        <line x1="${W/2-20}" y1="${-4}" x2="${W/2-20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
+        <line x1="${W/2+20}" y1="${-4}" x2="${W/2+20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">wieczko nakładane</text>`;
     } else if(type==='pull-slot'){
-      // rowek U przy górnej krawędzi (front) wieczka
       const cx=W/2, sl=cx-sw/2, sr=cx+sw/2;
-      extra=`${lidRect}<path d="M${sl} 0 A${r} ${r} 0 0 1 ${sl+r} ${sh} L${sr-r} ${sh} A${r} ${r} 0 0 1 ${sr} 0" fill="${bg}" stroke="${mark}" stroke-width="1.5"/>
-        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">rowek na palec</text>`;
+      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
+        <path d="M${sl} ${-th-4} A${r} ${r} 0 0 1 ${sl+r} ${-th-4+sh*0.85} L${sr-r} ${-th-4+sh*0.85} A${r} ${r} 0 0 1 ${sr} ${-th-4}" fill="${bg}" stroke="${mark}" stroke-width="1.5"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">rowek wyciągnięcia</text>`;
     } else if(type==='tab-latch'){
-      const cx=W/2, tl=cx-tw/2, tr2=cx+tw/2;
-      extra=`${lidRect}<rect x="${tl}" y="${-th}" width="${tw}" height="${th}" rx="${r}" fill="${mark}" stroke="${mark}" stroke-width="1.5"/>
-        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">języczek zatrzask</text>`;
+      const cx=W/2, tl=cx-tw/2;
+      // Wieczko z języczkiem sterczącym na dół + odpowiedni otwór w ściance
+      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
+        <rect x="${tl}" y="${-th-4+th}" width="${tw}" height="${th*0.9}" rx="${r*0.6}" fill="${mark}" stroke="${mark}" stroke-width="1.2"/>
+        <rect x="${tl}" y="${T}" width="${tw}" height="${th*0.9}" rx="${r*0.6}" fill="none" stroke="${mark}" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">języczek + zatrzask</text>`;
     } else if(type==='slide'){
-      const lw=W-2*T-1;
-      extra=`<rect x="${T}" y="${-T}" width="${lw}" height="${D+T}" fill="${lid}55" stroke="${lid}" stroke-width="1.5" rx="2"/>
-        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">wsuwane</text>`;
+      // Wieczko wysuwane od przodu — perspektywa boku
+      const lw=W-2*T-2;
+      extra=`<rect x="${T+1}" y="${-th/2}" width="${lw}" height="${D+th/2}" rx="2" fill="${g1}" stroke="${lidC}" stroke-width="1.5"/>
+        <line x1="${T+1}" y1="${D/2}" x2="${T+1+24}" y2="${D/2}" stroke="${mark}" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">wsuwane (od przodu)</text>`;
     } else if(type==='lid-lip'){
-      extra=`${lidRect}<rect x="${lip}" y="${lip}" width="${W-2*lip}" height="${D-2*lip}" fill="none" stroke="${mark}" stroke-width="1.5" stroke-dasharray="4 2" rx="2"/>
-        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">kołnierz wpasowany</text>`;
+      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
+        <rect x="${T/2+lip}" y="${-th-4+th}" width="${W-T-2*lip}" height="${th*0.7}" rx="2" fill="${lidC}88" stroke="${mark}" stroke-width="1.2"/>
+        <rect x="${T+lip}" y="${T}" width="${W-2*T-2*lip}" height="${th*0.7}" rx="2" fill="none" stroke="${mark}" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">kołnierz wpasowany</text>`;
     } else if(type==='hinged'){
-      // klapa z tyłu (góra) nachylona
-      extra=`${lidRect}<path d="M0 0 L${W} 0" stroke="${mark}" stroke-width="2"/>
-        <rect x="0" y="${-D*0.55}" width="${W}" height="${D*0.55}" fill="${lid}88" stroke="${lid}" stroke-width="1.5" rx="2"/>
-        <text x="${W/2}" y="${D/2+4}" text-anchor="middle" fill="${mark}" font-size="10" font-family="sans-serif">zawias żywy (flex)</text>`;
+      // Klapa otwarta — przychylona do tyłu
+      const hy=D*0.45;
+      extra=`<path d="M0 0 Q${W*0.1} ${-hy*0.7} ${W*0.38} ${-hy}" stroke="${lidC}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <line x1="${W*0.38}" y1="${-hy}" x2="${W-2}" y2="${-hy}" stroke="${lidC}" stroke-width="${th}" stroke-linecap="round" opacity="0.85"/>
+        <path d="M0 0 L4 0" stroke="${mark}" stroke-width="2.5"/>
+        <path d="M${W*0.3} ${-hy*0.65} A6 6 0 0 0 ${W*0.38} ${-hy}" stroke="${mark}" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">zawias żywy (flex)</text>`;
     }
-    const vb=`-2 ${-th-2} ${W+4} ${D+th+4}`;
-    boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="54" style="max-width:200px">${box}${extra}</svg>`;
+    const defs=`<defs>
+      <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${cl}"/></marker>
+      <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${mark}"/></marker>
+    </defs>`;
+    const vb=`-4 ${-th*2-8} ${W+8} ${D+th*2+16}`;
+    boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="68" style="display:block">${defs}${box}${extra}</svg>`;
   }
   const updateBoxClosureNote=()=>{
     const v=boxClosureSel.value;
@@ -5872,10 +5911,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const m=clamp(Number(document.getElementById('gearModule').value)||2,0.2,20);
     const alpha=clamp(Number(document.getElementById('gearPressure').value)||20,10,30);
     const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
-    const {rp,ra,rf}=buildGearPoints(z,m,alpha);
-    let info=`Śr. podziałowa: ${fmt(2*rp)} mm · Śr. zewnętrzna: ${fmt(2*ra)} mm · Śr. podstaw: ${fmt(2*rf)} mm`;
-    if(bore>0 && bore>=2*rf-0.5) info+=' ⚠ otwór za duży względem podstaw zębów!';
-    document.getElementById('gearInfo').textContent=info;
+    const {pts,rp,ra,rf}=buildGearPoints(z,m,alpha);
+    let info=`Śr. podziałowa: <strong style="color:var(--text)">${fmt(2*rp)} mm</strong><br>Śr. zewnętrzna: <strong style="color:var(--text)">${fmt(2*ra)} mm</strong><br>Śr. podstaw: <strong style="color:var(--text)">${fmt(2*rf)} mm</strong>`;
+    if(bore>0 && bore>=2*rf-0.5) info+='<br><span style="color:#f87171">⚠ otwór za duży!</span>';
+    document.getElementById('gearInfo').innerHTML=info;
+    // Mini-podgląd SVG koła
+    const prevEl=document.getElementById('gearPreview');
+    if(prevEl){
+      const pad=ra*0.18, vb=`${-(ra+pad)} ${-(ra+pad)} ${2*(ra+pad)} ${2*(ra+pad)}`;
+      const d=polyToPathD(pts);
+      let boreEl='';
+      if(bore>0 && bore<2*rf-0.5) boreEl=`<circle cx="0" cy="0" r="${fmt(bore/2)}" fill="#0f172a" stroke="#38bdf8" stroke-width="${fmt(ra*0.025)}"/>`;
+      const pd=`<circle cx="0" cy="0" r="${fmt(rp)}" fill="none" stroke="#38bdf866" stroke-width="${fmt(ra*0.02)}" stroke-dasharray="${fmt(ra*0.04)} ${fmt(ra*0.025)}"/>`;
+      prevEl.innerHTML=`<svg viewBox="${vb}" width="120" height="120"><path d="${d}" fill="#caa06c" stroke="#f0d6a8" stroke-width="${fmt(ra*0.025)}"/>${boreEl}${pd}</svg>`;
+    }
   }
   document.getElementById('gearGenBtn').addEventListener('click',()=>{ updateGearInfo(); modalGear.classList.add('open'); });
   document.getElementById('modalGearClose').addEventListener('click',()=>modalGear.classList.remove('open'));
