@@ -5904,6 +5904,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       // Kołek pionowy przez zakładki
       const pinX=hbx+nK2*(kW2+kGap)*0.5-kGap/2;
       extra+=`<line x1="${pinX}" y1="${hby-2}" x2="${pinX}" y2="${hby+kH2+4}" stroke="#e2c97e" stroke-width="3" stroke-linecap="round" opacity="0.92"/>`;
+    } else if(type==='drawer'){
+      // Szuflada częściowo wysunięta z tulei w prawo (widok z góry) + uchwyt + strzałka
+      const inset=T+3, dw=W*0.46, dd=D-2*inset, dx=W*0.46;
+      extra=`<rect x="${dx}" y="${inset}" width="${dw}" height="${dd}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
+        <ellipse cx="${dx+dw-9}" cy="${D/2}" rx="5" ry="3.2" fill="${bg}" stroke="${mark}" stroke-width="1.2"/>
+        <line x1="${dx+dw+5}" y1="${D/2}" x2="${dx+dw+24}" y2="${D/2}" stroke="${mark}" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">szuflada wysuwana</text>`;
     }
     const defs=`<defs>
       <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${cl}"/></marker>
