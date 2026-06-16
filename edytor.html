@@ -333,19 +333,23 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .li-cut{background:none;border:2px solid var(--cut)} .li-eng{background:var(--engrave);border:1px solid #666} .li-sco{background:none;border:2px dashed var(--score)}
 
 /* ---- Manager warstw 3D ---- */
-.depth-legend{display:flex;flex-direction:column;gap:5px;padding:4px 14px 8px}
+.depth-legend{display:flex;flex-direction:column;gap:4px;padding:4px 14px 8px}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
-.lyr-row{display:flex;align-items:center;gap:6px;padding:4px 6px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2)}
+.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2);transition:background .1s,border-color .1s}
+.lyr-row:hover{background:rgba(255,255,255,.04)}
 .lyr-row.on{border-color:var(--accent)}
-.lyr-row.lyr-hidden{opacity:.5}
-.lyr-pick{border:none;color:#fff;font-size:.72rem;font-weight:700;padding:4px 9px;border-radius:5px;cursor:pointer;flex:0 0 auto}
-.lyr-pick:hover{filter:brightness(1.2)}
-.lyr-cnt{font-size:.68rem;color:var(--muted);flex:1;white-space:nowrap}
-.lyr-mat{width:78px;flex:0 0 78px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.7rem;font-family:inherit}
-.lyr-mm{width:50px;flex:0 0 50px;padding:3px 5px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.74rem;font-family:inherit}
-.lyr-unit{font-size:.66rem;color:var(--muted)}
-.lyr-eye{background:none;border:none;cursor:pointer;font-size:.85rem;padding:2px;line-height:1}
-.dl-note{padding:2px 14px 8px;font-size:.71rem;color:var(--muted);line-height:1.45}
+.lyr-row.lyr-hidden{opacity:.45}
+.lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;flex:0 0 auto;transition:filter .1s}
+.lyr-pick:hover{filter:brightness(1.25)}
+.lyr-cnt{font-size:.66rem;color:var(--muted);flex:1;white-space:nowrap}
+.lyr-mat{width:72px;flex:0 0 72px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.68rem;font-family:inherit}
+.lyr-mm{width:46px;flex:0 0 46px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.72rem;font-family:inherit;text-align:center}
+.lyr-unit{font-size:.64rem;color:var(--muted);flex-shrink:0}
+.lyr-eye{background:none;border:none;cursor:pointer;font-size:.75rem;padding:2px 4px;line-height:1;color:var(--muted);border-radius:4px;transition:background .1s,color .1s}
+.lyr-eye:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.lyr-row.lyr-hidden .lyr-eye{color:var(--accent);opacity:1}
+.dl-note{padding:2px 14px 8px;font-size:.69rem;color:var(--muted);line-height:1.5}
+.dl-note strong{color:var(--text);font-weight:600}
 .layer-assign{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .la-btn{border:1.5px solid var(--border);border-radius:6px;padding:4px 9px;font-size:.72rem;font-weight:700;color:#fff;cursor:pointer;line-height:1}
 .la-btn.on{outline:2px solid var(--accent);outline-offset:1px}
@@ -490,7 +494,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       </label>
       <h2>Warstwy 3D</h2>
       <div class="depth-legend" id="depthLegend"></div>
-      <p class="dl-note">W{n} = zaznacz warstwę · pole mm = grubość materiału · 👁 = ukryj. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
+      <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
       <h2>Kolejność elementów</h2>
       <input type="text" id="layerSearch" class="layer-search" placeholder="🔍 Szukaj elementu po nazwie…">
       <div class="layers" id="layers"></div>
@@ -622,6 +626,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="field" style="flex-direction:row;align-items:center;gap:8px">
       <input type="checkbox" id="boxClasp" style="width:auto">
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
+    </div>
+    <div id="boxHingeTabNote" style="display:none;margin:0 0 8px;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.25);border-radius:8px;font-size:.73rem;color:var(--muted);line-height:1.6">
+      <strong style="color:var(--accent)">🪛 Montaż zawiasu zakładkowego:</strong><br>
+      1. Wytnij wszystkie elementy.<br>
+      2. Sklej <em>Zawias — pas do wieczka</em> do tyłu wieczka (zakładki do dołu).<br>
+      3. Sklej <em>Zawias — pas do tylnej ścianki</em> do góry tylnej ścianki (zakładki do góry).<br>
+      4. Przepleć zakładki obu pasów (W↔T↔W...) i wsuń kołek drewniany ⌀3 mm przez otwory.<br>
+      5. Możesz użyć grubej wykałaczki lub pałeczki bambusowej ⌀3 mm.
     </div>
     <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">Generuj pudełko</button>
   </div>
@@ -3079,15 +3091,18 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const cln={open:'Otwarte',lid:'Wieczko luźne','pull-slot':'Rowek na palec',
         'tab-latch':'Zatrzask języczek',slide:'Wsuwane','lid-lip':'Kołnierz',
         hinged:'Zawias żywy','hinged-tab':'Zawias zakładkowy'}[bCl]||bCl;
-      h+=`<div class=”field” style=”padding-bottom:8px”><div style=”background:var(--surface2);border:1.5px solid var(--accent-dark);border-radius:8px;padding:9px 11px;font-size:.78rem”>
-        <div style=”font-weight:700;color:var(--accent);margin-bottom:6px”>📦 ${rn}</div>
-        <div style=”display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;color:var(--muted)”>
-          <span>Szer. W: <strong style=”color:var(--text)”>${bW} mm</strong></span>
-          <span>Głęb. D: <strong style=”color:var(--text)”>${bD} mm</strong></span>
-          <span>Wys. H: <strong style=”color:var(--text)”>${bH} mm</strong></span>
-          <span>Grub. T: <strong style=”color:var(--text)”>${bT} mm</strong></span>
+      const roleColor={back:'#3b9eff',front:'#38bdf8',left:'#2a9d8f',right:'#06d6a0',
+        bottom:'#9b5de5',lid:'#caa06c',lip:'#f4a261',hinge:'#e76f51',fold:'#94a3b8',
+        'hinge-lid':'#caa06c','hinge-back':'#3b9eff'}[o.box.role]||'#caa06c';
+      h+=`<div class=”field” style=”padding-bottom:8px”><div style=”background:var(--surface2);border:1.5px solid ${roleColor}44;border-radius:8px;padding:9px 11px;font-size:.78rem;border-left:3px solid ${roleColor}”>
+        <div style=”font-weight:700;color:${roleColor};margin-bottom:5px;font-size:.76rem;letter-spacing:.03em;text-transform:uppercase”>📦 ${rn}</div>
+        <div style=”display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;color:var(--muted);font-size:.75rem”>
+          <span>Szer. W: <strong style=”color:var(--text)”>${bW}&nbsp;mm</strong></span>
+          <span>Głęb. D: <strong style=”color:var(--text)”>${bD}&nbsp;mm</strong></span>
+          <span>Wys. H: <strong style=”color:var(--text)”>${bH}&nbsp;mm</strong></span>
+          <span>Grub. T: <strong style=”color:var(--text)”>${bT}&nbsp;mm</strong></span>
         </div>
-        <div style=”margin-top:5px;color:var(--muted)”>Zamknięcie: <strong style=”color:var(--text)”>${cln}${bClasp?' + zapięcie':''}</strong></div>
+        <div style=”margin-top:5px;color:var(--muted);font-size:.75rem”>Zamknięcie: <strong style=”color:var(--text)”>${cln}${bClasp?' + zapięcie':''}</strong></div>
       </div></div>`;
     }
     // nazwa elementu (widoczna też w panelu „Warstwy”)
@@ -3218,7 +3233,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <button type="button" class="dbtn" id="depthDown">−</button>
         <span class="dval" id="depthVal">${dep}</span>
         <button type="button" class="dbtn" id="depthUp">+</button>
-        <span class="d-badge ${dc2}" style="margin-left:4px">W${dep}</span>
+        <span class="d-badge ${dc2}" style="margin-left:4px">${dep}</span>
         <span style="font-size:.7rem;color:var(--muted);margin-left:6px">${fmt(layerMM(dep))} mm grubości</span>
       </div>
     </div>`;
@@ -4482,7 +4497,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <span class="lyr-cnt">${cnt} el.</span>
         <select class="lyr-mat" data-mat="${dep}" title="Wybierz materiał z biblioteki">${matOptions}</select>
         <input class="lyr-mm" type="number" data-mm="${dep}" value="${fmt(layerMM(dep))}" min="0.5" step="0.5" title="Grubość materiału tej warstwy (mm)"><span class="lyr-unit">mm</span>
-        <button class="lyr-eye" data-eye="${dep}" title="Pokaż / ukryj warstwę">${hidden?'🚫':'👁'}</button>
+        <button class="lyr-eye" data-eye="${dep}" title="Pokaż / ukryj warstwę">${hidden?'◎':'◉'}</button>
       </div>`;
     }).join('');
     dlEl.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{
@@ -4742,7 +4757,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     // Wieczka flat (lid, lid-lip, pull-slot, tab-latch, slide) leżą na górze pudełka.
     // Zawias żywy (hinged) — wieczko widoczne jako otwarta klapa nachylona do tyłu.
     // Dla 'open' pokazujemy zaciemnione wnętrze (pudełko bez wieczka).
-    const hasLidFlat=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide') && g.panels.lid;
+    const hasLidFlat=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide'||closure==='hinged-tab') && g.panels.lid;
     if(hasLidFlat){
       // Dla slide: wieczko wsuwane jest nieco węższe; ed używa rzeczywistych wymiarów panelu
       const lidO=g.panels.lid;
@@ -5800,10 +5815,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const vb=`-4 ${-th*2-8} ${W+8} ${D+th*2+16}`;
     boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="68" style="display:block">${defs}${box}${extra}</svg>`;
   }
+  const boxHingeTabNote=document.getElementById('boxHingeTabNote');
   const updateBoxClosureNote=()=>{
     const v=boxClosureSel.value;
     boxClosureNote.textContent=BOX_CLOSURE_NOTES[v]||'';
     drawClosurePreview(v);
+    if(boxHingeTabNote) boxHingeTabNote.style.display=v==='hinged-tab'?'block':'none';
   };
   boxClosureSel.addEventListener('change',updateBoxClosureNote); updateBoxClosureNote();
   document.getElementById('boxGenBtn').addEventListener('click',()=>modalBox.classList.add('open'));
