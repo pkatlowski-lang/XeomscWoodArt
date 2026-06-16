@@ -4192,7 +4192,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       return `<div class="layer3d-card">
         <div class="card-head"><span class="d-badge d${Math.min(dep,6)}" style="background:${col}">W${dep}</span> Warstwa ${dep}</div>
         <svg viewBox="0 0 ${W} ${H}" xmlns="${SVG_NS}">${previewBody}</svg>
-        <div class="lcount">${cnt} element${cnt===1?'':'ów'}</div>
+        <div class="lcount">${cnt} ${cnt===1?'element':cnt>=2&&cnt<=4?'elementy':'elementów'}</div>
         <a href="${url}" download="warstwa-3d-${dep}.svg" class="tbtn" style="font-size:.72rem;text-decoration:none">⬇ Pobierz SVG</a>
       </div>`;
     }).join('');
@@ -4403,7 +4403,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     lqPrice.classList.remove('lq-empty');
     const mat=PRICING.materials[quoteMatSel.value];
     lqPrice.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
-    lqTime.textContent='⏱ '+formatQuoteTime(quoteTimeMin(mat))+' (min:sek pracy lasera)';
+    lqTime.textContent='⏱ '+formatQuoteTime(quoteTimeMin(mat))+' min.sek pracy lasera';
   }
   var _lqTimer=null;
   function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderLiveQuote,200); }
@@ -6612,7 +6612,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d: polyD(50,50,50,50,6,-90)},
       {id:'bb_oct',       label:'Ośmiokąt',              fillRule:'nonzero',
         d: polyD(50,50,50,50,8,-22.5)},
-      {id:'bb_star6',     label:'Gwiazda 6-rka',         fillRule:'nonzero',
+      {id:'bb_star6',     label:'Gwiazda 6-ramienna',     fillRule:'nonzero',
         d: starD(50,50,50,50,6,0.5,-90)},
       {id:'bb_bookmark',  label:'Zakładka',              fillRule:'evenodd',
         d: roundedRectD(0,0,40,120,6)+' '+ellipseD(20,8,4,4)},
@@ -6749,7 +6749,7 @@ submitBtn.addEventListener('click', async ()=>{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
     if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
     const q=payload.quote;
-    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera (min:sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
+    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
     setStatus('Wysyłam do pracowni…');
     const db=await ensureDb();
     await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
