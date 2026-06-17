@@ -460,7 +460,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
       <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)">🎨 Warstwy</button>
       <button class="tbtn" id="preview3dBtn" title="Podgląd 3D — interaktywna wizualizacja projektu jako stos warstw materiału">🎯 Podgląd 3D</button>
-      <button class="tbtn" id="boxGenBtn" title="Generator pudełka — parametryczne pudełko z łączeniami „na palec”, gotowe do wycięcia laserem">📦 Generator pudełka</button>
+
       <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
       <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębatego (ewolwentowe) z otworem na oś, gotowe do wycięcia laserem">⚙ Koło zębate</button>
       <button class="tbtn tbtn-primary" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
@@ -548,7 +548,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="bb-sec">
       <div class="bb-head"><span id="live3dTitle">🧊 Wizualizacja 3D — stos warstw materiału</span>
         <span class="bb-spacer"></span>
-        <button class="bb-btn" id="live3dViewToggle" title="Przełącz widok: złożone pudełko / siatka rozkroju" style="display:none">🗺 Siatka</button>
+
         <span class="zoom-badge" id="live3dZoomLabel" title="Przybliżenie — kółko myszy = zoom w miejscu kursora, przeciągnij = obróć, Shift+przeciągnij lub prawy przycisk = przesuń widok">100%</span>
         <button class="bb-btn" id="live3dZoomReset" title="Zresetuj przybliżenie">⟲ 100%</button>
         <button class="bb-btn" id="live3dExpand" title="Powiększ na cały ekran">⛶ Powiększ</button>
@@ -585,7 +585,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <h3>🎯 Wizualizacja 3D projektu</h3>
     <div class="p3d-controls"><span id="p3dHint">Grubości warstw ustawiasz w mm w panelu „Warstwy 3D” po lewej — model 3D odwzorowuje je proporcjonalnie.</span>
       <span class="bb-spacer"></span>
-      <button class="bb-btn" id="p3dViewToggle" title="Przełącz widok: złożone pudełko / siatka rozkroju" style="display:none">🗺 Siatka</button>
+
       <span class="zoom-badge" id="p3dZoomLabel" title="Przybliżenie — kółko myszy = zoom w miejscu kursora, przeciągnij = obróć, Shift+przeciągnij lub prawy przycisk = przesuń widok">100%</span>
       <button class="bb-btn" id="p3dZoomReset" title="Zresetuj przybliżenie i obrót">⟲ Reset widoku</button>
     </div>
@@ -618,31 +618,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" role="dialog" aria-modal="true" id="modalBox">
-  <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" aria-label="Zamknij" id="modalBoxClose" title="Zamknij">✕</button>
-    <h3>📦 Generator pudełka</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Każdy panel to <strong>osobny element</strong> (rozłożone obok siebie) — przesuniesz każdy oddzielnie. Podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
-    <div class="field"><label>Szerokość — W (mm)</label><input type="number" id="boxW" min="10" max="2000" step="1" value="120"></div>
-    <div class="field"><label>Głębokość — D (mm)</label><input type="number" id="boxD" min="10" max="2000" step="1" value="80"></div>
-    <div class="field"><label>Wysokość — H (mm)</label><input type="number" id="boxH" min="10" max="2000" step="1" value="60"></div>
-    <div class="field"><label>Grubość materiału — T (mm)</label><input type="number" id="boxT" min="0.5" max="20" step="0.5" value="3"></div>
-    <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="boxF" min="2" max="100" step="1" value="15"></div>
-    <div class="field"><label>Zamknięcie pudełka</label>
-      <select id="boxClosure">
-        <option value="open">Otwarte (bez wieczka)</option>
-        <option value="lid">Wieczko nakładane (luźne)</option>
-      </select>
-    </div>
-    <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 4px"></p>
-    <div id="boxClosurePreview" style="display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin:0 0 10px;min-height:72px;overflow:hidden"></div>
-    <div class="field" style="flex-direction:row;align-items:center;gap:8px">
-      <input type="checkbox" id="boxClasp" style="width:auto">
-      <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
-    </div>
-    <button type="button" class="tbtn tbtn-primary tbtn-block" id="boxGenerateBtn">📦 Generuj pudełko</button>
-  </div>
-</div>
+
 
 <div class="modal-ov" role="dialog" aria-modal="true" id="modalHinge">
   <div class="modal-box" style="max-width:420px">
@@ -1177,18 +1153,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       else if(forExport){ geo=`<path d="${o.d}"${exportShapeStyle(o)}${fr}/>`; }
       else if(state.depthView){ const dc=depthColor(o.depth||1); geo=`<path d="${o.d}" fill="${dc}" fill-opacity=".38" stroke="${dc}" stroke-width=".8" vector-effect="non-scaling-stroke"${fr}/>`; }
       else { const cls=o.role==='hole'?'geo-hole':(o.mode==='engrave'?'geo-engrave':o.mode==='score'?'geo-score':'geo-cut'); geo=`<path d="${o.d}" class="${cls}"${fr}/>`; }
-      // Etykieta roli panelu pudełka (widoczna tylko w edytorze, nie w eksporcie)
-      let boxLabel='';
-      if(o.box && !forExport && !_silFill){
-        const rln={back:'Tył',front:'Przód',left:'Lewo',right:'Prawo',bottom:'Dno',
-          lid:'Wieczko'}[o.box.role]||'';
-        if(rln){
-          const lx=(o.bx||0)+(o.bw||0)/2, ly=(o.by||0)+(o.bh||0)/2;
-          const fs=Math.max(5, Math.min(12, Math.min(o.bw||10, o.bh||10)*0.13));
-          boxLabel=`<text x="${fmt(lx)}" y="${fmt(ly)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="${fmt(fs)}" font-weight="700" fill="rgba(255,255,255,0.7)" stroke="rgba(0,80,60,0.5)" stroke-width="${fmt(fs*0.12)}" paint-order="stroke" pointer-events="none">${rln}</text>`;
-        }
-      }
-      return `<g transform="${t}">${geo}${boxLabel}</g>`;
+      return `<g transform="${t}">${geo}</g>`;
     }
     const cx=o.x+o.w/2, cy=o.y+o.h/2;
     const rot=o.rotation? ` transform="rotate(${fmt(o.rotation)} ${fmt(cx)} ${fmt(cy)})"`:'';
@@ -2529,10 +2494,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(e.altKey){                                                 // Alt+przeciągnij = zostaw oryginał, przesuwaj duplikat
       const sel=getSelected().filter(s=>!s.locked);
       const idx=sel.indexOf(o);
-      const gidMap={}, boxGidMap={};
+      const gidMap={};
       const copies=sel.map(s=>{ const c=JSON.parse(JSON.stringify(s)); c.id=uid();
         if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
-        if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
         return c; });
       state.objects.push(...copies);
       state.selectedIds=copies.map(c=>c.id);
@@ -3090,28 +3054,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:${BOX_FACE_COL}">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">otwarte lub z wieczkiem · podgląd 3D · siatka rozkroju</span></div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
-    // Karta informacyjna dla paneli pudełka (gdy element ma box.role/W/D/H)
-    if(o.box){
-      const {W:bW,D:bD,H:bH,T:bT,closure:bCl,clasp:bClasp}=o.box;
-      const rn={back:'Ścianka tylna',front:'Ścianka przednia',left:'Ścianka lewa',
-        right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko'}[o.box.role]||o.box.role;
-      const cln={open:'Otwarte',lid:'Wieczko luźne'}[bCl]||bCl;
-      const roleColor={back:'#3b9eff',front:ACCENT,left:'#2a9d8f',right:'#06d6a0',
-        bottom:'#9b5de5',lid:'#caa06c'}[o.box.role]||'#caa06c';
-      h+=`<div class="field" style="padding-bottom:8px"><div style="background:var(--surface2);border:1.5px solid ${roleColor}44;border-radius:8px;padding:9px 11px;font-size:.78rem;border-left:3px solid ${roleColor}">
-        <div style="font-weight:700;color:${roleColor};margin-bottom:5px;font-size:.76rem;letter-spacing:.03em;text-transform:uppercase">📦 ${rn}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:.74rem;margin-top:2px">
-          <span>W: <strong style="color:var(--text)">${bW}</strong></span>
-          <span>D: <strong style="color:var(--text)">${bD}</strong></span>
-          <span>H: <strong style="color:var(--text)">${bH}</strong></span>
-          <span>T: <strong style="color:var(--text)">${bT}&nbsp;mm</strong></span>
-        </div>
-        <div style="margin-top:5px;color:var(--muted);font-size:.75rem">Zamknięcie: <strong style="color:var(--text)">${cln}${bClasp?' + zapięcie':''}</strong></div>
-      </div></div>`;
-    }
     // ---- nazwa + operacja ----
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
     h+=`<div class="field"><label>Operacja lasera</label><div class="seg" data-seg="mode">
@@ -3854,7 +3799,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     gridSizeInput.value=state.grid; gridShowInput.checked=state.showGrid;
     setSnap(d.snap!==undefined?!!d.snap:false,false);
     state.selectedIds=[]; state.history=[]; state.hIndex=-1;
-    live3dMode='assembled'; p3dMode='assembled';
     docWInput.value=state.docW; docHInput.value=state.docH;
     depthViewBtn.classList.toggle('active',state.depthView);
     zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
@@ -3891,10 +3835,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
 
   function duplicateSel(){ const sel=getSelected(); if(!sel.length) return;
-    const gidMap={}, boxGidMap={};
+    const gidMap={};
     const copies=sel.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
-      if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
       return c; });
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
@@ -3905,10 +3848,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function copySel(){ const sel=getSelected(); if(!sel.length) return;
     clipboard=sel.map(o=>JSON.parse(JSON.stringify(o))); }
   function pasteClipboard(){ if(!clipboard.length) return;
-    const gidMap={}, boxGidMap={};
+    const gidMap={};
     const copies=clipboard.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
-      if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
       return c; });
     clipboard=copies.map(c=>JSON.parse(JSON.stringify(c))); // kolejne Ctrl+V odsuwa dalej, jak w Illustratorze/Cuttle
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
@@ -4667,124 +4609,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     return depths.length;
   }
 
-  /* ---------------- Złożone pudełko 3D (widok "produkt", nie siatka rozkroju) ----------------
-     Wykrywa panele wygenerowane przez generator pudełka (box.gid/box.role w state.objects)
-     i składa je w bryłę: każda ścianka to div .l3d-layer przesunięty/obrócony formułą
-     translate3d(...)+rotateX/Y(...) tak, by jej lokalny układ (0,0,0)=zewnętrzny narożnik,
-     lokalne z∈[0,T]=grubość materiału) trafił na właściwe miejsce w globalnym układzie
-     pudełka X∈[0,W], Y∈[0,D], Z∈[0,H]. Formuły zweryfikowane algebraicznie dla wszystkich
-     par sąsiadujących ścianek (każda wspólna krawędź pasuje 1:1). */
-  const BOX_FACE_COL='#caa06c', BOX_LID_COL='#d2a972', BOX_EDGE_COL='#f0d6a8';
-
-  // Współczynniki jasności poszczególnych ścianek — symulują światło z góry/przodu/lewej,
-  // dzięki czemu złożone pudełko ma wyraźną głębię 3D (a nie jednolitą plamę koloru).
-  const BOX_FACE_SHADE={bottom:0.55, back:0.62, left:0.92, right:0.74, front:0.86, lid:1.0};
-
-  // Jedna ścianka: renderuje DOKŁADNY obrys panelu (zęby + ewentualny otwór na zapięcie)
-  // jako SVG <path> przez viewBox (bez przeliczania punktów — zawsze zgodne z rozkrojem 2D),
-  // plus ścianę wewnętrzną (translateZ(Tpx)) i ścianki boczne wzdłuż nominalnego obrysu w×h.
-  // Ścianki w widoku złożonym renderujemy jako czyste prostokąty w*h (bez zębów
-  // łączeń „na palec” — te są szczegółem rozkroju, nie widoku gotowego produktu),
-  // dzięki czemu krawędzie ścianek i listwy boczne idealnie się stykają, bez przerw.
-  function buildBoxFace(o, ed, T, F, scale, Tpx, transform, baseCol, shade){
-    const {w,h,edges}=ed;
-    const wpx=w*scale, hpx=h*scale;
-    const outerCol=darkenHex(baseCol,shade);
-    const innerCol=darkenHex(outerCol,0.78);
-    const wallCol=darkenHex(BOX_EDGE_COL,shade);
-    // --- ścieżka twarzy + opcjonalne otwory/notche ---
-    let faceD=`M0 0H${fmt(w)}V${fmt(h)}H0Z`, fr='nonzero', holeLocal=null;
-    if(o.hole){
-      const lbb=polysBBoxMulti([boxPanelPoints(w,h,T,F,edges)]);
-      const hcx=lbb.minx+(o.hole.cx-o.bx), hcy=lbb.miny+(o.hole.cy-o.by);
-      faceD+=polyToPathD(ovalPoints(hcx,hcy,o.hole.rx,o.hole.ry));
-      fr='evenodd';
-      holeLocal={cx:hcx,cy:hcy,rx:o.hole.rx,ry:o.hole.ry};
-    }
-    const svgStyle=(z)=>`position:absolute;left:0;top:0;transform:translateZ(${fmt(z)}px)`;
-    const gfx=`fl${(Math.random()*1e9|0).toString(36)}`;
-    const vb2=`0 0 ${w} ${h}`;
-    const grainDefs=`<defs><linearGradient id="${gfx}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity="0.13"/><stop offset="50%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.09"/></linearGradient></defs>`;
-    const outer=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="${svgStyle(0)}">${grainDefs}<path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/><path d="${faceD}" fill="url(#${gfx})" fill-rule="${fr}"/></svg>`;
-    const inner=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
-    let walls='';
-    function addWall(ax,ay,bx2,by2){
-      const dx=bx2-ax, dy=by2-ay, len=Math.hypot(dx,dy);
-      if(len<0.5) return;
-      const ang=Math.atan2(dy,dx)*180/Math.PI;
-      const ux=dx/len, uy=dy/len;
-      const sx=ax-ux*WALL_OVERLAP, sy=ay-uy*WALL_OVERLAP;
-      const wl=len+WALL_OVERLAP*2, wt=Tpx+WALL_OVERLAP*2;
-      walls+=`<div class="l3d-wall" style="width:${fmt(wl)}px;height:${fmt(wt)}px;background:${wallCol};transform:translate3d(${fmt(sx)}px,${fmt(sy)}px,${fmt(-WALL_OVERLAP)}px) rotateZ(${fmt(ang)}deg) rotateX(90deg)"></div>`;
-    }
-    [[0,0,wpx,0],[wpx,0,wpx,hpx],[wpx,hpx,0,hpx],[0,hpx,0,0]].forEach(([ax,ay,bx2,by2])=>addWall(ax,ay,bx2,by2));
-    let hole='';
-    if(holeLocal){
-      const hx=holeLocal.cx*scale, hy=holeLocal.cy*scale, hrx=holeLocal.rx*scale, hry=holeLocal.ry*scale;
-      hole=`<div style="position:absolute;left:${fmt(hx-hrx)}px;top:${fmt(hy-hry)}px;width:${fmt(hrx*2)}px;height:${fmt(hry*2)}px;border-radius:50%;background:radial-gradient(ellipse at 38% 35%, #4a3520, #0c0703 78%);box-shadow:inset 0 0 ${fmt(Math.min(hrx,hry)*0.6)}px #000;transform:translateZ(${fmt(Tpx/2)}px)"></div>`;
-    }
-    return `<div class="l3d-layer" style="width:${fmt(wpx)}px;height:${fmt(hpx)}px;transform-origin:0 0 0;transform:${transform}">${walls}${outer}${inner}${hole}</div>`;
-  }
-
-  // Składa 5 (lub 6 z wieczkiem) ścianek jednego pudełka w bryłę 3D.
-  function buildBoxGroup3D(g, scale, xOff){
-    const {W,D,H,T,F,closure}=g.meta;
-    const Wpx=W*scale, Dpx=D*scale, Hpx=H*scale, Tpx=Math.max(2,T*scale);
-    const edgeDefs={}; boxPanelEdgeDefs(W,D,H).forEach(d=>edgeDefs[d.role]=d);
-    const TR={
-      bottom:`translate3d(${fmt(xOff)}px,0,0)`,
-      back:  `translate3d(${fmt(xOff)}px,0,${fmt(Hpx)}px) rotateX(-90deg)`,
-      front: `translate3d(${fmt(xOff)}px,${fmt(Dpx)}px,0) rotateX(90deg)`,
-      left:  `translate3d(${fmt(xOff)}px,0,${fmt(Hpx)}px) rotateY(90deg)`,
-      right: `translate3d(${fmt(xOff+Wpx)}px,0,0) rotateY(-90deg)`,
-      lid:   `translate3d(${fmt(xOff)}px,${fmt(Dpx)}px,${fmt(Hpx)}px) rotateX(180deg)`
-    };
-    // Cień pod pudełkiem — elipsa radial-gradient poniżej dna
-    const shW=Wpx*1.25, shD=Dpx*0.6, shX=xOff-(shW-Wpx)/2, shY=Dpx*0.72;
-    let html=`<div style="position:absolute;left:${fmt(shX)}px;top:${fmt(shY)}px;width:${fmt(shW)}px;height:${fmt(shD)}px;transform-origin:0 0 0;transform:translate3d(0,0,-2px);background:radial-gradient(ellipse,rgba(0,0,0,0.38) 0%,transparent 72%);pointer-events:none"></div>`;
-    ['bottom','back','left','right','front'].forEach(role=>{
-      const o=g.panels[role], ed=edgeDefs[role];
-      if(!o||!ed) return;
-      html+=buildBoxFace(o,ed,T,F,scale,Tpx,TR[role],BOX_FACE_COL,BOX_FACE_SHADE[role]);
-    });
-    const hasLidFlat=closure==='lid' && g.panels.lid;
-    if(hasLidFlat){
-      const ed={w:W,h:D,edges:{top:null,right:null,bottom:null,left:null}};
-      html+=buildBoxFace(g.panels.lid,ed,T,F,scale,Tpx,TR.lid,BOX_LID_COL,BOX_FACE_SHADE.lid);
-    } else {
-      // Pudełko otwarte — zaciemnione wnętrze w otworze górnym.
-      html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
-    }
-    return html;
-  }
-
-  // Wykrywa wygenerowane pudełka (box.gid/box.role na obiektach) i renderuje je jako złożoną
-  // bryłę zamiast płaskiej siatki. sw/sh = dostępna przestrzeń sceny w px. Zwraca liczbę
-  // narysowanych pudełek (0 = brak -> wołający pokazuje komunikat zastępczy).
-  function buildAssembledBoxScene(sceneEl, sw, sh){
-    const groups=new Map();
-    state.objects.forEach(o=>{
-      if(!o.box || !o.visible) return;
-      if(!groups.has(o.box.gid)) groups.set(o.box.gid,{meta:o.box,panels:{}});
-      groups.get(o.box.gid).panels[o.box.role]=o;
-    });
-    const gList=[...groups.values()].filter(g=>g.panels.bottom);
-    if(!gList.length){ sceneEl.innerHTML=''; sceneEl.dataset.empty='1'; return 0; }
-    sceneEl.dataset.empty='';
-    const GAP=24;
-    const maxDim=Math.max(...gList.flatMap(g=>[g.meta.W,g.meta.D,g.meta.H]));
-    const scale=clamp(Math.min(sw,sh)*0.85/maxDim, 0.2, 12);
-    let totalW=0, maxD=0;
-    gList.forEach(g=>{ totalW+=g.meta.W*scale; maxD=Math.max(maxD,g.meta.D*scale); });
-    totalW+=GAP*(gList.length-1);
-    sceneEl.style.width=Math.max(1,Math.round(totalW))+'px';
-    sceneEl.style.height=Math.max(1,Math.round(maxD))+'px';
-    let html='', xOff=0;
-    gList.forEach(g=>{ html+=buildBoxGroup3D(g,scale,xOff); xOff+=g.meta.W*scale+GAP; });
-    sceneEl.innerHTML=html;
-    return gList.length;
-  }
-
   // łączna grubość stosu w mm (do auto-skalowania wizualizacji)
   function totalStackMM(){
     const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
@@ -4795,11 +4619,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   /* ----- Dolny dok: podgląd 3D na żywo + podział SVG ----- */
   let liveRot={x:60,z:-28}, liveDrag=null, live3dRAF=null;
   let liveZoom={scale:1,x:0,y:0};
-  let live3dMode='assembled'; // 'assembled' = złożone pudełko (domyślnie, gdy jest pudełko), 'net' = siatka rozkroju
   const live3dStage=document.getElementById('live3dStage');
   const live3dScene=document.getElementById('live3dScene');
   const live3dZoomLabel=document.getElementById('live3dZoomLabel');
-  const live3dViewToggle=document.getElementById('live3dViewToggle');
   const live3dTitle=document.getElementById('live3dTitle');
   const bbSvgEl=document.getElementById('bbSvg');
   function applyLiveRot(){
@@ -4823,27 +4645,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function updateLive3D(){
     const W=state.docW,H=state.docH;
     const sh=live3dStage.clientHeight||200, sw0=live3dStage.clientWidth||300;
-    const hasBox=state.objects.some(o=>o.box && o.visible);
-    live3dViewToggle.style.display=hasBox?'':'none';
-    let n=0;
-    if(hasBox && live3dMode==='assembled'){
-      // Pobierz wymiary pierwszego pudełka do tytułu
-      const firstBox=state.objects.find(o=>o.box && o.visible);
-      const bm=firstBox?firstBox.box:null;
-      if(bm){
-        const clShort={open:'otwarte',lid:'+ wieczko'}[bm.closure]||'';
-        live3dTitle.textContent=`📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm, T=${bm.T} mm${clShort?' · '+clShort:''}`;
-      } else {
-        live3dTitle.textContent='📦 Wizualizacja 3D — złożone pudełko';
-      }
-      n=buildAssembledBoxScene(live3dScene, sw0*0.85, sh*0.85);
-    }
-    if(!n){
-      live3dTitle.textContent='🧊 Wizualizacja 3D — stos warstw materiału';
-      let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
-      const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
-      n=buildLayerScene(live3dScene, sw, pxPerMM);
-    }
+    live3dTitle.textContent='🧊 Wizualizacja 3D — stos warstw materiału';
+    let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
+    const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
+    const n=buildLayerScene(live3dScene, sw, pxPerMM);
     if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div style="color:var(--muted);font-size:.74rem;transform:none">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
     applyLiveRot();
     scheduleSvgSplit();
@@ -4873,48 +4678,27 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   live3dStage.addEventListener('wheel',e=>{ e.preventDefault(); zoomAtPoint(liveZoom, live3dScene, e.clientX, e.clientY, e.deltaY); applyLiveRot(); },{passive:false});
   live3dStage.addEventListener('dblclick',()=>{ liveZoom={scale:1,x:0,y:0}; applyLiveRot(); });
   document.getElementById('live3dZoomReset').addEventListener('click',()=>{ liveZoom={scale:1,x:0,y:0}; applyLiveRot(); });
-  live3dViewToggle.addEventListener('click',()=>{
-    live3dMode=live3dMode==='assembled'?'net':'assembled';
-    live3dViewToggle.textContent=live3dMode==='assembled'?'🗺 Siatka':'📦 Złożone';
-    updateLive3D();
-  });
   document.getElementById('live3dExpand').addEventListener('click',showPreview3D);
   document.getElementById('bbDownload').addEventListener('click',downloadSeparatedSVG);
   document.getElementById('bbSvgExpand').addEventListener('click',showSvgPreview);
 
   /* ----- Powiększony podgląd 3D (modal) ----- */
   let p3dRot={x:54,z:-24}, p3dDrag=null, p3dZoom={scale:1,x:0,y:0};
-  let p3dMode='assembled';
   const p3dScene=document.getElementById('p3dScene');
   const p3dZoomLabel=document.getElementById('p3dZoomLabel');
-  const p3dViewToggle=document.getElementById('p3dViewToggle');
   const p3dHint=document.getElementById('p3dHint');
   const p3dWrap0=document.getElementById('p3dWrap');
   const P3D_HINT_NET='Grubości warstw ustawiasz w mm w panelu „Warstwy 3D” po lewej — model 3D odwzorowuje je proporcjonalnie.';
-  const P3D_HINT_BOX='Podgląd pokazuje złożone pudełko — gotowy produkt po sklejeniu wszystkich ścianek.';
   function applyP3DTransform(){
     p3dScene.style.transform=`translate(${fmt(p3dZoom.x)}px,${fmt(p3dZoom.y)}px) scale(${fmt(p3dZoom.scale)}) rotateX(${p3dRot.x}deg) rotateZ(${p3dRot.z}deg)`;
     p3dZoomLabel.textContent=Math.round(p3dZoom.scale*100)+'%';
   }
   function renderP3D(){
     const W=state.docW, H=state.docH;
-    const hasBox=state.objects.some(o=>o.box && o.visible);
-    p3dViewToggle.style.display=hasBox?'':'none';
-    let n=0;
-    if(hasBox && p3dMode==='assembled'){
-      const firstBox2=state.objects.find(o=>o.box && o.visible);
-      const bm2=firstBox2?firstBox2.box:null;
-      p3dHint.textContent=bm2
-        ? `Złożone pudełko ${bm2.W}×${bm2.D}×${bm2.H} mm, T=${bm2.T} mm — widok gotowego produktu po sklejeniu.`
-        : P3D_HINT_BOX;
-      n=buildAssembledBoxScene(p3dScene, (p3dWrap0.clientWidth||320)*0.8, (p3dWrap0.clientHeight||320)*0.8);
-    }
-    if(!n){
-      p3dHint.textContent=P3D_HINT_NET;
-      const sw=Math.min(360, Math.round(W/H*300));
-      const pxPerMM=Math.max(2, Math.min(10, 200/totalStackMM()));
-      n=buildLayerScene(p3dScene, sw, pxPerMM);
-    }
+    p3dHint.textContent=P3D_HINT_NET;
+    const sw=Math.min(360, Math.round(W/H*300));
+    const pxPerMM=Math.max(2, Math.min(10, 200/totalStackMM()));
+    buildLayerScene(p3dScene, sw, pxPerMM);
   }
   function showPreview3D(){
     const W=state.docW, H=state.docH;
@@ -4942,11 +4726,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   p3dWrap.addEventListener('wheel',e=>{ e.preventDefault(); zoomAtPoint(p3dZoom, p3dScene, e.clientX, e.clientY, e.deltaY); applyP3DTransform(); },{passive:false});
   p3dWrap.addEventListener('dblclick',()=>{ p3dRot={x:54,z:-24}; p3dZoom={scale:1,x:0,y:0}; applyP3DTransform(); });
   document.getElementById('p3dZoomReset').addEventListener('click',()=>{ p3dRot={x:54,z:-24}; p3dZoom={scale:1,x:0,y:0}; applyP3DTransform(); });
-  p3dViewToggle.addEventListener('click',()=>{
-    p3dMode=p3dMode==='assembled'?'net':'assembled';
-    p3dViewToggle.textContent=p3dMode==='assembled'?'🗺 Siatka':'📦 Złożone';
-    renderP3D();
-  });
   document.getElementById('preview3dBtn').addEventListener('click',showPreview3D);
   document.getElementById('loadFontsBtn').addEventListener('click',loadLocalFonts);
   document.getElementById('modal3dPrevClose').addEventListener('click',()=>document.getElementById('modal3dPrev').classList.remove('open'));
@@ -5357,10 +5136,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     pushHistory(); renderAll(); renderProps(); zoomFit();
   }); tplEl.appendChild(b); });
 
-  /* ---------------- Generator pudełka (łączenia „na palec”) ---------------- */
-  // Punkty jednej krawędzi długości L: naprzemienne segmenty wystają na zewnątrz o `t`
-  // (palec) albo zostają przy krawędzi (0). `tabsFirst` ustala fazę — sąsiednia ścianka
-  // używa odwrotnej fazy, dzięki czemu palce jednej wsuwają się w przerwy drugiej.
+  /* ---------------- Punkty krawędzi „na palec” (używane przez generator zawiasu) ---------------- */
   function fingerEdgePoints(L,t,f,tabsFirst){
     let n=Math.max(1,Math.round(L/f));
     if(n%2===0) n+=1;
@@ -5371,17 +5147,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       pts.push([(i+1)*seg,off]);
       if(next!==off) pts.push([(i+1)*seg,next]);
     }
-    return pts;
-  }
-  // Kontur jednej ścianki w lokalnym układzie 0..w x 0..h. edges.{top,right,bottom,left}:
-  // true/false = krawędź z palcami (faza), null = krawędź prosta (bez łączenia, np. góra otwartego pudełka).
-  function boxPanelPoints(w,h,t,f,edges){
-    const pts=[];
-    const add=(x,y)=>{ const last=pts[pts.length-1]; if(!last||Math.abs(last[0]-x)>1e-6||Math.abs(last[1]-y)>1e-6) pts.push([x,y]); };
-    if(edges.top==null){ add(0,0); add(w,0); } else fingerEdgePoints(w,t,f,edges.top).forEach(([al,off])=>add(al,-off));
-    if(edges.right==null){ add(w,0); add(w,h); } else fingerEdgePoints(h,t,f,edges.right).forEach(([al,off])=>add(w+off,al));
-    if(edges.bottom==null){ add(w,h); add(0,h); } else fingerEdgePoints(w,t,f,edges.bottom).forEach(([al,off])=>add(w-al,h+off));
-    if(edges.left==null){ add(0,h); add(0,0); } else fingerEdgePoints(h,t,f,edges.left).forEach(([al,off])=>add(-off,h-al));
     return pts;
   }
   // Wzór "living hinge" zorientowany POZIOMO (oś zgięcia pozioma): nacięcia biegną wzdłuż
@@ -5440,162 +5205,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     return {d,count};
   }
-  // Mapowanie rola → {w,h,edges} dla pięciu głównych ścianek pudełka (bez pozycji w rozkroju).
-  // Współdzielone przez buildFingerBox (generowanie 2D) i buildAssembledBoxScene (podgląd 3D złożony) —
-  // jedno źródło prawdy dla geometrii łączeń „na palec”, żeby oba widoki nigdy nie rozjechały się.
-  function boxPanelEdgeDefs(W,D,H){
-    return [
-      {name:'Tył',           role:'back',   w:W,h:H, edges:{top:null,  right:true,  bottom:false, left:true }},
-      {name:'Lewa',          role:'left',   w:H,h:D, edges:{top:false, right:false, bottom:false, left:null }},
-      {name:'Dół (podstawa)',role:'bottom', w:W,h:D, edges:{top:true,  right:true,  bottom:true,  left:true }},
-      {name:'Prawa',         role:'right',  w:H,h:D, edges:{top:false, right:null,  bottom:false, left:false}},
-      {name:'Przód',         role:'front',  w:W,h:H, edges:{top:false, right:true,  bottom:null,  left:true }}
-    ];
-  }
-  // Punkty owalu (n-kąt foremny przybliżający elipsę) — używane do otworu na zapięcie/sznurek.
-  function ovalPoints(cx,cy,rx,ry,n){
-    n=n||48; const pts=[];
-    for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; pts.push([cx+Math.cos(a)*rx, cy+Math.sin(a)*ry]); }
-    return pts;
-  }
-  // Dodaje owalny otwór do istniejącego panelu jako dodatkową podścieżkę + fillRule:evenodd
-  // (działa niezależnie od kierunku obrysu zewnętrznego — nie trzeba dopasowywać winding order).
-  function addOvalHole(panel,cx,cy,rx,ry){
-    panel.d+=polyToPathD(ovalPoints(cx,cy,rx,ry));
-    panel.fillRule='evenodd';
-    panel.hole={cx,cy,rx,ry};
-  }
-  function buildFingerBox(W,D,H,T,F,closure,clasp){
-    const g=Math.max(T*4,12);
-    // Rozkrój: każdy panel ODDZIELNIE, rozmieszczony w wierszach z wyraźnym odstępem
-    // (jak w boxes.py) — żaden panel nie nachodzi na inny i każdy da się osobno
-    // zaznaczyć oraz przesunąć. Pakowanie zachłanne: panele kładziemy w rzędzie,
-    // a gdy rząd przekroczy maxRowW, zawijamy do nowego wiersza.
-    const defs=boxPanelEdgeDefs(W,D,H);
-    const maxRowW=Math.max(W*2+g, H*3+2*g, W+H+g);
-    const pos={}; let cx=0, cy=0, rowH=0;
-    for(const d of defs){
-      const pw=d.w+2*T, ph=d.h+2*T;            // zapas na wystające palce łączeń
-      if(cx>0 && cx+pw>maxRowW){ cx=0; cy+=rowH+g; rowH=0; }
-      pos[d.role]={x:cx+T, y:cy+T};
-      cx+=pw+g; rowH=Math.max(rowH,ph);
-    }
-    const base=defs.map(p=>({...p, x:pos[p.role].x, y:pos[p.role].y}));
-    const panels=base.map(p=>{
-      const pts=boxPanelPoints(p.w,p.h,T,F,p.edges).map(([x,y])=>[x+p.x,y+p.y]);
-      const bb=polysBBoxMulti([pts]);
-      return {name:p.name, role:p.role, mode:'cut', d:polyToPathD(pts), bx:bb.minx, by:bb.miny, bw:Math.max(1,bb.maxx-bb.minx), bh:Math.max(1,bb.maxy-bb.miny)};
-    });
-    // otwór na zapięcie na ściance przedniej — owal wycentrowany w poziomie, blisko górnej krawędzi
-    // (lokalne y=h ściany przedniej = górny, otwarty brzeg pudełka — patrz boxPanelEdgeDefs/edges.bottom=null)
-    const claspRx=clamp(Math.min(W,H,D)*0.16,7,22), claspRy=clamp(claspRx*0.45,3.5,9);
-    if(clasp){
-      const front=panels.find(p=>p.role==='front');
-      addOvalHole(front, front.bx+front.bw/2, front.by+front.bh-claspRy-3, claspRx, claspRy);
-    }
-    // --- elementy zamknięcia ustawiamy w nowym rzędzie poniżej rozkroju 5 ścianek ---
-    if(closure && closure!=='open'){
-      const bb=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
-      let ex=0; const ey=bb.maxy+g;
-      const place=(w)=>{ const px=ex; ex+=w+g; return px; };
-      const rectPanel=(name,role,w,h,mode)=>{
-        const px=place(w);
-        const pts=[[px,ey],[px+w,ey],[px+w,ey+h],[px,ey+h]];
-        const panel={name,role,mode:mode||'cut',d:polyToPathD(pts),bx:px,by:ey,bw:w,bh:h};
-        panels.push(panel);
-        return panel;
-      };
-      if(closure==='lid'){
-        const lid=rectPanel('Wieczko (góra)','lid', W, D);
-        if(clasp) addOvalHole(lid, lid.bx+lid.bw/2, lid.by+claspRy+3, claspRx, claspRy);
-      }
-    }
-    return panels;
-  }
-  const modalBox=document.getElementById('modalBox');
-  const BOX_CLOSURE_NOTES={
-    open:'Pudełko otwarte od góry — 5 ścianek łączonych „na palec".',
-    lid:'Dodatkowe płaskie wieczko leżące luźno na otworze — 6 ścianek.'
-  };
-  const boxClosureSel=document.getElementById('boxClosure');
-  const boxClosureNote=document.getElementById('boxClosureNote');
-  const boxClosurePrev=document.getElementById('boxClosurePreview');
-  // Rysuje schematyczny rzut z góry zamknięcia pudełka (uproszczona ikona SVG)
-  function drawClosurePreview(type){
-    // Rysunek schematyczny z boku (cross-section) + rzut z góry wieczka
-    // Paleta: bg=ciemne tło, bx=kontur pudełka (niebieski), lid=kolor wieczka (drewno), mark=akcent/opis, cl=muted
-    const W=200,D=70,T=6,sw=52,sh=13,r=5,tw=26,th=13,lip=8;
-    const bg='#0f172a',bx=ACCENT,lidC='#caa06c',mark='#f0d6a8',cl='#64748b',g1='#caa06c44',g2='#caa06c99';
-    const wall=`<rect x="0" y="0" width="${W}" height="${D}" fill="${bg}" stroke="${bx}" stroke-width="2" rx="2"/>`;
-    // Ścianki pudełka (grube kreski na obwodzie)
-    const walls=`<rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="${bx}" stroke-width="${T*0.9}" rx="2"/>`;
-    const inner=`<rect x="${T}" y="${T}" width="${W-2*T}" height="${D-2*T}" fill="${bg}" stroke="none"/>`;
-    const box=`${wall}${walls}${inner}`;
-    const lidBase=`<rect x="0" y="0" width="${W}" height="${D}" fill="${g1}" stroke="${lidC}" stroke-width="2" rx="2"/>`;
-    let extra='';
-    if(type==='open'){
-      // Otwarte pudełko — strzałki wskazujące do góry i jasny "otwór"
-      extra=`<rect x="${T}" y="${T}" width="${W-2*T}" height="${D-2*T}" fill="${bg}"/>
-        <line x1="${W/2-24}" y1="${T+10}" x2="${W/2-24}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
-        <line x1="${W/2}" y1="${T+10}" x2="${W/2}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
-        <line x1="${W/2+24}" y1="${T+10}" x2="${W/2+24}" y2="${-14}" stroke="${cl}" stroke-width="1.5" marker-end="url(#arr)"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${cl}" font-size="11" font-family="sans-serif" font-style="italic">otwarte od góry</text>`;
-    } else if(type==='lid'){
-      // Wieczko luźne — unosi się nad pudełkiem
-      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
-        <line x1="${W/2-20}" y1="${-4}" x2="${W/2-20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
-        <line x1="${W/2+20}" y1="${-4}" x2="${W/2+20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">wieczko nakładane</text>`;
-    }
-    const defs=`<defs>
-      <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${cl}"/></marker>
-      <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${mark}"/></marker>
-    </defs>`;
-    const vb=`-4 ${-th*2-8} ${W+8} ${D+th*2+16}`;
-    boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="68" style="display:block">${defs}${box}${extra}</svg>`;
-  }
-  const updateBoxClosureNote=()=>{
-    const v=boxClosureSel.value;
-    boxClosureNote.textContent=BOX_CLOSURE_NOTES[v]||'';
-    drawClosurePreview(v);
-  };
-  boxClosureSel.addEventListener('change',updateBoxClosureNote); updateBoxClosureNote();
-  document.getElementById('boxGenBtn').addEventListener('click',()=>modalBox.classList.add('open'));
-  document.getElementById('modalBoxClose').addEventListener('click',()=>modalBox.classList.remove('open'));
-  modalBox.addEventListener('click',e=>{ if(e.target===modalBox) modalBox.classList.remove('open'); });
-  document.getElementById('boxGenerateBtn').addEventListener('click',()=>{
-    const W=clamp(Number(document.getElementById('boxW').value)||120,10,2000);
-    const D=clamp(Number(document.getElementById('boxD').value)||80,10,2000);
-    const H=clamp(Number(document.getElementById('boxH').value)||60,10,2000);
-    const T=clamp(Number(document.getElementById('boxT').value)||3,0.5,20);
-    const F=clamp(Number(document.getElementById('boxF').value)||15,2,100);
-    const closure=boxClosureSel.value||'open';
-    const clasp=document.getElementById('boxClasp').checked;
-    const panels=buildFingerBox(W,D,H,T,F,closure,clasp);
-    const gid=uid();
-    // UWAGA: panele NIE są grupowane (brak groupId) — każdy jest osobnym, niezależnym
-    // elementem (można go zaznaczyć i przesunąć pojedynczo). Wspólne `box.gid` służy
-    // tylko do złożenia wizualizacji 3D, nie do grupowania zaznaczeniem.
-    const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:p.fillRule||'nonzero',
-      bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
-      depth:state.depth||1,repeat:{type:'none'},hole:p.hole||null,
-      box:p.box||{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
-    const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
-    if(totalBB.maxx>state.docW || totalBB.maxy>state.docH){
-      applyDocSize(Math.max(state.docW,Math.ceil(totalBB.maxx+5)), Math.max(state.docH,Math.ceil(totalBB.maxy+5)));
-    }
-    state.objects.push(...newObjs); state.selectedIds=newObjs.map(o=>o.id);
-    pushHistory();
-    // Po generowaniu pudełka: zawsze pokaż widok złożony w obu panelach 3D
-    live3dMode='assembled'; p3dMode='assembled';
-    live3dViewToggle.textContent='🗺 Siatka';
-    p3dViewToggle.textContent='🗺 Siatka';
-    renderAll();
-    renderProps();
-    zoomFit();
-    modalBox.classList.remove('open');
-  });
-
   /* ---------------- Generator zawiasu (living hinge) ---------------- */
   // Klasyczny wzór "living hinge": KOLUMNY pionowych szczelin. Kolumny parzyste/nieparzyste
   // są lekko przesunięte względem siebie (wzór "w cegiełkę"), ale OBIE sięgają blisko górnej
