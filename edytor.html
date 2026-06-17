@@ -1492,9 +1492,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const hs=[ ['nw',b.x,b.y],['n',b.x+b.w/2,b.y],['ne',b.x+b.w,b.y],
                  ['e',b.x+b.w,b.y+b.h/2],['se',b.x+b.w,b.y+b.h],['s',b.x+b.w/2,b.y+b.h],
                  ['sw',b.x,b.y+b.h],['w',b.x,b.y+b.h/2] ];
-      const hr=state.view.w*0.005;     // visible handle dot radius (~constant on screen)
-      const hit=hr*3;                  // invisible hit area — wider than the dot, so handles are easy to grab
-      const rotR=state.view.w*0.011, rotHit=rotR*2.4; // rotation handle stays larger/easier to grab
+      const hr=state.view.w*0.005;     // promień widocznej kropki uchwytu (~stały na ekranie)
+      const hit=hr*3;                  // niewidoczna strefa kliku — szersza niż kropka, łatwiej chwycić
+      const rotR=state.view.w*0.011, rotHit=rotR*2.4; // uchwyt obrotu — większy, łatwiej chwycić
       const rotY=b.y-rotR*4;
       s+=`<line class="sel-rot-line" x1="${fmt(c.x)}" y1="${fmt(b.y)}" x2="${fmt(c.x)}" y2="${fmt(rotY)}"/>`;
       s+=`<circle class="sel-rot" cx="${fmt(c.x)}" cy="${fmt(rotY)}" r="${fmt(rotR*1.25)}" style="pointer-events:none"/>`;
@@ -2403,7 +2403,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   canvas.addEventListener('pointerdown', e=>{
     trackPointer(e);
-    if(pointers.size>=2){ beginPinch(); return; }              // two fingers -> pan/zoom
+    if(pointers.size>=2){ beginPinch(); return; }              // dwa palce -> przesuwanie/zoom
     const wantPan = e.button===1 || spaceDown || state.tool==='pan';
     const guideHit = !wantPan && e.target.closest && e.target.closest('.guide-hit');
     if(guideHit){
@@ -2479,7 +2479,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       startMarquee(e,docP);                                       // puste pole = zaznaczanie ramką (nie przesuwa widoku)
       return;
     }
-    // shape tools -> draw
+    // narzędzia kształtów -> rysowanie
     startDraw(e,docP);
   });
 
@@ -5828,8 +5828,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Galeria podkładów ---------------- */
 
-  /* Scale all coordinate values in an SVG path d-string by factor s.
-     Arc flags (large-arc, sweep) are preserved unchanged. */
+  /* Skaluje wszystkie wartości współrzędnych w stringu d ścieżki SVG o współczynnik s.
+     Flagi łuków (large-arc, sweep) pozostają bez zmian. */
   function scalePathD(d, s){
     if(Math.abs(s-1) < 1e-9) return d;
     const NUM = /-?\d*\.?\d+(?:[eE][-+]?\d+)?/g;
@@ -5850,7 +5850,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     });
   }
 
-  /* Convert a single SVG shape element to a path d-string fragment. */
+  /* Konwertuje pojedynczy element kształtu SVG na fragment stringu d ścieżki. */
   function svgShapeElToD(el){
     const tag = el.tagName.toLowerCase().replace(/^.*:/, '');
     const num = a => parseFloat(el.getAttribute(a)) || 0;
@@ -6154,11 +6154,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     reader.readAsText(file);
   }
 
-  /* Import an SVG file as separate, editable path objects (one object per shape),
-     unlike importSvgFile (which merges everything into one "custom base" for the
-     gallery). Handles nested <g transform="..."> chains (translate/scale/rotate/
-     skew/matrix), infers cut/engrave/score mode from fill/stroke colors, and scales
-     + centers the whole drawing to fit the document. */
+  /* Importuje plik SVG jako osobne, edytowalne obiekty ścieżek (po jednym na kształt),
+     w odróżnieniu od importSvgFile (który scala wszystko w jeden „podkład" dla galerii).
+     Obsługuje zagnieżdżone łańcuchy <g transform="..."> (translate/scale/rotate/
+     skew/matrix), rozpoznaje tryb cięcia/graweru/nacięcia po kolorach fill/stroke,
+     i skaluje + centruje cały rysunek na dokumencie. */
   function importSvgAsObjects(file){
     if(!file) return;
     const reader=new FileReader();
@@ -6289,7 +6289,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     try{ localStorage.setItem('laser_edytor_custom_bases_v1', JSON.stringify(list.filter(b=>b.custom))); }catch(e){}
   }
 
-  /* Add shape from a base definition to canvas, scaled & centered. */
+  /* Dodaje kształt z definicji podkładu na płótno, przeskalowany i wycentrowany. */
   function addBaseToCanvas(base){
     const maxDim = Math.max(base.bw, base.bh) || 1;
     const target = Math.min(120, state.docW*0.7, state.docH*0.7);
@@ -6313,8 +6313,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     saveCustomBases(loadCustomBases().filter(b=>b.id!==id)); renderGallery();
   }
 
-  /* Build the built-in base shapes using existing geometry helpers.
-     Measure real bbox via temporary off-screen SVG path.getBBox(). */
+  /* Buduje wbudowane podkłady kształtów korzystając z istniejących helperów geometrii.
+     Mierzy rzeczywisty bbox przez tymczasowy off-screen SVG path.getBBox(). */
   function buildBuiltInBases(){
     const tmpSvg = document.createElementNS(SVG_NS,'svg');
     tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
