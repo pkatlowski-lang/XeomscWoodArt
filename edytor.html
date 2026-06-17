@@ -6136,7 +6136,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         branch(x1,y1,na, len*(0.74+rnd()*0.08), w*0.7, depth-1);
       }
     }
-    branch(W/2, H-2, -Math.PI/2, opt.trunk*H, opt.width*W, opt.depth);
+    const baseX=opt.baseX!=null?opt.baseX:W/2, baseY=opt.baseY!=null?opt.baseY:H-2;
+    const trunkLen=opt.trunkPx!=null?opt.trunkPx:opt.trunk*H, trunkW=opt.widthPx!=null?opt.widthPx:opt.width*W;
+    branch(baseX, baseY, -Math.PI/2, trunkLen, trunkW, opt.depth);
     if(opt.foliage){
       const flat=opt.canopyFlat||0;
       // zakres wysokości końców gałęzi; liście dodajemy TYLKO w górnym pasie (korona),
@@ -6152,6 +6154,26 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         ctx.beginPath(); ctx.ellipse(fx,fy,r,r*(flat>0?0.8:1),0,0,Math.PI*2); ctx.fill();
       }
     }
+  }
+
+  // Scena „drzewo w okręgu" (styl wall-art): pierścień + wzgórze + drzewo, wszystko
+  // połączone w JEDNĄ sylwetkę (pień stoi na wzgórzu, wzgórze styka się z pierścieniem),
+  // a niebo między gałęziami staje się otworem do wycięcia.
+  function drawTreeCircleScene(ctx, opt){
+    opt=opt||{};
+    const W=ctx.canvas.width, H=ctx.canvas.height, cx=W/2, cy=H/2;
+    const R=Math.min(W,H)/2-4, r=R-(opt.band||26);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();   // pierścień: dysk
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();   // okno (niebo)
+    ctx.fillStyle='#000';
+    ctx.beginPath();                                                                    // niskie wzgórze łączące się z pierścieniem po bokach
+    ctx.moveTo(cx-R, cy+r*0.74);
+    ctx.quadraticCurveTo(cx-r*0.4, cy+r*0.42, cx, cy+r*0.46);
+    ctx.quadraticCurveTo(cx+r*0.45, cy+r*0.50, cx+R, cy+r*0.70);
+    ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath(); ctx.fill();
+    drawTreeShape(ctx, {seed:opt.seed||23, depth:9, spread:1.2, up:0.24, foliage:true,
+      foliageR:opt.foliageR||1.0, canopyFlat:1, canopyBand:0.46, minW:2.6,
+      baseX:cx, baseY:cy+r*0.42, trunkPx:r*0.34, widthPx:r*0.058});
   }
 
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
@@ -6171,6 +6193,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:5,depth:8,trunk:0.17,width:0.046,spread:1.04,up:0.02,foliage:true,foliageR:1.4,canopyBand:0.6,minW:2.6}),560,640,{tol:1.5,corner:38,minArea:50})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
         d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{tol:1.5,corner:36,minArea:50})},
+      {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
+        d:rasterizeShapeToD(ctx=>drawTreeCircleScene(ctx,{seed:23}),640,640,{tol:1.4,corner:34,minArea:60})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:11,depth:7,trunk:0.18,width:0.06,spread:0.74,up:0.08,foliage:false,minW:3.2}),520,520,{tol:1.2,corner:30,minArea:70})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
