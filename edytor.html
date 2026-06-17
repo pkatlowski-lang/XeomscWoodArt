@@ -617,7 +617,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" aria-label="Zamknij" id="modalBoxClose" title="Zamknij">✕</button>
     <h3>📦 Generator pudełka</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Każdy panel to <strong>osobny element</strong> (rozdzielone z odstępem, jak w boxes.py) — przesuniesz każdy oddzielnie. Podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
+    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Każdy panel to <strong>osobny element</strong> (rozłożone obok siebie) — przesuniesz każdy oddzielnie. Podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
     <div class="field"><label>Szerokość — W (mm)</label><input type="number" id="boxW" min="10" max="2000" step="1" value="120"></div>
     <div class="field"><label>Głębokość — D (mm)</label><input type="number" id="boxD" min="10" max="2000" step="1" value="80"></div>
     <div class="field"><label>Wysokość — H (mm)</label><input type="number" id="boxH" min="10" max="2000" step="1" value="60"></div>
@@ -1113,7 +1113,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     return pts.map((p,i)=>(i?'L':'M')+fmt(p[0])+' '+fmt(p[1])).join('')+'Z';
   }
 
-  // Returns the path "d" for non-text shapes (in document/mm coords).
+  // Zwraca atrybut „d" ścieżki dla kształtów nie-tekstowych (w ukł. dokumentu, mm).
   function shapeD(o){
     const {x,y,w,h}=o, cx=x+w/2, cy=y+h/2;
     switch(o.type){
@@ -4170,7 +4170,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const grid=document.getElementById('layers3dGrid');
     const note=document.getElementById('modal3dNote');
 
-    // Clear previous blob URLs to avoid memory leaks
+    // Zwolnij stare blob URLs (zapobieganie wyciekom pamięci)
     grid.querySelectorAll('a[href^="blob:"]').forEach(a=>URL.revokeObjectURL(a.href));
 
     grid.innerHTML=depths.map(dep=>{
@@ -6444,7 +6444,7 @@ const ov=document.getElementById('modalSendQuote');
 const statusEl=document.getElementById('sendQuoteStatus');
 const submitBtn=document.getElementById('sendQuoteSubmit');
 const openBtn=document.getElementById('sendQuoteOpenBtn');
-const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'#ff7b7b':'var(--muted)'; };
+const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'var(--cut-light)':'var(--muted)'; };
 
 openBtn.addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
 document.getElementById('lqSend').addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
