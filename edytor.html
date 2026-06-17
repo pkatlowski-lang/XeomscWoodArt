@@ -188,7 +188,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer.layer-hidden .lname{opacity:.45}
 .layer .lico.lico-locked{opacity:.9!important;color:var(--accent)}
 
-/* ---- Parameters (parametry globalne) ---- */
+/* ---- Parametry globalne ---- */
 .params{display:flex;flex-direction:column;gap:8px;padding:0 14px 12px}
 .param-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 10px}
 .param-card .prow{display:flex;gap:6px;align-items:center}
@@ -2361,7 +2361,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     o.d=d; pushHistory(); renderObjects(); renderProps();
   }
 
-  /* ---------------- Edycja punktów ścieżki (Edit Points) ---------------- */
+  /* ---------------- Edycja punktów ścieżki ---------------- */
   // tylko ścieżki z pojedynczym konturem zbudowanym z prostych odcinków (M..L..L..Z) da się edytować punkt po punkcie
   function isEditablePolygonPath(o){
     if(o.type!=='path'||!o.d) return false;
@@ -2528,9 +2528,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(e.altKey){                                                 // Alt+przeciągnij = zostaw oryginał, przesuwaj duplikat
       const sel=getSelected().filter(s=>!s.locked);
       const idx=sel.indexOf(o);
-      const gidMap={};
+      const gidMap={}, boxGidMap={};
       const copies=sel.map(s=>{ const c=JSON.parse(JSON.stringify(s)); c.id=uid();
         if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
+        if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
         return c; });
       state.objects.push(...copies);
       state.selectedIds=copies.map(c=>c.id);
@@ -3408,8 +3409,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           o[otherProp]=Math.max(0.01, Math.round((val/(path==='w'?oldW:oldH))*(path==='w'?oldH:oldW)*100)/100);
           const otherInp=propsEl.querySelector(`[data-prop="${otherProp}"]`); if(otherInp) otherInp.value=fmt(o[otherProp]);
         }
-        // keep the corner-radius slider's range/value/label in sync with the (possibly re-clamped) rx
-        // after w/h change, without rebuilding the whole props panel (which would steal input focus)
+        // synchronizuj suwak zaokrąglenia narożników z (ewentualnie przyciętym) rx po zmianie w/h,
+        // bez przebudowy całego panelu właściwości (bo to zabierałoby focus z aktywnego inputa)
         if(o.type==='rect' && (path==='w'||path==='h')){
           const rxMax=Math.min(o.w,o.h)/2;
           if((o.rx||0)>rxMax) o.rx=rxMax;
@@ -3889,9 +3890,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
 
   function duplicateSel(){ const sel=getSelected(); if(!sel.length) return;
-    const gidMap={};
+    const gidMap={}, boxGidMap={};
     const copies=sel.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
+      if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
       return c; });
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
@@ -3902,9 +3904,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function copySel(){ const sel=getSelected(); if(!sel.length) return;
     clipboard=sel.map(o=>JSON.parse(JSON.stringify(o))); }
   function pasteClipboard(){ if(!clipboard.length) return;
-    const gidMap={};
+    const gidMap={}, boxGidMap={};
     const copies=clipboard.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
+      if(c.box && c.box.gid){ if(!boxGidMap[c.box.gid]) boxGidMap[c.box.gid]=uid(); c.box.gid=boxGidMap[c.box.gid]; }
       return c; });
     clipboard=copies.map(c=>JSON.parse(JSON.stringify(c))); // kolejne Ctrl+V odsuwa dalej, jak w Illustratorze/Cuttle
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
@@ -4158,7 +4161,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(o.groupId){ frame.groupId=o.groupId; }
     else { const gid=uid(); o.groupId=gid; frame.groupId=gid; }
     const i=state.objects.findIndex(x=>x.id===o.id);
-    state.objects.splice(i,0,frame);          // insert below text in render order
+    state.objects.splice(i,0,frame);          // wstaw pod tekstem w kolejności renderowania
     state.selectedIds=expandGroupSelection([o.id]);
     pushHistory(); renderAll(); renderProps();
   }
@@ -4788,7 +4791,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     return depths.reduce((s,d)=>s+layerMM(d),0)||3;
   }
 
-  /* ----- Bottom dock: live 3D + live SVG split ----- */
+  /* ----- Dolny dok: podgląd 3D na żywo + podział SVG ----- */
   let liveRot={x:60,z:-28}, liveDrag=null, live3dRAF=null;
   let liveZoom={scale:1,x:0,y:0};
   let live3dMode='assembled'; // 'assembled' = złożone pudełko (domyślnie, gdy jest pudełko), 'net' = siatka rozkroju
@@ -4878,7 +4881,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   document.getElementById('bbDownload').addEventListener('click',downloadSeparatedSVG);
   document.getElementById('bbSvgExpand').addEventListener('click',showSvgPreview);
 
-  /* ----- Big modal preview ----- */
+  /* ----- Powiększony podgląd 3D (modal) ----- */
   let p3dRot={x:54,z:-24}, p3dDrag=null, p3dZoom={scale:1,x:0,y:0};
   let p3dMode='assembled';
   const p3dScene=document.getElementById('p3dScene');
@@ -5158,7 +5161,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  /* ---------------- Export ---------------- */
+  /* ---------------- Eksport ---------------- */
   // Główny eksport SVG: tekst eksportowany jest zawsze jako zwektoryzowany kontur liter
   // (objSubPolysRepeated), nie jako element <text> zależny od czcionki dostępnej w innym
   // programie. Kształty cięcia/nacięcia (oraz tekst w tych trybach) tej samej warstwy
@@ -5317,7 +5320,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  /* ---------------- Templates ---------------- */
+  /* ---------------- Szablony ---------------- */
   const TEMPLATES=[
     {key:'tag',label:'🏷 Zawieszka z napisem',build(){
       return [
@@ -5822,7 +5825,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     modalGear.classList.remove('open');
   });
 
-  /* ---------------- Gallery of bases ---------------- */
+  /* ---------------- Galeria podkładów ---------------- */
 
   /* Scale all coordinate values in an SVG path d-string by factor s.
      Arc flags (large-arc, sweep) are preserved unchanged. */
@@ -6391,7 +6394,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
   });
 
-  /* ---------------- Init ---------------- */
+  /* ---------------- Inicjalizacja ---------------- */
   buildCanvasSkeleton();
   // Każde wejście do edytora zaczyna NOWĄ, pustą sesję — świadomie NIE przywracamy
   // poprzedniego projektu z autozapisu. Czyścimy też stary autozapis, żeby nie został
@@ -6403,7 +6406,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
-  window.addEventListener('resize',()=>{ applyView(); renderOverlay(); });
+  let _resizeRAF=0;
+  window.addEventListener('resize',()=>{ cancelAnimationFrame(_resizeRAF); _resizeRAF=requestAnimationFrame(()=>{ applyView(); renderOverlay(); }); });
   window.addEventListener('beforeunload',e=>{ if(state.objects.length){ e.preventDefault(); } });
 
   // Czcionki z Google Fonts wczytują się asynchronicznie - jeśli wektoryzacja tekstu
