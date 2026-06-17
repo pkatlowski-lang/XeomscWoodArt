@@ -53,6 +53,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .panel.right{border-left:1px solid var(--border)}
 .panel h2{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:14px 16px 6px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0}
 .panel h2::after{content:'';flex:1;height:1px;background:var(--border);opacity:.7}
+/* ---- Zakładki panelu bocznego ---- */
+.ptabs{display:flex;border-bottom:1.5px solid var(--border);flex-shrink:0}
+.ptab{flex:1;padding:9px 6px 8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:none;border:none;cursor:pointer;transition:color .15s,box-shadow .15s;text-align:center;position:relative}
+.ptab:hover{color:var(--text)}
+.ptab.active{color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0}
+.ptab-body.active{display:flex}
+/* Wycena inline */
+.pq-sec{padding:10px 14px 12px}
+.pq-sec+.pq-sec{border-top:1px solid var(--border)}
+.pq-h{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px;display:flex;align-items:center;gap:5px}
+.pq-mat{margin-bottom:7px}
+.pq-mat-head{display:grid;grid-template-columns:1fr 24px;gap:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;padding:0 1px}
+.pq-mat-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;background:rgba(15,23,42,.5);position:relative}
+.pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center}
+.pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.pq-mat-row .pq-row-nums label{font-size:.58rem;color:var(--muted);display:flex;flex-direction:column;gap:1px}
+.pq-mat-row input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:5px 5px;font-size:.74rem;outline:none;box-sizing:border-box}
+.pq-mat-row input:focus{border-color:var(--accent)}
+.pq-del{width:28px;height:28px;background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.35);color:var(--danger);border-radius:5px;cursor:pointer;font-size:.72rem;padding:0;display:flex;align-items:center;justify-content:center}
+.pq-del:hover{background:rgba(255,90,90,.25)}
+.pq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.pq-grid label{display:flex;flex-direction:column;font-size:.66rem;color:var(--muted);gap:3px}
+.pq-grid input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:5px 6px;font-size:.76rem;outline:none;width:100%;box-sizing:border-box}
+.pq-grid input:focus{border-color:var(--accent)}
+.pq-actions{display:flex;gap:6px;padding:8px 14px 14px}
+.pq-status{font-size:.72rem;min-height:16px;padding:0 14px 8px;font-weight:600}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;background:
   repeating-linear-gradient(45deg,#0f0b06 0 10px,#120d07 10px 20px)}
 #canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -479,6 +506,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   <div class="workspace">
     <aside class="panel left">
+      <div class="ptabs">
+        <button class="ptab active" data-ptab="project">🔧 Projekt</button>
+        <button class="ptab" data-ptab="pricing">💰 Wycena</button>
+      </div>
+      <div class="ptab-body active" data-ptab-body="project">
       <h2>Arkusz roboczy</h2>
       <div class="field">
         <label>Arkusz roboczy (mm)</label>
@@ -522,6 +554,32 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <span><i class="li-eng"></i> grawer</span>
         <span><i class="li-sco"></i> nacięcie</span>
       </div>
+      </div><!-- /ptab-body project -->
+
+      <div class="ptab-body" data-ptab-body="pricing">
+        <div class="pq-sec">
+          <div class="pq-h">📦 Materiały <span class="hint" data-tip="Lista materiałów do wyceny. Dla każdego podaj nazwę, grubość, koszt za cm² i prędkość cięcia lasera.">?</span></div>
+          <!-- materiały renderowane dynamicznie -->
+          <div id="pqMaterials"></div>
+          <button type="button" class="tbtn" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
+        </div>
+        <div class="pq-sec">
+          <div class="pq-h">⚙ Parametry wyceny <span class="hint" data-tip="Globalne parametry doliczane do każdej wyceny — wspólne dla wszystkich materiałów.">?</span></div>
+          <div class="pq-grid">
+            <label>Laser zł/min <span class="hint" data-tip="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">?</span><input type="number" id="pqLaserMin" step="0.1" min="0"></label>
+            <label>Pakowanie zł <span class="hint" data-tip="Stała kwota za pakowanie zamówienia (karton, folia).">?</span><input type="number" id="pqPack" step="0.5" min="0"></label>
+            <label>Marża % <span class="hint" data-tip="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">?</span><input type="number" id="pqMargin" step="1" min="0"></label>
+            <label>Zapas czasu % <span class="hint" data-tip="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">?</span><input type="number" id="pqBuffer" step="1" min="0"></label>
+            <label>Grawer mm/min <span class="hint" data-tip="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">?</span><input type="number" id="pqEngSpeed" step="100" min="1"></label>
+            <label>Odstęp grawera mm <span class="hint" data-tip="Odległość między liniami skanowania grawera. Typowo 0,1 mm.">?</span><input type="number" id="pqEngSpacing" step="0.01" min="0.01"></label>
+          </div>
+        </div>
+        <div class="pq-actions">
+          <button type="button" class="tbtn" id="pqRestore" style="font-size:.72rem;flex:1" title="Przywróć wartości fabryczne">↺ Domyślne</button>
+          <button type="button" class="tbtn tbtn-primary" id="pqSave" style="font-size:.72rem;flex:1">💾 Zapisz</button>
+        </div>
+        <div id="pqStatus" class="pq-status"></div>
+      </div><!-- /ptab-body pricing -->
     </aside>
 
     <section class="stage">
@@ -4438,6 +4496,77 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Panel operatora widoczny tylko w aplikacji desktop (lub ?admin=1 do testów w przeglądarce)
   const IS_OPERATOR = !!(window.xeoDesktop && window.xeoDesktop.isDesktop) || new URLSearchParams(location.search).has('admin');
   if(IS_OPERATOR){ const ag=document.getElementById('adminGroup'); if(ag) ag.style.display=''; }
+
+  /* ---------------- Zakładki panelu bocznego + inline edycja wyceny ---------------- */
+  document.querySelectorAll('.ptab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.ptab-body').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const body=document.querySelector(`[data-ptab-body="${btn.dataset.ptab}"]`);
+      if(body) body.classList.add('active');
+      if(btn.dataset.ptab==='pricing') fillPqPanel();
+    });
+  });
+  function pqMatRow(key,m){
+    const row=document.createElement('div');
+    row.className='pq-mat-row'; row.dataset.key=key;
+    row.innerHTML=
+      `<div class="pq-row-top"><input type="text" data-f="label" value="${String(m.label||'').replace(/"/g,'&quot;')}" placeholder="np. Sklejka 4 mm" style="flex:1"><button type="button" class="pq-del" title="Usuń materiał">✕</button></div>`
+      +`<div class="pq-row-nums">`
+      +`<label>Grubość mm<input type="number" data-f="mm" step="0.5" min="0" value="${m.mm!=null?m.mm:''}"></label>`
+      +`<label>zł/cm²<input type="number" data-f="pricePerCm2" step="0.0001" min="0" value="${m.pricePerCm2!=null?m.pricePerCm2:''}"></label>`
+      +`<label>Cięcie mm/min<input type="number" data-f="speed" step="10" min="1" value="${m.speed!=null?m.speed:''}"></label>`
+      +`</div>`;
+    row.querySelector('.pq-del').addEventListener('click',()=>row.remove());
+    return row;
+  }
+  function fillPqPanel(){
+    const box=document.getElementById('pqMaterials'); box.innerHTML='';
+    Object.entries(PRICING.materials).forEach(([k,m])=>box.appendChild(pqMatRow(k,m)));
+    document.getElementById('pqLaserMin').value=PRICING.laserPerMin;
+    document.getElementById('pqPack').value=PRICING.packaging;
+    document.getElementById('pqMargin').value=Math.round(PRICING.margin*100);
+    document.getElementById('pqBuffer').value=Math.round((PRICING.timeBuffer-1)*100);
+    document.getElementById('pqEngSpeed').value=PRICING.engraveSpeed;
+    document.getElementById('pqEngSpacing').value=PRICING.engraveSpacing;
+    document.getElementById('pqStatus').textContent='';
+  }
+  function collectPqAndSave(){
+    const st=document.getElementById('pqStatus');
+    const rows=[...document.querySelectorAll('#pqMaterials .pq-mat-row')];
+    const mats={};
+    rows.forEach(r=>{
+      const label=r.querySelector('[data-f="label"]').value.trim();
+      if(!label) return;
+      const mm=parseFloat(r.querySelector('[data-f="mm"]').value)||0;
+      const price=parseFloat(r.querySelector('[data-f="pricePerCm2"]').value)||0;
+      const speed=parseFloat(r.querySelector('[data-f="speed"]').value)||1;
+      let key=r.dataset.key; if(!key||mats[key]) key='mat-'+Math.random().toString(36).slice(2,8);
+      mats[key]={label, mm, speed:Math.max(1,speed), pricePerCm2:Math.max(0,price)};
+    });
+    if(!Object.keys(mats).length){ st.style.color='var(--cut-light)'; st.textContent='Dodaj przynajmniej jeden materiał.'; return; }
+    PRICING.materials=mats;
+    PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('pqLaserMin').value)||0);
+    PRICING.packaging=Math.max(0,parseFloat(document.getElementById('pqPack').value)||0);
+    PRICING.margin=Math.max(0,(parseFloat(document.getElementById('pqMargin').value)||0)/100);
+    PRICING.timeBuffer=1+Math.max(0,(parseFloat(document.getElementById('pqBuffer').value)||0)/100);
+    PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('pqEngSpeed').value)||8000);
+    PRICING.engraveSpacing=Math.max(0.01,parseFloat(document.getElementById('pqEngSpacing').value)||0.1);
+    savePricing(); refreshPricingUI();
+    st.style.color='var(--success)'; st.textContent='✅ Zapisano.';
+    setTimeout(()=>{ if(st.textContent==='✅ Zapisano.') st.textContent=''; },2500);
+  }
+  document.getElementById('pqAddMat').addEventListener('click',()=>{
+    document.getElementById('pqMaterials').appendChild(pqMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
+  });
+  document.getElementById('pqSave').addEventListener('click',collectPqAndSave);
+  document.getElementById('pqRestore').addEventListener('click',()=>{
+    if(!confirm('Przywrócić domyślny cennik i parametry?')) return;
+    PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
+    fillPqPanel(); refreshPricingUI();
+    const st=document.getElementById('pqStatus'); st.style.color='var(--success)'; st.textContent='↺ Przywrócono domyślne.';
+  });
 
   /* ---------------- Manager warstw 3D ---------------- */
   function renderDepthLegend(){
