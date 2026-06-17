@@ -6095,6 +6095,65 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     });
   }
 
+  /* ---------------- Generator sylwetek organicznych (rasteryzacja → kontur) ----------------
+     Rysuje kształt WYPEŁNIONY na ukrytym <canvas> (dowolnie nakładające się elementy —
+     Canvas2D scala je automatycznie), po czym śledzi kontur (traceMaskPolys, Moore-Neighbor)
+     i upraszcza/wygładza. Zwraca ścieżkę SVG `d` (kontur zewn. + naturalne prześwity jako
+     otwory, fillRule:evenodd) — jedną, czystą sylwetkę gotową do cięcia. */
+  function rasterizeShapeToD(draw, W, H, opt){
+    opt=opt||{};
+    const cnv=document.createElement('canvas'); cnv.width=W; cnv.height=H;
+    const ctx=cnv.getContext('2d');
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#000'; ctx.strokeStyle='#000'; ctx.lineCap='round'; ctx.lineJoin='round';
+    draw(ctx);
+    const data=ctx.getImageData(0,0,W,H).data;
+    const mask=new Uint8Array(W*H);
+    for(let i=0;i<W*H;i++) mask[i]= data[i*4]<128?1:0;
+    let polys=traceMaskPolys(mask,W,H);
+    const tol=opt.tol!=null?opt.tol:1.4, minArea=opt.minArea!=null?opt.minArea:18;
+    polys=polys.map(p=>simplifyRing(p,tol)).filter(p=>p.length>=3 && Math.abs(polyArea(p))>minArea);
+    const smooth=opt.smooth!==false;
+    return polys.map(p=> smooth?polyToSmoothPathD(p, opt.corner!=null?opt.corner:34):polyToPathD(p)).join(' ');
+  }
+  // Rekurencyjne drzewo (gałęzie zwężające się + opcjonalna korona z kęp liści).
+  // opt: seed, depth, trunk(0..1 wys.), width(0..1 szer.), spread(rad), up(0..1 nachylenie ku górze),
+  //      foliage(bool), foliageR, canopyFlat(0..1 — spłaszczenie korony, dla akacji).
+  function drawTreeShape(ctx, opt){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    let s=(opt.seed||7)>>>0; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
+    const foliage=[];
+    function branch(x,y,ang,len,w,depth){
+      const x1=x+Math.cos(ang)*len, y1=y+Math.sin(ang)*len;
+      ctx.lineWidth=Math.max(opt.minW||2.4,w); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x1,y1); ctx.stroke();
+      if(depth<=0){ foliage.push([x1,y1,len]); return; }
+      const nb = depth>(opt.depth-2) ? 2 : (2+(rnd()<0.45?1:0));
+      const spread=opt.spread!=null?opt.spread:0.72;
+      for(let i=0;i<nb;i++){
+        const t=nb===1?0:(i/(nb-1)-0.5);
+        let na=ang + t*spread + (rnd()-0.5)*0.34;
+        const up=opt.up||0; na=na*(1-up)+(-Math.PI/2)*up;
+        branch(x1,y1,na, len*(0.74+rnd()*0.08), w*0.7, depth-1);
+      }
+    }
+    branch(W/2, H-2, -Math.PI/2, opt.trunk*H, opt.width*W, opt.depth);
+    if(opt.foliage){
+      const flat=opt.canopyFlat||0;
+      // zakres wysokości końców gałęzi; liście dodajemy TYLKO w górnym pasie (korona),
+      // dzięki czemu niskie, rozłożyste końce gałęzi nie tworzą pływających kęp.
+      let topY=H, botY=0; for(const f of foliage){ topY=Math.min(topY,f[1]); botY=Math.max(botY,f[1]); }
+      const band=opt.canopyBand!=null?opt.canopyBand:0.5;
+      const cutoff=topY+(botY-topY)*band;
+      for(const [fx,fy,fl] of foliage){
+        if(fy>cutoff) continue;
+        let r=fl*(opt.foliageR||1.25);
+        if(flat>0){ const drop=(fy-topY)/H; r=r*(1-clamp(drop*flat*3,0,0.7)); }
+        if(r<1.5) continue;
+        ctx.beginPath(); ctx.ellipse(fx,fy,r,r*(flat>0?0.8:1),0,0,Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
      Wzory własne (nie odwzorowują konkretnych komercyjnych grafik). Każdy to ścieżka
      SVG w lokalnym układzie ~0..200; bbox mierzymy off-screen przez getBBox (jak bazy).
@@ -6108,9 +6167,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       let b; try{b=p.getBBox();}catch(e){b={x:0,y:0,width:100,height:100};} tmp.removeChild(p);
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
-      {id:'mo_tree', label:'Drzewo', fillRule:'nonzero',
-        d:'M100 120 C70 124 52 110 56 86 C38 78 46 48 72 50 C74 28 108 26 114 46 C140 38 162 60 148 84 C164 94 152 122 122 116 '
-         +'M94 112 L92 186 Q100 191 108 186 L106 112 Z'},
+      {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
+        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:5,depth:8,trunk:0.17,width:0.046,spread:1.04,up:0.02,foliage:true,foliageR:1.4,canopyBand:0.6,minW:2.6}),560,640,{tol:1.5,corner:38,minArea:50})},
+      {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
+        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{tol:1.5,corner:36,minArea:50})},
+      {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
+        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:11,depth:7,trunk:0.18,width:0.06,spread:0.74,up:0.08,foliage:false,minW:3.2}),520,520,{tol:1.2,corner:30,minArea:70})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
         d:'M100 12 L132 72 L114 72 L150 124 L128 124 L165 176 L110 176 L110 196 L90 196 L90 176 L35 176 L72 124 L50 124 L86 72 L68 72 Z'},
       {id:'mo_mountains', label:'Góry', fillRule:'nonzero',
