@@ -12,3 +12,6 @@ Thumbs.db
 # Lokalne kopie zapasowe (nie publikować)
 index.BACKUP-*.html
 _test_*.lbrn2
+
+# Artefakty testów
+test-results/
