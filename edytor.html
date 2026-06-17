@@ -3847,6 +3847,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     gridSizeInput.value=state.grid; gridShowInput.checked=state.showGrid;
     setSnap(d.snap!==undefined?!!d.snap:false,false);
     state.selectedIds=[]; state.history=[]; state.hIndex=-1;
+    live3dMode='assembled'; p3dMode='assembled';
     docWInput.value=state.docW; docHInput.value=state.docH;
     depthViewBtn.classList.toggle('active',state.depthView);
     zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
@@ -6398,6 +6399,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   updateLive3D();
   pushHistory();
   window.addEventListener('resize',()=>{ applyView(); renderOverlay(); });
+  window.addEventListener('beforeunload',e=>{ if(state.objects.length){ e.preventDefault(); } });
 
   // Czcionki z Google Fonts wczytują się asynchronicznie - jeśli wektoryzacja tekstu
   // (rasteryzacja na <canvas>, patrz rasterizeTextOutlines) zdarzy się WCZEŚNIEJ,
