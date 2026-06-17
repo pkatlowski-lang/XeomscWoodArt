@@ -878,6 +878,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // ułamkowe prześwity tła na stykach sąsiednich ścianek/płyt (patrz buildLayerScene)
   const WALL_OVERLAP=0.75;
   const COLORS={cut:'#ff2d2d',engrave:'#1c1c1c',score:'#2f7bd8',hole:'#9b5de5'};
+  const ACCENT='#38bdf8';
   const FONTS=[
     // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
     // bez instalowania czegokolwiek; wyglądają identycznie na PC, telefonie i Macu.
@@ -1436,7 +1437,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const w=dl.text.length*fs*0.58+padX*2, h=fs+padY*2;
     const x=dl.x+fs*0.7, y=dl.y+fs*0.7;
     return `<g class="drag-label" style="pointer-events:none">
-      <rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" rx="${fmt(fs*0.25)}" fill="#1c1c1cdd" stroke="#38bdf8" stroke-width="${fmt(Math.max(fs*0.04,0.05))}"/>
+      <rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" rx="${fmt(fs*0.25)}" fill="#1c1c1cdd" stroke="${ACCENT}" stroke-width="${fmt(Math.max(fs*0.04,0.05))}"/>
       <text x="${fmt(x+w/2)}" y="${fmt(y+h/2+fs*0.32)}" text-anchor="middle" font-size="${fmt(fs)}" font-family="sans-serif" fill="#fff">${escapeXml(dl.text)}</text>
     </g>`;
   }
@@ -1478,7 +1479,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         hs+=`<circle class="sel-handle" cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hr)}" style="pointer-events:none"/>`;
         hs+=`<circle cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hit)}" fill="transparent" data-mhandle="${k}"/>`;
       });
-      s=`<rect x="${fmt(minx)}" y="${fmt(miny)}" width="${fmt(maxx-minx)}" height="${fmt(maxy-miny)}" fill="none" stroke="#38bdf8" stroke-width="1.6px" vector-effect="non-scaling-stroke"/>`+s+hs+guideLinesMarkup()+dragLabelMarkup();
+      s=`<rect x="${fmt(minx)}" y="${fmt(miny)}" width="${fmt(maxx-minx)}" height="${fmt(maxy-miny)}" fill="none" stroke="${ACCENT}" stroke-width="1.6px" vector-effect="non-scaling-stroke"/>`+s+hs+guideLinesMarkup()+dragLabelMarkup();
       gOverlay.innerHTML=s; return;
     }
     const o=sel[0];
@@ -2332,9 +2333,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function renderPenDraft(){
     const pts=state.penDraft; if(!pts){ gOverlay.innerHTML=''; return; }
     const hr=state.view.w*0.011; let s='';
-    if(pts.length>1) s+=`<polyline points="${pts.map(p=>fmt(p[0])+','+fmt(p[1])).join(' ')}" fill="none" stroke="#38bdf8" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
-    if(state.penPreview){ const last=pts[pts.length-1]; s+=`<line x1="${fmt(last[0])}" y1="${fmt(last[1])}" x2="${fmt(state.penPreview[0])}" y2="${fmt(state.penPreview[1])}" stroke="#38bdf8" stroke-width="1.1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>`; }
-    pts.forEach((p,i)=>{ s+=`<circle cx="${fmt(p[0])}" cy="${fmt(p[1])}" r="${fmt(hr)}" fill="${i===0?'#fff':'#38bdf8'}" stroke="#38bdf8" stroke-width="1.3" vector-effect="non-scaling-stroke"/>`; });
+    if(pts.length>1) s+=`<polyline points="${pts.map(p=>fmt(p[0])+','+fmt(p[1])).join(' ')}" fill="none" stroke="${ACCENT}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+    if(state.penPreview){ const last=pts[pts.length-1]; s+=`<line x1="${fmt(last[0])}" y1="${fmt(last[1])}" x2="${fmt(state.penPreview[0])}" y2="${fmt(state.penPreview[1])}" stroke="${ACCENT}" stroke-width="1.1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>`; }
+    pts.forEach((p,i)=>{ s+=`<circle cx="${fmt(p[0])}" cy="${fmt(p[1])}" r="${fmt(hr)}" fill="${i===0?'#fff':ACCENT}" stroke="${ACCENT}" stroke-width="1.3" vector-effect="non-scaling-stroke"/>`; });
     gOverlay.innerHTML=s;
   }
   // zamiana łamanej (zamkniętej) na gładką krzywą Catmulla-Roma -> Béziera
@@ -2669,7 +2670,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     } else if(drag.mode==='marquee'){
       const x=Math.min(drag.x0,docP.x), y=Math.min(drag.y0,docP.y), w=Math.abs(docP.x-drag.x0), h=Math.abs(docP.y-drag.y0);
       drag.rect={x,y,w,h};
-      gOverlay.innerHTML=`<rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" fill="rgba(56,189,248,.12)" stroke="#38bdf8" stroke-width="1.2" vector-effect="non-scaling-stroke" stroke-dasharray="4 3"/>`;
+      gOverlay.innerHTML=`<rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" fill="rgba(56,189,248,.12)" stroke="${ACCENT}" stroke-width="1.2" vector-effect="non-scaling-stroke" stroke-dasharray="4 3"/>`;
     } else if(drag.mode==='draw'){
       const o=drag.o; let x0=drag.ax,y0=drag.ay,x1=snap(docP.x),y1=snap(docP.y);
       if(o.type==='line'){ o.x=x0;o.y=y0;o.w=x1-x0;o.h=y1-y0; }
@@ -3098,7 +3099,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const rn={back:'Ścianka tylna',front:'Ścianka przednia',left:'Ścianka lewa',
         right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko'}[o.box.role]||o.box.role;
       const cln={open:'Otwarte',lid:'Wieczko luźne'}[bCl]||bCl;
-      const roleColor={back:'#3b9eff',front:'#38bdf8',left:'#2a9d8f',right:'#06d6a0',
+      const roleColor={back:'#3b9eff',front:ACCENT,left:'#2a9d8f',right:'#06d6a0',
         bottom:'#9b5de5',lid:'#caa06c'}[o.box.role]||'#caa06c';
       h+=`<div class="field" style="padding-bottom:8px"><div style="background:var(--surface2);border:1.5px solid ${roleColor}44;border-radius:8px;padding:9px 11px;font-size:.78rem;border-left:3px solid ${roleColor}">
         <div style="font-weight:700;color:${roleColor};margin-bottom:5px;font-size:.76rem;letter-spacing:.03em;text-transform:uppercase">📦 ${rn}</div>
@@ -5524,7 +5525,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     // Rysunek schematyczny z boku (cross-section) + rzut z góry wieczka
     // Paleta: bg=ciemne tło, bx=kontur pudełka (niebieski), lid=kolor wieczka (drewno), mark=akcent/opis, cl=muted
     const W=200,D=70,T=6,sw=52,sh=13,r=5,tw=26,th=13,lip=8;
-    const bg='#0f172a',bx='#38bdf8',lidC='#caa06c',mark='#f0d6a8',cl='#64748b',g1='#caa06c44',g2='#caa06c99';
+    const bg='#0f172a',bx=ACCENT,lidC='#caa06c',mark='#f0d6a8',cl='#64748b',g1='#caa06c44',g2='#caa06c99';
     const wall=`<rect x="0" y="0" width="${W}" height="${D}" fill="${bg}" stroke="${bx}" stroke-width="2" rx="2"/>`;
     // Ścianki pudełka (grube kreski na obwodzie)
     const walls=`<rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="${bx}" stroke-width="${T*0.9}" rx="2"/>`;
@@ -5793,8 +5794,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const pad=ra*0.18, vb=`${-(ra+pad)} ${-(ra+pad)} ${2*(ra+pad)} ${2*(ra+pad)}`;
       const d=polyToPathD(pts);
       let boreEl='';
-      if(bore>0 && bore<2*rf-0.5) boreEl=`<circle cx="0" cy="0" r="${fmt(bore/2)}" fill="#0f172a" stroke="#38bdf8" stroke-width="${fmt(ra*0.025)}"/>`;
-      const pd=`<circle cx="0" cy="0" r="${fmt(rp)}" fill="none" stroke="#38bdf866" stroke-width="${fmt(ra*0.02)}" stroke-dasharray="${fmt(ra*0.04)} ${fmt(ra*0.025)}"/>`;
+      if(bore>0 && bore<2*rf-0.5) boreEl=`<circle cx="0" cy="0" r="${fmt(bore/2)}" fill="#0f172a" stroke="${ACCENT}" stroke-width="${fmt(ra*0.025)}"/>`;
+      const pd=`<circle cx="0" cy="0" r="${fmt(rp)}" fill="none" stroke="${ACCENT}66" stroke-width="${fmt(ra*0.02)}" stroke-dasharray="${fmt(ra*0.04)} ${fmt(ra*0.025)}"/>`;
       prevEl.innerHTML=`<svg viewBox="${vb}" width="120" height="120"><path d="${d}" fill="#caa06c" stroke="#f0d6a8" stroke-width="${fmt(ra*0.025)}"/>${boreEl}${pd}</svg>`;
     }
   }
