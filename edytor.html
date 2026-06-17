@@ -40,6 +40,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tbtn:active:not(:disabled){transform:scale(.96)}
 .tbtn:disabled{opacity:.4;cursor:not-allowed}
+.tbtn-block{width:100%;justify-content:center;margin-top:6px}
 .tbtn .ico{font-size:1rem;line-height:1}
 .zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--muted);font-weight:600}
 
@@ -158,6 +159,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .empty-note{padding:8px 16px 20px;font-size:.82rem;color:var(--muted);line-height:1.6}
 .flex-label{display:flex;align-items:center;gap:4px}
 .info-box{padding:9px 13px;background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.35);border-radius:8px}
+.muted-sm{font-size:.75rem;color:var(--muted);line-height:1.55}
 
 /* ---- Warstwy ---- */
 .layer-search{width:calc(100% - 20px);margin:0 10px 8px;padding:7px 10px 7px 32px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.8rem;box-sizing:border-box;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:9px center}
@@ -482,7 +484,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <label>Arkusz roboczy (mm)</label>
         <div class="info-box" style="display:flex;align-items:center;gap:8px">
           <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
-          <span style="font-size:.72rem;color:var(--muted)">— rozmiar stały</span>
+          <span class="muted-sm">— rozmiar stały</span>
         </div>
         <!-- Rozmiar arkusza jest stały (760×760 mm). Pola pozostają ukryte, aby
              reszta logiki edytora działała bez zmian. -->
@@ -577,7 +579,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="ctx-menu" id="ctxMenu"></div>
 
-<div class="modal-ov" id="modal3dPrev">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modal3dPrev">
   <div class="modal-box" style="max-width:860px">
     <button class="modal-close" aria-label="Zamknij" id="modal3dPrevClose" title="Zamknij">✕</button>
     <h3>🎯 Wizualizacja 3D projektu</h3>
@@ -594,7 +596,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalSvgPrev">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalSvgPrev">
   <div class="modal-box" style="max-width:1100px">
     <button class="modal-close" aria-label="Zamknij" id="modalSvgPrevClose" title="Zamknij">✕</button>
     <h3>📄 Podgląd SVG — warstwy rozdzielone (1 plik)</h3>
@@ -606,7 +608,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modal3d">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modal3d">
   <div class="modal-box">
     <button class="modal-close" aria-label="Zamknij" id="modal3dClose" title="Zamknij">✕</button>
     <h3>🧊 Eksport 3D — warstwy do sklejenia</h3>
@@ -616,7 +618,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalBox">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalBox">
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" aria-label="Zamknij" id="modalBoxClose" title="Zamknij">✕</button>
     <h3>📦 Generator pudełka</h3>
@@ -638,11 +640,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <input type="checkbox" id="boxClasp" style="width:auto">
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
     </div>
-    <button type="button" class="tbtn tbtn-primary" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">📦 Generuj pudełko</button>
+    <button type="button" class="tbtn tbtn-primary tbtn-block" id="boxGenerateBtn">📦 Generuj pudełko</button>
   </div>
 </div>
 
-<div class="modal-ov" id="modalHinge">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalHinge">
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" aria-label="Zamknij" id="modalHingeClose" title="Zamknij">✕</button>
     <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
@@ -678,11 +680,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <label class="flex-label"><input type="checkbox" id="hingeTabTop"> Górna</label>
       <label class="flex-label"><input type="checkbox" id="hingeTabBottom"> Dolna</label>
     </div>
-    <button type="button" class="tbtn tbtn-primary" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">🪗 Generuj zawias</button>
+    <button type="button" class="tbtn tbtn-primary tbtn-block" id="hingeGenerateBtn">🪗 Generuj zawias</button>
   </div>
 </div>
 
-<div class="modal-ov" id="modalGear">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalGear">
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" aria-label="Zamknij" id="modalGearClose" title="Zamknij">✕</button>
     <h3>⚙ Generator koła zębatego</h3>
@@ -697,11 +699,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"></div>
       <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
     </div>
-    <button type="button" class="tbtn tbtn-primary" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">⚙ Generuj koło zębate</button>
+    <button type="button" class="tbtn tbtn-primary tbtn-block" id="gearGenerateBtn">⚙ Generuj koło zębate</button>
   </div>
 </div>
 
-<div class="modal-ov" id="modalHelp">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalHelp">
   <div class="modal-box" style="max-width:680px">
     <button class="modal-close" aria-label="Zamknij" id="modalHelpClose" title="Zamknij">✕</button>
     <h3>⌨ Skróty klawiszowe</h3>
@@ -769,7 +771,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalMaterials">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalMaterials">
   <div class="modal-box" style="max-width:480px">
     <button class="modal-close" aria-label="Zamknij" id="modalMaterialsClose" title="Zamknij">✕</button>
     <h3>📦 Biblioteka materiałów</h3>
@@ -785,7 +787,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalSummary">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalSummary">
   <div class="modal-box" style="max-width:480px">
     <button class="modal-close" aria-label="Zamknij" id="modalSummaryClose" title="Zamknij">✕</button>
     <h3>📊 Podsumowanie projektu</h3>
@@ -804,7 +806,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalQuote">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalQuote">
   <div class="modal-box" style="max-width:420px">
     <button class="modal-close" aria-label="Zamknij" id="modalQuoteClose" title="Zamknij">✕</button>
     <h3>💰 Wycena projektu</h3>
@@ -813,12 +815,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="quote-price" id="quotePrice">–</div>
     <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie. Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
     <div class="field" style="padding:12px 0 0">
-      <button type="button" class="tbtn tbtn-primary" id="sendQuoteOpenBtn" style="width:100%">📨 Wyślij projekt do wyceny</button>
+      <button type="button" class="tbtn tbtn-primary tbtn-block" id="sendQuoteOpenBtn">📨 Wyślij projekt do wyceny</button>
     </div>
   </div>
 </div>
 
-<div class="modal-ov" id="modalPricing">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalPricing">
   <div class="modal-box op-box">
     <button class="modal-close" aria-label="Zamknij" id="modalPricingClose" title="Zamknij">✕</button>
     <h3>⚙ Cennik i materiały</h3>
@@ -853,7 +855,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" id="modalSendQuote">
+<div class="modal-ov" role="dialog" aria-modal="true" id="modalSendQuote">
   <div class="modal-box" style="max-width:440px">
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
