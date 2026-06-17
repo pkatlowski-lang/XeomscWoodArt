@@ -2438,7 +2438,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(guideClickInfo && guideClickInfo.gtype===gtype && guideClickInfo.idx===idx && Date.now()-guideClickInfo.time<400){
         guideClickInfo=null;
         state.guides[gtype].splice(idx,1);
-        renderGuides(); autoSaveProject();
+        renderGuides();
         return;
       }
       setCapture(e);
@@ -2523,7 +2523,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
   document.getElementById('rulerCorner').addEventListener('dblclick', ()=>{
     if(!state.guides.v.length && !state.guides.h.length) return;
-    state.guides={v:[],h:[]}; renderGuides(); autoSaveProject();
+    state.guides={v:[],h:[]}; renderGuides();
   });
 
   function setCapture(e){ try{ canvas.setPointerCapture(e.pointerId); }catch(_){} }
@@ -2783,15 +2783,15 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       else { nodeClickInfo={id:o.id, idx:drag.idx, time:Date.now()}; }
     } else if(m==='guideNewH'){
       if(pointInCanvas(e)) state.guides.h.push(drag.y);
-      renderGuides(); autoSaveProject();
+      renderGuides();
     } else if(m==='guideNewV'){
       if(pointInCanvas(e)) state.guides.v.push(drag.x);
-      renderGuides(); autoSaveProject();
+      renderGuides();
     } else if(m==='guideMove'){
       if(!pointInCanvas(e)){ state.guides[drag.gtype].splice(drag.idx,1); guideClickInfo=null; }
       else if(state.guides[drag.gtype][drag.idx]===drag.orig){ guideClickInfo={gtype:drag.gtype, idx:drag.idx, time:Date.now()}; }
       else { guideClickInfo=null; }
-      renderGuides(); autoSaveProject();
+      renderGuides();
     }
     drag=null;
   });
@@ -3721,7 +3721,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     state.history.push(snapshot()); state.hIndex=state.history.length-1;
     if(state.history.length>120){ state.history.shift(); state.hIndex--; }
     updateUndoButtons();
-    autoSaveProject();
   }
   function restore(s){
     const d=JSON.parse(s);
@@ -3781,17 +3780,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   gridSizeInput.addEventListener('change',()=>{
     state.grid=clamp(Number(gridSizeInput.value)||1,0.5,500);
     gridSizeInput.value=state.grid;
-    renderGrid(); autoSaveProject();
+    renderGrid();
   });
   gridShowInput.addEventListener('change',()=>{
-    state.showGrid=gridShowInput.checked; renderGrid(); autoSaveProject();
+    state.showGrid=gridShowInput.checked; renderGrid();
   });
   const snapInput=document.getElementById('snapInput');
   function setSnap(v,save){
     state.snap=v;
     snapBtn.classList.toggle('active',v);
     snapInput.checked=v;
-    if(save) autoSaveProject();
   }
   setSnap(state.snap,false);
   snapBtn.addEventListener('click',()=>setSnap(!state.snap,true));
@@ -3825,26 +3823,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       hiddenDepths:state.hiddenDepths, depthView:state.depthView, guides:state.guides,
       grid:state.grid, showGrid:state.showGrid, snap:state.snap
     };
-  }
-  function autoSaveProject(){
-    try{ localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(serializeProject())); }catch(e){}
-  }
-  function restoreAutosave(){
-    try{
-      const raw=localStorage.getItem(AUTOSAVE_KEY);
-      if(!raw) return;
-      const d=JSON.parse(raw);
-      if(!d || !Array.isArray(d.objects) || !d.objects.length) return;
-      state.docW=clamp(d.docW||state.docW,10,760); state.docH=clamp(d.docH||state.docH,10,760);
-      state.objects=d.objects; state.params=d.params||state.params;
-      state.layerMM=d.layerMM||{}; state.hiddenDepths=d.hiddenDepths||[];
-      state.depthView=d.depthView!==undefined?d.depthView:true;
-      state.guides=d.guides&&Array.isArray(d.guides.v)&&Array.isArray(d.guides.h)?d.guides:{v:[],h:[]};
-      state.grid=d.grid>0?d.grid:state.grid;
-      state.showGrid=d.showGrid!==undefined?d.showGrid:true;
-      gridSizeInput.value=state.grid; gridShowInput.checked=state.showGrid;
-      setSnap(d.snap!==undefined?!!d.snap:false,false);
-    }catch(e){}
   }
   function applyProjectData(d){
     state.docW=760; state.docH=760; // arkusz roboczy ma stały rozmiar 760 × 760 mm
@@ -6137,9 +6115,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Inicjalizacja ---------------- */
   buildCanvasSkeleton();
-  // Każde wejście do edytora zaczyna NOWĄ, pustą sesję — świadomie NIE przywracamy
-  // poprzedniego projektu z autozapisu. Czyścimy też stary autozapis, żeby nie został
-  // przypadkowo wczytany. (Zapis projektu do pliku: przycisk „Zapisz projekt".)
+  // Każde wejście do edytora zaczyna NOWĄ, pustą sesję — projekt zapisuje się wyłącznie
+  // do pliku (przycisk „Zapisz projekt"). Czyścimy ewentualny stary autozapis z localStorage
+  // pozostawiony przez wcześniejsze wersje, żeby nie zalegał.
   try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView);
