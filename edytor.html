@@ -6165,6 +6165,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const R=Math.min(W,H)/2-4, r=R-(opt.band||26);
     ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();   // pierścień: dysk
     ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();   // okno (niebo)
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();              // grunt i drzewo tylko wewnątrz okręgu
     ctx.fillStyle='#000';
     ctx.beginPath();                                                                    // niskie wzgórze łączące się z pierścieniem po bokach
     ctx.moveTo(cx-R, cy+r*0.74);
@@ -6174,6 +6175,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     drawTreeShape(ctx, {seed:opt.seed||23, depth:9, spread:1.2, up:0.24, foliage:true,
       foliageR:opt.foliageR||1.0, canopyFlat:1, canopyBand:0.46, minW:2.6,
       baseX:cx, baseY:cy+r*0.42, trunkPx:r*0.34, widthPx:r*0.058});
+    ctx.restore();
   }
 
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
