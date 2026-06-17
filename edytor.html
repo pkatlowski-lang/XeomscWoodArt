@@ -17,6 +17,11 @@
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-height:1.45;overflow:hidden}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+*{scrollbar-width:thin;scrollbar-color:var(--border) var(--surface)}
 .app{height:100vh;display:flex;flex-direction:column}
 
 /* ---- Top toolbar ---- */
@@ -25,9 +30,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolbar .brand span{color:var(--accent)}
 .tgroup{display:flex;gap:4px;align-items:center;padding-right:8px;margin-right:2px;border-right:1px solid var(--border)}
 .tgroup:last-child{border-right:none}
-.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:38px;height:36px;padding:0 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap}
+.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:38px;height:36px;padding:0 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s,filter .15s,box-shadow .15s;white-space:nowrap}
 .tbtn:hover{border-color:var(--accent);color:var(--accent)}
 .tbtn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
+.tbtn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700}
+.tbtn-primary:hover{filter:brightness(1.1);box-shadow:0 2px 10px rgba(56,189,248,.3)}
 .tbtn:disabled{opacity:.4;cursor:not-allowed}
 .tbtn .ico{font-size:1rem;line-height:1}
 .zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--muted);font-weight:600}
@@ -238,7 +245,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer3d-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px}
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700}
 .layer3d-card .lcount{font-size:.71rem;color:var(--muted)}
-.layer3d-card svg{width:120px;height:76px;overflow:visible;background:#111;border-radius:5px;border:1px solid var(--border)}
+.layer3d-card svg{width:120px;height:76px;overflow:visible;background:var(--bg);border-radius:5px;border:1px solid var(--border)}
 .modal-note{margin-top:16px;font-size:.76rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:12px}
 
 /* ---- Biblioteka materiałów (modal) ---- */
@@ -246,7 +253,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .mat-row{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);font-size:.8rem}
 .mat-row .mat-label{flex:1}
 .mat-row .mat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:2px;line-height:1}
-.mat-row .mat-del:hover{color:#e76f51}
+.mat-row .mat-del:hover{color:var(--cut)}
 .mat-empty{font-size:.74rem;color:var(--muted);line-height:1.5}
 
 /* ---- Dwie kolumny pól (np. w modalu podsumowania) ---- */
@@ -277,7 +284,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted)}
-.live-quote .lq-send{width:100%;height:32px;font-size:.76rem;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700}
+.live-quote .lq-send{width:100%;height:32px;font-size:.76rem}
 
 /* ---- Skróty klawiszowe (modal) ---- */
 .shortcuts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 28px;margin-top:16px}
@@ -305,7 +312,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .p3d-controls b{color:var(--text);min-width:22px;display:inline-block}
 
 /* ---- SVG split preview modal ---- */
-.svgprev-wrap{margin:12px 0;overflow:auto;background:#0e0e16;border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;max-height:68vh}
+.svgprev-wrap{margin:12px 0;overflow:auto;background:var(--bg);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;max-height:68vh}
 .svgprev-wrap svg{max-width:100%;background:#fff;border-radius:4px}
 .svgprev-wrap .bb-empty{color:#666;font-size:.8rem}
 
@@ -317,7 +324,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .bb-head{display:flex;align-items:center;gap:6px;padding:7px 10px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);overflow:hidden}
 .bb-head>span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1}
 .bb-spacer{flex:0;min-width:0}
-.bb-btn{border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer}
+.bb-btn{border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color .12s,color .12s,background .12s}
 .bb-btn:hover{border-color:var(--accent);color:var(--accent)}
 .bb-btn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
 .zoom-badge{font-size:.7rem;font-weight:700;color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;min-width:42px;text-align:center}
@@ -328,7 +335,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .l3d-layer{position:absolute;top:0;left:0;transform-style:preserve-3d}
 .l3d-layer svg{display:block}
 .l3d-wall{position:absolute;top:0;left:0;transform-origin:0 0}
-.bb-svg{flex:1;overflow:auto;background:#0e0e16;display:flex;align-items:center;justify-content:center;padding:10px}
+.bb-svg{flex:1;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:10px}
 .bb-svg svg{max-width:100%;max-height:100%;background:#fff;border-radius:4px}
 .bb-svg .bb-empty{color:#555;font-size:.74rem}
 
@@ -379,25 +386,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 /* === Branding (logo + nazwa programu) === */
 .brand{display:flex;align-items:center;gap:0}
 .brand-logo{height:30px;width:auto;background:#fff;border-radius:6px;padding:3px 4px;box-shadow:0 1px 4px rgba(0,0,0,.4);vertical-align:middle}
-.brand-name{font-weight:800;letter-spacing:.3px;margin-left:9px;color:#eaf4ff;white-space:nowrap}
+.brand-name{font-weight:800;letter-spacing:.3px;margin-left:9px;color:var(--text);white-space:nowrap}
 .brand-name span{color:var(--accent,#38bdf8)}
 /* === Wyróżniony przycisk operatora (Cennik i materiały) === */
 .tbtn.cfgbtn{background:linear-gradient(135deg,#f7b733,#e0892a);border-color:#f7b733;color:#1a1206;font-weight:800;box-shadow:0 0 0 1px rgba(247,183,51,.45),0 4px 14px rgba(247,183,51,.28)}
 .tbtn.cfgbtn:hover{filter:brightness(1.07)}
 /* === Podpowiedzi „?" przy polach === */
 .hint{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--accent,#38bdf8);color:#04101e;font-size:11px;font-weight:800;cursor:help;position:relative;vertical-align:middle;margin-left:5px;flex:0 0 auto}
-.hint::after{content:attr(data-tip);position:absolute;top:140%;left:50%;transform:translateX(-50%);width:260px;max-width:58vw;background:#0b1424;color:#eaf4ff;border:1px solid var(--accent,#38bdf8);border-radius:9px;padding:9px 12px;font-size:12px;font-weight:500;line-height:1.5;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:99999;pointer-events:none}
+.hint::after{content:attr(data-tip);position:absolute;top:140%;left:50%;transform:translateX(-50%);width:260px;max-width:58vw;background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:9px;padding:9px 12px;font-size:12px;font-weight:500;line-height:1.5;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:99999;pointer-events:none}
 .hint:hover::after{opacity:1;visibility:visible}
 /* === Panel operatora: Cennik i materiały === */
 .op-box{max-width:760px}
 .op-intro{font-size:.8rem;color:var(--muted,#9fb3c8);line-height:1.55;margin:0 0 14px}
-.op-h{margin:18px 0 8px;font-size:.95rem;color:#eaf4ff;display:flex;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
+.op-h{margin:18px 0 8px;font-size:.95rem;color:var(--text);display:flex;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
 .op-mat-head,.op-mat-row{display:grid;grid-template-columns:1fr 92px 108px 108px 38px;gap:8px;align-items:center}
 .op-mat-head{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#9fb3c8);margin-bottom:6px;padding:0 2px}
 .op-mat-head span{display:flex;align-items:center}
 .op-mat-row{margin-bottom:7px}
-.op-box input[type=text],.op-box input[type=number]{width:100%;background:#0f1830;border:1px solid #2a3a5a;color:#eaf4ff;border-radius:7px;padding:7px 9px;font-size:.82rem;outline:none;box-sizing:border-box}
-.op-box input:focus{border-color:var(--accent,#38bdf8)}
+.op-box input[type=text],.op-box input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 9px;font-size:.82rem;outline:none;box-sizing:border-box}
+.op-box input:focus{border-color:var(--accent);outline:none}
 .op-del{background:rgba(255,90,90,.14);border:1px solid rgba(255,90,90,.45);color:#ff8a8a;border-radius:7px;height:34px;cursor:pointer;font-size:.9rem}
 .op-del:hover{background:rgba(255,90,90,.28)}
 .op-add{margin-top:8px}
@@ -449,7 +456,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="tbtn" id="boxGenBtn" title="Generator pudełka — parametryczne pudełko z łączeniami „na palec”, gotowe do wycięcia laserem">📦 Generator pudełka</button>
       <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
       <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębatego (ewolwentowe) z otworem na oś, gotowe do wycięcia laserem">⚙ Koło zębate</button>
-      <button class="tbtn" id="exportBtn" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
+      <button class="tbtn tbtn-primary" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
       <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
       <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości i sklejaj je, by uzyskać efekt 3D">🧊 Eksport 3D</button>
     </div>
@@ -551,7 +558,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <div class="lq-head"><span>💰 Wycena</span><select id="lqMat" title="Materiał"></select></div>
         <div class="lq-price lq-empty" id="lqPrice">narysuj projekt…</div>
         <div class="lq-time" id="lqTime"></div>
-        <button type="button" class="tbtn lq-send" id="lqSend">📨 Wyślij do wyceny</button>
+        <button type="button" class="tbtn tbtn-primary lq-send" id="lqSend">📨 Wyślij do wyceny</button>
       </div>
     </div>
   </div>
@@ -618,13 +625,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <select id="boxClosure">
         <option value="open">Otwarte (bez wieczka)</option>
         <option value="lid">Wieczko nakładane (luźne)</option>
-        <option value="pull-slot">Wieczko z wyciągnięciem (rowek na palec)</option>
-        <option value="tab-latch">Zatrzask — wieczko z języczkiem (wcisk)</option>
-        <option value="slide">Wieczko wsuwane (skrzynka zapałkowa)</option>
-        <option value="lid-lip">Wieczko z kołnierzem (chwyt — nie spada)</option>
-        <option value="hinged">Wieczko na zawiasie żywym (flex — uchylne)</option>
-        <option value="hinged-tab">Wieczko na zawiasie zakładkowym (kołek — uchylne)</option>
-        <option value="drawer">Szuflada wysuwana (tuleja + szuflada)</option>
       </select>
     </div>
     <p id="boxClosureNote" style="font-size:.75rem;color:var(--muted);margin:-4px 0 4px"></p>
@@ -633,15 +633,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <input type="checkbox" id="boxClasp" style="width:auto">
       <label for="boxClasp" style="margin:0">Otwór na zapięcie (sznurek / zatrzask) — ścianka przednia + wieczko</label>
     </div>
-    <div id="boxHingeTabNote" style="display:none;margin:0 0 8px;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.25);border-radius:8px;font-size:.73rem;color:var(--muted);line-height:1.6">
-      <strong style="color:var(--accent)">🪛 Montaż zawiasu kołkowego (knykcie zintegrowane):</strong><br>
-      1. Wytnij wszystkie elementy — knykcie zawiasu są już <em>częścią</em> tylnej ścianki i wieczka (nic nie klejisz).<br>
-      2. Złóż pudełko: tylna ścianka łączy się palcami z bokami i podstawą.<br>
-      3. Ustaw wieczko tak, by jego knykcie weszły w przerwy między knykciami ścianki (przeplot W↔T↔W…).<br>
-      4. Przesuń kołek ⌀3 mm przez otwory wszystkich knykci — to oś obrotu wieczka.<br>
-      5. Użyj drewnianego kołka, grubej wykałaczki lub pałeczki bambusowej ⌀3 mm.
-    </div>
-    <button type="button" class="tbtn" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📦 Generuj pudełko</button>
+    <button type="button" class="tbtn tbtn-primary" id="boxGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">📦 Generuj pudełko</button>
   </div>
 </div>
 
@@ -681,7 +673,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabTop"> Górna</label>
       <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="hingeTabBottom"> Dolna</label>
     </div>
-    <button type="button" class="tbtn" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">🪗 Generuj zawias</button>
+    <button type="button" class="tbtn tbtn-primary" id="hingeGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">🪗 Generuj zawias</button>
   </div>
 </div>
 
@@ -700,7 +692,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"></div>
       <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
     </div>
-    <button type="button" class="tbtn" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">⚙ Generuj koło zębate</button>
+    <button type="button" class="tbtn tbtn-primary" id="gearGenerateBtn" style="width:100%;justify-content:center;margin-top:6px">⚙ Generuj koło zębate</button>
   </div>
 </div>
 
@@ -816,7 +808,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="quote-price" id="quotePrice">–</div>
     <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie. Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
     <div class="field" style="padding:12px 0 0">
-      <button type="button" class="tbtn" id="sendQuoteOpenBtn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">📨 Wyślij projekt do wyceny</button>
+      <button type="button" class="tbtn tbtn-primary" id="sendQuoteOpenBtn" style="width:100%">📨 Wyślij projekt do wyceny</button>
     </div>
   </div>
 </div>
@@ -867,7 +859,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div id="sendQuoteStatus" style="font-size:.78rem;min-height:18px;margin:2px 0 6px;color:var(--muted)"></div>
     <div class="field" style="padding:6px 0 0;display:flex;justify-content:flex-end;gap:8px">
       <button type="button" class="tbtn" id="sendQuoteCancel">Anuluj</button>
-      <button type="button" class="tbtn" id="sendQuoteSubmit" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700">Wyślij projekt</button>
+      <button type="button" class="tbtn tbtn-primary" id="sendQuoteSubmit">Wyślij projekt</button>
     </div>
   </div>
 </div>
@@ -988,7 +980,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       _textOutlineCache.clear();
       renderProps(); renderAll();
       const note=embeddedFamilies.size<fams.length?` (zarejestrowano do wektoryzacji ${embeddedFamilies.size}/${fams.length})`:'';
-      alert('Wczytano '+fams.length+' czcionek z komputera'+note+'. Znajdziesz je na liście „Czcionka” (oznaczone • PC).');
+      const fcnt=fams.length, fpl=fcnt===1?'czcionkę':fcnt<=4?'czcionki':'czcionek';
+      alert('Wczytano '+fcnt+' '+fpl+' z komputera'+note+'. Znajdziesz je na liście „Czcionka” (oznaczone • PC).');
     }catch(e){ alert('Nie udało się wczytać czcionek z komputera: '+e.message); }
   }
 
@@ -3097,9 +3090,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko',lip:'Kołnierz',
         hinge:'Nacięcia zawiasu',fold:'Linie zgięcia',
         'hinge-lid':'Zawias — pas do wieczka','hinge-back':'Zawias — pas do tylnej ścianki'}[o.box.role]||o.box.role;
-      const cln={open:'Otwarte',lid:'Wieczko luźne','pull-slot':'Rowek na palec',
-        'tab-latch':'Zatrzask języczek',slide:'Wsuwane','lid-lip':'Kołnierz',
-        hinged:'Zawias żywy','hinged-tab':'Zawias zakładkowy'}[bCl]||bCl;
+      const cln={open:'Otwarte',lid:'Wieczko luźne'}[bCl]||bCl;
       const roleColor={back:'#3b9eff',front:'#38bdf8',left:'#2a9d8f',right:'#06d6a0',
         bottom:'#9b5de5',lid:'#caa06c',lip:'#f4a261',hinge:'#e76f51',fold:'#94a3b8',
         'hinge-lid':'#caa06c','hinge-back':'#3b9eff'}[o.box.role]||'#caa06c';
@@ -4693,13 +4684,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const wallCol=darkenHex(BOX_EDGE_COL,shade);
     // --- ścieżka twarzy + opcjonalne otwory/notche ---
     let faceD=`M0 0H${fmt(w)}V${fmt(h)}H0Z`, fr='nonzero', holeLocal=null;
-    // Rowek wyciągnięcia (pull-slot / slide): otwarta szczelina U przy y=0 (krawędź przednia wieczka)
-    if(o.pullSlot){
-      const {slotW:sw,slotH:sh,r:sr}=o.pullSlot;
-      const cx=w/2, sl=cx-sw/2, sr2=cx+sw/2, sb=sh;
-      const r2=Math.min(sr,sh-0.1,sw/2-0.1);
-      faceD=`M0 0L${fmt(sl)} 0L${fmt(sl)} ${fmt(sb-r2)}A${fmt(r2)} ${fmt(r2)} 0 0 0 ${fmt(sl+r2)} ${fmt(sb)}L${fmt(sr2-r2)} ${fmt(sb)}A${fmt(r2)} ${fmt(r2)} 0 0 0 ${fmt(sr2)} ${fmt(sb-r2)}L${fmt(sr2)} 0L${fmt(w)} 0L${fmt(w)} ${fmt(h)}L0 ${fmt(h)}Z`;
-    }
     if(o.hole){
       const lbb=polysBBoxMulti([boxPanelPoints(w,h,T,F,edges)]);
       const hcx=lbb.minx+(o.hole.cx-o.bx), hcy=lbb.miny+(o.hole.cy-o.by);
@@ -4707,26 +4691,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       fr='evenodd';
       holeLocal={cx:hcx,cy:hcy,rx:o.hole.rx,ry:o.hole.ry};
     }
-    // --- generujemy SVG twarzy z viewBox dopasowanym do ew. wystającego języczka (pullTab) ---
-    let svgOffY=0, svgH=hpx;
-    if(o.pullTab){
-      const tabHpx=o.pullTab.tabH*scale;
-      svgOffY=-tabHpx; svgH=hpx+tabHpx;
-      // faceD dla zatrzasku-grotu: prostokąt + grot z barkami na górnej krawędzi (ten sam kształt co w rozkroju)
-      const {tabW:tw,tabH:th,barb,neckH}=o.pullTab;
-      const tab=latchTabPts(w/2,0,tw,th,barb||2,neckH||(th*0.4));
-      faceD=polyToPathD([[0,0],...tab,[w,0],[w,h],[0,h]]);
-    }
-    const svgStyle=(z)=>`position:absolute;left:0;top:${fmt(svgOffY)}px;transform:translateZ(${fmt(z)}px)`;
-    // Delikatny gradient "drewna": lekko jaśniejszy przy lewej-górnej krawędzi, ciemniejszy przy prawej-dolnej
+    const svgStyle=(z)=>`position:absolute;left:0;top:0;transform:translateZ(${fmt(z)}px)`;
     const gfx=`fl${(Math.random()*1e9|0).toString(36)}`;
-    const tabHmm=o.pullTab?o.pullTab.tabH:0;
-    const vb2=`0 ${-tabHmm} ${w} ${h+tabHmm}`;
+    const vb2=`0 0 ${w} ${h}`;
     const grainDefs=`<defs><linearGradient id="${gfx}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity="0.13"/><stop offset="50%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.09"/></linearGradient></defs>`;
-    const outer=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(0)}">${grainDefs}<path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/><path d="${faceD}" fill="url(#${gfx})" fill-rule="${fr}"/></svg>`;
-    const inner=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(svgH)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
-    // --- ściany boczne (listwy grubości materiału wzdłuż krawędzi) ---
-    // Przy rowku wyciągnięcia (pull-slot) krawędź przednia (y=0) jest rozbita na dwa segmenty.
+    const outer=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="${svgStyle(0)}">${grainDefs}<path d="${faceD}" fill="${outerCol}" fill-rule="${fr}"/><path d="${faceD}" fill="url(#${gfx})" fill-rule="${fr}"/></svg>`;
+    const inner=`<svg viewBox="${vb2}" width="${fmt(wpx)}" height="${fmt(hpx)}" style="${svgStyle(Tpx)}"><path d="${faceD}" fill="${innerCol}" fill-rule="${fr}"/></svg>`;
     let walls='';
     function addWall(ax,ay,bx2,by2){
       const dx=bx2-ax, dy=by2-ay, len=Math.hypot(dx,dy);
@@ -4737,13 +4707,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const wl=len+WALL_OVERLAP*2, wt=Tpx+WALL_OVERLAP*2;
       walls+=`<div class="l3d-wall" style="width:${fmt(wl)}px;height:${fmt(wt)}px;background:${wallCol};transform:translate3d(${fmt(sx)}px,${fmt(sy)}px,${fmt(-WALL_OVERLAP)}px) rotateZ(${fmt(ang)}deg) rotateX(90deg)"></div>`;
     }
-    if(o.pullSlot){
-      const sl=(w/2-o.pullSlot.slotW/2)*scale, sr2=(w/2+o.pullSlot.slotW/2)*scale;
-      addWall(0,0,sl,0); addWall(sr2,0,wpx,0); // krawędź przednia: lewa i prawa część (rowek pominięty)
-      addWall(wpx,0,wpx,hpx); addWall(wpx,hpx,0,hpx); addWall(0,hpx,0,0); // pozostałe 3 krawędzie
-    } else {
-      [[0,0,wpx,0],[wpx,0,wpx,hpx],[wpx,hpx,0,hpx],[0,hpx,0,0]].forEach(([ax,ay,bx2,by2])=>addWall(ax,ay,bx2,by2));
-    }
+    [[0,0,wpx,0],[wpx,0,wpx,hpx],[wpx,hpx,0,hpx],[0,hpx,0,0]].forEach(([ax,ay,bx2,by2])=>addWall(ax,ay,bx2,by2));
     let hole='';
     if(holeLocal){
       const hx=holeLocal.cx*scale, hy=holeLocal.cy*scale, hrx=holeLocal.rx*scale, hry=holeLocal.ry*scale;
@@ -4773,45 +4737,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(!o||!ed) return;
       html+=buildBoxFace(o,ed,T,F,scale,Tpx,TR[role],BOX_FACE_COL,BOX_FACE_SHADE[role]);
     });
-    // Wieczka flat (lid, lid-lip, pull-slot, tab-latch, slide) leżą na górze pudełka.
-    // Zawias żywy (hinged) — wieczko widoczne jako otwarta klapa nachylona do tyłu.
-    // Dla 'open' pokazujemy zaciemnione wnętrze (pudełko bez wieczka).
-    const hasLidFlat=(closure==='lid'||closure==='lid-lip'||closure==='pull-slot'||closure==='tab-latch'||closure==='slide'||closure==='hinged-tab') && g.panels.lid;
+    const hasLidFlat=closure==='lid' && g.panels.lid;
     if(hasLidFlat){
-      // Dla slide: wieczko wsuwane jest nieco węższe; ed używa rzeczywistych wymiarów panelu
-      const lidO=g.panels.lid;
-      let lidW=W, lidD3=D;
-      if(closure==='slide'){ lidW=Math.max(4,W-2*T-0.4); lidD3=D+2*T; }
-      const ed={w:lidW,h:lidD3,edges:{top:null,right:null,bottom:null,left:null}};
-      // Przesuń wsuwane wieczko tak, by wystawało o T mm poza przednią krawędź (widać rowek wyciągnięcia)
-      const lidTR=closure==='slide'
-        ? `translate3d(${fmt(xOff+(W-lidW)/2)}px,${fmt(Dpx-T*scale)}px,${fmt(Hpx)}px) rotateX(180deg)`
-        : TR.lid;
-      html+=buildBoxFace(lidO,ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
-      // Dla lid-lip: kołnierz jest wewnętrznym detalem niewidocznym z zewnątrz przy zamkniętym wieczku.
-      // W widoku 3D wystarczy lekka ramka na obwodzie wieczka, sygnalizująca wcisk — renderowana jako
-      // 4 cienkie paski na zewnętrznej krawędzi otworu pudełka, WYRAŹNIE poniżej wieczka (Hpx-Tpx*3)
-      // żeby nie powodowała CSS3D z-sorting z wieczkiem (które jest przy Hpx).
-      if(closure==='lid-lip'){
-        const lw=Math.min(F*scale*0.28, Math.min(Wpx,Dpx)*0.12);
-        const lipCol=darkenHex(BOX_FACE_COL,0.55);
-        const lipZ=Hpx-Tpx*3;
-        const lipTR=`translate3d(${fmt(xOff)}px,0px,${fmt(lipZ)}px)`;
-        const b2=(l,t,w2,h2)=>`<div style="position:absolute;left:${fmt(l)}px;top:${fmt(t)}px;width:${fmt(w2)}px;height:${fmt(h2)}px;background:${lipCol};z-index:1"></div>`;
-        html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${lipTR}">
-          ${b2(0,0,Wpx,lw)}${b2(0,Dpx-lw,Wpx,lw)}
-          ${b2(0,lw,lw,Dpx-2*lw)}${b2(Wpx-lw,lw,lw,Dpx-2*lw)}
-        </div>`;
-      }
-    } else if(closure==='hinged'){
-      // Zawias żywy ZINTEGROWANY: wieczko (D głębokie) zawiaszone na tylnej-górnej krawędzi,
-      // pokazane jako otwarta klapa nachylona do tyłu (~108°). Tylna ścianka jest rysowana
-      // osobno jako twarz 'back' (to ten sam, jeden fizyczny element ciągły w rozkroju).
       const ed={w:W,h:D,edges:{top:null,right:null,bottom:null,left:null}};
-      const lidTR=`translate3d(${fmt(xOff)}px,0px,${fmt(Hpx)}px) rotateX(-108deg)`;
-      html+=buildBoxFace({},ed,T,F,scale,Tpx,lidTR,BOX_LID_COL,BOX_FACE_SHADE.lid);
-      // Zaciemnione wnętrze — klapa jest otwarta, widać wnętrze pudełka
-      html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
+      html+=buildBoxFace(g.panels.lid,ed,T,F,scale,Tpx,TR.lid,BOX_LID_COL,BOX_FACE_SHADE.lid);
     } else {
       // Pudełko otwarte — zaciemnione wnętrze w otworze górnym.
       html+=`<div class="l3d-layer" style="width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;transform-origin:0 0 0;transform:${TR.lid}"><div style="position:absolute;left:0;top:0;width:${fmt(Wpx)}px;height:${fmt(Dpx)}px;background:${darkenHex(BOX_FACE_COL,0.18)}"></div></div>`;
@@ -4892,7 +4821,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const firstBox=state.objects.find(o=>o.box && o.visible);
       const bm=firstBox?firstBox.box:null;
       if(bm){
-        const clShort={open:'otwarte',lid:'+ wieczko','pull-slot':'+ rowek','tab-latch':'+ zatrzask',slide:'+ wsuwane','lid-lip':'+ kołnierz',hinged:'+ zawias','hinged-tab':'+ zawias kołek',drawer:'szuflada'}[bm.closure]||'';
+        const clShort={open:'otwarte',lid:'+ wieczko'}[bm.closure]||'';
         live3dTitle.textContent=`📦 Złożone pudełko — ${bm.W}×${bm.D}×${bm.H} mm, T=${bm.T} mm${clShort?' · '+clShort:''}`;
       } else {
         live3dTitle.textContent='📦 Wizualizacja 3D — złożone pudełko';
@@ -4915,7 +4844,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   let svgSplitTimer=null;
   function scheduleSvgSplit(){ clearTimeout(svgSplitTimer); svgSplitTimer=setTimeout(updateSvgSplit, 280); }
   function updateSvgSplit(){
-    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('SVG split error',e); }
+    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
     bbSvgEl.innerHTML = r ? r.svg : '<div class="bb-empty">Dodaj elementy — tu pojawi się plik z rozdzielonymi warstwami</div>';
   }
 
@@ -5015,7 +4944,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ----- Powiększony podgląd rozdzielonego SVG ----- */
   function showSvgPreview(){
-    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('SVG split error',e); }
+    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
     document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.</div>';
     document.getElementById('modalSvgPrev').classList.add('open');
   }
@@ -5519,49 +5448,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; pts.push([cx+Math.cos(a)*rx, cy+Math.sin(a)*ry]); }
     return pts;
   }
-  // Punkty zaokrąglonego prostokąta (zgodnie z ruchem wskazówek zegara, n punktów per narożnik).
-  function roundedRectPoints(cx,cy,w,h,r,n){
-    n=n||5; r=Math.min(r||2, w/2-0.1, h/2-0.1);
-    const pts=[], corners=[
-      {ax:cx-w/2+r, ay:cy-h/2+r, a0:Math.PI,  a1:1.5*Math.PI},
-      {ax:cx+w/2-r, ay:cy-h/2+r, a0:1.5*Math.PI, a1:2*Math.PI},
-      {ax:cx+w/2-r, ay:cy+h/2-r, a0:0,        a1:0.5*Math.PI},
-      {ax:cx-w/2+r, ay:cy+h/2-r, a0:0.5*Math.PI, a1:Math.PI}
-    ];
-    for(const {ax,ay,a0,a1} of corners)
-      for(let i=0;i<=n;i++){ const a=a0+(a1-a0)*(i/n); pts.push([ax+r*Math.cos(a), ay+r*Math.sin(a)]); }
-    return pts;
-  }
-  // Dodaje prostokątny otwór jako dodatkową podścieżkę evenodd.
-  function addRectHole(panel,cx,cy,w,h,r){
-    panel.d+=polyToPathD(roundedRectPoints(cx,cy,w,h,r||2));
-    panel.fillRule='evenodd';
-    panel.hole={cx,cy,rx:w/2,ry:h/2};
-  }
-  // Generuje ścieżkę SVG prostokąta z otwartym rowkiem U na górnej krawędzi (y=y0).
-  // Rowek wyciągnięcia: centruję w cx, szerokość sw, głębokość sh, zaokrąglony narożnik r.
-  function lidPullSlotPath(x0,y0,w,d,sw,sh,r){
-    r=Math.min(r||3, sh-0.2, sw/2-0.2);
-    const cx=x0+w/2, sl=cx-sw/2, sr=cx+sw/2, sb=y0+sh;
-    return `M${fmt(x0)} ${fmt(y0)}L${fmt(sl)} ${fmt(y0)}L${fmt(sl)} ${fmt(sb-r)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sl+r)} ${fmt(sb)}L${fmt(sr-r)} ${fmt(sb)}A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(sr)} ${fmt(sb-r)}L${fmt(sr)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0)}L${fmt(x0+w)} ${fmt(y0+d)}L${fmt(x0)} ${fmt(y0+d)}Z`;
-  }
-  // Punkty grotu zatrzasku (barb) względem środka podstawy (cx,y0), grot wystaje ku górze (-y):
-  //   szyjka o szerokości tw przechodzi przez wąską szczelinę w ściance, a szersze barki
-  //   (tw+2*barb) zaczepiają od wewnątrz — wieczko wkłada się pod kątem i trzyma po dociśnięciu.
-  function latchTabPts(cx,y0,tw,th,barb,neckH){
-    const hw=tw/2, hb=hw+barb, sh=Math.min(neckH+1.6, th-0.6);
-    return [
-      [cx-hw,y0],[cx-hw,y0-neckH],[cx-hb,y0-neckH],[cx-hb,y0-sh],
-      [cx,y0-th],
-      [cx+hb,y0-sh],[cx+hb,y0-neckH],[cx+hw,y0-neckH],[cx+hw,y0]
-    ];
-  }
-  // Prostokąt wieczka (w×d) z zatrzaskiem-grotem na górnej krawędzi (y=y0, grot ku górze).
-  function lidTabPath(x0,y0,w,d,tw,th,barb,neckH){
-    const cx=x0+w/2;
-    const tab=latchTabPts(cx,y0,tw,th,barb,neckH);
-    return polyToPathD([[x0,y0],...tab,[x0+w,y0],[x0+w,y0+d],[x0,y0+d]]);
-  }
   // Dodaje owalny otwór do istniejącego panelu jako dodatkową podścieżkę + fillRule:evenodd
   // (działa niezależnie od kierunku obrysu zewnętrznego — nie trzeba dopasowywać winding order).
   function addOvalHole(panel,cx,cy,rx,ry){
@@ -5569,66 +5455,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     panel.fillRule='evenodd';
     panel.hole={cx,cy,rx,ry};
   }
-  // Pudełko z szufladą (SlidingDrawer z boxes.py): zewnętrzna TULEJA (otwarta z przodu)
-  // + wewnętrzna SZUFLADA (otwarta od góry) z luzem, wsuwana od przodu. Oba elementy to
-  // skrzynki łączone „na palec". Każdy panel to osobny element rozkroju (jak reszta).
-  // Tuleja = skrzynka „otwarta od góry" o przestawionych wymiarach (W,H,D) — po obróceniu
-  // otwór góry staje się otworem przodu. Szuflada = mniejsza skrzynka otwarta od góry.
-  function buildDrawerBox(W,D,H,T,F,g){
-    const play=clamp(T*0.12,0.2,0.5);              // luz między tuleją a szufladą
-    const panels=[];
-    let cx=0, cy=0, rowH=0;
-    const maxRowW=Math.max(W,H,D)*2.6+g*2;
-    function add(def,name,role,gid,meta){
-      const pw=def.w+2*T, ph=def.h+2*T;
-      if(cx>0 && cx+pw>maxRowW){ cx=0; cy+=rowH+g; rowH=0; }
-      const x=cx+T, y=cy+T; cx+=pw+g; rowH=Math.max(rowH,ph);
-      const pts=boxPanelPoints(def.w,def.h,T,F,def.edges).map(([px,py])=>[px+x,py+y]);
-      const bb=polysBBoxMulti([pts]);
-      const p={name,role,mode:'cut',d:polyToPathD(pts),bx:bb.minx,by:bb.miny,
-        bw:Math.max(1,bb.maxx-bb.minx),bh:Math.max(1,bb.maxy-bb.miny),box:{gid,...meta,role}};
-      panels.push(p); return p;
-    }
-    // --- TULEJA (otwarta z przodu) = skrzynka open-top o wymiarach (W, H, D) ---
-    const sGid=uid();
-    const sMeta={W,D:H,H:D,T,F,closure:'drawer',clasp:false};   // przestawione wymiary dla widoku 3D
-    const sName={bottom:'Tuleja — ścianka tylna',back:'Tuleja — góra',front:'Tuleja — dół',
-      left:'Tuleja — bok lewy',right:'Tuleja — bok prawy'};
-    boxPanelEdgeDefs(W,H,D).forEach(d=>add(d,sName[d.role]||('Tuleja '+d.role),d.role,sGid,sMeta));
-    // --- SZUFLADA (otwarta od góry), mniejsza o luz; front z otworem-uchwytem ---
-    const dW=Math.max(12,W-2*T-2*play), dH=Math.max(10,H-2*T-2*play), dD=Math.max(12,D-T-play);
-    const drGid=uid();
-    const drMeta={W:dW,D:dD,H:dH,T,F,closure:'drawer',clasp:false};
-    const drName={bottom:'Szuflada — dno',back:'Szuflada — ścianka tylna',front:'Szuflada — front (uchwyt)',
-      left:'Szuflada — bok lewy',right:'Szuflada — bok prawy'};
-    boxPanelEdgeDefs(dW,dD,dH).forEach(d=>{
-      const p=add(d,drName[d.role]||('Szuflada '+d.role),d.role,drGid,drMeta);
-      if(d.role==='front'){
-        // owalny otwór-uchwyt na palec, przy otwartej (górnej) krawędzi frontu szuflady
-        const fr=clamp(dW*0.18,10,30), frY=clamp(fr*0.4,4,9);
-        addOvalHole(p, p.bx+p.bw/2, p.by+p.bh-frY-4, fr, frY);
-      }
-    });
-    return panels;
-  }
-  // Ścianki pudełka (łączenia „na palec”) ułożone obok siebie w gotowym do cięcia rozkroju.
-  // closure: 'open' (5 ścianek), 'lid' (+ luźne wieczko), 'lid-lip' (+ wieczko z kołnierzem
-  // wpasowującym się w otwór — chwyt, nie spada), 'hinged' (+ wieczko na zawiasie żywym, uchylne).
-  // clasp: gdy true, dodaje owalny otwór na zapięcie/sznurek/zatrzask na ściance przedniej
-  // (oraz na wieczku, jeśli istnieje) — para otworów do przewleczenia troczka/zapięcia.
-  // Każdy panel ma `role` (back/front/left/right/bottom/lid/lip/hinge/fold) do oznaczeń i wizualizacji 3D.
   function buildFingerBox(W,D,H,T,F,closure,clasp){
     const g=Math.max(T*4,12);
-    if(closure==='drawer') return buildDrawerBox(W,D,H,T,F,g);
     // Rozkrój: każdy panel ODDZIELNIE, rozmieszczony w wierszach z wyraźnym odstępem
     // (jak w boxes.py) — żaden panel nie nachodzi na inny i każdy da się osobno
     // zaznaczyć oraz przesunąć. Pakowanie zachłanne: panele kładziemy w rzędzie,
     // a gdy rząd przekroczy maxRowW, zawijamy do nowego wiersza.
-    const allDefs=boxPanelEdgeDefs(W,D,H);
-    // Dla zawiasu żywego (hinged) tylna ścianka jest częścią JEDNEGO ciągłego elementu
-    // (tył + strefa zawiasu + wieczko), a dla zawiasu kołkowego (hinged-tab) tylna ścianka
-    // ma wbudowane knykcie zawiasu — w obu przypadkach budujemy ją osobno w sekcji zamknięcia.
-    const defs = (closure==='hinged'||closure==='hinged-tab') ? allDefs.filter(d=>d.role!=='back') : allDefs;
+    const defs=boxPanelEdgeDefs(W,D,H);
     const maxRowW=Math.max(W*2+g, H*3+2*g, W+H+g);
     const pos={}; let cx=0, cy=0, rowH=0;
     for(const d of defs){
@@ -5662,164 +5495,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         panels.push(panel);
         return panel;
       };
-      if(closure==='pull-slot'){
-        // Wieczko z rowkiem wyciągnięcia na palec — otwarta szczelina U przy krawędzi przedniej wieczka.
-        const sw=clamp(W*0.28,18,70), sh=clamp(Math.max(H,D)*0.14,5,14), sr=clamp(sh*0.4,1.5,5);
-        const px=place(W);
-        const lidD=lidPullSlotPath(px,ey,W,D,sw,sh,sr);
-        const lid={name:'Wieczko z wyciągnięciem',role:'lid',mode:'cut',d:lidD,bx:px,by:ey,bw:W,bh:D,
-          pullSlot:{slotW:sw,slotH:sh,r:sr}};
-        panels.push(lid);
-        // otwór na zapięcie na środku wieczka — z dala od rowka wyciągnięcia
-        if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
-      } else if(closure==='tab-latch'){
-        // PRAWDZIWY zatrzask-grot: języczek wieczka ma wąską szyjkę (przechodzi przez szczelinę
-        // w ściance) i szersze barki (zaczepiają od wewnątrz). Wkłada się przechylając wieczko,
-        // a po dociśnięciu barki blokują wieczko przed podniesieniem (trzeba znów przechylić, by otworzyć).
-        const tw=clamp(W*0.13,9,28);            // szerokość szyjki
-        const barb=clamp(T*0.9,1.5,4);          // wysięg barków poza szyjkę
-        const neckH=T+0.6;                       // długość szyjki = grubość ścianki (przechodzi na wylot)
-        const th=clamp(neckH+T*2.2,8,18);        // całkowita wysokość grotu (barki + ostrze za ścianką)
-        const px=place(W);
-        const lidD=lidTabPath(px,ey,W,D,tw,th,barb,neckH);
-        // bh=D+th, by=ey-th (grot wystaje powyżej prostokąta wieczka)
-        const lid={name:'Wieczko z zatrzaskiem (grot)',role:'lid',mode:'cut',d:lidD,bx:px,by:ey-th,bw:W,bh:D+th,
-          pullTab:{tabW:tw,tabH:th,barb,neckH}};
-        panels.push(lid);
-        // Wąska SZCZELINA na szyjkę w ściance przedniej (tylko szyjka przechodzi; barki zaczepiają
-        // od wewnątrz). Blisko górnej krawędzi skrzynki (local y=H ściany przedniej).
-        const frontP=panels.find(p=>p.role==='front');
-        if(frontP) addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-1-neckH/2, tw+0.4, neckH+0.4, Math.min(1,neckH*0.3));
-        if(clasp) addOvalHole(lid, px+W/2, ey+D/2, claspRx, claspRy);
-      } else if(closure==='slide'){
-        // Wieczko wsuwane (matchbox): węższe wieczko wsuwane od przodu przez szczelinę w ściance przedniej.
-        const lidW=Math.max(4, W-2*T-0.4), lidD2=D+2*T;
-        const px=place(lidW);
-        const sw=clamp(lidW*0.35,12,50), sh=clamp(T*2+1,5,12), sr2=clamp(sh*0.35,1.5,4);
-        const lid={name:'Wieczko wsuwane',role:'lid',mode:'cut',
-          d:lidPullSlotPath(px,ey,lidW,lidD2,sw,sh,sr2),
-          bx:px,by:ey,bw:lidW,bh:lidD2,pullSlot:{slotW:sw,slotH:sh,r:sr2}};
-        panels.push(lid);
-        if(clasp) addOvalHole(lid, px+lidW/2, ey+lidD2/2, claspRx, claspRy);
-        // Ścianka przednia: szczelina wejściowa dla wieczka — przy górnej krawędzi
-        const frontP=panels.find(p=>p.role==='front');
-        if(frontP){
-          const slitW=Math.max(4,lidW+0.4), slitH=Math.max(2,T+0.4);
-          addRectHole(frontP, frontP.bx+frontP.bw/2, frontP.by+frontP.bh-slitH/2-0.5, slitW, slitH, 1.5);
-        }
-      } else if(closure==='lid' || closure==='lid-lip'){
+      if(closure==='lid'){
         const lid=rectPanel('Wieczko (góra)','lid', W, D);
-        // otwór na zapięcie na wieczku — przy odpowiadającej krawędzi (para z otworem na ściance przedniej)
         if(clasp) addOvalHole(lid, lid.bx+lid.bw/2, lid.by+claspRy+3, claspRx, claspRy);
-        if(closure==='lid-lip'){
-          // kołnierz = ramka wpasowująca się w otwór pudełka (luz 0.3 mm); wkleja się pod wieczko
-          const c=0.3, lw=Math.max(6, Math.min(F, Math.min(W,D)/2-2*T-1));
-          const ow=Math.max(4, W-2*T-2*c), oh=Math.max(4, D-2*T-2*c);
-          const px=place(ow);
-          const outer=[[px,ey],[px+ow,ey],[px+ow,ey+oh],[px,ey+oh]];
-          const inner=[[px+lw,ey+lw],[px+ow-lw,ey+lw],[px+ow-lw,ey+oh-lw],[px+lw,ey+oh-lw]];
-          panels.push({name:'Kołnierz wieczka (chwyt)',role:'lip',mode:'cut',fillRule:'evenodd',
-            d:polyToPathD(outer)+polyToPathD(inner),bx:px,by:ey,bw:ow,bh:oh});
-        }
-      } else if(closure==='hinged'){
-        // ZINTEGROWANE wieczko na zawiasie żywym (jak FlexBook w boxes.py): tylna ścianka
-        // + strefa zawiasu (nacięcia flex) + wieczko to JEDEN ciągły element. Tylna ścianka
-        // łączy się palcami z bokami i podstawą (dokładnie jak zwykła tylna ścianka), a
-        // powyżej przechodzi przez zawias w wieczko, które po zgięciu nakrywa pudełko od góry.
-        // Nic nie trzeba doklejać — zawias jest częścią konstrukcji.
-        const band=clamp(Math.max(8,6*T),6,28);   // strefa zawiasu (flex)
-        const yB=D+band;                            // lokalne y: górna krawędź tylnej ścianki
-        const px=place(W), py=ey;
-        // Ciągły obrys (lokalnie 0,0 = lewy-górny róg wieczka, potem przesuwany o px,py):
-        //   wieczko (y 0..D) → strefa zawiasu (y D..D+band) → tylna ścianka (y yB..yB+H, z palcami)
-        const pts=[[0,0],[W,0],[W,yB]];
-        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>pts.push([W+off, yB+al]));    // prawa krawędź tylnej ścianki (palce → prawa ścianka)
-        fingerEdgePoints(W,T,F,false).forEach(([al,off])=>pts.push([W-al, yB+H+off]));  // dolna krawędź (palce → podstawa)
-        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>pts.push([-off, yB+H-al]));   // lewa krawędź tylnej ścianki (palce → lewa ścianka)
-        pts.push([0,yB]);
-        const opts=pts.map(([x,y])=>[x+px,y+py]);
-        const bb=polysBBoxMulti([opts]);
-        const backLid={name:'Tył + zawias + wieczko (1 element)',role:'back',mode:'cut',
-          d:polyToPathD(opts),bx:bb.minx,by:bb.miny,bw:Math.max(1,bb.maxx-bb.minx),bh:Math.max(1,bb.maxy-bb.miny)};
-        panels.push(backLid);
-        // Nacięcia living hinge w strefie zawiasu (lokalne y: D..D+band)
-        const slitLen=Math.min(20, Math.max(6, W/5));
-        const hb=livingHingeHorizontal(W,band,slitLen,0.5,3,3,0, px, py+D);
-        if(hb.count) panels.push({name:'Nacięcia zawiasu (flex)',role:'hinge',mode:'cut',d:hb.d,bx:px,by:py+D,bw:W,bh:band});
-        // Linie zgięcia (score) na granicach strefy zawiasu — orientacyjnie gdzie się wygina
-        const f1=py+D, f2=py+D+band;
-        panels.push({name:'Linie zgięcia zawiasu',role:'fold',mode:'score',
-          d:`M${fmt(px)} ${fmt(f1)}L${fmt(px+W)} ${fmt(f1)}M${fmt(px)} ${fmt(f2)}L${fmt(px+W)} ${fmt(f2)}`,
-          bx:px,by:f1,bw:W,bh:band});
-        // Otwór na zapięcie przy wolnej (przedniej) krawędzi wieczka — para z otworem ściany przedniej
-        if(clasp) addOvalHole(backLid, px+W/2, py+claspRy+3, claspRx, claspRy);
-      } else if(closure==='hinged-tab'){
-        // ZINTEGROWANY zawias kołkowy (jak HingeBox w boxes.py): knykcie (człony zawiasu)
-        // są WYCIĘTE bezpośrednio w górnej krawędzi tylnej ścianki (kolumny parzyste) oraz
-        // w tylnej krawędzi wieczka (kolumny nieparzyste). Po złożeniu przeplatają się i
-        // mają otwory na wspólny kołek/sworzeń ⌀3 mm (drewniany kołek lub gwóźdź).
-        // Nic nie trzeba doklejać — zawias jest częścią ścianki i wieczka.
-        const nK=W<=80?5:W<=170?7:9;            // liczba knykci (nieparzysta → końce należą do ścianki)
-        const gap=clamp(T+0.4,1.6,5);           // luz między knykciami (grubość materiału + tolerancja)
-        const kp=clamp(T*4,9,18);               // jak daleko knykieć wystaje poza krawędź
-        const hR=(3.0+0.4)/2;                   // otwór na kołek ⌀3 mm (z tolerancją)
-        const kw=W/nK;
-        const evenIdx=[], oddIdx=[];
-        for(let i=0;i<nK;i++){ (i%2===0?evenIdx:oddIdx).push(i); }
-        // Górna krawędź (lewo→prawo) z knykciami wystającymi do -kp w kolumnach `mine`.
-        // Zwraca punkty krawędzi oraz środki otworów na kołek.
-        function knuckleTop(mine){
-          const pts=[[0,0]]; const holes=[];
-          for(let i=0;i<nK;i++){
-            const x0=i*kw+gap/2, x1=(i+1)*kw-gap/2;
-            if(mine.includes(i)){
-              pts.push([x0,0],[x0,-kp],[x1,-kp],[x1,0]);
-              holes.push([(x0+x1)/2,-kp*0.5]);
-            }
-          }
-          pts.push([W,0]);
-          return {pts,holes};
-        }
-        // --- TYLNA ŚCIANKA z knykciami (parzyste) na górnej krawędzi ---
-        const bkTop=knuckleTop(evenIdx);
-        const bpx=place(W), bpy=ey+kp+2;        // +kp+2: knykcie (-kp) nie wychodzą nad obszar
-        const bp=[...bkTop.pts];
-        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>bp.push([W+off, al]));    // prawa (palce → prawa ścianka)
-        fingerEdgePoints(W,T,F,false).forEach(([al,off])=>bp.push([W-al, H+off]));  // dół (palce → podstawa)
-        fingerEdgePoints(H,T,F,true ).forEach(([al,off])=>bp.push([-off, H-al]));   // lewa (palce → lewa ścianka)
-        const bpAbs=bp.map(([x,y])=>[x+bpx,y+bpy]);
-        let backD=polyToPathD(bpAbs);
-        bkTop.holes.forEach(([cx,cy])=>{ backD+=polyToPathD(ovalPoints(cx+bpx,cy+bpy,hR,hR)); });
-        const bbB=polysBBoxMulti([bpAbs]);
-        panels.push({name:'Tylna ścianka + zawias (knykcie)',role:'back',mode:'cut',fillRule:'evenodd',
-          d:backD,bx:bbB.minx,by:bbB.miny,bw:Math.max(1,bbB.maxx-bbB.minx),bh:Math.max(1,bbB.maxy-bbB.miny)});
-        // --- WIECZKO z knykciami (nieparzyste) na tylnej krawędzi ---
-        const ldTop=knuckleTop(oddIdx);
-        const lpx=place(W), lpy=ey+kp+2;
-        const lp=[...ldTop.pts]; lp.push([W,D],[0,D]);   // prawa/dół/lewa — proste (wieczko tylko nakrywa)
-        const lpAbs=lp.map(([x,y])=>[x+lpx,y+lpy]);
-        let lidD2=polyToPathD(lpAbs);
-        ldTop.holes.forEach(([cx,cy])=>{ lidD2+=polyToPathD(ovalPoints(cx+lpx,cy+lpy,hR,hR)); });
-        const bbL=polysBBoxMulti([lpAbs]);
-        const lidPanel={name:'Wieczko + zawias (knykcie)',role:'lid',mode:'cut',fillRule:'evenodd',
-          d:lidD2,bx:bbL.minx,by:bbL.miny,bw:Math.max(1,bbL.maxx-bbL.minx),bh:Math.max(1,bbL.maxy-bbL.miny)};
-        panels.push(lidPanel);
-        if(clasp) addOvalHole(lidPanel, lpx+W/2, lpy+D-claspRy-3, claspRx, claspRy);
       }
     }
     return panels;
   }
   const modalBox=document.getElementById('modalBox');
   const BOX_CLOSURE_NOTES={
-    open:'Pudełko otwarte od góry — 5 ścianek.',
-    lid:'Dodatkowe płaskie wieczko leżące luźno na otworze.',
-    'pull-slot':'Wieczko z rowkiem wyciągnięcia (jak na pudełkach ślubnych/prezentowych) — zaokrąglona szczelina przy przedniej krawędzi, chwyt dwoma palcami.',
-    'tab-latch':'Prawdziwy zatrzask-grot — języczek wieczka ma wąską szyjkę i szersze barki. Szyjka przechodzi przez szczelinę w ściance przedniej, a barki zaczepiają od wewnątrz. Wkładasz przechylając wieczko; po dociśnięciu barki blokują je przed podniesieniem (do otwarcia znów przechyl).',
-    slide:'Wieczko wsuwane (skrzynka zapałkowa) — wieczko wsuwa się od przodu przez szczelinę w ściance czołowej. Rowek wyciągnięcia ułatwia wysunięcie.',
-    'lid-lip':'Wieczko + kołnierz wpasowujący się w otwór pudełka — wieczko trzyma się na wcisk i nie spada.',
-    hinged:'Zintegrowane wieczko na zawiasie żywym (flex): tylna ścianka + strefa nacięć + wieczko to JEDEN ciągły element — nic nie trzeba doklejać. Tylna ścianka łączy się palcami z bokami i podstawą, a wieczko zgina się na zawiasie i nakrywa pudełko od góry.',
-    'hinged-tab':'Zintegrowany zawias kołkowy (jak HingeBox): knykcie zawiasu są wycięte bezpośrednio w krawędzi tylnej ścianki i wieczka — przeplatają się, a wspólny kołek ⌀3 mm (wykałaczka) tworzy oś obrotu. Nic nie trzeba doklejać. Klasyczny mechanizm skrzynek z drewna.',
-    drawer:'Szuflada wysuwana (jak SlidingDrawer): zewnętrzna TULEJA (otwarta z przodu) + wewnętrzna SZUFLADA (otwarta od góry, z otworem-uchwytem na palec) — dwa osobne elementy łączone „na palec". Szuflada wsuwa się w tuleję od przodu z lekkim luzem. Łącznie 10 paneli.'
+    open:'Pudełko otwarte od góry — 5 ścianek łączonych „na palec".',
+    lid:'Dodatkowe płaskie wieczko leżące luźno na otworze — 6 ścianek.'
   };
   const boxClosureSel=document.getElementById('boxClosure');
   const boxClosureNote=document.getElementById('boxClosureNote');
@@ -5850,67 +5536,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <line x1="${W/2-20}" y1="${-4}" x2="${W/2-20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
         <line x1="${W/2+20}" y1="${-4}" x2="${W/2+20}" y2="${T+4}" stroke="${mark}" stroke-width="1" stroke-dasharray="3 2"/>
         <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">wieczko nakładane</text>`;
-    } else if(type==='pull-slot'){
-      const cx=W/2, sl=cx-sw/2, sr=cx+sw/2;
-      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
-        <path d="M${sl} ${-th-4} A${r} ${r} 0 0 1 ${sl+r} ${-th-4+sh*0.85} L${sr-r} ${-th-4+sh*0.85} A${r} ${r} 0 0 1 ${sr} ${-th-4}" fill="${bg}" stroke="${mark}" stroke-width="1.5"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">rowek wyciągnięcia</text>`;
-    } else if(type==='tab-latch'){
-      const cx=W/2, tl=cx-tw/2;
-      // Wieczko z języczkiem sterczącym na dół + odpowiedni otwór w ściance
-      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
-        <rect x="${tl}" y="${-th-4+th}" width="${tw}" height="${th*0.9}" rx="${r*0.6}" fill="${mark}" stroke="${mark}" stroke-width="1.2"/>
-        <rect x="${tl}" y="${T}" width="${tw}" height="${th*0.9}" rx="${r*0.6}" fill="none" stroke="${mark}" stroke-width="1.2" stroke-dasharray="3 2"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">języczek + zatrzask</text>`;
-    } else if(type==='slide'){
-      // Wieczko wysuwane od przodu — perspektywa boku
-      const lw=W-2*T-2;
-      extra=`<rect x="${T+1}" y="${-th/2}" width="${lw}" height="${D+th/2}" rx="2" fill="${g1}" stroke="${lidC}" stroke-width="1.5"/>
-        <line x1="${T+1}" y1="${D/2}" x2="${T+1+24}" y2="${D/2}" stroke="${mark}" stroke-width="1.5" marker-end="url(#arr2)"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">wsuwane (od przodu)</text>`;
-    } else if(type==='lid-lip'){
-      extra=`<rect x="${T/2}" y="${-th-4}" width="${W-T}" height="${th}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
-        <rect x="${T/2+lip}" y="${-th-4+th}" width="${W-T-2*lip}" height="${th*0.7}" rx="2" fill="${lidC}88" stroke="${mark}" stroke-width="1.2"/>
-        <rect x="${T+lip}" y="${T}" width="${W-2*T-2*lip}" height="${th*0.7}" rx="2" fill="none" stroke="${mark}" stroke-width="1.2" stroke-dasharray="3 2"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">kołnierz wpasowany</text>`;
-    } else if(type==='hinged'){
-      // Klapa otwarta — przychylona do tyłu
-      const hy=D*0.45;
-      extra=`<path d="M0 0 Q${W*0.1} ${-hy*0.7} ${W*0.38} ${-hy}" stroke="${lidC}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <line x1="${W*0.38}" y1="${-hy}" x2="${W-2}" y2="${-hy}" stroke="${lidC}" stroke-width="${th}" stroke-linecap="round" opacity="0.85"/>
-        <path d="M0 0 L4 0" stroke="${mark}" stroke-width="2.5"/>
-        <path d="M${W*0.3} ${-hy*0.65} A6 6 0 0 0 ${W*0.38} ${-hy}" stroke="${mark}" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">zawias żywy (flex)</text>`;
-    } else if(type==='hinged-tab'){
-      // Zawias zakładkowy — widok boczny: wieczko uchylone do góry z zawiasem kołkowym przy lewej krawędzi
-      const hy=D*0.48; const kH2=th*0.85; const gH2=th*0.55; const pR2=2.4;
-      const nK2=3; const kW2=14; const kGap=4;
-      // Wieczko przechylone w górę (zawiaszone przy lewej krawędzi, obrót ~45°)
-      const lx1=0,ly1=0, lx2=hy*0.7,ly2=-hy;
-      extra=`<line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${lidC}" stroke-width="${th}" stroke-linecap="round" opacity="0.85"/>
-        <line x1="${lx2}" y1="${ly2}" x2="${lx2+W*0.8}" y2="${ly2}" stroke="${lidC}" stroke-width="${th*0.55}" stroke-linecap="round" opacity="0.7"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">zawias zakładkowy</text>
-        <text x="${W/2}" y="${D/2+31}" text-anchor="middle" fill="${cl}" font-size="9.5" font-family="sans-serif">kołek drewniany ⌀3 mm</text>`;
-      // Schematyczne zakładki (widok z przodu): 3 knuckle obok siebie
-      const hby=-gH2-kH2; const hbx=-nK2*(kW2+kGap);
-      for(let i=0;i<nK2;i++){
-        const bx3=hbx+i*(kW2+kGap);
-        const col2=i%2===0?lidC:mark;
-        const lbl=i%2===0?'W':'T'; // W=wieczko, T=tył
-        extra+=`<rect x="${bx3}" y="${hby}" width="${kW2}" height="${kH2}" rx="2.5" fill="${col2}44" stroke="${col2}" stroke-width="1.4"/>
-          <circle cx="${bx3+kW2/2}" cy="${hby+kH2*0.5}" r="${pR2}" fill="${col2}44" stroke="${col2}" stroke-width="1.2"/>
-          <text x="${bx3+kW2/2}" y="${hby-2.5}" text-anchor="middle" fill="${col2}" font-size="7.5" font-family="sans-serif">${lbl}</text>`;
-      }
-      // Kołek pionowy przez zakładki
-      const pinX=hbx+nK2*(kW2+kGap)*0.5-kGap/2;
-      extra+=`<line x1="${pinX}" y1="${hby-2}" x2="${pinX}" y2="${hby+kH2+4}" stroke="#e2c97e" stroke-width="3" stroke-linecap="round" opacity="0.92"/>`;
-    } else if(type==='drawer'){
-      // Szuflada częściowo wysunięta z tulei w prawo (widok z góry) + uchwyt + strzałka
-      const inset=T+3, dw=W*0.46, dd=D-2*inset, dx=W*0.46;
-      extra=`<rect x="${dx}" y="${inset}" width="${dw}" height="${dd}" rx="2" fill="${g2}" stroke="${lidC}" stroke-width="1.5"/>
-        <ellipse cx="${dx+dw-9}" cy="${D/2}" rx="5" ry="3.2" fill="${bg}" stroke="${mark}" stroke-width="1.2"/>
-        <line x1="${dx+dw+5}" y1="${D/2}" x2="${dx+dw+24}" y2="${D/2}" stroke="${mark}" stroke-width="1.5" marker-end="url(#arr2)"/>
-        <text x="${W/2}" y="${D/2+18}" text-anchor="middle" fill="${mark}" font-size="11" font-family="sans-serif">szuflada wysuwana</text>`;
     }
     const defs=`<defs>
       <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${cl}"/></marker>
@@ -5919,12 +5544,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const vb=`-4 ${-th*2-8} ${W+8} ${D+th*2+16}`;
     boxClosurePrev.innerHTML=`<svg viewBox="${vb}" width="100%" height="68" style="display:block">${defs}${box}${extra}</svg>`;
   }
-  const boxHingeTabNote=document.getElementById('boxHingeTabNote');
   const updateBoxClosureNote=()=>{
     const v=boxClosureSel.value;
     boxClosureNote.textContent=BOX_CLOSURE_NOTES[v]||'';
     drawClosurePreview(v);
-    if(boxHingeTabNote) boxHingeTabNote.style.display=v==='hinged-tab'?'block':'none';
   };
   boxClosureSel.addEventListener('change',updateBoxClosureNote); updateBoxClosureNote();
   document.getElementById('boxGenBtn').addEventListener('click',()=>modalBox.classList.add('open'));
@@ -5946,7 +5569,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const newObjs=panels.map(p=>({id:uid(),type:'path',name:p.name,d:p.d,fillRule:p.fillRule||'nonzero',
       bx:p.bx,by:p.by,bw:p.bw,bh:p.bh,x:0,y:0,rotation:0,mode:p.mode||'cut',visible:true,locked:false,
       depth:state.depth||1,repeat:{type:'none'},hole:p.hole||null,
-      pullSlot:p.pullSlot||null,pullTab:p.pullTab||null,
       box:p.box||{gid,role:p.role,W,D,H,T,F,closure,clasp}}));
     const totalBB=polysBBoxMulti(panels.map(p=>[[p.bx,p.by],[p.bx+p.bw,p.by+p.bh]]));
     if(totalBB.maxx>state.docW || totalBB.maxy>state.docH){
@@ -6859,7 +6481,7 @@ submitBtn.addEventListener('click', async ()=>{
     submitBtn.textContent='Wysłano ✓';
     setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.textContent='Wyślij projekt'; },2500);
   }catch(err){
-    console.error('Send quote error',err);
+    console.error('Błąd wysyłki wyceny',err);
     setStatus('Błąd wysyłki: '+(err?.message||'spróbuj ponownie'),true);
     submitBtn.disabled=false;
   }
