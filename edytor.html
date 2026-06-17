@@ -80,6 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-grid input:focus{border-color:var(--accent)}
 .pq-actions{display:flex;gap:6px;padding:8px 14px 14px}
 .pq-status{font-size:.72rem;min-height:16px;padding:0 14px 8px;font-weight:600}
+.pq-help{font-size:.7rem;color:var(--muted);line-height:1.5;margin:0 0 9px}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;background:
   repeating-linear-gradient(45deg,#0f0b06 0 10px,#120d07 10px 20px)}
 #canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -557,20 +558,22 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
       <div class="ptab-body" data-ptab-body="pricing">
         <div class="pq-sec">
-          <div class="pq-h">📦 Materiały <span class="hint" data-tip="Lista materiałów do wyceny. Dla każdego podaj nazwę, grubość, koszt za cm² i prędkość cięcia lasera.">?</span></div>
+          <div class="pq-h">📦 Materiały</div>
+          <p class="pq-help">Lista materiałów do wyceny. Dla każdego podaj nazwę, grubość (mm), koszt materiału za 1&nbsp;cm² oraz prędkość cięcia lasera (mm/min).</p>
           <!-- materiały renderowane dynamicznie -->
           <div id="pqMaterials"></div>
           <button type="button" class="tbtn" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
         </div>
         <div class="pq-sec">
-          <div class="pq-h">⚙ Parametry wyceny <span class="hint" data-tip="Globalne parametry doliczane do każdej wyceny — wspólne dla wszystkich materiałów.">?</span></div>
+          <div class="pq-h">⚙ Parametry wyceny</div>
+          <p class="pq-help">Globalne wartości doliczane do każdej wyceny — wspólne dla wszystkich materiałów.</p>
           <div class="pq-grid">
-            <label>Laser zł/min <span class="hint" data-tip="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">?</span><input type="number" id="pqLaserMin" step="0.1" min="0"></label>
-            <label>Pakowanie zł <span class="hint" data-tip="Stała kwota za pakowanie zamówienia (karton, folia).">?</span><input type="number" id="pqPack" step="0.5" min="0"></label>
-            <label>Marża % <span class="hint" data-tip="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">?</span><input type="number" id="pqMargin" step="1" min="0"></label>
-            <label>Zapas czasu % <span class="hint" data-tip="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">?</span><input type="number" id="pqBuffer" step="1" min="0"></label>
-            <label>Grawer mm/min <span class="hint" data-tip="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">?</span><input type="number" id="pqEngSpeed" step="100" min="1"></label>
-            <label>Odstęp grawera mm <span class="hint" data-tip="Odległość między liniami skanowania grawera. Typowo 0,1 mm.">?</span><input type="number" id="pqEngSpacing" step="0.01" min="0.01"></label>
+            <label title="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">Laser zł/min<input type="number" id="pqLaserMin" step="0.1" min="0"></label>
+            <label title="Stała kwota za pakowanie zamówienia (karton, folia).">Pakowanie zł<input type="number" id="pqPack" step="0.5" min="0"></label>
+            <label title="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">Marża %<input type="number" id="pqMargin" step="1" min="0"></label>
+            <label title="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">Zapas czasu %<input type="number" id="pqBuffer" step="1" min="0"></label>
+            <label title="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">Grawer mm/min<input type="number" id="pqEngSpeed" step="100" min="1"></label>
+            <label title="Odległość między liniami skanowania grawera. Typowo 0,1 mm.">Odstęp grawera mm<input type="number" id="pqEngSpacing" step="0.01" min="0.01"></label>
           </div>
         </div>
         <div class="pq-actions">
