@@ -12,7 +12,8 @@
 :root{
   --bg:#020617; --surface:#0f172a; --surface2:#1e293b; --border:#334155;
   --accent:#38bdf8; --accent-dark:#0284c7; --text:#f1f5f9; --muted:#94a3b8;
-  --cut:#ff2d2d; --engrave:#1c1c1c; --score:#2f7bd8;
+  --cut:#ff2d2d; --cut-light:#ff4444; --engrave:#1c1c1c; --score:#2f7bd8; --score-light:#3b9eff;
+  --hole:#9b5de5; --accent-text:#04101e; --success:#5fd38a; --operator:#f7b733; --operator-dark:#e0892a;
   --font-d:'Poppins',system-ui,sans-serif; --font-b:'Poppins',system-ui,sans-serif; --r:9px;
 }
 html,body{height:100%}
@@ -30,11 +31,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolbar .brand span{color:var(--accent)}
 .tgroup{display:flex;gap:4px;align-items:center;padding-right:8px;margin-right:2px;border-right:1px solid var(--border)}
 .tgroup:last-child{border-right:none}
-.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:38px;height:36px;padding:0 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s,filter .15s,box-shadow .15s;white-space:nowrap}
+.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:38px;height:36px;padding:0 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s,filter .15s,box-shadow .15s,transform .08s;white-space:nowrap}
 .tbtn:hover{border-color:var(--accent);color:var(--accent)}
-.tbtn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
-.tbtn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e;font-weight:700}
+.tbtn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.tbtn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:var(--accent-text);font-weight:700}
 .tbtn-primary:hover{filter:brightness(1.1);box-shadow:0 2px 10px rgba(56,189,248,.3)}
+.tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbtn:active:not(:disabled){transform:scale(.96)}
 .tbtn:disabled{opacity:.4;cursor:not-allowed}
 .tbtn .ico{font-size:1rem;line-height:1}
 .zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--muted);font-weight:600}
@@ -80,7 +83,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .text-toolbar input[type=number]{width:58px}
 .text-toolbar label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase}
 .text-toolbar .tbtn{height:30px;min-width:30px;padding:0 9px}
-.text-toolbar .tbtn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
+.text-toolbar .tbtn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .tt-sep{width:1px;height:22px;background:var(--border)}
 
 /* ---- Rozwijana lista czcionek z podglądem na żywo (najechanie = podgląd, klik = wybór) ---- */
@@ -90,10 +93,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:280px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.55)}
 .font-dd.open .font-dd-list{display:block}
 .font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.font-dd-item:hover{background:var(--accent);color:#04101e}
+.font-dd-item:hover{background:var(--accent);color:var(--accent-text)}
 .font-dd-item.cur{background:rgba(56,189,248,.18)}
 .font-dd-item .pc{font-family:var(--font-b);font-size:.68rem;color:var(--muted)}
-.font-dd-item:hover .pc{color:#04101e}
+.font-dd-item:hover .pc{color:var(--accent-text)}
 
 /* canvas geometry styling */
 .doc-bg{fill:#e8d9b8}
@@ -106,8 +109,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .geo-engrave-txt{fill:var(--engrave);stroke:none}
 .geo-cut-txt{fill:transparent;stroke:var(--cut);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-score-txt{fill:transparent;stroke:var(--score);stroke-width:1.4px;vector-effect:non-scaling-stroke}
-.geo-hole{fill:rgba(155,93,229,.22);stroke:#9b5de5;stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
-.geo-hole-txt{fill:rgba(155,93,229,.30);stroke:#9b5de5;stroke-width:0.8px;vector-effect:non-scaling-stroke}
+.geo-hole{fill:rgba(155,93,229,.22);stroke:var(--hole);stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
+.geo-hole-txt{fill:rgba(155,93,229,.30);stroke:var(--hole);stroke-width:0.8px;vector-effect:non-scaling-stroke}
 .sel-box{fill:none;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:5 3}
 .sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
 .sel-rot-line{stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
@@ -132,8 +135,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field{padding:0 16px 12px}
 .field label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
 .field .row2{display:flex;gap:8px}
-.field input[type=number],.field input[type=text],.field select{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem}
-.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.field input[type=number],.field input[type=text],.field select,.field textarea{width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
 #props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:rgba(255,255,255,.06);margin-top:2px;opacity:.55;transition:opacity .15s,border-color .12s}
 #props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
 #props .form-sec{padding:0 16px}
@@ -147,7 +150,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .seg{display:flex;gap:4px}
 .seg button{flex:1;padding:8px 4px;border-radius:6px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.74rem;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s}
 .seg button:hover:not(.on){border-color:rgba(125,211,252,.35);color:var(--text)}
-.seg button.on{border-color:var(--accent);color:#04101e;background:var(--accent)}
+.seg button.on{border-color:var(--accent);color:var(--accent-text);background:var(--accent)}
 .seg button.cut.on{background:var(--cut);border-color:var(--cut);color:#fff}
 .seg button.engrave.on{background:var(--engrave);border-color:var(--engrave);color:#fff}
 .seg button.score.on{background:var(--score);border-color:var(--score);color:#fff}
@@ -160,12 +163,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:7px;border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background .1s,border-color .1s}
 .layer:hover{background:rgba(255,255,255,.04)}
 .layer.sel{border-color:var(--accent);border-left-color:var(--accent)}
-.layer.lyr-cut{border-left-color:#ff4444}
-.layer.lyr-cut.sel{border-color:var(--accent);border-left-color:#ff4444}
-.layer.lyr-score{border-left-color:#3b9eff}
-.layer.lyr-score.sel{border-color:var(--accent);border-left-color:#3b9eff}
-.layer.lyr-engrave{border-left-color:#9b5de5}
-.layer.lyr-engrave.sel{border-color:var(--accent);border-left-color:#9b5de5}
+.layer.lyr-cut{border-left-color:var(--cut-light)}
+.layer.lyr-cut.sel{border-color:var(--accent);border-left-color:var(--cut-light)}
+.layer.lyr-score{border-left-color:var(--score-light)}
+.layer.lyr-score.sel{border-color:var(--accent);border-left-color:var(--score-light)}
+.layer.lyr-engrave{border-left-color:var(--hole)}
+.layer.lyr-engrave.sel{border-color:var(--accent);border-left-color:var(--hole)}
 .layer .lname{flex:1;font-size:.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .layer .lname input{width:100%;background:transparent;border:none;color:var(--text);font:inherit;font-size:.8rem;outline:none}
 .layer .lico{font-size:.78rem;opacity:0;cursor:pointer;background:none;border:none;color:var(--muted);padding:2px 4px;border-radius:4px;transition:opacity .1s,background .1s,color .1s;line-height:1;flex-shrink:0}
@@ -226,11 +229,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu{position:fixed;z-index:3000;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.6);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.97) translateY(-4px);transition:opacity .1s ease,transform .1s ease}
 .ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0)}
 .ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:6px;cursor:pointer;font:inherit}
-.ctx-menu button:hover:not(:disabled){background:var(--accent);color:#04101e}
-.ctx-menu button:hover:not(:disabled) .ctx-key{color:#04101e;opacity:.7}
+.ctx-menu button:hover:not(:disabled){background:var(--accent);color:var(--accent-text)}
+.ctx-menu button:hover:not(:disabled) .ctx-key{color:var(--accent-text);opacity:.7}
 .ctx-menu button:disabled{opacity:.4;cursor:not-allowed}
-.ctx-key{font-size:.7rem;color:var(--muted);opacity:.8}
-.ctx-menu .ctx-key{font-size:.7rem;color:var(--muted)}
+.ctx-key{font-size:.7rem;color:var(--muted)}
 .ctx-menu hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
 
 /* ---- 3D export modal ---- */
@@ -263,9 +265,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Podsumowanie projektu (modal) ---- */
 .sum-stats{display:flex;flex-direction:column;gap:5px}
 .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);font-size:.82rem;border-left-width:3px}
-.sum-row.sum-cut{border-left-color:#ff4444}
-.sum-row.sum-score{border-left-color:#3b9eff}
-.sum-row.sum-engrave{border-left-color:#9b5de5}
+.sum-row.sum-cut{border-left-color:var(--cut-light)}
+.sum-row.sum-score{border-left-color:var(--score-light)}
+.sum-row.sum-engrave{border-left-color:var(--hole)}
 .sum-row .sum-val{color:var(--accent);font-weight:600}
 .sum-time{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .sum-time-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);padding:3px 2px;border-radius:5px}
@@ -314,7 +316,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 /* ---- SVG split preview modal ---- */
 .svgprev-wrap{margin:12px 0;overflow:auto;background:var(--bg);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;max-height:68vh}
 .svgprev-wrap svg{max-width:100%;background:#fff;border-radius:4px}
-.svgprev-wrap .bb-empty{color:#666;font-size:.8rem}
+.svgprev-wrap .bb-empty{color:var(--muted);font-size:.8rem}
 
 /* ---- Kolumna boczna (stały podgląd 3D + plik SVG, zawsze widoczny) — prawa strona ---- */
 .bottombar{flex:45 1 0;min-height:0;min-width:0;display:flex;flex-direction:column;gap:1px;background:var(--border);border-left:2px solid var(--accent-dark);border-right:1px solid var(--border);position:relative}
@@ -326,7 +328,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .bb-spacer{flex:0;min-width:0}
 .bb-btn{border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color .12s,color .12s,background .12s}
 .bb-btn:hover{border-color:var(--accent);color:var(--accent)}
-.bb-btn.active{background:var(--accent);border-color:var(--accent);color:#04101e}
+.bb-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .zoom-badge{font-size:.7rem;font-weight:700;color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;min-width:42px;text-align:center}
 .live3d-stage{flex:1;perspective:1100px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 68% 62% at 50% 62%,#1c1508 0%,#060402 100%);cursor:grab}
 .live3d-stage.l3d-dragging{cursor:grabbing}
@@ -337,7 +339,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .l3d-wall{position:absolute;top:0;left:0;transform-origin:0 0}
 .bb-svg{flex:1;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:10px}
 .bb-svg svg{max-width:100%;max-height:100%;background:#fff;border-radius:4px}
-.bb-svg .bb-empty{color:#555;font-size:.74rem}
+.bb-svg .bb-empty{color:var(--muted);font-size:.74rem}
 
 .legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -387,20 +389,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .brand{display:flex;align-items:center;gap:0}
 .brand-logo{height:30px;width:auto;background:#fff;border-radius:6px;padding:3px 4px;box-shadow:0 1px 4px rgba(0,0,0,.4);vertical-align:middle}
 .brand-name{font-weight:800;letter-spacing:.3px;margin-left:9px;color:var(--text);white-space:nowrap}
-.brand-name span{color:var(--accent,#38bdf8)}
+.brand-name span{color:var(--accent)}
 /* === Wyróżniony przycisk operatora (Cennik i materiały) === */
-.tbtn.cfgbtn{background:linear-gradient(135deg,#f7b733,#e0892a);border-color:#f7b733;color:#1a1206;font-weight:800;box-shadow:0 0 0 1px rgba(247,183,51,.45),0 4px 14px rgba(247,183,51,.28)}
+.tbtn.cfgbtn{background:linear-gradient(135deg,var(--operator),var(--operator-dark));border-color:var(--operator);color:#1a1206;font-weight:800;box-shadow:0 0 0 1px rgba(247,183,51,.45),0 4px 14px rgba(247,183,51,.28)}
 .tbtn.cfgbtn:hover{filter:brightness(1.07)}
 /* === Podpowiedzi „?" przy polach === */
-.hint{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--accent,#38bdf8);color:#04101e;font-size:11px;font-weight:800;cursor:help;position:relative;vertical-align:middle;margin-left:5px;flex:0 0 auto}
-.hint::after{content:attr(data-tip);position:absolute;top:140%;left:50%;transform:translateX(-50%);width:260px;max-width:58vw;background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:9px;padding:9px 12px;font-size:12px;font-weight:500;line-height:1.5;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:99999;pointer-events:none}
+.hint{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--accent-text);font-size:11px;font-weight:800;cursor:help;position:relative;vertical-align:middle;margin-left:5px;flex:0 0 auto}
+.hint::after{content:attr(data-tip);position:absolute;top:140%;left:50%;transform:translateX(-50%);width:260px;max-width:58vw;background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:9px;padding:9px 12px;font-size:12px;font-weight:500;line-height:1.5;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:3001;pointer-events:none}
 .hint:hover::after{opacity:1;visibility:visible}
 /* === Panel operatora: Cennik i materiały === */
 .op-box{max-width:760px}
-.op-intro{font-size:.8rem;color:var(--muted,#9fb3c8);line-height:1.55;margin:0 0 14px}
+.op-intro{font-size:.8rem;color:var(--muted);line-height:1.55;margin:0 0 14px}
 .op-h{margin:18px 0 8px;font-size:.95rem;color:var(--text);display:flex;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
 .op-mat-head,.op-mat-row{display:grid;grid-template-columns:1fr 92px 108px 108px 38px;gap:8px;align-items:center}
-.op-mat-head{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#9fb3c8);margin-bottom:6px;padding:0 2px}
+.op-mat-head{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;padding:0 2px}
 .op-mat-head span{display:flex;align-items:center}
 .op-mat-row{margin-bottom:7px}
 .op-box input[type=text],.op-box input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 9px;font-size:.82rem;outline:none;box-sizing:border-box}
@@ -409,10 +411,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .op-del:hover{background:rgba(255,90,90,.28)}
 .op-add{margin-top:8px}
 .op-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-top:4px}
-.op-grid label{display:flex;flex-direction:column;font-size:.76rem;color:var(--muted,#9fb3c8);gap:5px}
+.op-grid label{display:flex;flex-direction:column;font-size:.76rem;color:var(--muted);gap:5px}
 .op-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
-.op-save{background:linear-gradient(135deg,var(--accent,#38bdf8),var(--accent-dark,#0ea5e9));border-color:var(--accent,#38bdf8);color:#04101e;font-weight:800}
-.op-status{font-size:.8rem;color:#5fd38a;min-height:18px;margin-top:8px;text-align:right;font-weight:600}
+.op-save{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:var(--accent-text);font-weight:800}
+.op-status{font-size:.8rem;color:var(--success);min-height:18px;margin-top:8px;text-align:right;font-weight:600}
 </style>
 </head>
 <body>
@@ -421,17 +423,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.style.display='none'"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
     <div class="tgroup" id="tools"></div>
     <div class="tgroup">
-      <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)"><span class="ico">↶</span></button>
-      <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)"><span class="ico">↷</span></button>
-      <button class="tbtn" id="copyBtn" title="Kopiuj (Ctrl+C)"><span class="ico">⎘</span></button>
-      <button class="tbtn" id="pasteBtn" title="Wklej (Ctrl+V)"><span class="ico">📋</span></button>
-      <button class="tbtn" id="dupBtn" title="Duplikuj (Ctrl+D)"><span class="ico">⧉</span></button>
-      <button class="tbtn" id="delBtn" title="Usuń (Delete)"><span class="ico">🗑</span></button>
+      <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)" aria-label="Cofnij"><span class="ico">↶</span></button>
+      <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)" aria-label="Ponów"><span class="ico">↷</span></button>
+      <button class="tbtn" id="copyBtn" title="Kopiuj (Ctrl+C)" aria-label="Kopiuj"><span class="ico">⎘</span></button>
+      <button class="tbtn" id="pasteBtn" title="Wklej (Ctrl+V)" aria-label="Wklej"><span class="ico">📋</span></button>
+      <button class="tbtn" id="dupBtn" title="Duplikuj (Ctrl+D)" aria-label="Duplikuj"><span class="ico">⧉</span></button>
+      <button class="tbtn" id="delBtn" title="Usuń (Delete)" aria-label="Usuń"><span class="ico">🗑</span></button>
     </div>
     <div class="tgroup">
-      <button class="tbtn" id="zoomOut" title="Pomniejsz"><span class="ico">−</span></button>
+      <button class="tbtn" id="zoomOut" title="Pomniejsz" aria-label="Pomniejsz"><span class="ico">−</span></button>
       <span class="zoomval" id="zoomVal">100%</span>
-      <button class="tbtn" id="zoomIn" title="Powiększ"><span class="ico">+</span></button>
+      <button class="tbtn" id="zoomIn" title="Powiększ" aria-label="Powiększ"><span class="ico">+</span></button>
       <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku">Dopasuj</button>
       <button class="tbtn" id="zoomSelBtn" title="Przybliż do zaznaczenia (klawisz 2)">⌖ Zaznaczenie</button>
     </div>
@@ -574,7 +576,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modal3dPrev">
   <div class="modal-box" style="max-width:860px">
-    <button class="modal-close" id="modal3dPrevClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modal3dPrevClose" title="Zamknij">✕</button>
     <h3>🎯 Wizualizacja 3D projektu</h3>
     <div class="p3d-controls"><span id="p3dHint">Grubości warstw ustawiasz w mm w panelu „Warstwy 3D” po lewej — model 3D odwzorowuje je proporcjonalnie.</span>
       <span class="bb-spacer"></span>
@@ -591,19 +593,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalSvgPrev">
   <div class="modal-box" style="max-width:1100px">
-    <button class="modal-close" id="modalSvgPrevClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalSvgPrevClose" title="Zamknij">✕</button>
     <h3>📄 Podgląd SVG — warstwy rozdzielone (1 plik)</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0">Każda warstwa ma osobną kolumnę — wspólne elementy są scalone w jeden obrys gotowy do wycięcia.</p>
     <div class="svgprev-wrap" id="svgPrevWrap"></div>
     <div class="field" style="padding:14px 0 0;display:flex;justify-content:flex-end">
-      <button type="button" class="tbtn" id="svgPrevDownload" style="background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:#04101e">⬇ Pobierz SVG warstw</button>
+      <button type="button" class="tbtn tbtn-primary" id="svgPrevDownload">⬇ Pobierz SVG warstw</button>
     </div>
   </div>
 </div>
 
 <div class="modal-ov" id="modal3d">
   <div class="modal-box">
-    <button class="modal-close" id="modal3dClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modal3dClose" title="Zamknij">✕</button>
     <h3>🧊 Eksport 3D — warstwy do sklejenia</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0">Każda warstwa to osobny plik SVG. Wytnij je z osobnych arkuszy materiału i sklejaj od dołu (Warstwa 1) do góry — uzyskasz efekt głębi 3D.</p>
     <div class="layers3d-grid" id="layers3dGrid"></div>
@@ -613,7 +615,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalBox">
   <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" id="modalBoxClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalBoxClose" title="Zamknij">✕</button>
     <h3>📦 Generator pudełka</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj ścianki pudełka z łączeniami „na palec” — wsuwają się w siebie i są gotowe do wycięcia laserem. Każdy panel to <strong>osobny element</strong> (rozdzielone z odstępem, jak w boxes.py) — przesuniesz każdy oddzielnie. Podgląd 3D pokazuje pudełko <strong>złożone</strong>.</p>
     <div class="field"><label>Szerokość — W (mm)</label><input type="number" id="boxW" min="10" max="2000" step="1" value="120"></div>
@@ -639,7 +641,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalHinge">
   <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" id="modalHingeClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalHingeClose" title="Zamknij">✕</button>
     <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec” (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
     <div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
@@ -679,7 +681,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalGear">
   <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" id="modalGearClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalGearClose" title="Zamknij">✕</button>
     <h3>⚙ Generator koła zębatego</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -698,7 +700,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalHelp">
   <div class="modal-box" style="max-width:680px">
-    <button class="modal-close" id="modalHelpClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalHelpClose" title="Zamknij">✕</button>
     <h3>⌨ Skróty klawiszowe</h3>
     <div class="shortcuts-grid">
       <div class="sc-group">
@@ -766,7 +768,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalMaterials">
   <div class="modal-box" style="max-width:480px">
-    <button class="modal-close" id="modalMaterialsClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalMaterialsClose" title="Zamknij">✕</button>
     <h3>📦 Biblioteka materiałów</h3>
     <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px;line-height:1.5">Dodaj własne materiały (nazwa + grubość w mm), aby szybko ustawiać grubość warstw 3D z listy „Materiał…” przy warstwie.</p>
     <div class="field"><label>Nowy materiał</label>
@@ -782,7 +784,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalSummary">
   <div class="modal-box" style="max-width:480px">
-    <button class="modal-close" id="modalSummaryClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalSummaryClose" title="Zamknij">✕</button>
     <h3>📊 Podsumowanie projektu</h3>
     <div class="sum-stats" id="summaryStats"></div>
     <h4 style="margin:14px 0 8px;font-size:.8rem;color:var(--muted)">Szacowany czas pracy lasera</h4>
@@ -801,7 +803,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalQuote">
   <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" id="modalQuoteClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalQuoteClose" title="Zamknij">✕</button>
     <h3>💰 Wycena projektu</h3>
     <div class="field"><label>Materiał</label><select id="quoteMat"></select></div>
     <div class="sum-stats" id="quoteStats" style="margin-top:8px"></div>
@@ -815,7 +817,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalPricing">
   <div class="modal-box op-box">
-    <button class="modal-close" id="modalPricingClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalPricingClose" title="Zamknij">✕</button>
     <h3>⚙ Cennik i materiały</h3>
     <p class="op-intro">Ustaw materiały i parametry wyceny pod swój zakład. Zmiany zapisują się na tym komputerze i od razu wpływają na wyceny. <b>Najedź kursorem na „?"</b> przy polu, aby zobaczyć podpowiedź, co wpisać.</p>
 
@@ -850,7 +852,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 <div class="modal-ov" id="modalSendQuote">
   <div class="modal-box" style="max-width:440px">
-    <button class="modal-close" id="modalSendQuoteClose" title="Zamknij">✕</button>
+    <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
     <p style="font-size:.78rem;color:var(--muted);margin:0 0 6px;line-height:1.5">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
     <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
@@ -1171,9 +1173,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       else { const cls=o.role==='hole'?'geo-hole':(o.mode==='engrave'?'geo-engrave':o.mode==='score'?'geo-score':'geo-cut'); geo=`<path d="${o.d}" class="${cls}"${fr}/>`; }
       // Etykieta roli panelu pudełka (widoczna tylko w edytorze, nie w eksporcie)
       let boxLabel='';
-      if(o.box && !forExport && !_silFill && o.box.role!=='hinge' && o.box.role!=='fold' && o.box.role!=='hinge-lid' && o.box.role!=='hinge-back'){
+      if(o.box && !forExport && !_silFill){
         const rln={back:'Tył',front:'Przód',left:'Lewo',right:'Prawo',bottom:'Dno',
-          lid:'Wieczko',lip:'Kołnierz'}[o.box.role]||'';
+          lid:'Wieczko'}[o.box.role]||'';
         if(rln){
           const lx=(o.bx||0)+(o.bw||0)/2, ly=(o.by||0)+(o.bh||0)/2;
           const fs=Math.max(5, Math.min(12, Math.min(o.bw||10, o.bh||10)*0.13));
@@ -2508,6 +2510,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function updatePinch(){
     const ps=[...pointers.values()]; if(ps.length<2||!pinch) return; const a=ps[0], b=ps[1];
     const dist=Math.hypot(a.x-b.x,a.y-b.y)||1, mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2}, r=pinch.r;
+    if(!r.width||!r.height) return;
     let nw=clamp(pinch.vw*(pinch.dist/dist),20,4000), nh=nw*(pinch.vh/pinch.vw);
     const fx=(pinch.mid.x-r.left)/r.width, fy=(pinch.mid.y-r.top)/r.height;
     const docX=pinch.vx+fx*pinch.vw, docY=pinch.vy+fy*pinch.vh;
@@ -3080,20 +3083,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:#caa06c">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">8 typów zamknięcia · podgląd 3D · siatka rozkroju</span></div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div><div style="margin:8px 16px 0;padding:9px 11px;background:rgba(202,160,108,.07);border:1px solid rgba(202,160,108,.28);border-radius:8px;font-size:.78rem;color:var(--muted)">📦 <strong style="color:${BOX_FACE_COL}">Generator pudełka</strong> — kliknij przycisk w górnym pasku, aby stworzyć parametryczne pudełko z łączeniami „na palec" gotowe do wycięcia laserem.<br><span style="color:rgba(148,163,184,.6);font-size:.73rem">otwarte lub z wieczkiem · podgląd 3D · siatka rozkroju</span></div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // Karta informacyjna dla paneli pudełka (gdy element ma box.role/W/D/H)
     if(o.box){
       const {W:bW,D:bD,H:bH,T:bT,closure:bCl,clasp:bClasp}=o.box;
       const rn={back:'Ścianka tylna',front:'Ścianka przednia',left:'Ścianka lewa',
-        right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko',lip:'Kołnierz',
-        hinge:'Nacięcia zawiasu',fold:'Linie zgięcia',
-        'hinge-lid':'Zawias — pas do wieczka','hinge-back':'Zawias — pas do tylnej ścianki'}[o.box.role]||o.box.role;
+        right:'Ścianka prawa',bottom:'Podstawa',lid:'Wieczko'}[o.box.role]||o.box.role;
       const cln={open:'Otwarte',lid:'Wieczko luźne'}[bCl]||bCl;
       const roleColor={back:'#3b9eff',front:'#38bdf8',left:'#2a9d8f',right:'#06d6a0',
-        bottom:'#9b5de5',lid:'#caa06c',lip:'#f4a261',hinge:'#e76f51',fold:'#94a3b8',
-        'hinge-lid':'#caa06c','hinge-back':'#3b9eff'}[o.box.role]||'#caa06c';
+        bottom:'#9b5de5',lid:'#caa06c'}[o.box.role]||'#caa06c';
       h+=`<div class="field" style="padding-bottom:8px"><div style="background:var(--surface2);border:1.5px solid ${roleColor}44;border-radius:8px;padding:9px 11px;font-size:.78rem;border-left:3px solid ${roleColor}">
         <div style="font-weight:700;color:${roleColor};margin-bottom:5px;font-size:.76rem;letter-spacing:.03em;text-transform:uppercase">📦 ${rn}</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:.74rem;margin-top:2px">
@@ -4834,7 +4834,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
       n=buildLayerScene(live3dScene, sw, pxPerMM);
     }
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div style="color:#666;font-size:.74rem;transform:none">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div style="color:var(--muted);font-size:.74rem;transform:none">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -5776,7 +5776,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
     const {pts,rp,ra,rf}=buildGearPoints(z,m,alpha);
     let info=`Śr. podziałowa: <strong style="color:var(--text)">${fmt(2*rp)} mm</strong><br>Śr. zewnętrzna: <strong style="color:var(--text)">${fmt(2*ra)} mm</strong><br>Śr. podstaw: <strong style="color:var(--text)">${fmt(2*rf)} mm</strong>`;
-    if(bore>0 && bore>=2*rf-0.5) info+='<br><span style="color:#f87171">⚠ otwór za duży!</span>';
+    if(bore>0 && bore>=2*rf-0.5) info+='<br><span style="color:var(--cut-light)">⚠ otwór za duży!</span>';
     document.getElementById('gearInfo').innerHTML=info;
     // Mini-podgląd SVG koła
     const prevEl=document.getElementById('gearPreview');
