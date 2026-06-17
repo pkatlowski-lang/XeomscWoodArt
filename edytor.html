@@ -543,6 +543,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         📤 Wrzuć własną bazę (SVG)
         <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none">
       </label>
+      <h2>Galeria motywów</h2>
+      <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
+      <div class="gallery" id="motifs"></div>
       <h2>Warstwy 3D</h2>
       <div class="depth-legend" id="depthLegend"></div>
       <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
@@ -6092,6 +6095,61 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     });
   }
 
+  /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
+     Wzory własne (nie odwzorowują konkretnych komercyjnych grafik). Każdy to ścieżka
+     SVG w lokalnym układzie ~0..200; bbox mierzymy off-screen przez getBBox (jak bazy).
+     Po kliknięciu trafiają na arkusz jako kształt cięcia (mode:'cut'), gotowy do
+     skalowania, łączenia (Suma) i otoczenia ramką. */
+  function buildMotifs(){
+    const tmp=document.createElementNS(SVG_NS,'svg');
+    tmp.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+    document.body.appendChild(tmp);
+    const mbox=(d)=>{ const p=document.createElementNS(SVG_NS,'path'); p.setAttribute('d',d); tmp.appendChild(p);
+      let b; try{b=p.getBBox();}catch(e){b={x:0,y:0,width:100,height:100};} tmp.removeChild(p);
+      return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
+    const defs=[
+      {id:'mo_tree', label:'Drzewo', fillRule:'nonzero',
+        d:'M100 120 C70 124 52 110 56 86 C38 78 46 48 72 50 C74 28 108 26 114 46 C140 38 162 60 148 84 C164 94 152 122 122 116 '
+         +'M94 112 L92 186 Q100 191 108 186 L106 112 Z'},
+      {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
+        d:'M100 12 L132 72 L114 72 L150 124 L128 124 L165 176 L110 176 L110 196 L90 196 L90 176 L35 176 L72 124 L50 124 L86 72 L68 72 Z'},
+      {id:'mo_mountains', label:'Góry', fillRule:'nonzero',
+        d:'M2 178 L2 120 L50 55 L92 110 L128 60 L170 120 L198 90 L198 178 Z '+ellipseD(158,58,16,16)},
+      {id:'mo_sun', label:'Słońce', fillRule:'nonzero',
+        d:starD(100,100,92,92,16,0.66,-90)},
+      {id:'mo_moon', label:'Księżyc', fillRule:'evenodd',
+        d:ellipseD(95,100,82,82)+' '+ellipseD(125,80,68,68)+' '+starD(58,58,12,12,5,0.45,-90)},
+      {id:'mo_birds', label:'Ptaki', fillRule:'nonzero',
+        d:'M37.6 60 Q48.8 47.4 60 57.2 Q71.2 47.4 82.4 60 Q71.2 55.8 60 64.2 Q48.8 55.8 37.6 60 Z '
+         +'M99 38 Q107 29 115 36 Q123 29 131 38 Q123 34 115 41 Q107 34 99 38 Z '
+         +'M124.6 76 Q133.8 65.7 143 73.7 Q152.2 65.7 161.4 76 Q152.2 71.4 143 79.5 Q133.8 71.4 124.6 76 Z'},
+      {id:'mo_leaf', label:'Liść', fillRule:'evenodd',
+        d:'M100 8 C145 40 150 115 100 192 C50 115 55 40 100 8 Z M100 34 L103 110 L100 172 L97 110 Z'},
+      {id:'mo_boat', label:'Żaglówka', fillRule:'nonzero',
+        d:'M28 152 L172 152 L150 178 L50 178 Z M98 28 L98 146 L42 146 Z M104 54 L104 146 L158 146 Z'},
+      {id:'mo_wave', label:'Fala', fillRule:'nonzero',
+        d:'M2 128 Q38 92 74 120 Q98 139 116 116 Q132 96 152 110 Q170 122 198 104 L198 176 L2 176 Z'},
+      {id:'mo_flower', label:'Kwiat', fillRule:'evenodd',
+        d:starD(100,100,92,92,10,0.42,-90)+' '+ellipseD(100,100,20,20)},
+      {id:'mo_ring', label:'Pierścień (ramka)', fillRule:'evenodd',
+        d:ellipseD(100,100,95,95)+' '+ellipseD(100,100,81,81)},
+    ];
+    const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
+    document.body.removeChild(tmp);
+    return out;
+  }
+  const MOTIFS=buildMotifs();
+  const motifsEl=document.getElementById('motifs');
+  function renderMotifs(){
+    motifsEl.innerHTML=MOTIFS.map(m=>{
+      const fr=m.fillRule==='evenodd'?' fill-rule="evenodd"':'';
+      return `<div class="gallery-card" data-motif-id="${m.id}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
+    }).join('');
+    motifsEl.querySelectorAll('.gallery-card').forEach(card=>{
+      card.addEventListener('click',()=>{ const m=MOTIFS.find(x=>x.id===card.getAttribute('data-motif-id')); if(m) addBaseToCanvas(m); });
+    });
+  }
+
   document.getElementById('galleryUpload').addEventListener('change', e => {
     const f=e.target.files[0]; if(f) importSvgFile(f); e.target.value='';
   });
@@ -6121,7 +6179,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView);
-  zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams(); renderGallery();
+  zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams(); renderGallery(); renderMotifs();
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
