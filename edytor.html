@@ -45,8 +45,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--muted);font-weight:600}
 
 /* ---- Główny układ 3-kolumnowy ---- */
-/* Układ roboczy (od lewej): panel „Arkusz roboczy" | EDYTOR (płótno) | kolumna 3D+SVG | panel „Właściwości".
-   Dwa panele boczne mają stałą szerokość; środek (płótno + 3D + SVG) dzieli się proporcjonalnie 55/30/15. */
+/* Układ roboczy (od lewej): panel boczny (zakładki Projekt/Wycena) | strefa centralna | panel „Właściwości".
+   Panele boczne mają stałą szerokość 240px; strefa centralna dzieli się pionowo: płótno (flex:55)
+   nad dolnym paskiem 3D+SVG (flex:45), a w dolnym pasku podgląd 3D i SVG są ułożone w proporcji 2:1. */
 .workspace{flex:1;display:flex;min-height:0}
 .panel{flex:0 0 240px;background:var(--surface);display:flex;flex-direction:column;overflow-y:auto}
 .panel.left{border-right:1px solid var(--border)}
@@ -64,7 +65,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-sec{padding:10px 14px 12px}
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
 .pq-h{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px;display:flex;align-items:center;gap:5px}
-.pq-mat{margin-bottom:7px}
 .pq-mat-head{display:grid;grid-template-columns:1fr 24px;gap:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;padding:0 1px}
 .pq-mat-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;background:rgba(15,23,42,.5);position:relative}
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center}
@@ -112,7 +112,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .text-toolbar input[type=number]{width:58px}
 .text-toolbar label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase}
 .text-toolbar .tbtn{height:30px;min-width:30px;padding:0 9px}
-.text-toolbar .tbtn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .tt-sep{width:1px;height:22px;background:var(--border)}
 
 /* ---- Rozwijana lista czcionek z podglądem na żywo (najechanie = podgląd, klik = wybór) ---- */
@@ -234,7 +233,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Szablony ---- */
 .tpl{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 14px 16px}
 .tpl button{padding:9px 6px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer;line-height:1.35;text-align:center;transition:border-color .12s,color .12s,background .12s}
-.tpl button:hover{border-color:var(--accent);color:var(--accent);background:rgba(202,160,108,.06)}
+.tpl button:hover{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,.06)}
 
 /* ---- Galeria podkładów ---- */
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 14px 10px}
@@ -303,10 +302,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .sum-row .sum-val{color:var(--accent);font-weight:600}
 .sum-time{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .sum-time-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);padding:3px 2px;border-radius:5px}
-.sum-time-row.total{color:var(--text);font-weight:700;font-size:.9rem;margin-top:6px;padding:7px 10px;border-radius:7px;background:rgba(202,160,108,.1);border:1px solid rgba(202,160,108,.2)}
+.sum-time-row.total{color:var(--text);font-weight:700;font-size:.9rem;margin-top:6px;padding:7px 10px;border-radius:7px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2)}
 
 /* ---- Wycena projektu (modal) ---- */
-.quote-price{margin-top:14px;padding:22px 12px 18px;text-align:center;font-size:2rem;font-weight:800;color:var(--accent);background:linear-gradient(135deg,rgba(202,160,108,.08),rgba(56,189,248,.06));border:1px solid rgba(202,160,108,.3);border-radius:12px;letter-spacing:.5px;position:relative}
+.quote-price{margin-top:14px;padding:22px 12px 18px;text-align:center;font-size:2rem;font-weight:800;color:var(--accent);background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(56,189,248,.05));border:1px solid rgba(56,189,248,.3);border-radius:12px;letter-spacing:.5px;position:relative}
 .quote-price::before{content:'Łączna cena';display:block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
 .quote-price.quote-empty{font-size:.86rem;font-weight:500;color:var(--muted)}
 .quote-price.quote-empty::before{display:none}
@@ -593,13 +592,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <span class="tt-sep"></span>
         <label>Szer.</label><input type="number" id="ttW" min="1" step="1" title="Szerokość napisu (mm) — rozciąganie">
         <label>Wys.</label><input type="number" id="ttH" min="1" step="1" title="Wysokość napisu (mm) — rozciąganie">
-        <button type="button" class="tbtn" id="ttReset" title="Przywróć proporcje 1:1">↺</button>
+        <button type="button" class="tbtn" id="ttReset" aria-label="Przywróć proporcje 1:1" title="Przywróć proporcje 1:1">↺</button>
       </div>
       <div class="ruler-corner" id="rulerCorner" title="Dwuklik: usuń wszystkie linie pomocnicze"></div>
       <div class="ruler ruler-h" id="rulerH" title="Przeciągnij w dół, aby utworzyć linię pomocniczą"></div>
       <div class="ruler ruler-v" id="rulerV" title="Przeciągnij w prawo, aby utworzyć linię pomocniczą"></div>
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt — kliknij szablon lub wygeneruj 📦 pudełko</div>
+      <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt — albo kliknij gotowy szablon po lewej</div>
     </section>
 
   <div class="bottombar" id="bottombar">
@@ -615,7 +614,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     </div>
     <div class="bb-sec">
       <div class="bb-head"><span>📄 Plik SVG — warstwy rozdzielone (1 plik)</span>
-        <button class="bb-btn" id="bbSvgExpand" title="Powiększ podgląd SVG">⛶</button>
+        <button class="bb-btn" id="bbSvgExpand" aria-label="Powiększ podgląd SVG" title="Powiększ podgląd SVG">⛶</button>
         <button class="bb-btn" id="bbDownload" title="Pobierz rozdzielony plik SVG">⬇ Pobierz SVG</button>
       </div>
       <div class="bb-svg" id="bbSvg"></div>
@@ -2971,7 +2970,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(sel.length>=3) h+=`<div class="field"><label>Rozłóż równomiernie</label><div class="seg">
       <button data-dist="h">↔ Poziomo</button><button data-dist="v">↕ Pionowo</button></div></div>`;
     h+=`<div class="field"><label>Obróć każdy element</label><div class="seg">
-      <button data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° w lewo</button><button data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° w prawo</button></div></div>`;
+      <button data-rot90="-1" title="Obróć o 90° w lewo">↺ 90° w lewo</button><button data-rot90="1" title="Obróć o 90° w prawo">↻ 90° w prawo</button></div></div>`;
     const boolCount=sel.filter(o=>BOOL_TYPES.includes(o.type)).length;
     if(boolCount>=2){
       const xorBtn=boolCount===2?'<button data-bool="xor" title="XOR — usuń część wspólną, zostaw resztę obu kształtów">⊕ XOR</button>':'';
@@ -3150,8 +3149,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=`<div class="field" style="margin-top:-6px"><div class="seg">
-      <button type="button" data-rot90="-1" title="Obróć o 90° w lewo (CCW)">↺ 90° w lewo</button>
-      <button type="button" data-rot90="1" title="Obróć o 90° w prawo (CW)">↻ 90° w prawo</button>
+      <button type="button" data-rot90="-1" title="Obróć o 90° w lewo">↺ 90° w lewo</button>
+      <button type="button" data-rot90="1" title="Obróć o 90° w prawo">↻ 90° w prawo</button>
     </div></div>`;
     h+=rangeField('Krycie w edytorze (%)','opacity',o.opacity??100,0,100,1,o);
     if(o.type==='path'||o.type==='text'){
@@ -3665,7 +3664,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const dbadge=`<span class="d-badge ${dc}" title="Warstwa 3D ${d}">${d}</span>`;
       const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'🔒':'🔓';
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
-      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls}" data-id="${o.id}">
+      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}">
         <span class="swatch ${sw}"></span>
         ${dbadge}
         <span class="lname" title="Kliknij dwukrotnie, aby zmienić nazwę">${escapeXml(autoName(o))}</span>
@@ -5534,7 +5533,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       let boreEl='';
       if(bore>0 && bore<2*rf-0.5) boreEl=`<circle cx="0" cy="0" r="${fmt(bore/2)}" fill="#0f172a" stroke="${ACCENT}" stroke-width="${fmt(ra*0.025)}"/>`;
       const pd=`<circle cx="0" cy="0" r="${fmt(rp)}" fill="none" stroke="${ACCENT}66" stroke-width="${fmt(ra*0.02)}" stroke-dasharray="${fmt(ra*0.04)} ${fmt(ra*0.025)}"/>`;
-      prevEl.innerHTML=`<svg viewBox="${vb}" width="120" height="120"><path d="${d}" fill="#caa06c" stroke="#f0d6a8" stroke-width="${fmt(ra*0.025)}"/>${boreEl}${pd}</svg>`;
+      prevEl.innerHTML=`<svg viewBox="${vb}" width="120" height="120"><path d="${d}" fill="${ACCENT}33" stroke="${ACCENT}" stroke-width="${fmt(ra*0.025)}"/>${boreEl}${pd}</svg>`;
     }
   }
   document.getElementById('gearGenBtn').addEventListener('click',()=>{ updateGearInfo(); modalGear.classList.add('open'); });
