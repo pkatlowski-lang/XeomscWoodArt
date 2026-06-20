@@ -6304,7 +6304,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
       {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:2,tol:1.6,minArea:50})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:2,tol:1.6,minArea:130})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
@@ -6317,8 +6317,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:5,trunk:0.2,width:0.066,spread:0.82,up:0.12,curve:0.5,foliage:false,minW:5}),520,520,{ss:2,tol:1.3,minArea:150,close:2})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
         d:'M100 12 L132 72 L114 72 L150 124 L128 124 L165 176 L110 176 L110 196 L90 196 L90 176 L35 176 L72 124 L50 124 L86 72 L68 72 Z'},
-      {id:'mo_mountains', label:'Góry', fillRule:'nonzero',
-        d:'M2 178 L2 120 L50 55 L92 110 L128 60 L170 120 L198 90 L198 178 Z '+ellipseD(158,58,16,16)},
+      {id:'mo_mountains', label:'Góry', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.beginPath(); ctx.arc(150*u,76*u,18*u,0,Math.PI*2); ctx.fill();                 // słońce (nachodzi na zbocze → połączone)
+          ctx.beginPath(); ctx.moveTo(2*u,178*u); ctx.lineTo(2*u,120*u); ctx.lineTo(50*u,55*u); ctx.lineTo(92*u,110*u); ctx.lineTo(128*u,60*u); ctx.lineTo(170*u,120*u); ctx.lineTo(198*u,90*u); ctx.lineTo(198*u,178*u); ctx.closePath(); ctx.fill();
+        },200,178,{ss:3,tol:1.1,minArea:30,smoothIter:0})},
       {id:'mo_sun', label:'Słońce', fillRule:'nonzero',
         d:starD(100,100,92,92,16,0.66,-90)},
       {id:'mo_moon', label:'Księżyc', fillRule:'evenodd',
@@ -6329,8 +6332,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
          +'M124.6 76 Q133.8 65.7 143 73.7 Q152.2 65.7 161.4 76 Q152.2 71.4 143 79.5 Q133.8 71.4 124.6 76 Z'},
       {id:'mo_leaf', label:'Liść', fillRule:'evenodd',
         d:'M100 8 C145 40 150 115 100 192 C50 115 55 40 100 8 Z M100 34 L103 110 L100 172 L97 110 Z'},
-      {id:'mo_boat', label:'Żaglówka', fillRule:'nonzero',
-        d:'M28 152 L172 152 L150 178 L50 178 Z M98 28 L98 146 L42 146 Z M104 54 L104 146 L158 146 Z'},
+      {id:'mo_boat', label:'Żaglówka', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.fillRect(96*u,24*u,8*u,128*u);                                                  // maszt (łączy żagle z kadłubem)
+          ctx.beginPath(); ctx.moveTo(96*u,30*u); ctx.lineTo(96*u,150*u); ctx.lineTo(44*u,150*u); ctx.closePath(); ctx.fill();    // żagiel lewy
+          ctx.beginPath(); ctx.moveTo(104*u,50*u); ctx.lineTo(104*u,150*u); ctx.lineTo(158*u,150*u); ctx.closePath(); ctx.fill(); // żagiel prawy
+          ctx.beginPath(); ctx.moveTo(24*u,150*u); ctx.lineTo(176*u,150*u); ctx.lineTo(150*u,180*u); ctx.lineTo(50*u,180*u); ctx.closePath(); ctx.fill(); // kadłub
+        },200,200,{ss:3,tol:1.1,minArea:30,smoothIter:0})},
       {id:'mo_wave', label:'Fala', fillRule:'nonzero',
         d:'M2 128 Q38 92 74 120 Q98 139 116 116 Q132 96 152 110 Q170 122 198 104 L198 176 L2 176 Z'},
       {id:'mo_flower', label:'Kwiat', fillRule:'evenodd',
