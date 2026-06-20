@@ -3539,9 +3539,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     textToolbar.classList.add('show');
     ttFontDD.innerHTML=fontDDMarkup(o.font);
     if(document.activeElement!==ttSize) ttSize.value=fmt(o.fontSize||24);
-    ttBold.classList.toggle('active',!!o.bold);
-    ttItalic.classList.toggle('active',!!o.italic);
-    ttUnderline.classList.toggle('active',!!o.underline);
+    ttBold.classList.toggle('active',!!o.bold); ttBold.setAttribute('aria-pressed',o.bold?'true':'false');
+    ttItalic.classList.toggle('active',!!o.italic); ttItalic.setAttribute('aria-pressed',o.italic?'true':'false');
+    ttUnderline.classList.toggle('active',!!o.underline); ttUnderline.setAttribute('aria-pressed',o.underline?'true':'false');
     const bb=objBBox(o);
     if(document.activeElement!==ttW) ttW.value=fmt(bb.w);
     if(document.activeElement!==ttH) ttH.value=fmt(bb.h);
@@ -3751,11 +3751,12 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const toolsEl=document.getElementById('tools');
   TOOLS.forEach(t=>{
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
+    b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
     b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=t.label;
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
-  function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>b.classList.toggle('active',b.dataset.tool===state.tool)); updateCanvasCursor(); }
+  function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); }
   function updateCanvasCursor(){ canvas.style.cursor = state.tool==='pan'?'grab' : (state.tool==='select'?'default':'crosshair'); }
 
   document.getElementById('undoBtn').addEventListener('click',undo);
@@ -3794,7 +3795,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   const snapInput=document.getElementById('snapInput');
   function setSnap(v,save){
     state.snap=v;
-    snapBtn.classList.toggle('active',v);
+    snapBtn.classList.toggle('active',v); snapBtn.setAttribute('aria-pressed',v?'true':'false');
     snapInput.checked=v;
   }
   setSnap(state.snap,false);
@@ -3844,7 +3845,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     setSnap(d.snap!==undefined?!!d.snap:false,false);
     state.selectedIds=[]; state.history=[]; state.hIndex=-1;
     docWInput.value=state.docW; docHInput.value=state.docH;
-    depthViewBtn.classList.toggle('active',state.depthView);
+    depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
     zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
     pushHistory();
   }
@@ -4631,10 +4632,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   modalMaterials.addEventListener('click',e=>{ if(e.target===modalMaterials) modalMaterials.classList.remove('open'); });
 
   const depthViewBtn=document.getElementById('depthViewBtn');
-  depthViewBtn.classList.toggle('active',state.depthView);
+  depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
   depthViewBtn.addEventListener('click',()=>{
     state.depthView=!state.depthView;
-    depthViewBtn.classList.toggle('active',state.depthView);
+    depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
     depthViewBtn.title=state.depthView?'Pokaż kolory cięcia/grawer':'Pokoloruj elementy według warstwy 3D';
     renderObjects(); renderOverlay();
   });
@@ -6379,7 +6380,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // pozostawiony przez wcześniejsze wersje, żeby nie zalegał.
   try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
-  depthViewBtn.classList.toggle('active',state.depthView);
+  depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
   zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams(); renderGallery(); renderMotifs();
   updateCanvasCursor();
   updateLive3D();
