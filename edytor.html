@@ -6331,7 +6331,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
          +'M99 38 Q107 29 115 36 Q123 29 131 38 Q123 34 115 41 Q107 34 99 38 Z '
          +'M124.6 76 Q133.8 65.7 143 73.7 Q152.2 65.7 161.4 76 Q152.2 71.4 143 79.5 Q133.8 71.4 124.6 76 Z'},
       {id:'mo_leaf', label:'Liść', fillRule:'evenodd',
-        d:'M100 8 C145 40 150 115 100 192 C50 115 55 40 100 8 Z M100 34 L103 110 L100 172 L97 110 Z'},
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.beginPath(); ctx.moveTo(100*u,6*u); ctx.bezierCurveTo(148*u,44*u,150*u,118*u,100*u,196*u); ctx.bezierCurveTo(50*u,118*u,52*u,44*u,100*u,6*u); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle='#fff'; ctx.lineCap='round';                                       // żyłki = białe nacięcia (otwory)
+          ctx.lineWidth=3.2*u; ctx.beginPath(); ctx.moveTo(100*u,24*u); ctx.lineTo(100*u,182*u); ctx.stroke();   // nerw główny
+          ctx.lineWidth=2.2*u;
+          const vy=[158,130,104,80], vl=[26,34,36,30];
+          for(let i=0;i<vy.length;i++){ const my=vy[i]*u, L=vl[i]*u;
+            ctx.beginPath(); ctx.moveTo(100*u,my); ctx.lineTo(100*u-L*0.82, my-L*0.72); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(100*u,my); ctx.lineTo(100*u+L*0.82, my-L*0.72); ctx.stroke();
+          }
+        },200,200,{ss:3,tol:1,minArea:20,smoothIter:1})},
       {id:'mo_boat', label:'Żaglówka', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
           ctx.fillRect(96*u,24*u,8*u,128*u);                                                  // maszt (łączy żagle z kadłubem)
