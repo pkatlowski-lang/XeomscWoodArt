@@ -6227,6 +6227,29 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  // Scena „góry w okręgu" (krajobraz wall-art): pierścień + słońce + pasmo gór, scalone
+  // w jedną sylwetkę (góry stykają się z pierścieniem po bokach, słońce wystaje zza grani
+  // i łączy się z górami przez nakładkę). Niebo = otwór.
+  function drawMountainCircleScene(ctx, W, H, opt){
+    opt=opt||{};
+    const cx=W/2, cy=H/2, R=Math.min(W,H)/2-4, r=R-(opt.band||26);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#000';
+    const ridge=(pts)=>{ ctx.beginPath(); ctx.moveTo(cx-R, cy+R); ctx.lineTo(pts[0][0], pts[0][1]);
+      for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]); ctx.lineTo(cx+R, cy+R); ctx.closePath(); ctx.fill(); };
+    // duże słońce górujące nad środkiem (dołem nachodzi na grań → połączone z masą gór)
+    ctx.beginPath(); ctx.arc(cx, cy-r*0.20, r*0.34, 0, Math.PI*2); ctx.fill();
+    // pasmo gór — rozsunięte szczyty obejmują słońce, środkowe siodło niskie (prześwity nieba po bokach słońca)
+    ridge([
+      [cx-r*0.99,cy+r*0.30],[cx-r*0.70,cy-r*0.05],[cx-r*0.45,cy-r*0.40],
+      [cx-r*0.22,cy+r*0.05],[cx,cy+r*0.02],[cx+r*0.22,cy+r*0.06],
+      [cx+r*0.45,cy-r*0.42],[cx+r*0.72,cy-r*0.06],[cx+r*0.99,cy+r*0.28]
+    ]);
+    ctx.restore();
+  }
+
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
      Wzory własne (nie odwzorowują konkretnych komercyjnych grafik). Każdy to ścieżka
      SVG w lokalnym układzie ~0..200; bbox mierzymy off-screen przez getBBox (jak bazy).
@@ -6246,6 +6269,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),640,640,{ss:1.8,tol:1.5,minArea:60})},
+      {id:'mo_mtn_circle', label:'Góry w okręgu', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.5,minArea:60})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:6,trunk:0.2,width:0.062,spread:0.76,up:0.08,foliage:false,minW:4}),520,520,{ss:2,tol:1.3,minArea:120,close:1.4})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
