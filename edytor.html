@@ -268,8 +268,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
 
 /* ---- Modal eksportu 3D ---- */
-.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .18s ease}
-.modal-ov.open{opacity:1;pointer-events:auto}
+/* visibility:hidden po zakończeniu animacji znikania — usuwa zamknięte modale (i ich pola
+   formularzy) z kolejności Tab; przy otwarciu staje się widoczny natychmiast */
+.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s ease,visibility 0s linear .18s}
+.modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .18s ease,visibility 0s}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;transform:scale(.97) translateY(-10px);transition:transform .2s ease,opacity .18s ease;opacity:0}
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
 .modal-box h3{margin:0 0 14px;font-size:1.08rem;padding-bottom:12px;border-bottom:1px solid var(--border)}
