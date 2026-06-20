@@ -6272,9 +6272,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     document.body.removeChild(tmp);
     return out;
   }
-  const MOTIFS=buildMotifs();
+  // Generowanie motywów (rasteryzacja drzew) jest kosztowne — odkładamy je na PO
+  // pierwszym renderze, żeby edytor startował od razu. Do czasu wygenerowania
+  // pokazujemy placeholder.
+  let MOTIFS=[];
   const motifsEl=document.getElementById('motifs');
+  function buildMotifsDeferred(){
+    if(MOTIFS.length) return;
+    MOTIFS=buildMotifs(); renderMotifs();
+  }
   function renderMotifs(){
+    if(!MOTIFS.length){ motifsEl.innerHTML='<div class="dl-note" style="grid-column:1/-1;text-align:center">⏳ Generowanie motywów…</div>'; return; }
     motifsEl.innerHTML=MOTIFS.map(m=>{
       const fr=m.fillRule==='evenodd'?' fill-rule="evenodd"':'';
       return `<div class="gallery-card" data-motif-id="${m.id}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
@@ -6317,6 +6325,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
+  // wygeneruj motywy dopiero po pierwszym malowaniu (edytor startuje natychmiast)
+  (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   let _resizeRAF=0;
   window.addEventListener('resize',()=>{ cancelAnimationFrame(_resizeRAF); _resizeRAF=requestAnimationFrame(()=>{ applyView(); renderOverlay(); }); });
   window.addEventListener('beforeunload',e=>{ if(state.objects.length){ e.preventDefault(); } });
