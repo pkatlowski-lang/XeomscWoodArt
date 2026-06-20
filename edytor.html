@@ -6097,30 +6097,71 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
   /* ---------------- Generator sylwetek organicznych (rasteryzacja → kontur) ----------------
      Rysuje kształt WYPEŁNIONY na ukrytym <canvas> (dowolnie nakładające się elementy —
-     Canvas2D scala je automatycznie), po czym śledzi kontur (traceMaskPolys, Moore-Neighbor)
-     i upraszcza/wygładza. Zwraca ścieżkę SVG `d` (kontur zewn. + naturalne prześwity jako
+     Canvas2D scala je automatycznie), po czym śledzi kontur (traceMaskPolys, Moore-Neighbor),
+     upraszcza i WYGŁADZA (Chaikin) — schodki/fasety z rasteryzacji znikają, kontur jest
+     gładką krzywą organiczną. Zwraca ścieżkę SVG `d` (kontur zewn. + naturalne prześwity jako
      otwory, fillRule:evenodd) — jedną, czystą sylwetkę gotową do cięcia. */
+  // Wygładzanie Chaikina (corner-cutting) zamkniętego wielokąta — każda iteracja ścina
+  // narożniki, zaokrąglając schodki rasteryzacji w płynną krzywą.
+  function chaikinClosed(pts, iters){
+    let p=pts;
+    for(let k=0;k<iters;k++){
+      const q=[], n=p.length;
+      for(let i=0;i<n;i++){
+        const a=p[i], b=p[(i+1)%n];
+        q.push([a[0]*0.75+b[0]*0.25, a[1]*0.75+b[1]*0.25]);
+        q.push([a[0]*0.25+b[0]*0.75, a[1]*0.25+b[1]*0.75]);
+      }
+      p=q;
+    }
+    return p;
+  }
+  // Separowalny filtr maksymalny (dylatacja) / minimalny (erozja) — kwadratowy element o promieniu r.
+  function morphPass(src,W,H,r,isMax){
+    const tmp=new Uint8Array(W*H), out=new Uint8Array(W*H), hit=isMax?1:0;
+    for(let y=0;y<H;y++){ const o=y*W;
+      for(let x=0;x<W;x++){ let v=isMax?0:1;
+        for(let k=-r;k<=r;k++){ const xx=x+k; if(xx<0||xx>=W) continue; if(src[o+xx]===hit){ v=hit; break; } }
+        tmp[o+x]=v; } }
+    for(let x=0;x<W;x++){
+      for(let y=0;y<H;y++){ let v=isMax?0:1;
+        for(let k=-r;k<=r;k++){ const yy=y+k; if(yy<0||yy>=H) continue; if(tmp[yy*W+x]===hit){ v=hit; break; } }
+        out[y*W+x]=v; } }
+    return out;
+  }
+  // Domknięcie morfologiczne: dylatacja → erozja. Scala bliskie kształty (kępy liści) w gładką
+  // masę i usuwa cienkie kolce/zadziory z rasteryzacji. Promień r w pikselach.
+  function closeMask(mask,W,H,r){ if(r<=0) return mask; return morphPass(morphPass(mask,W,H,r,true),W,H,r,false); }
   function rasterizeShapeToD(draw, W, H, opt){
     opt=opt||{};
-    const cnv=document.createElement('canvas'); cnv.width=W; cnv.height=H;
+    const ss=opt.ss||2;                                  // nadpróbkowanie: rysuj w wyższej rozdzielczości
+    const cw=W*ss, ch=H*ss;
+    const cnv=document.createElement('canvas'); cnv.width=cw; cnv.height=ch;
     const ctx=cnv.getContext('2d');
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,cw,ch);
+    ctx.scale(ss,ss);
     ctx.fillStyle='#000'; ctx.strokeStyle='#000'; ctx.lineCap='round'; ctx.lineJoin='round';
-    draw(ctx);
-    const data=ctx.getImageData(0,0,W,H).data;
-    const mask=new Uint8Array(W*H);
-    for(let i=0;i<W*H;i++) mask[i]= data[i*4]<128?1:0;
-    let polys=traceMaskPolys(mask,W,H);
-    const tol=opt.tol!=null?opt.tol:1.4, minArea=opt.minArea!=null?opt.minArea:18;
+    draw(ctx, W, H);                                      // rysuj w układzie LOGICZNYM (kontekst już przeskalowany)
+    const data=ctx.getImageData(0,0,cw,ch).data;
+    let mask=new Uint8Array(cw*ch);
+    for(let i=0;i<cw*ch;i++) mask[i]= data[i*4]<128?1:0;
+    if(opt.close) mask=closeMask(mask,cw,ch,Math.round(opt.close*ss));   // wygładź masę, usuń kolce
+    let polys=traceMaskPolys(mask,cw,ch);
+    const tol=(opt.tol!=null?opt.tol:1.4)*ss, minArea=(opt.minArea!=null?opt.minArea:18)*ss*ss;
+    const iters=opt.smoothIter!=null?opt.smoothIter:2;
     polys=polys.map(p=>simplifyRing(p,tol)).filter(p=>p.length>=3 && Math.abs(polyArea(p))>minArea);
-    const smooth=opt.smooth!==false;
-    return polys.map(p=> smooth?polyToSmoothPathD(p, opt.corner!=null?opt.corner:34):polyToPathD(p)).join(' ');
+    // wygładź (Chaikin) + przeskaluj z powrotem do układu W×H + lekko uprość współliniowe punkty
+    return polys.map(p=>{
+      let s=iters>0?chaikinClosed(p,iters):p;
+      s=s.map(pt=>[pt[0]/ss, pt[1]/ss]);
+      s=simplifyRing(s, 0.35);
+      return polyToPathD(s);
+    }).join(' ');
   }
   // Rekurencyjne drzewo (gałęzie zwężające się + opcjonalna korona z kęp liści).
   // opt: seed, depth, trunk(0..1 wys.), width(0..1 szer.), spread(rad), up(0..1 nachylenie ku górze),
   //      foliage(bool), foliageR, canopyFlat(0..1 — spłaszczenie korony, dla akacji).
-  function drawTreeShape(ctx, opt){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
+  function drawTreeShape(ctx, W, H, opt){
     let s=(opt.seed||7)>>>0; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
     const foliage=[];
     function branch(x,y,ang,len,w,depth){
@@ -6143,15 +6184,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       const flat=opt.canopyFlat||0;
       // zakres wysokości końców gałęzi; liście dodajemy TYLKO w górnym pasie (korona),
       // dzięki czemu niskie, rozłożyste końce gałęzi nie tworzą pływających kęp.
-      let topY=H, botY=0; for(const f of foliage){ topY=Math.min(topY,f[1]); botY=Math.max(botY,f[1]); }
+      let topY=H, botY=0, avgL=0; for(const f of foliage){ topY=Math.min(topY,f[1]); botY=Math.max(botY,f[1]); avgL+=f[2]; }
+      avgL/=Math.max(1,foliage.length);
       const band=opt.canopyBand!=null?opt.canopyBand:0.5;
       const cutoff=topY+(botY-topY)*band;
+      // minimalny promień kępy = ułamek średniej długości liścia → wszystkie kępy są
+      // dostatecznie duże i gęsto nachodzą, więc brzeg korony jest gładko ząbkowany,
+      // bez pojedynczych cienkich kolców wystających z masy.
+      const minR=avgL*(opt.foliageMin!=null?opt.foliageMin:0.85);
       for(const [fx,fy,fl] of foliage){
         if(fy>cutoff) continue;
-        let r=fl*(opt.foliageR||1.25);
+        let r=Math.max(minR, fl*(opt.foliageR||1.25));
         if(flat>0){ const drop=(fy-topY)/H; r=r*(1-clamp(drop*flat*3,0,0.7)); }
         if(r<1.5) continue;
-        ctx.beginPath(); ctx.ellipse(fx,fy,r,r*(flat>0?0.8:1),0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(fx,fy,r,r*(flat>0?0.82:1),0,0,Math.PI*2); ctx.fill();
       }
     }
   }
@@ -6159,9 +6205,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   // Scena „drzewo w okręgu" (styl wall-art): pierścień + wzgórze + drzewo, wszystko
   // połączone w JEDNĄ sylwetkę (pień stoi na wzgórzu, wzgórze styka się z pierścieniem),
   // a niebo między gałęziami staje się otworem do wycięcia.
-  function drawTreeCircleScene(ctx, opt){
+  function drawTreeCircleScene(ctx, W, H, opt){
     opt=opt||{};
-    const W=ctx.canvas.width, H=ctx.canvas.height, cx=W/2, cy=H/2;
+    const cx=W/2, cy=H/2;
     const R=Math.min(W,H)/2-4, r=R-(opt.band||26);
     ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();   // pierścień: dysk
     ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();   // okno (niebo)
@@ -6172,8 +6218,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.quadraticCurveTo(cx-r*0.4, cy+r*0.42, cx, cy+r*0.46);
     ctx.quadraticCurveTo(cx+r*0.45, cy+r*0.50, cx+R, cy+r*0.70);
     ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath(); ctx.fill();
-    drawTreeShape(ctx, {seed:opt.seed||23, depth:9, spread:1.2, up:0.24, foliage:true,
-      foliageR:opt.foliageR||1.0, canopyFlat:1, canopyBand:0.46, minW:2.6,
+    drawTreeShape(ctx, W, H, {seed:opt.seed||23, depth:9, spread:1.2, up:0.24, foliage:true,
+      foliageR:opt.foliageR||1.0, foliageMin:0.9, canopyFlat:1, canopyBand:0.46, minW:2.6,
       baseX:cx, baseY:cy+r*0.42, trunkPx:r*0.34, widthPx:r*0.058});
     ctx.restore();
   }
@@ -6192,13 +6238,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
       {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
-        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:5,depth:8,trunk:0.17,width:0.046,spread:1.04,up:0.02,foliage:true,foliageR:1.4,canopyBand:0.6,minW:2.6}),560,640,{tol:1.5,corner:38,minArea:50})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:5,depth:8,trunk:0.17,width:0.046,spread:1.04,up:0.02,foliage:true,foliageR:1.4,foliageMin:0.95,canopyBand:0.6,minW:2.6}),560,640,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
-        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{tol:1.5,corner:36,minArea:50})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD(ctx=>drawTreeCircleScene(ctx,{seed:23}),640,640,{tol:1.4,corner:34,minArea:60})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),640,640,{ss:1.8,tol:1.5,minArea:60})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
-        d:rasterizeShapeToD(ctx=>drawTreeShape(ctx,{seed:11,depth:7,trunk:0.18,width:0.06,spread:0.74,up:0.08,foliage:false,minW:3.2}),520,520,{tol:1.2,corner:30,minArea:70})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:7,trunk:0.18,width:0.06,spread:0.74,up:0.08,foliage:false,minW:3.2}),520,520,{ss:2,tol:1.3,minArea:70})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
         d:'M100 12 L132 72 L114 72 L150 124 L128 124 L165 176 L110 176 L110 196 L90 196 L90 176 L35 176 L72 124 L50 124 L86 72 L68 72 Z'},
       {id:'mo_mountains', label:'Góry', fillRule:'nonzero',
