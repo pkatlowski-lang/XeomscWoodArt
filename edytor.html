@@ -6250,6 +6250,35 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  // Pojedynczy świerk (3 piętra trójkątów + pieniek) — filled, wierzchołek w górę.
+  function drawPine(ctx,x,baseY,h,w){
+    const tri=(ay,by,hw)=>{ ctx.beginPath(); ctx.moveTo(x,baseY-h*ay); ctx.lineTo(x-hw,baseY-h*by); ctx.lineTo(x+hw,baseY-h*by); ctx.closePath(); ctx.fill(); };
+    ctx.fillRect(x-w*0.12, baseY-h*0.04, w*0.24, h*0.16);   // pieniek
+    tri(0.42,0.0,w); tri(0.7,0.34,w*0.72); tri(1.0,0.62,w*0.46);
+  }
+  // Scena „las w okręgu": pierścień + grunt + rząd świerków różnej wysokości, scalone w
+  // jedną sylwetkę (drzewa stoją na gruncie, grunt styka się z pierścieniem; niebo = otwór).
+  function drawPineForestCircleScene(ctx, W, H, opt){
+    opt=opt||{};
+    const cx=W/2, cy=H/2, R=Math.min(W,H)/2-4, r=R-(opt.band||26);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#000';
+    const gy=cy+r*0.5;
+    // świerki: wysokość maleje ku brzegom (mieszczą się w okręgu); naprzemienne plany
+    const trees=[
+      [cx-r*0.62, r*0.5, r*0.2],[cx-r*0.33, r*0.86, r*0.26],[cx-r*0.04, r*1.12, r*0.3],
+      [cx+r*0.27, r*0.92, r*0.27],[cx+r*0.56, r*0.6, r*0.22],[cx+r*0.8, r*0.36, r*0.17]
+    ];
+    trees.forEach(([x,h,w])=>drawPine(ctx,x,gy,h,w));
+    // grunt (łagodne wzgórze stykające się z pierścieniem po bokach)
+    ctx.beginPath(); ctx.moveTo(cx-R, gy-r*0.04);
+    ctx.quadraticCurveTo(cx, gy-r*0.16, cx+R, gy-r*0.02);
+    ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
      Wzory własne (nie odwzorowują konkretnych komercyjnych grafik). Każdy to ścieżka
      SVG w lokalnym układzie ~0..200; bbox mierzymy off-screen przez getBBox (jak bazy).
@@ -6271,6 +6300,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),640,640,{ss:1.8,tol:1.5,minArea:60})},
       {id:'mo_mtn_circle', label:'Góry w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.5,minArea:60})},
+      {id:'mo_forest_circle', label:'Las w okręgu', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.4,minArea:60})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:6,trunk:0.2,width:0.062,spread:0.76,up:0.08,foliage:false,minW:4}),520,520,{ss:2,tol:1.3,minArea:120,close:1.4})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
