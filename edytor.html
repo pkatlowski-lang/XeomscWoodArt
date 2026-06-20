@@ -6168,17 +6168,27 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function drawTreeShape(ctx, W, H, opt){
     let s=(opt.seed||7)>>>0; const rnd=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
     const foliage=[];
+    const curve=opt.curve!=null?opt.curve:0.42, spread=opt.spread!=null?opt.spread:0.72, up=opt.up||0;
+    // Gałąź rysowana jako ZAKRZYWIONY (kwadratowy) odcinek zwężający się ku górze; dzieci:
+    // środkowy „lider" kontynuuje pień prosto w górę (wypełnia środek korony — brak centralnej
+    // szczeliny, drzewo jest jednolite), a boczne gałęzie rozchodzą się symetrycznie. Okrągłe
+    // złącza (lineCap/Join=round) spawają wszystko w jedną, organiczną sylwetkę.
     function branch(x,y,ang,len,w,depth){
-      const x1=x+Math.cos(ang)*len, y1=y+Math.sin(ang)*len;
-      ctx.lineWidth=Math.max(opt.minW||2.4,w); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x1,y1); ctx.stroke();
+      const bend=(rnd()-0.5)*curve;
+      const mAng=ang+bend*0.5, eAng=ang+bend;
+      const mx=x+Math.cos(mAng)*len*0.55, my=y+Math.sin(mAng)*len*0.55;
+      const x1=x+Math.cos(eAng)*len, y1=y+Math.sin(eAng)*len;
+      ctx.lineWidth=Math.max(opt.minW||2.4,w);
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo(mx,my,x1,y1); ctx.stroke();
       if(depth<=0){ foliage.push([x1,y1,len]); return; }
-      const nb = depth>(opt.depth-2) ? 2 : (2+(rnd()<0.45?1:0));
-      const spread=opt.spread!=null?opt.spread:0.72;
+      const nb = depth>(opt.depth-3) ? 3 : (2+(rnd()<0.5?1:0));   // pierwsze poziomy: 3 (z liderem)
+      const mid=(nb-1)/2;
       for(let i=0;i<nb;i++){
-        const t=nb===1?0:(i/(nb-1)-0.5);
-        let na=ang + t*spread + (rnd()-0.5)*0.34;
-        const up=opt.up||0; na=na*(1-up)+(-Math.PI/2)*up;
-        branch(x1,y1,na, len*(0.74+rnd()*0.08), w*0.7, depth-1);
+        let na;
+        if(nb%2===1 && i===mid) na=eAng + (rnd()-0.5)*0.16;        // lider — kontynuacja w górę
+        else na=eAng + (i-mid)/Math.max(1,mid)*spread + (rnd()-0.5)*0.28;
+        na=na*(1-up)+(-Math.PI/2)*up;
+        branch(x1,y1,na, len*(0.72+rnd()*0.1), w*0.66, depth-1);
       }
     }
     const baseX=opt.baseX!=null?opt.baseX:W/2, baseY=opt.baseY!=null?opt.baseY:H-2;
@@ -6294,7 +6304,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
       {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:5,depth:8,trunk:0.17,width:0.046,spread:1.04,up:0.02,foliage:true,foliageR:1.4,foliageMin:0.95,canopyBand:0.6,minW:2.6}),560,640,{ss:2,tol:1.6,minArea:50})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
