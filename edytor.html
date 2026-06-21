@@ -1656,6 +1656,13 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const pt=canvas.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
     const p=pt.matrixTransform(ctm.inverse()); return {x:p.x,y:p.y};
   }
+  // Współrzędne dokumentu -> ekran (px). Odwrotność clientToDoc — używane przez edycję
+  // tekstu w miejscu (nakładka textarea nad napisem na płótnie).
+  function docToClient(x,y){
+    const ctm=canvas.getScreenCTM(); if(!ctm) return {x:0,y:0,scale:1};
+    const pt=canvas.createSVGPoint(); pt.x=x; pt.y=y;
+    const p=pt.matrixTransform(ctm); return {x:p.x,y:p.y,scale:Math.abs(ctm.a)};
+  }
   function snap(v){ return state.snap? Math.round(v/state.grid)*state.grid : v; }
 
   /* ---------------- Fabryka obiektów ---------------- */
@@ -2538,12 +2545,18 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const handle=e.target.getAttribute && e.target.getAttribute('data-handle');
     const mhandle=e.target.getAttribute && e.target.getAttribute('data-mhandle');
     if(state.tool==='select'){
-      if(handle){ startHandle(e,handle,docP); return; }
+      if(handle){
+        // podwójne kliknięcie uchwytu zaznaczonego napisu -> edycja treści w miejscu
+        const selOne = state.selectedIds.length===1 ? getSel() : null;
+        if(selOne && selOne.type==='text' && !selOne.locked && maybeInlineTextDblClick(selOne)) return;
+        startHandle(e,handle,docP); return;
+      }
       if(mhandle){ startMResize(e,mhandle,docP); return; }
       const grp=e.target.closest && e.target.closest('[data-id]');
       if(grp){
         const id=grp.getAttribute('data-id'); const o=state.objects.find(x=>x.id===id);
         if(e.shiftKey){ toggleSelection(id); return; }            // shift+klik = dodaj/odejmij z zaznaczenia
+        if(o && o.type==='text' && !o.locked && maybeInlineTextDblClick(o)) return; // dwuklik napisu -> edycja w miejscu
         if(!state.selectedIds.includes(id)) select(id);           // klik na nowy = zaznacz tylko jego
         if(o && !o.locked) startMove(e,o,docP); else renderProps();// klik na już-zaznaczony = przesuń całą grupę
         return;
@@ -2631,6 +2644,75 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function focusTextEditor(){
     const grab=()=>{ const inp=document.querySelector('#props [data-prop="text"]'); if(inp){ inp.focus(); if(inp.select) inp.select(); return true; } return false; };
     if(!grab()) setTimeout(grab,30);
+  }
+  // Edycja tekstu BEZPOŚREDNIO na płycie: nakładka <textarea> ustawiona nad napisem,
+  // pisanie aktualizuje napis na żywo. Enter = zatwierdź, Shift+Enter = nowa linia,
+  // Esc = anuluj. Zamiast szukać pola edycji w panelu po prawej.
+  let _inlineEditor=null;
+  function closeInlineTextEdit(){ if(_inlineEditor){ const el=_inlineEditor; _inlineEditor=null; el.remove(); } }
+  function startInlineTextEdit(o){
+    if(!o || o.type!=='text' || o.locked) return;
+    closeInlineTextEdit();
+    const orig=o.text||'';
+    const ta=document.createElement('textarea');
+    _inlineEditor=ta;
+    ta.value=orig;
+    ta.setAttribute('aria-label','Edycja tekstu na płycie');
+    ta.spellcheck=false;
+    // pozycja i rozmiar wg ramki napisu (współrzędne dokumentu -> ekran)
+    const place=()=>{
+      const b=objBBox(o);
+      const tl=docToClient(b.x,b.y), br=docToClient(b.x+b.w,b.y+b.h);
+      const left=Math.min(tl.x,br.x), top=Math.min(tl.y,br.y);
+      const w=Math.abs(br.x-tl.x), h=Math.abs(br.y-tl.y);
+      const fsPx=Math.max(13, o.fontSize*(o.tsy||1)*tl.scale*0.92);
+      const pad=Math.max(6, fsPx*0.18);
+      ta.style.left=(left-pad)+'px'; ta.style.top=(top-pad)+'px';
+      ta.style.width=Math.max(60,w+pad*2)+'px'; ta.style.height=Math.max(fsPx*1.3,h+pad*2)+'px';
+      ta.style.fontSize=fsPx+'px';
+    };
+    Object.assign(ta.style,{
+      position:'fixed', zIndex:9999, resize:'none', overflow:'hidden',
+      textAlign:'center', lineHeight:'1.15', boxSizing:'border-box',
+      fontFamily:o.font||'inherit', fontWeight:o.bold?'700':'400', fontStyle:o.italic?'italic':'normal',
+      color:'#fff', background:'rgba(13,22,36,.92)', border:'2px solid var(--accent)',
+      borderRadius:'6px', padding:'2px 4px', outline:'none',
+      boxShadow:'0 6px 22px rgba(0,0,0,.5)'
+    });
+    place();
+    document.body.appendChild(ta);
+    const createdAt=Date.now();
+    ta.focus(); ta.select();
+    let done=false;
+    const commit=(cancel)=>{
+      if(done) return; done=true;
+      const val=cancel? orig : ta.value;
+      closeInlineTextEdit();
+      const changed=(o.text||'')!==val;
+      o.text = (val.trim()==='') ? orig : val;   // pusty napis -> przywróć poprzedni
+      renderAll(); renderProps(); scheduleLive3D();
+      if(changed && !cancel && o.text!==orig) pushHistory();
+    };
+    ta.addEventListener('input',()=>{ o.text=ta.value; renderObjectEl(o); renderOverlay(); place(); });
+    ta.addEventListener('keydown',e=>{
+      e.stopPropagation();
+      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); commit(false); }
+      else if(e.key==='Escape'){ e.preventDefault(); commit(true); }
+    });
+    ta.addEventListener('blur',()=>{
+      // ignoruj „fałszywy" blur z gestu otwierającego (mouseup tej samej sekwencji) — przywróć fokus
+      if(Date.now()-createdAt<260 && _inlineEditor===ta){ setTimeout(()=>{ if(_inlineEditor===ta) ta.focus(); },0); return; }
+      commit(false);
+    });
+  }
+  // Wykrywanie podwójnego kliknięcia napisu na poziomie pointerdown — uchwyty zaznaczenia
+  // zakrywają napis i przechwytują wskaźnik, więc natywne zdarzenie dblclick często nie powstaje.
+  let _txtClk=null;
+  function maybeInlineTextDblClick(o){
+    if(!o || o.type!=='text' || o.locked) return false;
+    if(_txtClk && _txtClk.id===o.id && Date.now()-_txtClk.time<400){ _txtClk=null; startInlineTextEdit(o); return true; }
+    _txtClk={id:o.id, time:Date.now()};
+    return false;
   }
   function startDraw(e,docP){
     setCapture(e);
@@ -2821,7 +2903,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     } else if(m==='drawText'){
       state.tool='select'; syncToolButtons();
       renderAll(); pushHistory(); renderProps(); scheduleLive3D();
-      focusTextEditor(); // synchronicznie w obrębie gestu — na dotyku otwiera klawiaturę
+      startInlineTextEdit(o); // od razu edycja nowego napisu na płycie (na dotyku otwiera klawiaturę)
     } else if(m==='move'||m==='resize'||m==='rotate'||m==='mresize'){
       state.guideLines=null; renderOverlay();
       pushHistory(); renderProps(); scheduleLive3D();
@@ -3968,6 +4050,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   }
 
   canvas.addEventListener('dblclick', e=>{
+    if(_inlineEditor) return; // edycja w miejscu już otwarta (wykryta na pointerdown)
     if(state.tool==='pen' && state.penDraft){ penFinish(); return; }
     // dwuklik / dwukrotne dotknięcie napisu -> od razu edycja jego treści (kursor w polu tekstu)
     const tgrp = e.target.closest && e.target.closest('[data-id]');
@@ -3976,9 +4059,15 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(to && to.type==='text' && !to.locked){
         if(!state.selectedIds.includes(to.id) || state.selectedIds.length!==1){ select(to.id); }
         else { renderProps(); }
-        focusTextEditor(); // w obrębie gestu dblclick -> klawiatura na dotyku
+        startInlineTextEdit(to); // edycja bezpośrednio na płycie (w obrębie gestu dblclick -> klawiatura na dotyku)
         return;
       }
+    }
+    // fallback: dwuklik trafił w nakładkę zaznaczenia (uchwyty są nad napisem) —
+    // jeśli zaznaczony jest dokładnie jeden napis, edytuj go w miejscu
+    if(!tgrp && state.selectedIds.length===1){
+      const to=state.objects.find(x=>x.id===state.selectedIds[0]);
+      if(to && to.type==='text' && !to.locked){ startInlineTextEdit(to); return; }
     }
     // edycja punktów: dwuklik na krawędzi -> dodaj nowy punkt w tym miejscu
     if(state.editingPathId && !(e.target.closest && e.target.closest('.node-handle'))){
