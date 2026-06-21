@@ -6290,6 +6290,45 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  // Sylwetka postaci (filled) — type: 'man' | 'woman' | 'child'. Stoi na linii gy, wysokość H.
+  // Złożona z nachodzących części (głowa, tułów/sukienka, nogi, ręce) — Canvas scala je,
+  // a tracer da jeden czysty obrys.
+  function drawPerson(ctx, x, gy, H, type){
+    const headR=H*(type==='child'?0.085:0.075), headY=gy-H+headR;
+    ctx.beginPath(); ctx.arc(x, headY, headR, 0, Math.PI*2); ctx.fill();               // głowa
+    const shoulderY=headY+headR*1.3, hipY=gy-H*0.44;
+    const shW=H*(type==='child'?0.072:type==='woman'?0.082:0.095);
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.lineWidth=shW*0.95;                                                              // kapsuła barków (zaokrągla ramiona)
+    ctx.beginPath(); ctx.moveTo(x-shW*0.65, shoulderY); ctx.lineTo(x+shW*0.65, shoulderY); ctx.stroke();
+    ctx.lineWidth=H*(type==='child'?0.052:0.058);                                        // szyja
+    ctx.beginPath(); ctx.moveTo(x, shoulderY-headR*0.5); ctx.lineTo(x, shoulderY); ctx.stroke();
+    if(type==='woman'){
+      const waistY=gy-H*0.4, waistW=H*0.05;
+      ctx.beginPath(); ctx.moveTo(x-shW*0.8, shoulderY); ctx.lineTo(x+shW*0.8, shoulderY); // stanik (barki → talia)
+      ctx.lineTo(x+waistW, waistY); ctx.lineTo(x-waistW, waistY); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x-waistW, waistY); ctx.lineTo(x+waistW, waistY);          // rozkloszowana spódnica
+      ctx.lineTo(x+H*0.17, gy); ctx.lineTo(x-H*0.17, gy); ctx.closePath(); ctx.fill();
+    } else {
+      const hipW=H*0.07;
+      ctx.beginPath(); ctx.moveTo(x-shW*0.8, shoulderY); ctx.lineTo(x+shW*0.8, shoulderY); // tors
+      ctx.lineTo(x+hipW, hipY); ctx.lineTo(x-hipW, hipY); ctx.closePath(); ctx.fill();
+      ctx.lineWidth=H*(type==='child'?0.05:0.056);                                        // nogi (rozstawione → wyraźna luka)
+      ctx.beginPath(); ctx.moveTo(x-hipW*0.6, hipY); ctx.lineTo(x-hipW*1.1, gy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+hipW*0.6, hipY); ctx.lineTo(x+hipW*1.1, gy); ctx.stroke();
+    }
+    ctx.lineWidth=H*0.036;                                                               // ręce wzdłuż ciała
+    ctx.beginPath(); ctx.moveTo(x-shW*0.78, shoulderY+H*0.015); ctx.lineTo(x-shW-H*0.025, hipY-H*0.03); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+shW*0.78, shoulderY+H*0.015); ctx.lineTo(x+shW+H*0.025, hipY-H*0.03); ctx.stroke();
+  }
+  // Scena „rodzina" — tata, dziecko, mama na wspólnej linii gruntu (połączone → jeden kształt).
+  function drawFamilyGroup(ctx, W, H, gy, scale){
+    const cx=W/2;
+    drawPerson(ctx, cx-W*0.2*scale, gy, H*0.7, 'man');
+    drawPerson(ctx, cx+W*0.04*scale, gy, H*0.42, 'child');
+    drawPerson(ctx, cx+W*0.22*scale, gy, H*0.62, 'woman');
+  }
+
   /* ---------------- Galeria motywów: autorskie sylwetki ozdobne ----------------
      Wzory własne (nie odwzorowują konkretnych komercyjnych grafik). Każdy to ścieżka
      SVG w lokalnym układzie ~0..200; bbox mierzymy off-screen przez getBBox (jak bazy).
@@ -6315,6 +6354,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.4,minArea:60})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:5,trunk:0.2,width:0.066,spread:0.82,up:0.12,curve:0.5,foliage:false,minW:5}),520,520,{ss:2,tol:1.3,minArea:150,close:2})},
+      {id:'mo_family', label:'Rodzina', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const gy=H*0.9; ctx.fillRect(W*0.06,gy,W*0.88,H*0.028); drawFamilyGroup(ctx,W,H,gy,1); },320,260,{ss:2,tol:0.9,minArea:25,smoothIter:1})},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
         d:'M100 12 L132 72 L114 72 L150 124 L128 124 L165 176 L110 176 L110 196 L90 196 L90 176 L35 176 L72 124 L50 124 L86 72 L68 72 Z'},
       {id:'mo_mountains', label:'Góry', fillRule:'evenodd',
