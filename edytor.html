@@ -81,6 +81,39 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-actions{display:flex;gap:6px;padding:8px 14px 14px}
 .pq-status{font-size:.72rem;min-height:16px;padding:0 14px 8px;font-weight:600}
 .pq-help{font-size:.7rem;color:var(--muted);line-height:1.5;margin:0 0 9px}
+/* --- Wycena: profile, karta ceny, pozycje dodatkowe, zwijana konfiguracja --- */
+.qbar{display:flex;gap:6px;align-items:center}
+.qbar select{flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 7px;font-size:.78rem;font-weight:600;outline:none}
+.qbar select:focus{border-color:var(--accent)}
+.qbar-btns{display:flex;gap:4px;margin-top:6px}
+.qbar-btns .tbtn{flex:1;font-size:.68rem;padding:5px 4px}
+.q-field{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}
+.q-field>span.lbl{font-size:.66rem;color:var(--muted);font-weight:600}
+.q-field select,.q-field input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 8px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box}
+.q-field select:focus,.q-field input:focus{border-color:var(--accent)}
+.q-price-card{background:linear-gradient(160deg,rgba(56,189,248,.12),rgba(15,23,42,.4));border:1.5px solid var(--accent);border-radius:11px;padding:12px 13px;margin:2px 0 10px}
+.q-price-card.empty{background:rgba(15,23,42,.4);border-color:var(--border)}
+.q-pp{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.q-pp .q-pp-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.q-pp .q-pp-val{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.q-total{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--border)}
+.q-total .q-total-lbl{font-size:.74rem;color:var(--text);font-weight:600}
+.q-total .q-total-val{font-size:1.05rem;font-weight:800;color:var(--text)}
+.q-empty-msg{font-size:.78rem;color:var(--muted);font-weight:500;line-height:1.5}
+.q-break{display:flex;flex-direction:column;gap:4px;margin-top:9px}
+.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
+.q-break .br-row b{color:var(--text);font-weight:600}
+.q-extra-row{display:flex;gap:5px;align-items:center;margin-bottom:5px}
+.q-extra-row input.ex-name{flex:1;min-width:0}
+.q-extra-row input.ex-amt{width:74px;flex:none;text-align:right}
+.q-extra-row input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:5px 6px;font-size:.76rem;outline:none;box-sizing:border-box}
+.q-extra-row input:focus{border-color:var(--accent)}
+.q-cfg-toggle{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.q-cfg-toggle:hover{color:var(--text)}
+.q-cfg-toggle .chev{transition:transform .15s;display:inline-block}
+.q-cfg-toggle.open .chev{transform:rotate(90deg)}
+.q-cfg-body{display:none}
+.q-cfg-body.open{display:block}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;background:
   repeating-linear-gradient(45deg,#0f0b06 0 10px,#120d07 10px 20px)}
 #canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -563,31 +596,66 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       </div><!-- /ptab-body project -->
 
       <div class="ptab-body" data-ptab-body="pricing">
+        <!-- PROFIL WYCENY: zapisane zestawy cennika do wyboru -->
         <div class="pq-sec">
-          <div class="pq-h">📦 Materiały</div>
-          <p class="pq-help">Lista materiałów do wyceny. Dla każdego podaj nazwę, grubość (mm), koszt materiału za 1&nbsp;cm² oraz prędkość cięcia lasera (mm/min).</p>
-          <!-- materiały renderowane dynamicznie -->
-          <div id="pqMaterials"></div>
-          <button type="button" class="tbtn" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
-        </div>
-        <div class="pq-sec">
-          <div class="pq-h">⚙ Parametry wyceny</div>
-          <p class="pq-help">Globalne wartości doliczane do każdej wyceny — wspólne dla wszystkich materiałów.</p>
-          <div class="pq-grid">
-            <label title="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">Laser zł/min<input type="number" id="pqLaserMin" step="0.1" min="0"></label>
-            <label title="Stawka pakowania za każdy próg cenowy.">Pakowanie zł/próg<input type="number" id="pqPack" step="0.05" min="0"></label>
-            <label title="Rozmiar progu cenowego — pakowanie wzrasta o stawkę za każde X zł ceny bazowej.">Próg (zł)<input type="number" id="pqPackTier" step="1" min="1"></label>
-            <label title="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">Marża %<input type="number" id="pqMargin" step="1" min="0"></label>
-            <label title="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">Zapas czasu %<input type="number" id="pqBuffer" step="1" min="0"></label>
-            <label title="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">Grawer mm/min<input type="number" id="pqEngSpeed" step="100" min="1"></label>
-            <label title="Odległość między liniami skanowania grawera. Typowo 0,1 mm.">Odstęp grawera mm<input type="number" id="pqEngSpacing" step="0.01" min="0.01"></label>
+          <div class="pq-h">💼 Profil wyceny</div>
+          <div class="qbar">
+            <select id="qProfile" title="Wybierz zapisany profil cennika"></select>
+          </div>
+          <div class="qbar-btns">
+            <button type="button" class="tbtn" id="qProfNew" title="Utwórz nowy profil (od domyślnych)">＋ Nowy</button>
+            <button type="button" class="tbtn" id="qProfRename" title="Zmień nazwę profilu">✎ Nazwa</button>
+            <button type="button" class="tbtn" id="qProfDup" title="Powiel bieżący profil">⧉ Powiel</button>
+            <button type="button" class="tbtn" id="qProfDel" title="Usuń bieżący profil">🗑 Usuń</button>
           </div>
         </div>
-        <div class="pq-actions">
-          <button type="button" class="tbtn" id="pqRestore" style="font-size:.72rem;flex:1" title="Przywróć wartości fabryczne">↺ Domyślne</button>
-          <button type="button" class="tbtn tbtn-primary" id="pqSave" style="font-size:.72rem;flex:1">💾 Zapisz</button>
+        <!-- TWOJA WYCENA: materiał, ilość, cena na żywo -->
+        <div class="pq-sec">
+          <div class="pq-h">🧮 Twoja wycena</div>
+          <div class="q-field"><span class="lbl">Materiał</span><select id="quoteMat"></select></div>
+          <div class="q-field"><span class="lbl">Ilość sztuk</span><input type="number" id="qQty" min="1" step="1" value="1"></div>
+          <div class="q-price-card empty" id="qPriceCard">
+            <div class="q-pp"><span class="q-pp-lbl">Cena / szt.</span><span class="q-pp-val" id="qPerPiece">–</span></div>
+            <div class="q-total"><span class="q-total-lbl">Razem (× <span id="qQtyEcho">1</span>)</span><span class="q-total-val" id="qTotal">–</span></div>
+            <div class="q-empty-msg" id="qEmptyMsg">Narysuj projekt na płycie, aby zobaczyć cenę.</div>
+            <div class="q-break" id="qBreak"></div>
+          </div>
+          <button type="button" class="tbtn tbtn-primary" id="sendQuoteOpenBtn" style="width:100%">📨 Wyślij projekt do wyceny</button>
         </div>
-        <div id="pqStatus" class="pq-status"></div>
+        <!-- POZYCJE DODATKOWE: ręczne dopłaty per sztuka -->
+        <div class="pq-sec">
+          <div class="pq-h">➕ Pozycje dodatkowe</div>
+          <p class="pq-help">Ręczne dopłaty doliczane do ceny każdej sztuki (np. „Malowanie", „Personalizacja"). Doliczane po marży.</p>
+          <div id="qExtras"></div>
+          <button type="button" class="tbtn" style="width:100%;font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
+        </div>
+        <!-- KONFIGURACJA CENNIKA: edycja materiałów i parametrów aktywnego profilu (zwijana) -->
+        <button type="button" class="q-cfg-toggle" id="qCfgToggle"><span class="chev">▸</span> ⚙ Cennik i parametry (edycja profilu)</button>
+        <div class="q-cfg-body" id="qCfgBody">
+          <div class="pq-sec">
+            <div class="pq-h">📦 Materiały</div>
+            <p class="pq-help">Dla każdego materiału: nazwa, grubość (mm), koszt za 1&nbsp;cm² oraz prędkość cięcia (mm/min).</p>
+            <div id="pqMaterials"></div>
+            <button type="button" class="tbtn" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
+          </div>
+          <div class="pq-sec">
+            <div class="pq-h">⚙ Parametry</div>
+            <div class="pq-grid">
+              <label title="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">Laser zł/min<input type="number" id="pqLaserMin" step="0.1" min="0"></label>
+              <label title="Stawka pakowania za każdy próg cenowy.">Pakowanie zł/próg<input type="number" id="pqPack" step="0.05" min="0"></label>
+              <label title="Rozmiar progu cenowego — pakowanie wzrasta o stawkę za każde X zł ceny bazowej.">Próg (zł)<input type="number" id="pqPackTier" step="1" min="1"></label>
+              <label title="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">Marża %<input type="number" id="pqMargin" step="1" min="0"></label>
+              <label title="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">Zapas czasu %<input type="number" id="pqBuffer" step="1" min="0"></label>
+              <label title="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">Grawer mm/min<input type="number" id="pqEngSpeed" step="100" min="1"></label>
+              <label title="Odległość między liniami skanowania grawera. Typowo 0,1 mm.">Odstęp grawera mm<input type="number" id="pqEngSpacing" step="0.01" min="0.01"></label>
+            </div>
+          </div>
+          <div class="pq-actions">
+            <button type="button" class="tbtn" id="pqRestore" style="font-size:.72rem;flex:1" title="Przywróć wartości fabryczne w tym profilu">↺ Domyślne</button>
+            <button type="button" class="tbtn tbtn-primary" id="pqSave" style="font-size:.72rem;flex:1">💾 Zapisz profil</button>
+          </div>
+          <div id="pqStatus" class="pq-status"></div>
+        </div>
       </div><!-- /ptab-body pricing -->
     </aside>
 
@@ -849,55 +917,9 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 </div>
 
-<div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wycena projektu" id="modalQuote">
-  <div class="modal-box" style="max-width:420px">
-    <button class="modal-close" aria-label="Zamknij" id="modalQuoteClose" title="Zamknij">✕</button>
-    <h3>💰 Wycena projektu</h3>
-    <div class="field"><label>Materiał</label><select id="quoteMat"></select></div>
-    <div class="sum-stats" id="quoteStats" style="margin-top:8px"></div>
-    <div class="quote-price" id="quotePrice">–</div>
-    <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie (0,25 zł za każde 5 zł wartości). Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
-    <div class="field" style="padding:12px 0 0">
-      <button type="button" class="tbtn tbtn-primary tbtn-block" id="sendQuoteOpenBtn">📨 Wyślij projekt do wyceny</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-ov" role="dialog" aria-modal="true" aria-label="Cennik i materiały" id="modalPricing">
-  <div class="modal-box op-box">
-    <button class="modal-close" aria-label="Zamknij" id="modalPricingClose" title="Zamknij">✕</button>
-    <h3>⚙ Cennik i materiały</h3>
-    <p class="op-intro">Ustaw materiały i parametry wyceny pod swój zakład. Zmiany zapisują się na tym komputerze i od razu wpływają na wyceny. <b>Najedź kursorem na „?"</b> przy polu, aby zobaczyć podpowiedź, co wpisać.</p>
-
-    <h4 class="op-h">📦 Materiały <span class="hint" data-tip="Lista materiałów dostępnych przy wycenie. Dla każdego ustaw nazwę, grubość, koszt materiału za 1 cm² oraz prędkość cięcia. To one decydują o cenie i czasie pracy lasera.">?</span></h4>
-    <div class="op-mat-head">
-      <span>Nazwa <span class="hint" data-tip="Nazwa widoczna na liście wyboru materiału, np. „Sklejka brzozowa 4 mm".">?</span></span>
-      <span>Grubość mm <span class="hint" data-tip="Grubość płyty w milimetrach. Ułatwia dobór materiału i odwzorowanie warstw w podglądzie 3D.">?</span></span>
-      <span>zł / cm² <span class="hint" data-tip="Koszt samego materiału za 1 cm². Przykład: arkusz 100×100 cm to 10 000 cm². Jeśli arkusz kosztuje 38 zł, wpisz 38/10000 = 0,0038.">?</span></span>
-      <span>Cięcie mm/min <span class="hint" data-tip="Prędkość cięcia lasera dla tego materiału (mm na minutę). Grubszy/twardszy materiał = mniejsza prędkość. Wpływa na czas i cenę.">?</span></span>
-      <span></span>
-    </div>
-    <div id="opMaterials"></div>
-    <button type="button" class="tbtn op-add" id="opAddMat">＋ Dodaj materiał</button>
-
-    <h4 class="op-h">💰 Parametry wyceny <span class="hint" data-tip="Globalne parametry doliczane do każdej wyceny — wspólne dla wszystkich materiałów.">?</span></h4>
-    <div class="op-grid">
-      <label>Koszt pracy lasera (zł/min) <span class="hint" data-tip="Ile kosztuje 1 minuta pracy lasera (prąd, amortyzacja, obsługa). Mnożone przez łączny czas cięcia i grawerowania.">?</span><input type="number" id="opLaserMin" step="0.1" min="0"></label>
-      <label>Pakowanie (zł/próg) <span class="hint" data-tip="Stawka za pakowanie: 0,25 zł za każde 5 zł ceny bazowej. Produkt do 5 zł = 0,25 zł, 5–10 zł = 0,50 zł itd.">?</span><input type="number" id="opPack" step="0.05" min="0"></label>
-      <label>Próg pakowania (zł) <span class="hint" data-tip="Rozmiar progu cenowego — pakowanie rośnie o stawkę za każde X zł ceny bazowej produktu.">?</span><input type="number" id="opPackTier" step="1" min="1"></label>
-      <label>Marża (%) <span class="hint" data-tip="Narzut/zysk doliczany na końcu. 50 oznacza +50% do sumy kosztów (materiał + laser + pakowanie).">?</span><input type="number" id="opMargin" step="1" min="0"></label>
-      <label>Zapas czasu (%) <span class="hint" data-tip="Dodatkowy czas na przejazdy, przyspieszenia i powtórzenia. 15 oznacza +15% do czasu pracy lasera.">?</span><input type="number" id="opBuffer" step="1" min="0"></label>
-      <label>Prędkość grawera (mm/min) <span class="hint" data-tip="Prędkość lasera przy grawerowaniu/wypełnianiu powierzchni. Zwykle wyższa niż prędkość cięcia.">?</span><input type="number" id="opEngSpeed" step="100" min="1"></label>
-      <label>Odstęp linii grawera (mm) <span class="hint" data-tip="Odległość między liniami skanowania grawera. Mniejszy odstęp = gęstszy, ładniejszy grawer, ale dłuższy czas. Typowo 0,1 mm.">?</span><input type="number" id="opEngSpacing" step="0.01" min="0.01"></label>
-    </div>
-
-    <div class="op-actions">
-      <button type="button" class="tbtn" id="opRestore" title="Przywróć wszystkie wartości fabryczne">↺ Przywróć domyślne</button>
-      <button type="button" class="tbtn op-save" id="opSave">💾 Zapisz ustawienia</button>
-    </div>
-    <div id="opStatus" class="op-status"></div>
-  </div>
-</div>
+<!-- Modale „Wycena projektu" i „Cennik i materiały" usunięte — całość wyceny scalona
+     w jedną zakładkę boczną „💰 Wycena" (profile, materiały, parametry, pozycje dodatkowe,
+     ilość, cena na żywo, wysyłka). -->
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wyślij projekt do pracowni" id="modalSendQuote">
   <div class="modal-box" style="max-width:440px">
@@ -4317,20 +4339,42 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     engraveSpacing:0.1,
     engraveOverscan:0.025
   };
-  const PRICING_KEY='laser_edytor_pricing_v1';
-  function loadPricing(){
-    try{
-      const s=JSON.parse(localStorage.getItem(PRICING_KEY)||'null');
-      const base=JSON.parse(JSON.stringify(QUOTE_DEFAULTS));
-      if(!s||typeof s!=='object') return base;
-      const out={...base, ...s};
-      out.materials=(s.materials && typeof s.materials==='object' && Object.keys(s.materials).length) ? s.materials : base.materials;
-      if(s.packaging!=null && s.packagingUnit==null){ out.packagingUnit=0.25; out.packagingTier=5; delete out.packaging; }
-      return out;
-    }catch(e){ return JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); }
+  const PRICING_KEY='laser_edytor_pricing_v1';   // legacy: pojedynczy cennik (tylko do migracji)
+  const PROFILES_KEY='laser_edytor_profiles_v1'; // nowy magazyn: profile wyceny
+  // Sprowadza dowolny zapisany obiekt cennika do pełnego, poprawnego kształtu (+ migracja pakowania).
+  function normalizeConfig(s){
+    const base=JSON.parse(JSON.stringify(QUOTE_DEFAULTS));
+    if(!s||typeof s!=='object') return base;
+    const out={...base, ...s};
+    out.materials=(s.materials && typeof s.materials==='object' && Object.keys(s.materials).length)
+      ? JSON.parse(JSON.stringify(s.materials)) : base.materials;
+    if(s.packaging!=null && s.packagingUnit==null){ out.packagingUnit=0.25; out.packagingTier=5; }
+    delete out.packaging;
+    return out;
   }
-  let PRICING=loadPricing();
-  function savePricing(){ try{ localStorage.setItem(PRICING_KEY, JSON.stringify(PRICING)); }catch(e){} }
+  const newProfId=()=>'prof-'+Math.random().toString(36).slice(2,8);
+  // Wczytuje profile z localStorage; jeśli brak — migruje stary pojedynczy cennik do profilu „Domyślny".
+  function loadProfiles(){
+    try{
+      const s=JSON.parse(localStorage.getItem(PROFILES_KEY)||'null');
+      if(s && Array.isArray(s.profiles) && s.profiles.length){
+        s.profiles.forEach(p=>{ p.config=normalizeConfig(p.config); if(!p.id) p.id=newProfId(); if(!p.name) p.name='Profil'; });
+        if(!s.profiles.some(p=>p.id===s.activeId)) s.activeId=s.profiles[0].id;
+        return s;
+      }
+    }catch(e){}
+    let cfg;
+    try{ cfg=normalizeConfig(JSON.parse(localStorage.getItem(PRICING_KEY)||'null')); }
+    catch(e){ cfg=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); }
+    const id=newProfId();
+    return { profiles:[{id, name:'Domyślny', config:cfg}], activeId:id };
+  }
+  let PROFILES=loadProfiles();
+  function activeProfile(){ return PROFILES.profiles.find(p=>p.id===PROFILES.activeId) || PROFILES.profiles[0]; }
+  let PRICING=activeProfile().config;  // żywy cennik aktualnie wybranego profilu
+  function saveProfiles(){ try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(PROFILES)); }catch(e){} }
+  // Zapisuje bieżący cennik do aktywnego profilu i utrwala wszystkie profile.
+  function savePricing(){ const p=activeProfile(); if(p) p.config=PRICING; saveProfiles(); }
   // Łączna długość trasy lasera po projekcie (mm) — kontury WSZYSTKICH widocznych
   // elementów (cięcie, nacięcie i grawer liniowy) z powieleniami; obrazy pomocnicze pomijane.
   function quotePathLen(){
@@ -4382,147 +4426,104 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(baseCost<=0) return unit;
     return Math.max(1, Math.ceil(baseCost/tier))*unit;
   }
-  function computeQuote(matKey){
+  // Pozycje dodatkowe i ilość dotyczą BIEŻĄCEJ wyceny (sesja), nie profilu cennika.
+  let quoteExtras=[];   // [{label, amount}] — ręczne dopłaty per sztuka (doliczane po marży)
+  let quoteQty=1;
+  function extrasSum(){ return quoteExtras.reduce((a,e)=>a+(parseFloat(e.amount)||0),0); }
+  // Pełne rozbicie wyceny: koszty, marża, pozycje dodatkowe, cena/szt i cena za cały nakład.
+  function computeQuoteFull(matKey){
     const mat=PRICING.materials[matKey]; if(!mat) return null;
     const timeMin=quoteTimeMin(mat);
     const laserCost=timeMin*PRICING.laserPerMin;
     const materialCost=quoteMaterialArea()*mat.pricePerCm2;
-    const baseCost=laserCost+materialCost;
-    const pack=calcPackaging(baseCost);
-    const total=(baseCost+pack)*(1+PRICING.margin);
-    return Math.round(total*100)/100;
+    const base=laserCost+materialCost;
+    const pack=calcPackaging(base);
+    const producedCost=base+pack;
+    const marginAmt=producedCost*PRICING.margin;
+    const exSum=extrasSum();
+    const perPiece=producedCost+marginAmt+exSum;
+    const qty=Math.max(1,Math.round(quoteQty||1));
+    return {mat, timeMin, laserCost, materialCost, base, pack, marginAmt, extrasSum:exSum, perPiece, qty, total:perPiece*qty};
   }
-  const modalQuote=document.getElementById('modalQuote');
+  // Cena końcowa całego zamówienia (z ilością i pozycjami dodatkowymi) — zaokrąglona do groszy.
+  function computeQuote(matKey){ const q=computeQuoteFull(matKey); return q? Math.round(q.total*100)/100 : null; }
+  /* ---- Jednolity kontroler wyceny: materiał, ilość, pozycje dodatkowe, cena na żywo ---- */
   const quoteMatSel=document.getElementById('quoteMat');
-  quoteMatSel.innerHTML=Object.entries(PRICING.materials).map(([k,m])=>`<option value="${k}">${m.label}</option>`).join('');
-  function renderQuote(){
-    const priceEl=document.getElementById('quotePrice');
-    const statsEl=document.getElementById('quoteStats');
-    const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
-    if(!hasWork){ priceEl.textContent='Brak elementów do wyceny — narysuj projekt na płycie.'; priceEl.classList.add('quote-empty'); statsEl.innerHTML=''; return; }
-    priceEl.classList.remove('quote-empty');
-    const mat=PRICING.materials[quoteMatSel.value];
-    const tb=quoteTimeBreakdown(mat);
-    const areaCm2=quoteMaterialArea();
-    const baseCost=tb.total*PRICING.laserPerMin+areaCm2*mat.pricePerCm2;
-    const packCost=calcPackaging(baseCost);
-    statsEl.innerHTML=
-      `<div class="sum-row sum-cut"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(tb.total)}</span></div>`
-      +(tb.engraveTime>0 ? `<div class="sum-row sum-score"><span>　✂ w tym cięcie/nacięcie</span><span class="sum-val">${formatTime(tb.cutTime*PRICING.timeBuffer)}</span></div>`
-        +`<div class="sum-row sum-engrave"><span>　▦ w tym grawerowanie</span><span class="sum-val">${formatTime(tb.engraveTime*PRICING.timeBuffer)}</span></div>` : '')
-      +`<div class="sum-row"><span>📐 Powierzchnia materiału</span><span class="sum-val">${String(fmt(areaCm2)).replace('.',',')} cm² (${String(fmt(areaCm2/10000)).replace('.',',')} m²)</span></div>`
-      +`<div class="sum-row"><span>📦 Pakowanie</span><span class="sum-val">${packCost.toFixed(2).replace('.',',')} zł</span></div>`;
-    priceEl.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
-  }
-  document.getElementById('quoteBtn').addEventListener('click',()=>{ renderQuote(); modalQuote.classList.add('open'); });
-  document.getElementById('modalQuoteClose').addEventListener('click',()=>modalQuote.classList.remove('open'));
-  modalQuote.addEventListener('click',e=>{ if(e.target===modalQuote) modalQuote.classList.remove('open'); });
-  quoteMatSel.addEventListener('change',renderQuote);
-
-  /* ---- Wycena na żywo: stały widget w rogu sceny, odświeżany przy każdej edycji ---- */
   const lqMat=document.getElementById('lqMat'), lqPrice=document.getElementById('lqPrice'), lqTime=document.getElementById('lqTime');
-  lqMat.innerHTML=quoteMatSel.innerHTML;
-  function renderLiveQuote(){
-    const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
-    if(!hasWork){ lqPrice.textContent='narysuj projekt…'; lqPrice.classList.add('lq-empty'); lqTime.textContent=''; return; }
-    lqPrice.classList.remove('lq-empty');
-    const mat=PRICING.materials[quoteMatSel.value];
-    lqPrice.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
-    lqTime.textContent='⏱ '+formatQuoteTime(quoteTimeMin(mat))+' min.sek pracy lasera';
-  }
-  var _lqTimer=null;
-  function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderLiveQuote,200); }
-  lqMat.addEventListener('change',()=>{ quoteMatSel.value=lqMat.value; renderLiveQuote(); });
-  quoteMatSel.addEventListener('change',()=>{ lqMat.value=quoteMatSel.value; renderLiveQuote(); });
-  renderLiveQuote();
-
-  /* ---------------- Panel operatora: Cennik i materiały (edytowalny) ---------------- */
-  function refreshPricingUI(){
-    const prev=quoteMatSel.value;
-    const opts=Object.entries(PRICING.materials).map(([k,m])=>`<option value="${k}">${m.label}</option>`).join('');
+  const qQtyInput=document.getElementById('qQty');
+  const zl=v=>(Math.round(v*100)/100).toFixed(2).replace('.',',')+' zł';
+  function matOptionsHTML(){ return Object.entries(PRICING.materials).map(([k,m])=>`<option value="${k}">${String(m.label||'').replace(/</g,'&lt;')}</option>`).join(''); }
+  function syncMatSelectors(keepKey){
+    const prev=keepKey!=null?keepKey:quoteMatSel.value;
+    const opts=matOptionsHTML();
     quoteMatSel.innerHTML=opts; lqMat.innerHTML=opts;
     const keys=Object.keys(PRICING.materials);
     const val=keys.includes(prev)?prev:(keys[0]||'');
     quoteMatSel.value=val; lqMat.value=val;
-    if(typeof renderQuote==='function' && document.getElementById('modalQuote').classList.contains('open')) renderQuote();
-    renderLiveQuote();
   }
-  const modalPricing=document.getElementById('modalPricing');
-  function opMatRow(key,m){
-    const row=document.createElement('div');
-    row.className='op-mat-row'; row.dataset.key=key;
-    row.innerHTML=
-      `<input type="text" data-f="label" value="${String(m.label||'').replace(/"/g,'&quot;')}" placeholder="np. Sklejka 4 mm">`
-      +`<input type="number" data-f="mm" step="0.5" min="0" value="${m.mm!=null?m.mm:''}">`
-      +`<input type="number" data-f="pricePerCm2" step="0.0001" min="0" value="${m.pricePerCm2!=null?m.pricePerCm2:''}">`
-      +`<input type="number" data-f="speed" step="10" min="1" value="${m.speed!=null?m.speed:''}">`
-      +`<button type="button" class="op-del" data-del title="Usuń materiał">🗑</button>`;
-    row.querySelector('[data-del]').addEventListener('click',()=>row.remove());
-    return row;
-  }
-  function renderOpMaterials(){
-    const box=document.getElementById('opMaterials'); box.innerHTML='';
-    Object.entries(PRICING.materials).forEach(([k,m])=>box.appendChild(opMatRow(k,m)));
-  }
-  function fillOpParams(){
-    document.getElementById('opLaserMin').value=PRICING.laserPerMin;
-    document.getElementById('opPack').value=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
-    document.getElementById('opPackTier').value=PRICING.packagingTier||5;
-    document.getElementById('opMargin').value=Math.round(PRICING.margin*100);
-    document.getElementById('opBuffer').value=Math.round((PRICING.timeBuffer-1)*100);
-    document.getElementById('opEngSpeed').value=PRICING.engraveSpeed;
-    document.getElementById('opEngSpacing').value=PRICING.engraveSpacing;
-  }
-  function openPricing(){
-    document.getElementById('opStatus').textContent='';
-    renderOpMaterials(); fillOpParams();
-    modalPricing.classList.add('open');
-  }
-  function collectAndSavePricing(){
-    const st=document.getElementById('opStatus');
-    const rows=[...document.querySelectorAll('#opMaterials .op-mat-row')];
-    const mats={};
-    rows.forEach(r=>{
-      const label=r.querySelector('[data-f="label"]').value.trim();
-      if(!label) return;
-      const mm=parseFloat(r.querySelector('[data-f="mm"]').value)||0;
-      const price=parseFloat(r.querySelector('[data-f="pricePerCm2"]').value)||0;
-      const speed=parseFloat(r.querySelector('[data-f="speed"]').value)||1;
-      let key=r.dataset.key; if(!key||mats[key]) key='mat-'+Math.random().toString(36).slice(2,8);
-      mats[key]={label, mm, speed:Math.max(1,speed), pricePerCm2:Math.max(0,price)};
+  // Pozycje dodatkowe — render edytowalnej listy
+  function renderExtras(){
+    const box=document.getElementById('qExtras'); if(!box) return;
+    box.innerHTML='';
+    quoteExtras.forEach((ex,i)=>{
+      const row=document.createElement('div'); row.className='q-extra-row';
+      row.innerHTML=`<input type="text" class="ex-name" placeholder="np. Malowanie" value="${String(ex.label||'').replace(/"/g,'&quot;')}">`
+        +`<input type="number" class="ex-amt" step="0.5" min="0" placeholder="zł" value="${ex.amount!=null?ex.amount:''}">`
+        +`<button type="button" class="pq-del" title="Usuń pozycję">✕</button>`;
+      const ins=row.querySelectorAll('input');
+      ins[0].addEventListener('input',()=>{ quoteExtras[i].label=ins[0].value; });
+      ins[1].addEventListener('input',()=>{ quoteExtras[i].amount=ins[1].value; renderQuoteAll(); });
+      row.querySelector('.pq-del').addEventListener('click',()=>{ quoteExtras.splice(i,1); renderExtras(); renderQuoteAll(); });
+      box.appendChild(row);
     });
-    if(!Object.keys(mats).length){ st.style.color='var(--cut-light)'; st.textContent='Dodaj przynajmniej jeden materiał (z nazwą).'; return false; }
-    PRICING.materials=mats;
-    PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('opLaserMin').value)||0);
-    PRICING.packagingUnit=Math.max(0,parseFloat(document.getElementById('opPack').value)||0);
-    PRICING.packagingTier=Math.max(1,parseFloat(document.getElementById('opPackTier').value)||5);
-    PRICING.margin=Math.max(0,(parseFloat(document.getElementById('opMargin').value)||0)/100);
-    PRICING.timeBuffer=1+Math.max(0,(parseFloat(document.getElementById('opBuffer').value)||0)/100);
-    PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('opEngSpeed').value)||8000);
-    PRICING.engraveSpacing=Math.max(0.01,parseFloat(document.getElementById('opEngSpacing').value)||0.1);
-    savePricing(); refreshPricingUI();
-    st.style.color='var(--success)'; st.textContent='✅ Zapisano ustawienia — wycena zaktualizowana.';
-    return true;
   }
-  const _cfgBtn=document.getElementById('pricingCfgBtn');
-  if(_cfgBtn) _cfgBtn.addEventListener('click',openPricing);
-  document.getElementById('opAddMat').addEventListener('click',()=>{
-    document.getElementById('opMaterials').appendChild(opMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
-  });
-  document.getElementById('opSave').addEventListener('click',()=>collectAndSavePricing());
-  document.getElementById('opRestore').addEventListener('click',()=>{
-    if(!confirm('Przywrócić domyślny cennik i parametry? Twoje zmiany zostaną nadpisane.')) return;
-    PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
-    renderOpMaterials(); fillOpParams(); refreshPricingUI();
-    const st=document.getElementById('opStatus'); st.style.color='var(--success)'; st.textContent='↺ Przywrócono wartości domyślne.';
-  });
-  document.getElementById('modalPricingClose').addEventListener('click',()=>modalPricing.classList.remove('open'));
-  modalPricing.addEventListener('click',e=>{ if(e.target===modalPricing) modalPricing.classList.remove('open'); });
-  // Panel operatora widoczny tylko w aplikacji desktop (lub ?admin=1 do testów w przeglądarce)
+  // Główny render ceny: karta w zakładce (cena/szt + razem + rozbicie) ORAZ widget na żywo
+  function renderQuoteAll(){
+    const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
+    const card=document.getElementById('qPriceCard');
+    const ppEl=document.getElementById('qPerPiece'), totEl=document.getElementById('qTotal'),
+          qtyEcho=document.getElementById('qQtyEcho'), brk=document.getElementById('qBreak'),
+          emptyMsg=document.getElementById('qEmptyMsg');
+    if(!hasWork){
+      if(card) card.classList.add('empty');
+      if(ppEl) ppEl.textContent='–'; if(totEl) totEl.textContent='–';
+      if(brk) brk.innerHTML=''; if(emptyMsg) emptyMsg.style.display='';
+      if(lqPrice){ lqPrice.textContent='narysuj projekt…'; lqPrice.classList.add('lq-empty'); }
+      if(lqTime) lqTime.textContent='';
+      return;
+    }
+    const q=computeQuoteFull(quoteMatSel.value);
+    if(!q) return;
+    if(card) card.classList.remove('empty');
+    if(emptyMsg) emptyMsg.style.display='none';
+    if(ppEl) ppEl.textContent=zl(q.perPiece);
+    if(qtyEcho) qtyEcho.textContent=q.qty;
+    if(totEl) totEl.textContent=zl(q.total);
+    if(brk) brk.innerHTML=
+      `<div class="br-row"><span>Materiał (${Math.round(quoteMaterialArea())} cm²)</span><b>${zl(q.materialCost)}</b></div>`
+      +`<div class="br-row"><span>Praca lasera (${formatQuoteTime(q.timeMin)} min.sek)</span><b>${zl(q.laserCost)}</b></div>`
+      +`<div class="br-row"><span>Pakowanie</span><b>${zl(q.pack)}</b></div>`
+      +`<div class="br-row"><span>Marża ${Math.round(PRICING.margin*100)}%</span><b>${zl(q.marginAmt)}</b></div>`
+      +(q.extrasSum>0?`<div class="br-row"><span>Pozycje dodatkowe</span><b>${zl(q.extrasSum)}</b></div>`:'');
+    if(lqPrice){ lqPrice.classList.remove('lq-empty'); lqPrice.textContent=zl(q.qty>1?q.total:q.perPiece); }
+    if(lqTime) lqTime.textContent='⏱ '+formatQuoteTime(q.timeMin)+' min.sek pracy lasera'+(q.qty>1?` · ${q.qty} szt.`:'');
+  }
+  // Alias zgodności (wołane z renderObjects/renderObjectEl po każdej edycji projektu)
+  function renderLiveQuote(){ renderQuoteAll(); }
+  var _lqTimer=null;
+  function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderQuoteAll,200); }
+  quoteMatSel.addEventListener('change',()=>{ lqMat.value=quoteMatSel.value; renderQuoteAll(); });
+  lqMat.addEventListener('change',()=>{ quoteMatSel.value=lqMat.value; renderQuoteAll(); });
+  qQtyInput.addEventListener('input',()=>{ quoteQty=Math.max(1,Math.round(parseFloat(qQtyInput.value)||1)); renderQuoteAll(); });
+  document.getElementById('qAddExtra').addEventListener('click',()=>{ quoteExtras.push({label:'',amount:''}); renderExtras(); });
+
+  /* ---------------- Edycja cennika aktywnego profilu (materiały + parametry) ---------------- */
+  function refreshPricingUI(){ syncMatSelectors(); renderQuoteAll(); }
+  // Operator zawsze ma dostęp do edycji (konfiguracja jest w zakładce); ?admin=1 pokazuje skrót w toolbarze
   const IS_OPERATOR = !!(window.xeoDesktop && window.xeoDesktop.isDesktop) || new URLSearchParams(location.search).has('admin');
   if(IS_OPERATOR){ const ag=document.getElementById('adminGroup'); if(ag) ag.style.display=''; }
 
-  /* ---------------- Zakładki panelu bocznego + inline edycja wyceny ---------------- */
+  /* ---------------- Zakładki panelu bocznego ---------------- */
   document.querySelectorAll('.ptab').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
@@ -4533,6 +4534,17 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(btn.dataset.ptab==='pricing') fillPqPanel();
     });
   });
+  // Aktywuje zakładkę „Wycena" (z paska narzędzi 💰 Wycena / ⚙ Cennik)
+  function activatePricingTab(openCfg){
+    const tab=document.querySelector('.ptab[data-ptab="pricing"]'); if(tab) tab.click();
+    if(openCfg){ const t=document.getElementById('qCfgToggle'), b=document.getElementById('qCfgBody');
+      if(t&&b&&!b.classList.contains('open')){ b.classList.add('open'); t.classList.add('open'); } }
+  }
+  const _quoteBtn=document.getElementById('quoteBtn');
+  if(_quoteBtn) _quoteBtn.addEventListener('click',()=>activatePricingTab(false));
+  const _cfgBtn=document.getElementById('pricingCfgBtn');
+  if(_cfgBtn) _cfgBtn.addEventListener('click',()=>activatePricingTab(true));
+
   function pqMatRow(key,m){
     const row=document.createElement('div');
     row.className='pq-mat-row'; row.dataset.key=key;
@@ -4589,11 +4601,75 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   });
   document.getElementById('pqSave').addEventListener('click',collectPqAndSave);
   document.getElementById('pqRestore').addEventListener('click',()=>{
-    if(!confirm('Przywrócić domyślny cennik i parametry?')) return;
+    if(!confirm('Przywrócić domyślny cennik i parametry w tym profilu?')) return;
     PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
     fillPqPanel(); refreshPricingUI();
     const st=document.getElementById('pqStatus'); st.style.color='var(--success)'; st.textContent='↺ Przywrócono domyślne.';
   });
+
+  /* ---------------- Profile wyceny: wybór, tworzenie, nazwa, powielanie, usuwanie ---------------- */
+  const qProfileSel=document.getElementById('qProfile');
+  function renderProfileSelect(){
+    if(!qProfileSel) return;
+    qProfileSel.innerHTML=PROFILES.profiles.map(p=>`<option value="${p.id}">${String(p.name||'Profil').replace(/</g,'&lt;')}</option>`).join('');
+    qProfileSel.value=PROFILES.activeId;
+    const delBtn=document.getElementById('qProfDel'); if(delBtn) delBtn.disabled=PROFILES.profiles.length<=1;
+  }
+  // Przełącza aktywny profil i odświeża cały interfejs wyceny.
+  function switchProfile(id){
+    if(!PROFILES.profiles.some(p=>p.id===id)) return;
+    PROFILES.activeId=id; PRICING=activeProfile().config; saveProfiles();
+    renderProfileSelect(); syncMatSelectors(); fillPqPanel(); renderQuoteAll();
+  }
+  function addProfile(name,cfg){
+    const id=newProfId();
+    PROFILES.profiles.push({id, name, config:cfg});
+    PROFILES.activeId=id; PRICING=activeProfile().config; saveProfiles();
+    renderProfileSelect(); syncMatSelectors(); fillPqPanel(); renderQuoteAll();
+  }
+  if(qProfileSel) qProfileSel.addEventListener('change',()=>switchProfile(qProfileSel.value));
+  const _pNew=document.getElementById('qProfNew');
+  if(_pNew) _pNew.addEventListener('click',()=>{
+    const name=(prompt('Nazwa nowego profilu:','Nowy profil')||'').trim(); if(!name) return;
+    addProfile(name, JSON.parse(JSON.stringify(QUOTE_DEFAULTS)));
+  });
+  const _pDup=document.getElementById('qProfDup');
+  if(_pDup) _pDup.addEventListener('click',()=>{
+    const cur=activeProfile(); if(!cur) return;
+    const name=(prompt('Nazwa kopii profilu:',cur.name+' (kopia)')||'').trim(); if(!name) return;
+    addProfile(name, JSON.parse(JSON.stringify(cur.config)));
+  });
+  const _pRen=document.getElementById('qProfRename');
+  if(_pRen) _pRen.addEventListener('click',()=>{
+    const cur=activeProfile(); if(!cur) return;
+    const name=(prompt('Nowa nazwa profilu:',cur.name)||'').trim(); if(!name) return;
+    cur.name=name; saveProfiles(); renderProfileSelect();
+  });
+  const _pDel=document.getElementById('qProfDel');
+  if(_pDel) _pDel.addEventListener('click',()=>{
+    if(PROFILES.profiles.length<=1){ alert('To jedyny profil — nie można go usunąć.'); return; }
+    const cur=activeProfile(); if(!cur) return;
+    if(!confirm('Usunąć profil „'+cur.name+'"?')) return;
+    PROFILES.profiles=PROFILES.profiles.filter(p=>p.id!==cur.id);
+    PROFILES.activeId=PROFILES.profiles[0].id; PRICING=activeProfile().config; saveProfiles();
+    renderProfileSelect(); syncMatSelectors(); fillPqPanel(); renderQuoteAll();
+  });
+
+  /* ---- Zwijana sekcja edycji cennika ---- */
+  const qCfgToggle=document.getElementById('qCfgToggle');
+  if(qCfgToggle) qCfgToggle.addEventListener('click',()=>{
+    const b=document.getElementById('qCfgBody'); if(!b) return;
+    const open=!b.classList.contains('open');
+    b.classList.toggle('open',open); qCfgToggle.classList.toggle('open',open);
+  });
+
+  /* ---- Inicjalizacja wyceny ---- */
+  renderProfileSelect();
+  syncMatSelectors();
+  renderExtras();
+  if(qQtyInput) qQtyInput.value=quoteQty;
+  fillPqPanel();
+  renderQuoteAll();
 
   /* ---------------- Manager warstw 3D ---------------- */
   function renderDepthLegend(){
@@ -5180,9 +5256,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!hasWork) return null;
     const matKey=quoteMatSel.value;
     const mat=PRICING.materials[matKey];
+    const qf=computeQuoteFull(matKey);
     const price=computeQuote(matKey);
     const timeMin=quoteTimeMin(mat);
     const areaCm2=quoteMaterialArea();
+    const extrasList=quoteExtras.filter(e=>(e.label||'').trim()||parseFloat(e.amount)).map(e=>({label:(e.label||'').trim()||'Pozycja', amount:+(parseFloat(e.amount)||0).toFixed(2)}));
     const svgStr=buildExportSvgString();
     const prevStr=buildPreviewSvgString();
     let size=1000, projImg=await svgToJpeg(svgStr,size), vizImg=await svgToJpeg(prevStr,size);
@@ -5195,7 +5273,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(projImg.length+(vizImg?vizImg.length:0)+svgStr.length>LIMIT){ svgOut=null; note='(bardzo duży projekt: plik SVG nie zmieścił się w wiadomości — poproś klienta o eksport)'; }
     return {
       svgFile:svgOut, projImg, vizImg, note,
-      quote:{ material:mat.label, price:+price.toFixed(2), timeMin:formatQuoteTime(timeMin), areaCm2:+areaCm2.toFixed(1) }
+      quote:{ material:mat.label, price:+price.toFixed(2), perPiece:+(qf?qf.perPiece:price).toFixed(2), qty:qf?qf.qty:1, extras:extrasList, timeMin:formatQuoteTime(timeMin), areaCm2:+areaCm2.toFixed(1) }
     };
   }
   window.XEO_BUILD_QUOTE_PAYLOAD=buildQuotePayload;
@@ -7303,7 +7381,9 @@ submitBtn.addEventListener('click', async ()=>{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
     if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
     const q=payload.quote;
-    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}\nCena: ${q.price.toFixed(2).replace('.',',')} zł\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
+    const exTxt=(q.extras&&q.extras.length)?'\nPozycje dodatkowe: '+q.extras.map(e=>`${e.label} ${e.amount.toFixed(2).replace('.',',')} zł`).join(', '):'';
+    const qtyTxt=(q.qty&&q.qty>1)?`\nIlość: ${q.qty} szt. (cena/szt.: ${(q.perPiece||0).toFixed(2).replace('.',',')} zł)`:'';
+    const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}${qtyTxt}\nCena${q.qty>1?' razem':''}: ${q.price.toFixed(2).replace('.',',')} zł${exTxt}\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
     setStatus('Wysyłam do pracowni…');
     const db=await ensureDb();
     await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
