@@ -15,3 +15,8 @@ _test_*.lbrn2
 
 # Artefakty testów
 test-results/
+
+# Node (zależności testowe)
+node_modules/
+package.json
+package-lock.json
