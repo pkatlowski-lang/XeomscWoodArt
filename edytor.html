@@ -6315,6 +6315,45 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  function drawDeerSilhouette(ctx, x, gy, h, facing){
+    const f=facing||1, u=h/120;
+    ctx.beginPath(); ctx.ellipse(x,gy-h*0.45,h*0.28,h*0.16,f*0.06,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.translate(x-f*h*0.24,gy-h*0.6); ctx.rotate(f*-0.35);
+    ctx.beginPath(); ctx.ellipse(0,0,h*0.08,h*0.18,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(x-f*h*0.36,gy-h*0.78,h*0.085,0,Math.PI*2); ctx.fill();
+    ctx.lineWidth=h*0.032; ctx.lineCap='round'; ctx.strokeStyle='#000';
+    ctx.beginPath(); ctx.moveTo(x-f*h*0.28,gy-h*0.64); ctx.lineTo(x-f*h*0.34,gy-h*0.72); ctx.stroke();
+    ctx.lineWidth=h*0.03;
+    ctx.beginPath(); ctx.moveTo(x-h*0.18,gy); ctx.lineTo(x-h*0.16,gy-h*0.36); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-h*0.06,gy); ctx.lineTo(x-h*0.04,gy-h*0.32); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+h*0.08,gy); ctx.lineTo(x+h*0.06,gy-h*0.32); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+h*0.20,gy); ctx.lineTo(x+h*0.18,gy-h*0.36); ctx.stroke();
+    ctx.lineWidth=h*0.024;
+    const a=(sx,sy,pts)=>{ ctx.beginPath(); ctx.moveTo(sx,sy);
+      for(const p of pts) ctx.lineTo(p[0],p[1]); ctx.stroke(); };
+    a(x-f*h*0.40,gy-h*0.84,[[x-f*h*0.44,gy-h*0.96],[x-f*h*0.46,gy-h*1.08]]);
+    a(x-f*h*0.44,gy-h*0.96,[[x-f*h*0.38,gy-h*1.02]]);
+    a(x-f*h*0.32,gy-h*0.84,[[x-f*h*0.28,gy-h*0.98],[x-f*h*0.24,gy-h*1.1]]);
+    a(x-f*h*0.28,gy-h*0.98,[[x-f*h*0.34,gy-h*1.04]]);
+  }
+  function drawDeerCircleScene(ctx, W, H, opt){
+    opt=opt||{};
+    const cx=W/2, cy=H/2, R=Math.min(W,H)/2-4, r=R-(opt.band||26);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#000';
+    const gy=cy+r*0.52;
+    ctx.beginPath(); ctx.moveTo(cx-R,gy+r*0.04);
+    ctx.quadraticCurveTo(cx,gy-r*0.14,cx+R,gy+r*0.06);
+    ctx.lineTo(cx+R,cy+R); ctx.lineTo(cx-R,cy+R); ctx.closePath(); ctx.fill();
+    drawPine(ctx,cx-r*0.6,gy-r*0.02,r*0.46,r*0.16);
+    drawPine(ctx,cx-r*0.36,gy-r*0.04,r*0.72,r*0.2);
+    drawDeerSilhouette(ctx,cx+r*0.16,gy-r*0.02,r*0.7,1);
+    drawPine(ctx,cx+r*0.62,gy,r*0.5,r*0.15);
+    ctx.restore();
+  }
+
   // Sylwetka postaci (filled) — type: 'man' | 'woman' | 'child'. Stoi na linii gy, wysokość H.
   // Złożona z nachodzących części (głowa, tułów/sukienka, nogi, ręce) — Canvas scala je,
   // a tracer da jeden czysty obrys.
@@ -6379,6 +6418,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.5,minArea:60})},
       {id:'mo_forest_circle', label:'Las w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.4,minArea:60})},
+      {id:'mo_deer_circle', label:'Jeleń w lesie', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>drawDeerCircleScene(ctx,W,H,{}),660,660,{ss:1.8,tol:1.4,minArea:40})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:7,trunk:0.22,width:0.055,spread:0.72,up:0.18,curve:0.42,foliage:false,minW:3.8}),520,600,{ss:2,tol:1.2,minArea:80})},
       {id:'mo_family', label:'Rodzina', fillRule:'evenodd',
@@ -6560,6 +6601,68 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.beginPath(); ctx.moveTo(114*u,82*u); ctx.lineTo(136*u,78*u); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(114*u,84*u); ctx.lineTo(138*u,84*u); ctx.stroke();
         },200,180,{ss:2,tol:0.9,minArea:12,smoothIter:1})},
+      {id:'mo_mandala', label:'Mandala', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,u=W/300;
+          ctx.beginPath(); ctx.arc(cx,cy,140*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,128*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          for(let i=0;i<12;i++){ const a=i/12*Math.PI*2; ctx.save(); ctx.translate(cx,cy); ctx.rotate(a);
+            ctx.beginPath(); ctx.ellipse(0,-102*u,14*u,28*u,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+          ctx.beginPath(); ctx.arc(cx,cy,78*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,66*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+Math.PI/8; ctx.save(); ctx.translate(cx,cy); ctx.rotate(a);
+            ctx.beginPath(); ctx.ellipse(0,-48*u,10*u,20*u,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+          ctx.beginPath(); ctx.arc(cx,cy,30*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,16*u,0,Math.PI*2); ctx.fill();
+        },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:2})},
+      {id:'mo_house', label:'Domek', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.beginPath(); ctx.moveTo(100*u,20*u); ctx.lineTo(180*u,80*u); ctx.lineTo(180*u,170*u);
+          ctx.lineTo(20*u,170*u); ctx.lineTo(20*u,80*u); ctx.closePath(); ctx.fill();
+          ctx.fillStyle='#fff';
+          ctx.fillRect(46*u,96*u,32*u,38*u);
+          ctx.fillRect(122*u,96*u,32*u,38*u);
+          ctx.fillStyle='#000';
+          ctx.fillRect(54*u,96*u,2*u,38*u); ctx.fillRect(46*u,112*u,32*u,2*u);
+          ctx.fillRect(130*u,96*u,2*u,38*u); ctx.fillRect(122*u,112*u,32*u,2*u);
+          ctx.fillStyle='#fff';
+          ctx.fillRect(82*u,118*u,36*u,52*u);
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(112*u,144*u,3*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          ctx.beginPath(); ctx.moveTo(100*u,4*u); ctx.lineTo(196*u,76*u); ctx.lineTo(188*u,76*u);
+          ctx.lineTo(100*u,12*u); ctx.lineTo(12*u,76*u); ctx.lineTo(4*u,76*u); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(156*u,44*u); ctx.lineTo(172*u,44*u); ctx.lineTo(172*u,64*u); ctx.lineTo(156*u,52*u); ctx.closePath(); ctx.fill();
+        },200,180,{ss:2,tol:1.0,minArea:15,smoothIter:0})},
+      {id:'mo_anchor', label:'Kotwica', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200, cx=100*u;
+          ctx.lineWidth=7*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(cx,30*u); ctx.lineTo(cx,168*u); ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx,168*u,50*u,Math.PI,0,true); ctx.stroke();
+          ctx.lineWidth=5*u;
+          ctx.beginPath(); ctx.moveTo(64*u,58*u); ctx.lineTo(136*u,58*u); ctx.stroke();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,24*u,14*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,24*u,7*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          const arr=(x,y,a)=>{ ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+            ctx.beginPath(); ctx.moveTo(0,-12*u); ctx.lineTo(14*u,0); ctx.lineTo(0,12*u); ctx.closePath(); ctx.fill(); ctx.restore(); };
+          arr(50*u,168*u,-Math.PI/2);
+          arr(150*u,168*u,Math.PI/2);
+        },200,200,{ss:2,tol:1.0,minArea:15,smoothIter:1})},
+      {id:'mo_snowflake', label:'Śnieżynka', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,R=W*0.42,n=6;
+          ctx.lineWidth=W*0.025; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          for(let i=0;i<n;i++){ const a=i/n*Math.PI*2-Math.PI/2;
+            const ex=cx+Math.cos(a)*R, ey=cy+Math.sin(a)*R;
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ex,ey); ctx.stroke();
+            for(let j=1;j<=2;j++){ const f=j*0.36, bL=R*0.3;
+              const mx=cx+Math.cos(a)*R*f, my=cy+Math.sin(a)*R*f;
+              for(const s of[-1,1]){ const ba=a+s*Math.PI/3.5;
+                ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(mx+Math.cos(ba)*bL,my+Math.sin(ba)*bL); ctx.stroke(); }}
+            ctx.beginPath(); ctx.arc(ex,ey,W*0.02,0,Math.PI*2); ctx.fill();
+          }
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,W*0.04,0,Math.PI*2); ctx.fill();
+        },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
