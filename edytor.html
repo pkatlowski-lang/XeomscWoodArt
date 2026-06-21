@@ -94,16 +94,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6)}
 .ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0}
 .ptab-body.active{display:flex}
-/* Wycena inline */
-.pq-sec{padding:10px 14px 12px}
+/* Wycena inline — każda sekcja jako wyraźna karta */
+.pq-sec{padding:12px 13px;margin:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px}
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
-.pq-h{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px;display:flex;align-items:center;gap:5px}
+.pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border)}
 .pq-mat-head{display:grid;grid-template-columns:1fr 24px;gap:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;padding:0 1px}
-.pq-mat-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;background:rgba(15,23,42,.5);position:relative}
+.pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:9px;background:var(--bg-2);position:relative}
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center}
-.pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
-.pq-mat-row .pq-row-nums label{font-size:.58rem;color:var(--muted);display:flex;flex-direction:column;gap:1px}
-.pq-mat-row input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:5px 5px;font-size:.74rem;outline:none;box-sizing:border-box}
+.pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.pq-mat-row .pq-row-nums label{font-size:.58rem;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.pq-mat-row input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px;font-size:.74rem;outline:none;box-sizing:border-box}
 .pq-mat-row input:focus{border-color:var(--accent)}
 .pq-del{width:28px;height:28px;background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.35);color:var(--danger);border-radius:5px;cursor:pointer;font-size:.72rem;padding:0;display:flex;align-items:center;justify-content:center}
 .pq-del:hover{background:rgba(255,90,90,.25)}
@@ -143,6 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-extra-row input:focus{border-color:var(--accent)}
 .q-cfg-toggle{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:6px}
 .q-cfg-toggle:hover{color:var(--text)}
+.q-cfg-toggle.open{color:var(--accent);background:rgba(var(--accent-rgb),.06)}
 .q-cfg-toggle .chev{transition:transform .15s;display:inline-block}
 .q-cfg-toggle.open .chev{transform:rotate(90deg)}
 .q-cfg-body{display:none}
@@ -177,7 +178,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .text-toolbar select,.text-toolbar input[type=number]{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.78rem;padding:5px 6px}
 .text-toolbar select{max-width:150px}
 .text-toolbar input[type=number]{width:58px}
-.text-toolbar label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase}
+.text-toolbar label{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .text-toolbar .tbtn{height:30px;min-width:30px;padding:0 9px}
 .tt-sep{width:1px;height:22px;background:var(--border)}
 
@@ -231,7 +232,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field label{display:block;font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
 .field .row2{display:flex;gap:8px}
 .field input[type=number],.field input[type=text],.field select,.field textarea{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;transition:border-color .14s,box-shadow .14s}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.3),inset 0 0 0 1px rgba(var(--accent-rgb),.4)}
 #props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:rgba(255,255,255,.06);margin-top:2px;opacity:.55;transition:opacity .15s,border-color .12s}
 #props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
 #props fieldset:disabled{opacity:.5}
@@ -250,7 +251,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .seg button.score.on{background:var(--score);border-color:var(--score);color:#fff}
 .empty-note{padding:12px 16px 20px;font-size:.8rem;color:var(--muted);line-height:1.7}
 .flex-label{display:flex;align-items:center;gap:4px}
-.info-box{padding:9px 13px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.35);border-radius:8px}
+.info-box{padding:10px 13px;background:rgba(var(--accent-rgb),.13);border:1px solid rgba(var(--accent-rgb),.4);border-radius:9px}
 .muted-sm{font-size:.75rem;color:var(--muted);line-height:1.55}
 
 /* ---- Warstwy ---- */
@@ -258,8 +259,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer-search:focus{outline:none;border-color:var(--accent)}
 .layers{display:flex;flex-direction:column;gap:2px;padding:0 10px 14px}
 .layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:7px;border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background .1s,border-color .1s}
-.layer:hover{background:rgba(255,255,255,.04)}
-.layer.sel{border-color:var(--accent);border-left-color:var(--accent)}
+.layer:hover{background:var(--surface3);border-color:var(--border-strong)}
+.layer.sel{border-color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),.08)}
 .layer.lyr-cut{border-left-color:var(--cut-light)}
 .layer.lyr-cut.sel{border-color:var(--accent);border-left-color:var(--cut-light)}
 .layer.lyr-score{border-left-color:var(--score-light)}
@@ -337,7 +338,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu button:hover:not(:disabled) .ctx-key{color:var(--accent-text);opacity:.7}
 .ctx-menu button:disabled{opacity:.4;cursor:not-allowed}
 .ctx-key{font-size:.7rem;color:var(--muted)}
-.ctx-menu hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
+.ctx-menu hr{border:none;border-top:1px solid var(--border);margin:6px 8px;opacity:.7}
 
 /* ---- Modal eksportu 3D ---- */
 /* visibility:hidden po zakończeniu animacji znikania — usuwa zamknięte modale (i ich pola
@@ -391,7 +392,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote select{padding:3px 5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.72rem;max-width:120px}
 .live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
-.live-quote .lq-time{font-size:.72rem;color:var(--muted)}
+.live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:32px;font-size:.76rem}
 
 /* ---- Skróty klawiszowe (modal) ---- */
@@ -432,7 +433,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .bb-head{display:flex;align-items:center;gap:6px;padding:8px 11px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));overflow:hidden}
 .bb-head>span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1}
 .bb-spacer{flex:0;min-width:0}
-.bb-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:var(--r-sm);cursor:pointer;transition:border-color .14s,color .14s,background .14s}
+.bb-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.72rem;font-weight:600;height:30px;padding:0 11px;display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-sm);cursor:pointer;transition:border-color .14s,color .14s,background .14s;white-space:nowrap}
 .bb-btn:hover{border-color:var(--border-strong);background:var(--surface3);color:#fff}
 .bb-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
 .zoom-badge{font-size:.7rem;font-weight:700;color:var(--muted);background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;min-width:42px;text-align:center}
@@ -449,19 +450,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 
 .legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:13px;height:13px;border-radius:3px;display:inline-block}
+.legend i{width:16px;height:16px;border-radius:4px;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .li-cut{background:none;border:2px solid var(--cut)} .li-eng{background:var(--engrave);border:1px solid #666} .li-sco{background:none;border:2px dashed var(--score)}
 
 /* ---- Manager warstw 3D ---- */
 .depth-legend{display:flex;flex-direction:column;gap:4px;padding:4px 14px 8px}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
 .lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:7px;background:var(--surface2);transition:background .1s,border-color .1s}
-.lyr-row:hover{background:rgba(255,255,255,.04)}
-.lyr-row.on{border-color:var(--accent)}
+.lyr-row:hover{background:var(--surface3);border-color:var(--border-strong)}
+.lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08)}
 .lyr-row.lyr-hidden{opacity:.45}
 .lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;flex:0 0 auto;transition:filter .1s}
 .lyr-pick:hover{filter:brightness(1.25)}
-.lyr-cnt{font-size:.66rem;color:var(--muted);flex:1;white-space:nowrap}
+.lyr-cnt{font-size:.64rem;color:var(--muted);flex:0 0 auto;min-width:38px;white-space:nowrap;background:rgba(255,255,255,.05);padding:2px 6px;border-radius:5px;text-align:center}
 .lyr-mat{width:88px;flex:0 0 88px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.68rem;font-family:inherit}
 .lyr-mm{width:46px;flex:0 0 46px;padding:3px 4px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.72rem;font-family:inherit;text-align:center}
 .lyr-unit{font-size:.64rem;color:var(--muted);flex-shrink:0}
@@ -557,6 +558,9 @@ input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(
 input[type=checkbox],input[type=radio]{accent-color:var(--accent);cursor:pointer}
 /* --- Wspólny pierścień fokusu dla wszystkich pól tekstowych/liczbowych/list --- */
 input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
+/* --- Spójny przycisk „akcji dodawania" (dashed akcent) w całej aplikacji --- */
+.add-action{background:rgba(var(--accent-rgb),.06)!important;border:1.5px dashed rgba(var(--accent-rgb),.45)!important;color:var(--accent)!important;font-weight:700}
+.add-action:hover{background:rgba(var(--accent-rgb),.12)!important;border-color:var(--accent)!important;color:#fff!important;box-shadow:none!important;transform:none}
 </style>
 </head>
 <body>
@@ -649,7 +653,7 @@ input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-vis
         <div class="tpl" id="templates"></div>
         <h2>Galeria baz podstawowych</h2>
         <div class="gallery" id="gallery"></div>
-        <label class="tbtn gallery-upload-btn" title="Wrzuć własny kształt SVG jako bazę">
+        <label class="tbtn gallery-upload-btn add-action" title="Wrzuć własny kształt SVG jako bazę">
           📤 Wrzuć własną bazę (SVG)
           <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
         </label>
@@ -683,7 +687,7 @@ input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-vis
         </div>
         <h2>Parametry globalne</h2>
         <div class="params" id="params"></div>
-        <button type="button" class="tbtn addparam" id="addParamBtn">+ Dodaj parametr</button>
+        <button type="button" class="tbtn addparam add-action" id="addParamBtn">+ Dodaj parametr</button>
       </div><!-- /ptab-body sheet -->
 
       <!-- ZAKŁADKA: WARSTWY — głębokość 3D i kolejność elementów -->
@@ -733,7 +737,7 @@ input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-vis
           <div class="pq-h">➕ Pozycje dodatkowe</div>
           <p class="pq-help">Ręczne dopłaty doliczane do ceny każdej sztuki (np. „Malowanie", „Personalizacja"). Doliczane po marży.</p>
           <div id="qExtras"></div>
-          <button type="button" class="tbtn" style="width:100%;font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
+          <button type="button" class="tbtn add-action" style="width:100%;font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
         </div>
         <!-- KONFIGURACJA CENNIKA: edycja materiałów i parametrów aktywnego profilu (zwijana) -->
         <button type="button" class="q-cfg-toggle" id="qCfgToggle"><span class="chev">▸</span> ⚙ Cennik i parametry (edycja profilu)</button>
@@ -742,7 +746,7 @@ input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-vis
             <div class="pq-h">📦 Materiały</div>
             <p class="pq-help">Dla każdego materiału: nazwa, grubość (mm), koszt za 1&nbsp;cm² oraz prędkość cięcia (mm/min).</p>
             <div id="pqMaterials"></div>
-            <button type="button" class="tbtn" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
+            <button type="button" class="tbtn add-action" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
           </div>
           <div class="pq-sec">
             <div class="pq-h">⚙ Parametry</div>
@@ -4893,7 +4897,7 @@ input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-vis
       const hidden=state.hiddenDepths.includes(dep);
       const cnt=state.objects.filter(o=>(o.depth||1)===dep).length;
       const sel=selDepths.has(dep)?' on':'';
-      const matOptions=`<option value="">Materiał…</option>`
+      const matOptions=`<option value="">Wybierz materiał…</option>`
         +MATERIAL_PRESETS.map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')
         +(loadCustomMaterials().length?`<optgroup label="Własne">${loadCustomMaterials().map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')}</optgroup>`:'')
         +`<option value="__manage__">⚙ Zarządzaj materiałami…</option>`;
