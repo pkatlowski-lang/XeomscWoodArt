@@ -6958,7 +6958,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.fillStyle='#000'; ctx.fillRect(70*u,188*u,108*u,5*u);                                 // grunt
         },200,200,{ss:2,tol:0.9,minArea:14,smoothIter:1})},
       {id:'mo_monstera', label:'Liść monstera', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=92*u;
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=90*u;
           // sercowaty kontur liścia
           ctx.beginPath();
           ctx.moveTo(cx,12*u);
@@ -6970,19 +6970,25 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.bezierCurveTo(50*u,168*u,16*u,140*u,16*u,98*u);
           ctx.bezierCurveTo(16*u,52*u,50*u,18*u,cx,12*u);
           ctx.closePath(); ctx.fill();
-          // charakterystyczne rozcięcia monstery = otwory
+          // rozcięcia promieniujące od nerwu ku brzegom = otwory (klin zwężający się na zewnątrz)
           ctx.fillStyle='#fff';
-          const slit=(side,y,len,ww)=>{ ctx.save(); ctx.translate(cx,cy);
+          const slit=(side,y,len,inner)=>{ const ang=side>0?-0.32:Math.PI+0.32;
+            const dx=Math.cos(ang), dy=-0.18;
             ctx.beginPath();
-            ctx.ellipse(side*len*0.5, y, len*0.5, ww, side*0.15,0,Math.PI*2); ctx.fill();
-            ctx.restore(); };
-          for(let i=0;i<4;i++){ const y=-40*u+i*30*u, len=(58-i*6)*u;
-            slit(1,y,len,5*u); slit(-1,y,len,5*u); }
-          // dziurki
-          ctx.beginPath(); ctx.ellipse(cx+44*u,cy-10*u,7*u,4*u,0.3,0,Math.PI*2); ctx.fill();
-          ctx.beginPath(); ctx.ellipse(cx-44*u,cy+20*u,7*u,4*u,-0.3,0,Math.PI*2); ctx.fill();
+            ctx.moveTo(cx+side*inner, y-7*u);
+            ctx.lineTo(cx+side*(inner+len), y+side*len*0.18-2*u);
+            ctx.lineTo(cx+side*(inner+len), y+side*len*0.18+2*u);
+            ctx.lineTo(cx+side*inner, y+7*u);
+            ctx.closePath(); ctx.fill(); };
+          for(let i=0;i<5;i++){ const y=(40+i*26)*u, len=(54-i*7)*u;
+            slit(1,y,len,9*u); slit(-1,y,len,9*u); }
+          // górne krótsze rozcięcia
+          slit(1,28*u,30*u,9*u); slit(-1,28*u,30*u,9*u);
+          // środkowy nerw (cienki otwór)
+          ctx.lineWidth=2.4*u; ctx.lineCap='round'; ctx.strokeStyle='#fff';
+          ctx.beginPath(); ctx.moveTo(cx,24*u); ctx.lineTo(cx,168*u); ctx.stroke();
           // ogonek
-          ctx.fillStyle='#000'; ctx.lineWidth=5*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.fillStyle='#000'; ctx.lineWidth=5*u; ctx.strokeStyle='#000';
           ctx.beginPath(); ctx.moveTo(cx,170*u); ctx.lineTo(cx,200*u); ctx.stroke();
         },200,206,{ss:2,tol:1.0,minArea:10,smoothIter:2})},
       {id:'mo_xmas_tree', label:'Choinka', fillRule:'evenodd',
