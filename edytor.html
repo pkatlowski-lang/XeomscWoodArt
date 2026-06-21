@@ -6544,30 +6544,33 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.fillStyle='#fff'; heart(100*u,110*u,36*u);
         },200,200,{ss:2,tol:1.0,minArea:15,smoothIter:2})},
       {id:'mo_rose', label:'Róża', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=80*u;
-          const petal=(a,d,rx,ry)=>{ ctx.save(); ctx.translate(cx,cy); ctx.rotate(a);
-            ctx.beginPath(); ctx.ellipse(0,-d*u,rx*u,ry*u,0,0,Math.PI*2); ctx.fill(); ctx.restore(); };
-          for(let i=0;i<6;i++) petal(i/6*Math.PI*2,46,28,18);
-          ctx.fillStyle='#fff';
-          for(let i=0;i<6;i++) petal(i/6*Math.PI*2,48,18,10);
-          ctx.fillStyle='#000';
-          for(let i=0;i<5;i++) petal(i/5*Math.PI*2+0.32,28,18,12);
-          ctx.fillStyle='#fff';
-          for(let i=0;i<5;i++) petal(i/5*Math.PI*2+0.32,30,10,6);
-          ctx.fillStyle='#000';
-          ctx.beginPath(); ctx.arc(cx,cy,12*u,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,5*u,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='#000';
-          ctx.lineWidth=5.5*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
-          ctx.beginPath(); ctx.moveTo(cx,cy+46*u);
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=82*u,R=66*u;
+          // pełny dysk kwiatu (zewnętrzne płatki obejmują całość → jeden kształt)
+          ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+          // zewnętrzny wieniec płatków — wcięcia między płatkami jako otwory
+          ctx.fillStyle='#fff'; ctx.lineWidth=2.6*u; ctx.lineCap='round'; ctx.strokeStyle='#fff';
+          for(let i=0;i<8;i++){ const a=i/8*Math.PI*2;
+            ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R);
+            ctx.lineTo(cx+Math.cos(a)*R*0.5, cy+Math.sin(a)*R*0.5); ctx.stroke(); }
+          // spirala środka róży (klasyczny zwój) jako linia-otwór
+          ctx.lineWidth=2.8*u; ctx.beginPath();
+          let first=true;
+          for(let t=0;t<=Math.PI*4.2;t+=0.12){ const rr=R*0.52*(1-t/(Math.PI*4.6));
+            const x=cx+Math.cos(t)*rr, y=cy+Math.sin(t)*rr;
+            if(first){ ctx.moveTo(x,y); first=false; } else ctx.lineTo(x,y); }
+          ctx.stroke();
+          // łodyga + listki
+          ctx.fillStyle='#000'; ctx.strokeStyle='#000';
+          ctx.lineWidth=5.5*u; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(cx,cy+R*0.92);
           ctx.bezierCurveTo(cx+5*u,cy+70*u,cx-8*u,cy+100*u,cx,cy+126*u); ctx.stroke();
           ctx.lineWidth=3.5*u;
           ctx.beginPath(); ctx.moveTo(cx-3*u,cy+82*u);
           ctx.bezierCurveTo(cx-22*u,cy+68*u,cx-38*u,cy+72*u,cx-44*u,cy+64*u); ctx.stroke();
-          ctx.beginPath(); ctx.ellipse(cx-46*u,cy+60*u,11*u,6*u,-0.5,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(cx-46*u,cy+60*u,12*u,6.5*u,-0.5,0,Math.PI*2); ctx.fill();
           ctx.beginPath(); ctx.moveTo(cx+3*u,cy+98*u);
           ctx.bezierCurveTo(cx+20*u,cy+86*u,cx+36*u,cy+88*u,cx+42*u,cy+80*u); ctx.stroke();
-          ctx.beginPath(); ctx.ellipse(cx+44*u,cy+76*u,11*u,6*u,0.5,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(cx+44*u,cy+76*u,12*u,6.5*u,0.5,0,Math.PI*2); ctx.fill();
         },200,220,{ss:2,tol:1.0,minArea:12,smoothIter:2})},
       {id:'mo_cat', label:'Kot', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
@@ -6725,19 +6728,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       {id:'mo_fish', label:'Rybka', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=H/2;
           ctx.beginPath();
-          ctx.moveTo(170*u,cy); ctx.bezierCurveTo(170*u,cy-36*u,136*u,cy-46*u,90*u,cy-42*u);
+          ctx.moveTo(168*u,cy); ctx.bezierCurveTo(168*u,cy-36*u,136*u,cy-46*u,90*u,cy-42*u);
           ctx.bezierCurveTo(50*u,cy-38*u,26*u,cy-26*u,26*u,cy);
           ctx.bezierCurveTo(26*u,cy+26*u,50*u,cy+38*u,90*u,cy+42*u);
-          ctx.bezierCurveTo(136*u,cy+46*u,170*u,cy+36*u,170*u,cy); ctx.closePath(); ctx.fill();
-          ctx.beginPath(); ctx.moveTo(170*u,cy); ctx.lineTo(196*u,cy-28*u);
-          ctx.lineTo(196*u,cy+28*u); ctx.closePath(); ctx.fill();
+          ctx.bezierCurveTo(136*u,cy+46*u,168*u,cy+36*u,168*u,cy); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(150*u,cy-18*u); ctx.lineTo(196*u,cy-30*u);
+          ctx.lineTo(190*u,cy); ctx.lineTo(196*u,cy+30*u); ctx.lineTo(150*u,cy+18*u);
+          ctx.closePath(); ctx.fill();
           ctx.fillStyle='#fff';
           ctx.beginPath(); ctx.arc(56*u,cy-8*u,7*u,0,Math.PI*2); ctx.fill();
           ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(56*u,cy-8*u,3.5*u,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='#fff'; ctx.lineWidth=2.2*u; ctx.strokeStyle='#fff';
-          const sc=[[90,0.92],[110,0.86],[128,0.78],[144,0.68],[158,0.56]];
+          ctx.fillStyle='#fff'; ctx.lineWidth=2.4*u; ctx.strokeStyle='#fff'; ctx.lineCap='round';
+          const sc=[[84,0.92],[104,0.86],[122,0.78],[138,0.68]];
           for(const [sx,s] of sc){ ctx.beginPath();
-            ctx.arc(sx*u,cy,42*u*s,Math.PI*-0.35,Math.PI*0.35); ctx.stroke(); }
+            ctx.arc(sx*u,cy,42*u*s,Math.PI*-0.32,Math.PI*0.32); ctx.stroke(); }
         },200,120,{ss:2,tol:0.9,minArea:10,smoothIter:1})},
       {id:'mo_xmas_star', label:'Gwiazdka', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,u=W/200;
