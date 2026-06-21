@@ -2120,18 +2120,35 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   }
   // Rasteryzacja zależy tylko od treści/czcionki/stylu — tsx/tsy/flip/rotation nakładane są
   // już na wynik (objBBox/textOutlinePolys), więc NIE wchodzą do klucza pamięci podręcznej.
+  // fontSize również NIE wchodzi do klucza: kontury są liczone proporcjonalnie do fs*SCALE,
+  // a potem dzielone przez SCALE, więc wynik jest LINIOWY względem fontSize. Dzięki temu
+  // skalowanie napisu uchwytem (zmiana fontSize co klatkę) trafia w cache i tylko skaluje
+  // gotowy wynik, zamiast rasteryzować od nowa (kosztowny flood-fill) na każdy ruch myszy.
   function textOutlineKey(o){
-    return [o.text||'', o.font||'', o.fontSize||24, o.bold?1:0, o.italic?1:0].join('|');
+    return [o.text||'', o.font||'', o.bold?1:0, o.italic?1:0].join('|');
   }
   function getTextRaster(o){
     const key=textOutlineKey(o);
-    let cached=_textOutlineCache.get(key);
-    if(cached===undefined){
-      cached=rasterizeTextOutlines(o);
+    let entry=_textOutlineCache.get(key);
+    if(entry===undefined){
+      const raster=rasterizeTextOutlines(o);
+      entry = raster ? {raster, fsRef:Math.max(1,o.fontSize||24), scaledFs:0, scaled:null} : null;
       if(_textOutlineCache.size>80) _textOutlineCache.clear();
-      _textOutlineCache.set(key,cached);
+      _textOutlineCache.set(key,entry);
     }
-    return cached;
+    if(!entry) return null;
+    const fs=Math.max(1,o.fontSize||24);
+    if(fs===entry.fsRef) return entry.raster;
+    if(entry.scaledFs===fs) return entry.scaled;
+    // inny rozmiar niż referencyjny → przeskaluj gotowy wynik liniowo (bez rasteryzacji)
+    const k=fs/entry.fsRef, r=entry.raster, nb=r.nb;
+    const scaled={
+      polys:r.polys.map(poly=>poly.map(([x,y])=>[x*k,y*k])),
+      nb:{minx:nb.minx*k,miny:nb.miny*k,maxx:nb.maxx*k,maxy:nb.maxy*k},
+      anchor:{x:r.anchor.x*k,y:r.anchor.y*k}
+    };
+    entry.scaledFs=fs; entry.scaled=scaled;
+    return scaled;
   }
   // Ciasny obrys atramentu napisu przy tsx=tsy=1, jako przesunięcie {offX,offY} od punktu
   // zakotwiczenia (o.x, textBaselineY(o)) oraz wymiary {width,height} — to jest "naturalna"
@@ -2882,7 +2899,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     }
   }
 
-  /* zoom via wheel — anchored to the cursor */
+  /* zoom via wheel — anchored to the cursor.
+     Matematyka widoku liczona natychmiast (poprawność kolejnych zdarzeń), ale aktualizacja
+     DOM (applyView/renderOverlay) składana do JEDNEJ na klatkę przez RAF — bez tego szybki
+     scroll kółkiem kumuluje dziesiątki synchronicznych przeliczeń i zacina widok. */
+  let _zoomRaf=null;
   canvas.addEventListener('wheel', e=>{
     e.preventDefault();
     const r=renderedRect(); const fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
@@ -2890,7 +2911,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const factor=e.deltaY<0?0.85:1/0.85;
     v.w*=factor; v.h*=factor;
     v.x=docX-fx*v.w; v.y=docY-fy*v.h;
-    applyView(); renderOverlay();
+    if(!_zoomRaf) _zoomRaf=requestAnimationFrame(()=>{ _zoomRaf=null; applyView(); renderOverlay(); });
   },{passive:false});
 
   /* ---------------- Panel właściwości ---------------- */
