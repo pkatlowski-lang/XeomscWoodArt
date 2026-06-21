@@ -6862,15 +6862,16 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.beginPath(); ctx.arc(122*u,86*u,9*u,0,Math.PI*2); ctx.fill();
           // dziób
           ctx.beginPath(); ctx.moveTo(100*u,96*u); ctx.lineTo(92*u,108*u); ctx.lineTo(108*u,108*u); ctx.closePath(); ctx.fill();
-          // skrzydła (łuki-otwory po bokach)
-          ctx.fillStyle='#fff'; ctx.lineWidth=3*u; ctx.strokeStyle='#fff'; ctx.lineCap='round';
-          for(let i=0;i<3;i++){ const off=i*14*u;
-            ctx.beginPath(); ctx.arc(56*u,130*u+off,30*u,Math.PI*-0.4,Math.PI*0.25); ctx.stroke();
-            ctx.beginPath(); ctx.arc(144*u,130*u+off,30*u,Math.PI*0.75,Math.PI*1.4); ctx.stroke(); }
-          // pierś (łuski piór)
-          for(let row=0;row<3;row++){ for(let cc=0;cc<3;cc++){
-            const px=cx+(cc-1)*22*u, py=140*u+row*20*u;
-            ctx.beginPath(); ctx.arc(px,py,9*u,0,Math.PI); ctx.stroke(); }}
+          // skrzydła (wyraźne łuki-otwory po bokach)
+          ctx.fillStyle='#fff'; ctx.lineWidth=5*u; ctx.strokeStyle='#fff'; ctx.lineCap='round';
+          for(let i=0;i<4;i++){ const off=i*18*u;
+            ctx.beginPath(); ctx.arc(48*u,124*u+off,34*u,Math.PI*-0.45,Math.PI*0.28); ctx.stroke();
+            ctx.beginPath(); ctx.arc(152*u,124*u+off,34*u,Math.PI*0.72,Math.PI*1.45); ctx.stroke(); }
+          // pierś (łuski piór — wyraźne festony)
+          ctx.lineWidth=4*u;
+          for(let row=0;row<4;row++){ const cols=row%2===0?3:2, span=row%2===0?22:22, x0=cx-(cols-1)*span/2;
+            for(let cc=0;cc<cols;cc++){ const px=x0+cc*span, py=126*u+row*17*u;
+              ctx.beginPath(); ctx.arc(px,py,11*u,Math.PI*0.08,Math.PI*0.92); ctx.stroke(); }}
           // łapy
           ctx.fillStyle='#000';
           ctx.fillRect(82*u,182*u,6*u,12*u); ctx.fillRect(112*u,182*u,6*u,12*u);
