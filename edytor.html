@@ -510,6 +510,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .op-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
 .op-save{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:var(--accent-text);font-weight:800}
 .op-status{font-size:.8rem;color:var(--success);min-height:18px;margin-top:8px;text-align:right;font-weight:600}
+/* === Menu rozwijalne (dropdown) === */
+.tspacer{flex:1 1 auto}
+.dd{position:relative}
+.dd-toggle{display:inline-flex;align-items:center;gap:4px}
+.dd-caret{font-size:.65rem;opacity:.6;transition:transform .2s}
+.dd.open .dd-caret{transform:rotate(180deg)}
+.dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:210px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r);padding:6px 0;box-shadow:var(--sh),0 0 0 1px rgba(0,0,0,.12);z-index:900;flex-direction:column}
+.dd.open .dd-menu{display:flex}
+.dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:0;padding:8px 16px;font-size:.82rem;background:transparent;color:var(--text)}
+.dd-menu .tbtn:hover{background:var(--surface3)}
+.dd-menu .tbtn.cfgbtn{background:linear-gradient(135deg,rgba(247,183,51,.12),rgba(247,183,51,.06));color:var(--operator)}
+.dd-menu .tbtn.cfgbtn:hover{background:linear-gradient(135deg,rgba(247,183,51,.22),rgba(247,183,51,.12))}
+.dd-sep{border:none;border-top:1px solid var(--border);margin:4px 12px}
+.dd-menu input[type=file]{display:none}
 </style>
 </head>
 <body>
@@ -535,34 +549,52 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="tbtn" id="snapBtn" title="Przyciągaj do siatki">⊞ Siatka</button>
       <button class="tbtn" id="arrangeBtn" title="Rozmieść automatycznie — ułóż wszystkie elementy (odblokowane) jeden przy drugim na arkuszu, by zmieścić jak najwięcej na materiale">📐 Rozmieść</button>
     </div>
-    <div class="tgroup">
-      <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy</button>
-      <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (do wczytania później)">💾 Zapisz projekt</button>
-      <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json">📂 Otwórz projekt</button>
-      <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none" aria-label="Otwórz projekt">
-      <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
-      <input type="file" id="importImageInput" accept="image/*" style="display:none" aria-label="Importuj obraz">
-      <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie (czerwony=cięcie, niebieski=nacięcie, czarny=grawer); napisy <text> importowane jako edytowalny tekst (lub kontury liter, jeśli mają obrót/skos)">📐 Importuj SVG</button>
-      <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" style="display:none" aria-label="Importuj SVG">
+    <div class="tspacer"></div>
+    <!-- MENU: PLIK -->
+    <div class="dd" data-dd>
+      <button class="tbtn dd-toggle" type="button" title="Projekt: nowy, zapis, otwarcie, import">📂 Plik <span class="dd-caret">▾</span></button>
+      <div class="dd-menu">
+        <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy projekt</button>
+        <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (do wczytania później)">💾 Zapisz projekt</button>
+        <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json">📂 Otwórz projekt</button>
+        <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none" aria-label="Otwórz projekt">
+        <hr class="dd-sep">
+        <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
+        <input type="file" id="importImageInput" accept="image/*" style="display:none" aria-label="Importuj obraz">
+        <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie; napisy <text> jako edytowalny tekst">📐 Importuj SVG</button>
+        <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" style="display:none" aria-label="Importuj SVG">
+      </div>
     </div>
-    <div class="tgroup">
-      <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
-      <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)">🎨 Warstwy</button>
-      <button class="tbtn" id="preview3dBtn" title="Podgląd 3D — interaktywna wizualizacja projektu jako stos warstw materiału">🎯 Podgląd 3D</button>
-
-      <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
-      <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębatego (ewolwentowe) z otworem na oś, gotowe do wycięcia laserem">⚙ Koło zębate</button>
-      <button class="tbtn tbtn-primary" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
-      <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
-      <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości i sklejaj je, by uzyskać efekt 3D">🧊 Eksport 3D</button>
+    <!-- MENU: NARZĘDZIA -->
+    <div class="dd" data-dd>
+      <button class="tbtn dd-toggle" type="button" title="Dodatkowe narzędzia i generatory">🧩 Narzędzia <span class="dd-caret">▾</span></button>
+      <div class="dd-menu">
+        <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
+        <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)">🎨 Tryb warstw 3D</button>
+        <button class="tbtn" id="preview3dBtn" title="Podgląd 3D — interaktywna wizualizacja projektu jako stos warstw materiału">🎯 Podgląd 3D</button>
+        <hr class="dd-sep">
+        <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
+        <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębate (ewolwentowe) z otworem na oś">⚙ Koło zębate</button>
+      </div>
     </div>
-    <div class="tgroup">
-      <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
-      <button class="tbtn" id="quoteBtn" title="Wycena projektu — wybierz materiał i zobacz cenę końcową">💰 Wycena</button>
-      <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty</button>
+    <!-- MENU: WIĘCEJ -->
+    <div class="dd" data-dd>
+      <button class="tbtn dd-toggle" type="button" title="Podsumowanie, wycena, skróty">📊 Więcej <span class="dd-caret">▾</span></button>
+      <div class="dd-menu">
+        <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
+        <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny">💰 Wycena</button>
+        <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty klawiszowe</button>
+        <button class="tbtn cfgbtn" id="pricingCfgBtn" style="display:none" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
+      </div>
     </div>
-    <div class="tgroup" id="adminGroup" style="display:none">
-      <button class="tbtn cfgbtn" id="pricingCfgBtn" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
+    <!-- MENU: EKSPORT -->
+    <div class="dd" data-dd>
+      <button class="tbtn tbtn-primary dd-toggle" type="button" title="Pobierz gotowe pliki produkcyjne">⬇ Eksport <span class="dd-caret">▾</span></button>
+      <div class="dd-menu">
+        <button class="tbtn" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
+        <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
+        <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości">🧊 Eksport 3D</button>
+      </div>
     </div>
   </div>
 
@@ -4651,7 +4683,23 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   function refreshPricingUI(){ syncMatSelectors(); renderQuoteAll(); }
   // Operator zawsze ma dostęp do edycji (konfiguracja jest w zakładce); ?admin=1 pokazuje skrót w toolbarze
   const IS_OPERATOR = !!(window.xeoDesktop && window.xeoDesktop.isDesktop) || new URLSearchParams(location.search).has('admin');
-  if(IS_OPERATOR){ const ag=document.getElementById('adminGroup'); if(ag) ag.style.display=''; }
+  if(IS_OPERATOR){ const pcb=document.getElementById('pricingCfgBtn'); if(pcb) pcb.style.display=''; }
+
+  /* ---------------- Menu rozwijalne (dropdown) ---------------- */
+  document.querySelectorAll('.dd[data-dd]').forEach(dd=>{
+    const toggle=dd.querySelector('.dd-toggle');
+    if(!toggle) return;
+    toggle.addEventListener('click',e=>{
+      e.stopPropagation();
+      const wasOpen=dd.classList.contains('open');
+      document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
+      if(!wasOpen) dd.classList.add('open');
+    });
+    dd.querySelector('.dd-menu').addEventListener('click',e=>{
+      if(e.target.closest('.tbtn')) dd.classList.remove('open');
+    });
+  });
+  document.addEventListener('click',()=>{ document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open')); });
 
   /* ---------------- Zakładki panelu bocznego ---------------- */
   document.querySelectorAll('.ptab').forEach(btn=>{
