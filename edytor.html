@@ -6846,6 +6846,88 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy-R/2,R*0.14,0,Math.PI*2); ctx.fill();
           ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy+R/2,R*0.14,0,Math.PI*2); ctx.fill();
         },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:2})},
+      {id:'mo_owl', label:'Sowa', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u;
+          // ciało (jajowate)
+          ctx.beginPath(); ctx.ellipse(cx,116*u,58*u,72*u,0,0,Math.PI*2); ctx.fill();
+          // uszka (kępki piór)
+          ctx.beginPath(); ctx.moveTo(60*u,58*u); ctx.lineTo(48*u,22*u); ctx.lineTo(80*u,46*u); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(140*u,58*u); ctx.lineTo(152*u,22*u); ctx.lineTo(120*u,46*u); ctx.closePath(); ctx.fill();
+          // oczy (duże białe obwódki z czarnymi źrenicami)
+          ctx.fillStyle='#fff';
+          ctx.beginPath(); ctx.arc(78*u,86*u,22*u,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(122*u,86*u,22*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          ctx.beginPath(); ctx.arc(78*u,86*u,9*u,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(122*u,86*u,9*u,0,Math.PI*2); ctx.fill();
+          // dziób
+          ctx.beginPath(); ctx.moveTo(100*u,96*u); ctx.lineTo(92*u,108*u); ctx.lineTo(108*u,108*u); ctx.closePath(); ctx.fill();
+          // skrzydła (łuki-otwory po bokach)
+          ctx.fillStyle='#fff'; ctx.lineWidth=3*u; ctx.strokeStyle='#fff'; ctx.lineCap='round';
+          for(let i=0;i<3;i++){ const off=i*14*u;
+            ctx.beginPath(); ctx.arc(56*u,130*u+off,30*u,Math.PI*-0.4,Math.PI*0.25); ctx.stroke();
+            ctx.beginPath(); ctx.arc(144*u,130*u+off,30*u,Math.PI*0.75,Math.PI*1.4); ctx.stroke(); }
+          // pierś (łuski piór)
+          for(let row=0;row<3;row++){ for(let cc=0;cc<3;cc++){
+            const px=cx+(cc-1)*22*u, py=140*u+row*20*u;
+            ctx.beginPath(); ctx.arc(px,py,9*u,0,Math.PI); ctx.stroke(); }}
+          // łapy
+          ctx.fillStyle='#000';
+          ctx.fillRect(82*u,182*u,6*u,12*u); ctx.fillRect(112*u,182*u,6*u,12*u);
+        },200,200,{ss:2,tol:0.9,minArea:12,smoothIter:1})},
+      {id:'mo_elephant', label:'Słoń', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/220;
+          // tułów
+          ctx.beginPath(); ctx.ellipse(120*u,110*u,72*u,58*u,0,0,Math.PI*2); ctx.fill();
+          // głowa
+          ctx.beginPath(); ctx.arc(64*u,98*u,46*u,0,Math.PI*2); ctx.fill();
+          // ucho
+          ctx.beginPath(); ctx.ellipse(70*u,96*u,30*u,38*u,0.2,0,Math.PI*2); ctx.fill();
+          // trąba
+          ctx.beginPath();
+          ctx.moveTo(30*u,96*u);
+          ctx.bezierCurveTo(8*u,108*u,6*u,140*u,18*u,164*u);
+          ctx.bezierCurveTo(24*u,176*u,40*u,176*u,42*u,164*u);
+          ctx.bezierCurveTo(36*u,150*u,30*u,140*u,40*u,128*u);
+          ctx.bezierCurveTo(50*u,118*u,52*u,104*u,44*u,94*u);
+          ctx.closePath(); ctx.fill();
+          // nogi
+          ctx.fillRect(78*u,150*u,22*u,40*u);
+          ctx.fillRect(112*u,154*u,22*u,36*u);
+          ctx.fillRect(150*u,150*u,22*u,40*u);
+          // ogon
+          ctx.lineWidth=4*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(190*u,96*u);
+          ctx.bezierCurveTo(206*u,104*u,208*u,124*u,200*u,140*u); ctx.stroke();
+          // oko
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(54*u,90*u,5*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(54*u,90*u,2.5*u,0,Math.PI*2); ctx.fill();
+          // odstępy między nogami = otwory (już są tłem)
+          ctx.fillStyle='#000';
+          ctx.fillRect(70*u,186*u,110*u,5*u);
+        },220,200,{ss:2,tol:0.9,minArea:14,smoothIter:1})},
+      {id:'mo_feather', label:'Pióro', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/120,cx=60*u;
+          // wypełniona chorągiewka pióra (dwa łukowe brzegi schodzące się u góry i dołu)
+          ctx.beginPath();
+          ctx.moveTo(cx,18*u);
+          ctx.bezierCurveTo(cx+34*u,60*u,cx+36*u,140*u,cx+10*u,196*u);
+          ctx.bezierCurveTo(cx+6*u,200*u,cx-6*u,200*u,cx-10*u,196*u);
+          ctx.bezierCurveTo(cx-36*u,140*u,cx-34*u,60*u,cx,18*u);
+          ctx.closePath(); ctx.fill();
+          // stosina (środkowy nerw) jako wąski otwór
+          ctx.fillStyle='#fff'; ctx.lineWidth=2.4*u; ctx.lineCap='round'; ctx.strokeStyle='#fff';
+          ctx.beginPath(); ctx.moveTo(cx,30*u);
+          ctx.bezierCurveTo(cx+3*u,90*u,cx+1*u,150*u,cx+6*u,190*u); ctx.stroke();
+          // nacięcia chorągiewki (ukośne szczeliny po obu stronach) = otwory
+          ctx.lineWidth=1.8*u;
+          for(let t=0.1;t<0.9;t+=0.07){ const y=18*u+t*176*u;
+            const w=32*u*Math.sin(t*Math.PI);
+            const sx=cx+Math.sin(t*3)*2*u;
+            ctx.beginPath(); ctx.moveTo(sx-3*u,y); ctx.lineTo(sx-w, y-w*0.55); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sx+3*u,y); ctx.lineTo(sx+w, y-w*0.55); ctx.stroke();
+          }
+        },120,210,{ss:2,tol:0.8,minArea:8,smoothIter:2})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
