@@ -6722,6 +6722,55 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
             ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*inner,cy+Math.sin(a)*inner);
             ctx.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len); ctx.stroke(); }
         },300,300,{ss:2,tol:1.0,minArea:12,smoothIter:1})},
+      {id:'mo_fish', label:'Rybka', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=H/2;
+          ctx.beginPath();
+          ctx.moveTo(170*u,cy); ctx.bezierCurveTo(170*u,cy-36*u,136*u,cy-46*u,90*u,cy-42*u);
+          ctx.bezierCurveTo(50*u,cy-38*u,26*u,cy-26*u,26*u,cy);
+          ctx.bezierCurveTo(26*u,cy+26*u,50*u,cy+38*u,90*u,cy+42*u);
+          ctx.bezierCurveTo(136*u,cy+46*u,170*u,cy+36*u,170*u,cy); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(170*u,cy); ctx.lineTo(196*u,cy-28*u);
+          ctx.lineTo(196*u,cy+28*u); ctx.closePath(); ctx.fill();
+          ctx.fillStyle='#fff';
+          ctx.beginPath(); ctx.arc(56*u,cy-8*u,7*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(56*u,cy-8*u,3.5*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.lineWidth=2.2*u; ctx.strokeStyle='#fff';
+          const sc=[[90,0.92],[110,0.86],[128,0.78],[144,0.68],[158,0.56]];
+          for(const [sx,s] of sc){ ctx.beginPath();
+            ctx.arc(sx*u,cy,42*u*s,Math.PI*-0.35,Math.PI*0.35); ctx.stroke(); }
+        },200,120,{ss:2,tol:0.9,minArea:10,smoothIter:1})},
+      {id:'mo_xmas_star', label:'Gwiazdka', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,u=W/200;
+          const star=(x,y,R,r,n,rot)=>{ ctx.beginPath();
+            for(let i=0;i<n*2;i++){ const a=rot+i*Math.PI/n, rr=i%2===0?R:r;
+              const px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr;
+              i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); } ctx.closePath(); ctx.fill(); };
+          star(cx,cy-4*u,84*u,34*u,5,-Math.PI/2);
+          ctx.fillStyle='#fff'; star(cx,cy-4*u,42*u,18*u,5,-Math.PI/2);
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy-4*u,12*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy-4*u,5*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.lineWidth=3*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(cx,cy-88*u); ctx.lineTo(cx,cy-98*u); ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx,cy-98*u,4*u,0,Math.PI*2); ctx.fill();
+        },200,210,{ss:2,tol:1.0,minArea:12,smoothIter:2})},
+      {id:'mo_treble_clef', label:'Klucz wiolinowy', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/120,cx=60*u;
+          ctx.lineWidth=6.5*u; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#000';
+          ctx.beginPath();
+          ctx.moveTo(cx,188*u);
+          ctx.lineTo(cx,40*u);
+          ctx.bezierCurveTo(cx-34*u,52*u,cx-40*u,88*u,cx-14*u,108*u);
+          ctx.bezierCurveTo(cx+14*u,128*u,cx+36*u,108*u,cx+36*u,84*u);
+          ctx.bezierCurveTo(cx+36*u,58*u,cx+8*u,46*u,cx-8*u,56*u);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx,120*u);
+          ctx.bezierCurveTo(cx+28*u,128*u,cx+34*u,156*u,cx+14*u,168*u);
+          ctx.bezierCurveTo(cx-8*u,180*u,cx-30*u,170*u,cx-30*u,152*u);
+          ctx.bezierCurveTo(cx-30*u,136*u,cx-12*u,126*u,cx,130*u);
+          ctx.stroke();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,188*u,8*u,0,Math.PI*2); ctx.fill();
+        },120,210,{ss:2,tol:0.8,minArea:10,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
