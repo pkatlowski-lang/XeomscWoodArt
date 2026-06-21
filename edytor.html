@@ -6290,6 +6290,31 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  // Scena „drzewo z rodziną w okręgu" — odwzorowanie klasycznej pracy wall-art:
+  // akacja po lewej, rodzina pod koroną po prawej, wszystko na gruncie w pierścieniu (jedna sylwetka).
+  function drawTreeFamilyCircleScene(ctx, W, H, opt){
+    opt=opt||{};
+    const cx=W/2, cy=H/2, R=Math.min(W,H)/2-4, r=R-(opt.band||26);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#000';
+    const gy=cy+r*0.46;
+    ctx.beginPath(); ctx.moveTo(cx-R, gy+r*0.06);                                       // grunt łączący się z pierścieniem
+    ctx.quadraticCurveTo(cx-r*0.2, gy-r*0.12, cx, gy-r*0.06);
+    ctx.quadraticCurveTo(cx+r*0.5, gy+r*0.02, cx+R, gy+r*0.1);
+    ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath(); ctx.fill();
+    // akacja po lewej — szeroka korona rozpościera się nad całą sceną
+    drawTreeShape(ctx, W, H, {seed:23,depth:9,spread:0.98,up:0.34,foliage:true,foliageR:0.9,foliageMin:0.85,canopyFlat:1,canopyBand:0.42,minW:2.4,
+      baseX:cx-r*0.32, baseY:gy-r*0.04, trunkPx:r*0.42, widthPx:r*0.06});
+    // rodzina pod koroną po prawej
+    const fh=r*0.5, fy=gy-r*0.03;
+    drawPerson(ctx, cx+r*0.12, fy, fh*0.62, 'child');
+    drawPerson(ctx, cx+r*0.30, fy, fh, 'man');
+    drawPerson(ctx, cx+r*0.50, fy, fh*0.82, 'woman');
+    ctx.restore();
+  }
+
   // Sylwetka postaci (filled) — type: 'man' | 'woman' | 'child'. Stoi na linii gy, wysokość H.
   // Złożona z nachodzących części (głowa, tułów/sukienka, nogi, ręce) — Canvas scala je,
   // a tracer da jeden czysty obrys.
@@ -6348,6 +6373,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:2,tol:1.6,minArea:50})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),640,640,{ss:1.8,tol:1.5,minArea:60})},
+      {id:'mo_tree_family', label:'Drzewo z rodziną', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeFamilyCircleScene(ctx,W,H,{}),660,660,{ss:1.8,tol:1.4,minArea:50})},
       {id:'mo_mtn_circle', label:'Góry w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),640,640,{ss:1.8,tol:1.5,minArea:60})},
       {id:'mo_forest_circle', label:'Las w okręgu', fillRule:'evenodd',
