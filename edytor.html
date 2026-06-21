@@ -84,7 +84,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Zakładki panelu bocznego ---- */
 .ptabs{display:flex;gap:4px;padding:8px 8px 0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg-2)}
 .ptab{flex:1;padding:10px 6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:none;border:none;border-radius:var(--r-sm) var(--r-sm) 0 0;cursor:pointer;transition:color .15s,background .15s,box-shadow .15s;text-align:center;position:relative}
-.ptab:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.ptab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.ptab:focus-visible{outline:none;box-shadow:var(--glow)}
 .ptab.active{color:var(--accent);background:var(--surface);box-shadow:inset 0 -2px 0 var(--accent)}
 .ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0}
 .ptab-body.active{display:flex}
@@ -243,7 +244,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .seg button.cut.on{background:var(--cut);border-color:var(--cut);color:#fff}
 .seg button.engrave.on{background:var(--engrave);border-color:var(--engrave);color:#fff}
 .seg button.score.on{background:var(--score);border-color:var(--score);color:#fff}
-.empty-note{padding:8px 16px 20px;font-size:.82rem;color:var(--muted);line-height:1.6}
+.empty-note{padding:12px 16px 20px;font-size:.8rem;color:var(--muted);line-height:1.7}
 .flex-label{display:flex;align-items:center;gap:4px}
 .info-box{padding:9px 13px;background:rgba(70,197,255,.08);border:1px solid rgba(70,197,255,.35);border-radius:8px}
 .muted-sm{font-size:.75rem;color:var(--muted);line-height:1.55}
