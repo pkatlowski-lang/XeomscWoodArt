@@ -6315,6 +6315,24 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     ctx.restore();
   }
 
+  function drawTreeOfLifeScene(ctx, W, H, opt){
+    opt=opt||{};
+    const cx=W/2, cy=H/2, R=Math.min(W,H)/2-4, r=R-(opt.band||24);
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#000';
+    drawTreeShape(ctx, W, H, {seed:opt.seed||42,depth:8,trunk:0.18,width:0.048,spread:0.9,up:0.22,curve:0.4,
+      foliage:true,foliageR:1.0,foliageMin:0.8,canopyBand:0.5,minW:2.2,
+      baseX:cx, baseY:cy+r*0.08, trunkPx:r*0.52, widthPx:r*0.06});
+    ctx.save(); ctx.translate(cx, cy+r*0.08); ctx.scale(1,-0.7);
+    ctx.translate(-cx, -(cy+r*0.08));
+    drawTreeShape(ctx, W, H, {seed:opt.seed||42,depth:6,trunk:0.16,width:0.04,spread:0.85,up:0.2,curve:0.35,
+      foliage:true,foliageR:0.8,foliageMin:0.7,canopyBand:0.6,minW:2,
+      baseX:cx, baseY:cy+r*0.08, trunkPx:r*0.36, widthPx:r*0.05});
+    ctx.restore();
+    ctx.restore();
+  }
   function drawDeerSilhouette(ctx, x, gy, h, facing){
     const f=facing||1, u=h/120;
     ctx.beginPath(); ctx.ellipse(x,gy-h*0.45,h*0.28,h*0.16,f*0.06,0,Math.PI*2); ctx.fill();
@@ -6663,6 +6681,68 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           }
           ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,W*0.04,0,Math.PI*2); ctx.fill();
         },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:1})},
+      {id:'mo_tree_life', label:'Drzewo życia', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeOfLifeScene(ctx,W,H,{seed:42}),660,660,{ss:1.8,tol:1.4,minArea:50})},
+      {id:'mo_dreamcatcher', label:'Łapacz snów', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,u=W/300,R=120*u,r=R-12*u;
+          ctx.fillStyle='#000';
+          ctx.beginPath(); ctx.arc(cx,130*u,R,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,130*u,r,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.lineWidth=3*u; ctx.strokeStyle='#000';
+          const web=(n,rr)=>{ for(let i=0;i<n;i++){ const a=i/n*Math.PI*2-Math.PI/2;
+            ctx.beginPath(); ctx.moveTo(cx,130*u); ctx.lineTo(cx+Math.cos(a)*rr,130*u+Math.sin(a)*rr); ctx.stroke(); }};
+          web(8,r);
+          for(let ring=1;ring<=3;ring++){ const rr=r*ring/4;
+            ctx.beginPath(); ctx.arc(cx,130*u,rr,0,Math.PI*2); ctx.stroke(); }
+          ctx.beginPath(); ctx.arc(cx,130*u,8*u,0,Math.PI*2); ctx.fill();
+          ctx.lineWidth=3.5*u; ctx.lineCap='round';
+          const feather=(fx,fy,len,rot)=>{ ctx.save(); ctx.translate(fx,fy); ctx.rotate(rot);
+            ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,len); ctx.stroke();
+            const fW=len*0.22;
+            for(let j=0.15;j<0.9;j+=0.12){ const y=len*j;
+              ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(-fW*(1-j*0.5),y+len*0.06); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(fW*(1-j*0.5),y+len*0.06); ctx.stroke(); }
+            ctx.restore(); };
+          feather(cx-R*0.7,130*u+R*0.72,80*u,0.15);
+          feather(cx,130*u+R,80*u,0);
+          feather(cx+R*0.7,130*u+R*0.72,80*u,-0.15);
+        },300,340,{ss:2,tol:0.9,minArea:10,smoothIter:1})},
+      {id:'mo_compass', label:'Kompas', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,u=W/300,R=130*u;
+          ctx.fillStyle='#000';
+          ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,R-10*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R-16*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,R-20*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          for(let i=0;i<4;i++){ const a=i*Math.PI/2-Math.PI/2, L=R*0.72, w=R*0.14;
+            ctx.beginPath();
+            ctx.moveTo(cx+Math.cos(a)*L,cy+Math.sin(a)*L);
+            ctx.lineTo(cx+Math.cos(a-Math.PI/2)*w,cy+Math.sin(a-Math.PI/2)*w);
+            ctx.lineTo(cx,cy);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(cx+Math.cos(a)*L,cy+Math.sin(a)*L);
+            ctx.lineTo(cx+Math.cos(a+Math.PI/2)*w,cy+Math.sin(a+Math.PI/2)*w);
+            ctx.lineTo(cx,cy);
+            ctx.closePath(); ctx.fill();
+          }
+          for(let i=0;i<4;i++){ const a=i*Math.PI/2+Math.PI/4, L=R*0.42, w=R*0.08;
+            ctx.beginPath();
+            ctx.moveTo(cx+Math.cos(a)*L,cy+Math.sin(a)*L);
+            ctx.lineTo(cx+Math.cos(a-Math.PI/2)*w,cy+Math.sin(a-Math.PI/2)*w);
+            ctx.lineTo(cx,cy);
+            ctx.lineTo(cx+Math.cos(a+Math.PI/2)*w,cy+Math.sin(a+Math.PI/2)*w);
+            ctx.closePath(); ctx.fill();
+          }
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,8*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000';
+          ctx.lineWidth=4*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          for(let i=0;i<32;i++){ const a=i/32*Math.PI*2, inner=R-19*u, outer=R-11*u;
+            const len=i%8===0?outer:i%4===0?inner+3*u:inner+1.5*u;
+            ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*inner,cy+Math.sin(a)*inner);
+            ctx.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len); ctx.stroke(); }
+        },300,300,{ss:2,tol:1.0,minArea:12,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
