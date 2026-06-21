@@ -6771,6 +6771,67 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           ctx.stroke();
           ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,188*u,8*u,0,Math.PI*2); ctx.fill();
         },120,210,{ss:2,tol:0.8,minArea:10,smoothIter:1})},
+      {id:'mo_horse', label:'Koń', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.beginPath();
+          ctx.moveTo(46*u,180*u); ctx.lineTo(46*u,140*u);
+          ctx.bezierCurveTo(44*u,122*u,50*u,106*u,60*u,94*u);
+          ctx.bezierCurveTo(66*u,86*u,68*u,74*u,64*u,62*u);
+          ctx.bezierCurveTo(60*u,50*u,56*u,40*u,54*u,30*u);
+          ctx.bezierCurveTo(52*u,22*u,54*u,14*u,60*u,12*u);
+          ctx.bezierCurveTo(66*u,10*u,72*u,14*u,74*u,22*u);
+          ctx.bezierCurveTo(78*u,32*u,84*u,44*u,92*u,52*u);
+          ctx.bezierCurveTo(100*u,60*u,110*u,64*u,118*u,66*u);
+          ctx.bezierCurveTo(128*u,68*u,136*u,76*u,140*u,88*u);
+          ctx.bezierCurveTo(144*u,100*u,152*u,108*u,162*u,114*u);
+          ctx.bezierCurveTo(172*u,120*u,178*u,132*u,178*u,148*u);
+          ctx.lineTo(178*u,180*u); ctx.lineTo(166*u,180*u);
+          ctx.lineTo(164*u,152*u);
+          ctx.bezierCurveTo(162*u,140*u,156*u,130*u,148*u,124*u);
+          ctx.bezierCurveTo(140*u,118*u,134*u,110*u,130*u,100*u);
+          ctx.bezierCurveTo(126*u,90*u,116*u,82*u,104*u,78*u);
+          ctx.bezierCurveTo(92*u,74*u,82*u,80*u,76*u,90*u);
+          ctx.bezierCurveTo(70*u,100*u,66*u,114*u,66*u,130*u);
+          ctx.lineTo(66*u,180*u); ctx.closePath(); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(62*u,28*u,3*u,0,Math.PI*2); ctx.fill();
+        },200,186,{ss:2,tol:0.9,minArea:15,smoothIter:1})},
+      {id:'mo_swan', label:'Łabędź', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.beginPath();
+          ctx.moveTo(30*u,130*u);
+          ctx.bezierCurveTo(44*u,120*u,80*u,112*u,120*u,112*u);
+          ctx.bezierCurveTo(140*u,112*u,156*u,108*u,162*u,98*u);
+          ctx.bezierCurveTo(168*u,88*u,158*u,74*u,140*u,66*u);
+          ctx.bezierCurveTo(124*u,58*u,108*u,62*u,94*u,72*u);
+          ctx.bezierCurveTo(82*u,80*u,68*u,86*u,56*u,82*u);
+          ctx.bezierCurveTo(44*u,78*u,38*u,68*u,36*u,56*u);
+          ctx.bezierCurveTo(34*u,44*u,38*u,30*u,48*u,22*u);
+          ctx.bezierCurveTo(56*u,14*u,66*u,14*u,68*u,20*u);
+          ctx.bezierCurveTo(70*u,26*u,64*u,34*u,56*u,38*u);
+          ctx.bezierCurveTo(48*u,42*u,44*u,50*u,46*u,60*u);
+          ctx.bezierCurveTo(48*u,68*u,56*u,72*u,66*u,70*u);
+          ctx.bezierCurveTo(78*u,68*u,90*u,58*u,102*u,50*u);
+          ctx.bezierCurveTo(114*u,42*u,128*u,48*u,140*u,58*u);
+          ctx.bezierCurveTo(152*u,68*u,166*u,82*u,170*u,100*u);
+          ctx.bezierCurveTo(174*u,116*u,168*u,124*u,160*u,128*u);
+          ctx.bezierCurveTo(178*u,128*u,186*u,134*u,186*u,142*u);
+          ctx.bezierCurveTo(186*u,150*u,178*u,154*u,166*u,152*u);
+          ctx.bezierCurveTo(146*u,150*u,116*u,146*u,86*u,148*u);
+          ctx.bezierCurveTo(56*u,150*u,38*u,156*u,28*u,152*u);
+          ctx.bezierCurveTo(18*u,148*u,18*u,138*u,30*u,130*u);
+          ctx.closePath(); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(60*u,30*u,3*u,0,Math.PI*2); ctx.fill();
+        },200,162,{ss:2,tol:0.9,minArea:12,smoothIter:2})},
+      {id:'mo_yin_yang', label:'Yin-Yang', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,R=Math.min(W,H)*0.45;
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff';
+          ctx.beginPath(); ctx.arc(cx,cy,R,-Math.PI/2,Math.PI/2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy+R/2,R/2,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy-R/2,R/2,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(cx,cy-R/2,R*0.14,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy+R/2,R*0.14,0,Math.PI*2); ctx.fill();
+        },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:2})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
