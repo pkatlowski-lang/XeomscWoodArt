@@ -575,7 +575,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           <p class="pq-help">Globalne wartości doliczane do każdej wyceny — wspólne dla wszystkich materiałów.</p>
           <div class="pq-grid">
             <label title="Koszt 1 minuty pracy lasera (prąd, amortyzacja, obsługa).">Laser zł/min<input type="number" id="pqLaserMin" step="0.1" min="0"></label>
-            <label title="Stała kwota za pakowanie zamówienia (karton, folia).">Pakowanie zł<input type="number" id="pqPack" step="0.5" min="0"></label>
+            <label title="Stawka pakowania za każdy próg cenowy.">Pakowanie zł/próg<input type="number" id="pqPack" step="0.05" min="0"></label>
+            <label title="Rozmiar progu cenowego — pakowanie wzrasta o stawkę za każde X zł ceny bazowej.">Próg (zł)<input type="number" id="pqPackTier" step="1" min="1"></label>
             <label title="Narzut doliczany na końcu. 50 = +50% do sumy kosztów.">Marża %<input type="number" id="pqMargin" step="1" min="0"></label>
             <label title="Dodatkowy czas na przejazdy i przyspieszenia. 15 = +15%.">Zapas czasu %<input type="number" id="pqBuffer" step="1" min="0"></label>
             <label title="Prędkość lasera przy grawerowaniu. Zwykle wyższa niż cięcie.">Grawer mm/min<input type="number" id="pqEngSpeed" step="100" min="1"></label>
@@ -855,7 +856,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <div class="field"><label>Materiał</label><select id="quoteMat"></select></div>
     <div class="sum-stats" id="quoteStats" style="margin-top:8px"></div>
     <div class="quote-price" id="quotePrice">–</div>
-    <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie. Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
+    <p style="font-size:.73rem;color:var(--muted);margin:8px 0 0;line-height:1.55;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--border)">📦 Cena obejmuje materiał, pracę lasera i pakowanie (0,25 zł za każde 5 zł wartości). Cennik możesz edytować w <strong style="color:var(--text)">⚙ Cennik i materiały</strong>.</p>
     <div class="field" style="padding:12px 0 0">
       <button type="button" class="tbtn tbtn-primary tbtn-block" id="sendQuoteOpenBtn">📨 Wyślij projekt do wyceny</button>
     </div>
@@ -882,7 +883,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <h4 class="op-h">💰 Parametry wyceny <span class="hint" data-tip="Globalne parametry doliczane do każdej wyceny — wspólne dla wszystkich materiałów.">?</span></h4>
     <div class="op-grid">
       <label>Koszt pracy lasera (zł/min) <span class="hint" data-tip="Ile kosztuje 1 minuta pracy lasera (prąd, amortyzacja, obsługa). Mnożone przez łączny czas cięcia i grawerowania.">?</span><input type="number" id="opLaserMin" step="0.1" min="0"></label>
-      <label>Pakowanie (zł) <span class="hint" data-tip="Stała kwota doliczana do każdego zamówienia za zapakowanie (karton, folia, wypełnienie).">?</span><input type="number" id="opPack" step="0.5" min="0"></label>
+      <label>Pakowanie (zł/próg) <span class="hint" data-tip="Stawka za pakowanie: 0,25 zł za każde 5 zł ceny bazowej. Produkt do 5 zł = 0,25 zł, 5–10 zł = 0,50 zł itd.">?</span><input type="number" id="opPack" step="0.05" min="0"></label>
+      <label>Próg pakowania (zł) <span class="hint" data-tip="Rozmiar progu cenowego — pakowanie rośnie o stawkę za każde X zł ceny bazowej produktu.">?</span><input type="number" id="opPackTier" step="1" min="1"></label>
       <label>Marża (%) <span class="hint" data-tip="Narzut/zysk doliczany na końcu. 50 oznacza +50% do sumy kosztów (materiał + laser + pakowanie).">?</span><input type="number" id="opMargin" step="1" min="0"></label>
       <label>Zapas czasu (%) <span class="hint" data-tip="Dodatkowy czas na przejazdy, przyspieszenia i powtórzenia. 15 oznacza +15% do czasu pracy lasera.">?</span><input type="number" id="opBuffer" step="1" min="0"></label>
       <label>Prędkość grawera (mm/min) <span class="hint" data-tip="Prędkość lasera przy grawerowaniu/wypełnianiu powierzchni. Zwykle wyższa niż prędkość cięcia.">?</span><input type="number" id="opEngSpeed" step="100" min="1"></label>
@@ -4285,7 +4287,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       'hdf-3':{label:'HDF 3 mm', mm:3, speed:750, pricePerCm2:0.0038}
     },
     laserPerMin:1.5,   // koszt minuty pracy lasera (zł)
-    packaging:2.5,     // pakowanie (zł)
+    packagingUnit:0.25, // pakowanie — stawka za każdy próg 5 zł ceny bazowej
+    packagingTier:5,    // rozmiar progu cenowego (zł)
     margin:0.50,       // marża (50% = 0,50)
     timeBuffer:1.15,   // +15% czasu (przejazdy, przyspieszenia, powtórzenia)
     // Parametry grawerowania (wypełnienia): prędkość mm/min, odstęp linii mm, overscan.
@@ -4301,6 +4304,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(!s||typeof s!=='object') return base;
       const out={...base, ...s};
       out.materials=(s.materials && typeof s.materials==='object' && Object.keys(s.materials).length) ? s.materials : base.materials;
+      if(s.packaging!=null && s.packagingUnit==null){ out.packagingUnit=0.25; out.packagingTier=5; delete out.packaging; }
       return out;
     }catch(e){ return JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); }
   }
@@ -4351,12 +4355,20 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const m=Math.floor(totalSec/60), s=totalSec%60;
     return `${m}.${String(s).padStart(2,'0')}`;
   }
+  function calcPackaging(baseCost){
+    const tier=PRICING.packagingTier||5;
+    const unit=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
+    if(baseCost<=0) return unit;
+    return Math.max(1, Math.ceil(baseCost/tier))*unit;
+  }
   function computeQuote(matKey){
     const mat=PRICING.materials[matKey]; if(!mat) return null;
     const timeMin=quoteTimeMin(mat);
     const laserCost=timeMin*PRICING.laserPerMin;
     const materialCost=quoteMaterialArea()*mat.pricePerCm2;
-    const total=(laserCost+materialCost+PRICING.packaging)*(1+PRICING.margin);
+    const baseCost=laserCost+materialCost;
+    const pack=calcPackaging(baseCost);
+    const total=(baseCost+pack)*(1+PRICING.margin);
     return Math.round(total*100)/100;
   }
   const modalQuote=document.getElementById('modalQuote');
@@ -4371,11 +4383,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const mat=PRICING.materials[quoteMatSel.value];
     const tb=quoteTimeBreakdown(mat);
     const areaCm2=quoteMaterialArea();
+    const baseCost=tb.total*PRICING.laserPerMin+areaCm2*mat.pricePerCm2;
+    const packCost=calcPackaging(baseCost);
     statsEl.innerHTML=
       `<div class="sum-row sum-cut"><span>⏱ Czas cyklu (praca lasera)</span><span class="sum-val">${formatTime(tb.total)}</span></div>`
       +(tb.engraveTime>0 ? `<div class="sum-row sum-score"><span>　✂ w tym cięcie/nacięcie</span><span class="sum-val">${formatTime(tb.cutTime*PRICING.timeBuffer)}</span></div>`
         +`<div class="sum-row sum-engrave"><span>　▦ w tym grawerowanie</span><span class="sum-val">${formatTime(tb.engraveTime*PRICING.timeBuffer)}</span></div>` : '')
-      +`<div class="sum-row"><span>📐 Powierzchnia materiału</span><span class="sum-val">${String(fmt(areaCm2)).replace('.',',')} cm² (${String(fmt(areaCm2/10000)).replace('.',',')} m²)</span></div>`;
+      +`<div class="sum-row"><span>📐 Powierzchnia materiału</span><span class="sum-val">${String(fmt(areaCm2)).replace('.',',')} cm² (${String(fmt(areaCm2/10000)).replace('.',',')} m²)</span></div>`
+      +`<div class="sum-row"><span>📦 Pakowanie</span><span class="sum-val">${packCost.toFixed(2).replace('.',',')} zł</span></div>`;
     priceEl.textContent=computeQuote(quoteMatSel.value).toFixed(2).replace('.',',')+' zł';
   }
   document.getElementById('quoteBtn').addEventListener('click',()=>{ renderQuote(); modalQuote.classList.add('open'); });
@@ -4430,7 +4445,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   }
   function fillOpParams(){
     document.getElementById('opLaserMin').value=PRICING.laserPerMin;
-    document.getElementById('opPack').value=PRICING.packaging;
+    document.getElementById('opPack').value=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
+    document.getElementById('opPackTier').value=PRICING.packagingTier||5;
     document.getElementById('opMargin').value=Math.round(PRICING.margin*100);
     document.getElementById('opBuffer').value=Math.round((PRICING.timeBuffer-1)*100);
     document.getElementById('opEngSpeed').value=PRICING.engraveSpeed;
@@ -4457,7 +4473,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!Object.keys(mats).length){ st.style.color='var(--cut-light)'; st.textContent='Dodaj przynajmniej jeden materiał (z nazwą).'; return false; }
     PRICING.materials=mats;
     PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('opLaserMin').value)||0);
-    PRICING.packaging=Math.max(0,parseFloat(document.getElementById('opPack').value)||0);
+    PRICING.packagingUnit=Math.max(0,parseFloat(document.getElementById('opPack').value)||0);
+    PRICING.packagingTier=Math.max(1,parseFloat(document.getElementById('opPackTier').value)||5);
     PRICING.margin=Math.max(0,(parseFloat(document.getElementById('opMargin').value)||0)/100);
     PRICING.timeBuffer=1+Math.max(0,(parseFloat(document.getElementById('opBuffer').value)||0)/100);
     PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('opEngSpeed').value)||8000);
@@ -4512,7 +4529,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     const box=document.getElementById('pqMaterials'); box.innerHTML='';
     Object.entries(PRICING.materials).forEach(([k,m])=>box.appendChild(pqMatRow(k,m)));
     document.getElementById('pqLaserMin').value=PRICING.laserPerMin;
-    document.getElementById('pqPack').value=PRICING.packaging;
+    document.getElementById('pqPack').value=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
+    document.getElementById('pqPackTier').value=PRICING.packagingTier||5;
     document.getElementById('pqMargin').value=Math.round(PRICING.margin*100);
     document.getElementById('pqBuffer').value=Math.round((PRICING.timeBuffer-1)*100);
     document.getElementById('pqEngSpeed').value=PRICING.engraveSpeed;
@@ -4535,7 +4553,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     if(!Object.keys(mats).length){ st.style.color='var(--cut-light)'; st.textContent='Dodaj przynajmniej jeden materiał.'; return; }
     PRICING.materials=mats;
     PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('pqLaserMin').value)||0);
-    PRICING.packaging=Math.max(0,parseFloat(document.getElementById('pqPack').value)||0);
+    PRICING.packagingUnit=Math.max(0,parseFloat(document.getElementById('pqPack').value)||0);
+    PRICING.packagingTier=Math.max(1,parseFloat(document.getElementById('pqPackTier').value)||5);
     PRICING.margin=Math.max(0,(parseFloat(document.getElementById('pqMargin').value)||0)/100);
     PRICING.timeBuffer=1+Math.max(0,(parseFloat(document.getElementById('pqBuffer').value)||0)/100);
     PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('pqEngSpeed').value)||8000);
@@ -7015,6 +7034,66 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
             ctx.closePath(); ctx.fill(); };
           star(cx,24*u,18*u,8*u,5);
         },200,200,{ss:2,tol:1.0,minArea:10,smoothIter:1})},
+      {id:'mo_seahorse', label:'Konik morski', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/140;
+          // korpus konika morskiego — grube esowate pasmo zwijające się w ogon
+          ctx.lineWidth=20*u; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#000';
+          ctx.beginPath();
+          ctx.moveTo(58*u,34*u);                       // kark/głowa
+          ctx.bezierCurveTo(78*u,40*u,84*u,64*u,72*u,86*u);   // grzbiet wygięty
+          ctx.bezierCurveTo(64*u,102*u,52*u,112*u,56*u,130*u);// brzuch
+          ctx.bezierCurveTo(58*u,144*u,72*u,148*u,80*u,140*u);// początek zwoju ogona
+          ctx.bezierCurveTo(86*u,134*u,84*u,124*u,76*u,124*u);// zwój
+          ctx.stroke();
+          // pysk (rurkowaty) skierowany w lewo-górę
+          ctx.lineWidth=9*u;
+          ctx.beginPath(); ctx.moveTo(58*u,34*u); ctx.lineTo(30*u,30*u); ctx.stroke();
+          // korona/grzebień na głowie
+          ctx.lineWidth=4*u;
+          ctx.beginPath(); ctx.moveTo(62*u,22*u); ctx.lineTo(58*u,10*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(70*u,24*u); ctx.lineTo(72*u,12*u); ctx.stroke();
+          // płetwa grzbietowa
+          ctx.beginPath(); ctx.moveTo(80*u,72*u);
+          ctx.quadraticCurveTo(98*u,74*u,96*u,92*u); ctx.quadraticCurveTo(86*u,86*u,76*u,88*u);
+          ctx.closePath(); ctx.fillStyle='#000'; ctx.fill();
+          // oko
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(60*u,32*u,3.5*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(60*u,32*u,1.6*u,0,Math.PI*2); ctx.fill();
+        },140,160,{ss:2,tol:0.8,minArea:10,smoothIter:1})},
+      {id:'mo_lovebirds', label:'Ptaki na gałęzi', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/220;
+          // gałąź
+          ctx.lineWidth=7*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(10*u,150*u);
+          ctx.quadraticCurveTo(110*u,140*u,210*u,154*u); ctx.stroke();
+          ctx.lineWidth=3.5*u;
+          ctx.beginPath(); ctx.moveTo(60*u,146*u); ctx.lineTo(48*u,128*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(48*u,128*u); ctx.lineTo(40*u,132*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(48*u,128*u); ctx.lineTo(52*u,118*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(160*u,148*u); ctx.lineTo(174*u,132*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(174*u,132*u); ctx.lineTo(182*u,136*u); ctx.stroke();
+          // dwa ptaszki zwrócone do siebie (każdy: ciało + głowa + ogon + dziób)
+          const bird=(bx,by,dir)=>{
+            ctx.beginPath(); ctx.ellipse(bx,by,18*u,14*u,dir*0.3,0,Math.PI*2); ctx.fill();      // ciało
+            ctx.beginPath(); ctx.arc(bx+dir*16*u,by-14*u,9*u,0,Math.PI*2); ctx.fill();          // głowa
+            ctx.beginPath(); ctx.moveTo(bx+dir*24*u,by-14*u); ctx.lineTo(bx+dir*36*u,by-12*u);  // dziób
+            ctx.lineTo(bx+dir*24*u,by-9*u); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(bx-dir*14*u,by); ctx.lineTo(bx-dir*34*u,by-8*u);         // ogon
+            ctx.lineTo(bx-dir*32*u,by+6*u); ctx.closePath(); ctx.fill();
+            ctx.lineWidth=3*u; ctx.beginPath();                                                  // nóżka do gałęzi
+            ctx.moveTo(bx,by+12*u); ctx.lineTo(bx,by+30*u); ctx.stroke();
+            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(bx+dir*18*u,by-15*u,2.6*u,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='#000';
+          };
+          bird(82*u,118*u,1);
+          bird(138*u,118*u,-1);
+          // serduszko między nimi
+          ctx.fillStyle='#000';
+          const hx=110*u,hy=78*u,s=10*u;
+          ctx.beginPath(); ctx.moveTo(hx,hy+s*0.7);
+          ctx.bezierCurveTo(hx-s*1.1,hy+s*0.1,hx-s*1.1,hy-s*0.7,hx,hy-s*0.35);
+          ctx.bezierCurveTo(hx+s*1.1,hy-s*0.7,hx+s*1.1,hy+s*0.1,hx,hy+s*0.7); ctx.closePath(); ctx.fill();
+        },220,170,{ss:2,tol:0.9,minArea:10,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
