@@ -6928,6 +6928,86 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
             ctx.beginPath(); ctx.moveTo(sx+3*u,y); ctx.lineTo(sx+w, y-w*0.55); ctx.stroke();
           }
         },120,210,{ss:2,tol:0.8,minArea:8,smoothIter:2})},
+      {id:'mo_wolf', label:'Wilk (wyjący)', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          // siedzący wilk wyjący — złożony z nachodzących brył (canvas scala je w jedną sylwetkę)
+          // zad i tylna noga
+          ctx.beginPath(); ctx.ellipse(132*u,150*u,42*u,40*u,0,0,Math.PI*2); ctx.fill();
+          // pierś / front
+          ctx.beginPath(); ctx.ellipse(96*u,140*u,30*u,46*u,0,0,Math.PI*2); ctx.fill();
+          // przednie nogi (od piersi do ziemi)
+          ctx.fillRect(80*u,150*u,16*u,40*u);
+          ctx.fillRect(100*u,152*u,16*u,38*u);
+          // łapa tylna
+          ctx.beginPath(); ctx.ellipse(150*u,184*u,26*u,12*u,0,0,Math.PI*2); ctx.fill();
+          // szyja — gruby pas łączący pierś (ok. 92,104) z głową (ok. 64,58)
+          ctx.lineWidth=30*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(94*u,116*u); ctx.lineTo(66*u,62*u); ctx.stroke();
+          // głowa uniesiona (pysk skierowany ku górze-lewo)
+          ctx.beginPath(); ctx.ellipse(62*u,56*u,19*u,16*u,-0.5,0,Math.PI*2); ctx.fill();
+          // pysk (nachodzi na głowę)
+          ctx.save(); ctx.translate(48*u,44*u); ctx.rotate(-0.7);
+          ctx.beginPath(); ctx.ellipse(0,0,18*u,9*u,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+          // ucho
+          ctx.beginPath(); ctx.moveTo(72*u,44*u); ctx.lineTo(76*u,22*u); ctx.lineTo(84*u,42*u); ctx.closePath(); ctx.fill();
+          // ogon zakrzywiony
+          ctx.lineWidth=16*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(166*u,144*u);
+          ctx.quadraticCurveTo(196*u,140*u,190*u,108*u); ctx.stroke();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(60*u,52*u,3*u,0,Math.PI*2); ctx.fill();   // oko
+          ctx.fillStyle='#000'; ctx.fillRect(70*u,188*u,108*u,5*u);                                 // grunt
+        },200,200,{ss:2,tol:0.9,minArea:14,smoothIter:1})},
+      {id:'mo_monstera', label:'Liść monstera', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u,cy=92*u;
+          // sercowaty kontur liścia
+          ctx.beginPath();
+          ctx.moveTo(cx,12*u);
+          ctx.bezierCurveTo(150*u,18*u,184*u,52*u,184*u,98*u);
+          ctx.bezierCurveTo(184*u,140*u,150*u,168*u,108*u,176*u);
+          ctx.bezierCurveTo(104*u,177*u,100*u,177*u,100*u,172*u);
+          ctx.lineTo(100*u,168*u);
+          ctx.bezierCurveTo(100*u,172*u,96*u,177*u,92*u,176*u);
+          ctx.bezierCurveTo(50*u,168*u,16*u,140*u,16*u,98*u);
+          ctx.bezierCurveTo(16*u,52*u,50*u,18*u,cx,12*u);
+          ctx.closePath(); ctx.fill();
+          // charakterystyczne rozcięcia monstery = otwory
+          ctx.fillStyle='#fff';
+          const slit=(side,y,len,ww)=>{ ctx.save(); ctx.translate(cx,cy);
+            ctx.beginPath();
+            ctx.ellipse(side*len*0.5, y, len*0.5, ww, side*0.15,0,Math.PI*2); ctx.fill();
+            ctx.restore(); };
+          for(let i=0;i<4;i++){ const y=-40*u+i*30*u, len=(58-i*6)*u;
+            slit(1,y,len,5*u); slit(-1,y,len,5*u); }
+          // dziurki
+          ctx.beginPath(); ctx.ellipse(cx+44*u,cy-10*u,7*u,4*u,0.3,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(cx-44*u,cy+20*u,7*u,4*u,-0.3,0,Math.PI*2); ctx.fill();
+          // ogonek
+          ctx.fillStyle='#000'; ctx.lineWidth=5*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(cx,170*u); ctx.lineTo(cx,200*u); ctx.stroke();
+        },200,206,{ss:2,tol:1.0,minArea:10,smoothIter:2})},
+      {id:'mo_xmas_tree', label:'Choinka', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200,cx=100*u;
+          // trzy trójkątne piętra (nachodzą się → jedna sylwetka)
+          const tier=(topY,botY,hw)=>{ ctx.beginPath();
+            ctx.moveTo(cx,topY); ctx.lineTo(cx-hw,botY); ctx.lineTo(cx+hw,botY);
+            ctx.closePath(); ctx.fill(); };
+          tier(28*u,84*u,40*u);
+          tier(60*u,128*u,56*u);
+          tier(100*u,172*u,72*u);
+          ctx.fillRect(cx-11*u,172*u,22*u,22*u);   // pieniek
+          // bombki = otwory
+          ctx.fillStyle='#fff';
+          const balls=[[cx-14*u,72*u],[cx+16*u,70*u],[cx-28*u,116*u],[cx+6*u,118*u],[cx+30*u,112*u],
+            [cx-44*u,160*u],[cx-10*u,160*u],[cx+24*u,160*u],[cx+50*u,164*u]];
+          for(const [bx,by] of balls){ ctx.beginPath(); ctx.arc(bx,by,5*u,0,Math.PI*2); ctx.fill(); }
+          // gwiazda na szczycie (nachodzi na czubek)
+          ctx.fillStyle='#000';
+          const star=(x,y,R,r,n)=>{ ctx.beginPath();
+            for(let i=0;i<n*2;i++){ const a=-Math.PI/2+i*Math.PI/n, rr=i%2===0?R:r;
+              const px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr; i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
+            ctx.closePath(); ctx.fill(); };
+          star(cx,24*u,18*u,8*u,5);
+        },200,200,{ss:2,tol:1.0,minArea:10,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
