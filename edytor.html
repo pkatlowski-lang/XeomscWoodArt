@@ -7035,65 +7035,119 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
           star(cx,24*u,18*u,8*u,5);
         },200,200,{ss:2,tol:1.0,minArea:10,smoothIter:1})},
       {id:'mo_seahorse', label:'Konik morski', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/140;
-          // korpus konika morskiego — grube esowate pasmo zwijające się w ogon
-          ctx.lineWidth=20*u; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#000';
-          ctx.beginPath();
-          ctx.moveTo(58*u,34*u);                       // kark/głowa
-          ctx.bezierCurveTo(78*u,40*u,84*u,64*u,72*u,86*u);   // grzbiet wygięty
-          ctx.bezierCurveTo(64*u,102*u,52*u,112*u,56*u,130*u);// brzuch
-          ctx.bezierCurveTo(58*u,144*u,72*u,148*u,80*u,140*u);// początek zwoju ogona
-          ctx.bezierCurveTo(86*u,134*u,84*u,124*u,76*u,124*u);// zwój
-          ctx.stroke();
-          // pysk (rurkowaty) skierowany w lewo-górę
-          ctx.lineWidth=9*u;
-          ctx.beginPath(); ctx.moveTo(58*u,34*u); ctx.lineTo(30*u,30*u); ctx.stroke();
-          // korona/grzebień na głowie
-          ctx.lineWidth=4*u;
-          ctx.beginPath(); ctx.moveTo(62*u,22*u); ctx.lineTo(58*u,10*u); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(70*u,24*u); ctx.lineTo(72*u,12*u); ctx.stroke();
-          // płetwa grzbietowa
-          ctx.beginPath(); ctx.moveTo(80*u,72*u);
-          ctx.quadraticCurveTo(98*u,74*u,96*u,92*u); ctx.quadraticCurveTo(86*u,86*u,76*u,88*u);
-          ctx.closePath(); ctx.fillStyle='#000'; ctx.fill();
-          // oko
-          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(60*u,32*u,3.5*u,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(60*u,32*u,1.6*u,0,Math.PI*2); ctx.fill();
-        },140,160,{ss:2,tol:0.8,minArea:10,smoothIter:1})},
-      {id:'mo_lovebirds', label:'Ptaki na gałęzi', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/220;
-          // gałąź
-          ctx.lineWidth=7*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
-          ctx.beginPath(); ctx.moveTo(10*u,150*u);
-          ctx.quadraticCurveTo(110*u,140*u,210*u,154*u); ctx.stroke();
-          ctx.lineWidth=3.5*u;
-          ctx.beginPath(); ctx.moveTo(60*u,146*u); ctx.lineTo(48*u,128*u); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(48*u,128*u); ctx.lineTo(40*u,132*u); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(48*u,128*u); ctx.lineTo(52*u,118*u); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(160*u,148*u); ctx.lineTo(174*u,132*u); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(174*u,132*u); ctx.lineTo(182*u,136*u); ctx.stroke();
-          // dwa ptaszki zwrócone do siebie (każdy: ciało + głowa + ogon + dziób)
-          const bird=(bx,by,dir)=>{
-            ctx.beginPath(); ctx.ellipse(bx,by,18*u,14*u,dir*0.3,0,Math.PI*2); ctx.fill();      // ciało
-            ctx.beginPath(); ctx.arc(bx+dir*16*u,by-14*u,9*u,0,Math.PI*2); ctx.fill();          // głowa
-            ctx.beginPath(); ctx.moveTo(bx+dir*24*u,by-14*u); ctx.lineTo(bx+dir*36*u,by-12*u);  // dziób
-            ctx.lineTo(bx+dir*24*u,by-9*u); ctx.closePath(); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(bx-dir*14*u,by); ctx.lineTo(bx-dir*34*u,by-8*u);         // ogon
-            ctx.lineTo(bx-dir*32*u,by+6*u); ctx.closePath(); ctx.fill();
-            ctx.lineWidth=3*u; ctx.beginPath();                                                  // nóżka do gałęzi
-            ctx.moveTo(bx,by+12*u); ctx.lineTo(bx,by+30*u); ctx.stroke();
-            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(bx+dir*18*u,by-15*u,2.6*u,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle='#000';
-          };
-          bird(82*u,118*u,1);
-          bird(138*u,118*u,-1);
-          // serduszko między nimi
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
           ctx.fillStyle='#000';
-          const hx=110*u,hy=78*u,s=10*u;
+          // głowa — elipsa pochylona
+          ctx.save(); ctx.translate(90*u,36*u); ctx.rotate(-0.3);
+          ctx.beginPath(); ctx.ellipse(0,0,20*u,15*u,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+          // pysk/rurka
+          ctx.save(); ctx.translate(56*u,34*u); ctx.rotate(-0.15);
+          ctx.beginPath(); ctx.ellipse(0,0,26*u,6*u,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+          // kark — łączy głowę z korpusem
+          ctx.beginPath(); ctx.ellipse(100*u,52*u,14*u,18*u,-0.2,0,Math.PI*2); ctx.fill();
+          // korpus górny — brzuch wypukły w prawo
+          ctx.beginPath(); ctx.ellipse(96*u,76*u,18*u,22*u,0.15,0,Math.PI*2); ctx.fill();
+          // korpus środkowy
+          ctx.beginPath(); ctx.ellipse(88*u,104*u,16*u,20*u,0.1,0,Math.PI*2); ctx.fill();
+          // korpus dolny — zaczyna się zwężać
+          ctx.beginPath(); ctx.ellipse(82*u,130*u,13*u,18*u,0.2,0,Math.PI*2); ctx.fill();
+          // ogon — gruba krzywa zwijająca się w spiralę
+          ctx.lineWidth=14*u; ctx.lineCap='round'; ctx.strokeStyle='#000';
+          ctx.beginPath(); ctx.moveTo(78*u,146*u);
+          ctx.bezierCurveTo(70*u,162*u,58*u,172*u,54*u,180*u);
+          ctx.bezierCurveTo(48*u,192*u,62*u,196*u,72*u,188*u);
+          ctx.bezierCurveTo(82*u,180*u,78*u,170*u,68*u,172*u);
+          ctx.stroke();
+          // korona/grzebień (3 kolce)
+          ctx.lineWidth=5*u;
+          ctx.beginPath(); ctx.moveTo(84*u,22*u); ctx.lineTo(78*u,6*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(92*u,20*u); ctx.lineTo(90*u,4*u); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(100*u,22*u); ctx.lineTo(102*u,8*u); ctx.stroke();
+          // płetwa grzbietowa
+          ctx.beginPath(); ctx.moveTo(112*u,62*u);
+          ctx.quadraticCurveTo(138*u,60*u,134*u,90*u);
+          ctx.quadraticCurveTo(120*u,80*u,108*u,84*u);
+          ctx.closePath(); ctx.fill();
+          // małe płetwy piersiowe
+          ctx.beginPath(); ctx.moveTo(80*u,70*u);
+          ctx.quadraticCurveTo(60*u,66*u,58*u,80*u);
+          ctx.quadraticCurveTo(68*u,78*u,80*u,76*u);
+          ctx.closePath(); ctx.fill();
+          // oko (wydrążone)
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(86*u,32*u,4*u,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(86*u,32*u,1.8*u,0,Math.PI*2); ctx.fill();
+          // linie segmentów brzucha
+          ctx.lineWidth=2*u; ctx.strokeStyle='#000';
+          for(let i=0;i<6;i++){
+            const y=66*u+i*12*u;
+            ctx.beginPath();
+            ctx.moveTo(82*u-Math.sin(i*0.3)*3*u,y);
+            ctx.quadraticCurveTo(90*u,y+3*u,100*u+Math.sin(i*0.3)*3*u,y);
+            ctx.stroke();
+          }
+        },200,200,{ss:2,tol:0.8,minArea:10,smoothIter:2})},
+      {id:'mo_lovebirds', label:'Ptaki na gałęzi', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
+          ctx.fillStyle='#000'; ctx.strokeStyle='#000';
+          // gałąź — gruba, wyrazista, z odrostami
+          ctx.lineWidth=8*u; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(6*u,128*u);
+          ctx.quadraticCurveTo(100*u,114*u,194*u,130*u); ctx.stroke();
+          // odrosty z listkami
+          ctx.lineWidth=3.5*u;
+          ctx.beginPath(); ctx.moveTo(44*u,122*u); ctx.lineTo(30*u,100*u); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(26*u,96*u,6*u,10*u,-0.4,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(34*u,98*u,5*u,9*u,0.5,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(156*u,120*u); ctx.lineTo(172*u,98*u); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(176*u,94*u,5*u,9*u,0.3,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(168*u,96*u,5*u,8*u,-0.5,0,Math.PI*2); ctx.fill();
+          // ptaszek lewy (zwrócony w prawo)
+          const drawBird=(bx,by,dir)=>{
+            // ciało — duża elipsa pochylona
+            ctx.beginPath(); ctx.ellipse(bx,by,24*u,17*u,dir*0.25,0,Math.PI*2); ctx.fill();
+            // głowa
+            ctx.beginPath(); ctx.arc(bx+dir*20*u,by-16*u,12*u,0,Math.PI*2); ctx.fill();
+            // kark
+            ctx.beginPath(); ctx.ellipse(bx+dir*12*u,by-8*u,10*u,12*u,dir*0.4,0,Math.PI*2); ctx.fill();
+            // dziób
+            ctx.beginPath(); ctx.moveTo(bx+dir*30*u,by-18*u); ctx.lineTo(bx+dir*44*u,by-14*u);
+            ctx.lineTo(bx+dir*30*u,by-11*u); ctx.closePath(); ctx.fill();
+            // ogon — rozłożony wachlarzowo
+            ctx.beginPath(); ctx.moveTo(bx-dir*18*u,by-4*u);
+            ctx.lineTo(bx-dir*44*u,by-18*u); ctx.lineTo(bx-dir*42*u,by-6*u);
+            ctx.lineTo(bx-dir*46*u,by+4*u); ctx.lineTo(bx-dir*40*u,by+10*u);
+            ctx.lineTo(bx-dir*18*u,by+6*u); ctx.closePath(); ctx.fill();
+            // skrzydło — elipsa na ciele
+            ctx.fillStyle='#222'; ctx.beginPath();
+            ctx.ellipse(bx-dir*2*u,by-2*u,14*u,10*u,dir*0.3,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='#000';
+            // nóżki (dwie)
+            ctx.lineWidth=3*u;
+            ctx.beginPath(); ctx.moveTo(bx-dir*4*u,by+14*u); ctx.lineTo(bx-dir*6*u,by+32*u); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(bx+dir*4*u,by+14*u); ctx.lineTo(bx+dir*2*u,by+32*u); ctx.stroke();
+            // paluszki
+            ctx.lineWidth=2*u;
+            ctx.beginPath(); ctx.moveTo(bx-dir*6*u,by+32*u);
+            ctx.lineTo(bx-dir*12*u,by+36*u); ctx.moveTo(bx-dir*6*u,by+32*u);
+            ctx.lineTo(bx-dir*2*u,by+36*u); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(bx+dir*2*u,by+32*u);
+            ctx.lineTo(bx-dir*4*u,by+36*u); ctx.moveTo(bx+dir*2*u,by+32*u);
+            ctx.lineTo(bx+dir*8*u,by+36*u); ctx.stroke();
+            // oko
+            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(bx+dir*24*u,by-18*u,3.5*u,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(bx+dir*24*u,by-18*u,1.6*u,0,Math.PI*2); ctx.fill();
+          };
+          drawBird(70*u,94*u,1);
+          drawBird(130*u,94*u,-1);
+          // serduszko nad nimi
+          const hx=100*u,hy=46*u,s=14*u;
           ctx.beginPath(); ctx.moveTo(hx,hy+s*0.7);
-          ctx.bezierCurveTo(hx-s*1.1,hy+s*0.1,hx-s*1.1,hy-s*0.7,hx,hy-s*0.35);
-          ctx.bezierCurveTo(hx+s*1.1,hy-s*0.7,hx+s*1.1,hy+s*0.1,hx,hy+s*0.7); ctx.closePath(); ctx.fill();
-        },220,170,{ss:2,tol:0.9,minArea:10,smoothIter:1})},
+          ctx.bezierCurveTo(hx-s*1.2,hy+s*0.1,hx-s*1.2,hy-s*0.8,hx,hy-s*0.3);
+          ctx.bezierCurveTo(hx+s*1.2,hy-s*0.8,hx+s*1.2,hy+s*0.1,hx,hy+s*0.7);
+          ctx.closePath(); ctx.fill();
+        },200,180,{ss:2,tol:0.8,minArea:10,smoothIter:2})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
