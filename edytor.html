@@ -6423,6 +6423,21 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         d:starD(100,100,92,92,10,0.42,-90)+' '+ellipseD(100,100,20,20)},
       {id:'mo_ring', label:'Pierścień (ramka)', fillRule:'evenodd',
         d:ellipseD(100,100,95,95)+' '+ellipseD(100,100,81,81)},
+      {id:'mo_ring2', label:'Pierścień podwójny', fillRule:'evenodd',
+        d:ellipseD(100,100,96,96)+' '+ellipseD(100,100,86,86)+' '+ellipseD(100,100,76,76)+' '+ellipseD(100,100,70,70)},
+      {id:'mo_frame_scallop', label:'Ramka koronkowa', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,R=Math.min(W,H)/2-6,br=W*0.04,rr=R-br;
+          for(let i=0;i<28;i++){ const a=i/28*Math.PI*2; ctx.beginPath(); ctx.arc(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr, br,0,Math.PI*2); ctx.fill(); }  // ząbki
+          ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,R-br*2.6,0,Math.PI*2); ctx.fill();   // otwór
+        },300,300,{ss:2,tol:1.1,minArea:30,smoothIter:1})},
+      {id:'mo_frame_dots', label:'Ramka z perełkami', fillRule:'evenodd',
+        d:rasterizeShapeToD((ctx,W,H)=>{ const cx=W/2,cy=H/2,R=Math.min(W,H)/2-6, band=W*0.12;
+          ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx,cy,R-band,0,Math.PI*2); ctx.fill();      // pas pierścienia
+          const rmid=R-band*0.5, bead=W*0.02;
+          for(let i=0;i<30;i++){ const a=i/30*Math.PI*2; ctx.beginPath(); ctx.arc(cx+Math.cos(a)*rmid, cy+Math.sin(a)*rmid, bead,0,Math.PI*2); ctx.fill(); } // perełki = otwory
+        },300,300,{ss:2,tol:1.0,minArea:15,smoothIter:1})},
     ];
     const out=defs.map(def=>{ const m=mbox(def.d); return {...def,...m,custom:false}; });
     document.body.removeChild(tmp);
