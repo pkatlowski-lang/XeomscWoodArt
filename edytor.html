@@ -68,6 +68,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
    Panele boczne mają stałą szerokość 240px; strefa centralna dzieli się pionowo: płótno (flex:55)
    nad dolnym paskiem 3D+SVG (flex:45), a w dolnym pasku podgląd 3D i SVG są ułożone w proporcji 2:1. */
 .workspace{flex:1;display:flex;min-height:0}
+/* ---- Pionowy pasek narzędzi rysowania (lewa krawędź) ---- */
+.toolrail{flex:0 0 66px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh-sm);z-index:5}
+.toolrail .tool-list{display:flex;flex-direction:column;gap:6px;align-items:center}
+.toolrail .tbtn{flex-direction:column;width:54px;height:52px;min-width:0;gap:3px;font-size:.58rem;font-weight:600;border-radius:var(--r-sm);padding:0;line-height:1.05;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted)}
+.toolrail .tbtn .ico{font-size:1.3rem;line-height:1}
+.toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:var(--border)}
+.toolrail .tbtn.active{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:var(--accent-text);border-color:transparent;box-shadow:0 3px 12px -2px rgba(70,197,255,.5)}
 .panel{flex:0 0 248px;background:var(--surface);display:flex;flex-direction:column;overflow-y:auto}
 .panel.left{border-right:1px solid var(--border)}
 .panel.right{border-left:1px solid var(--border)}
@@ -509,7 +516,6 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 <div class="app">
   <div class="toolbar">
     <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.style.display='none'"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
-    <div class="tgroup" id="tools"></div>
     <div class="tgroup">
       <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)" aria-label="Cofnij"><span class="ico">↶</span></button>
       <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)" aria-label="Ponów"><span class="ico">↷</span></button>
@@ -561,59 +567,74 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   </div>
 
   <div class="workspace">
+    <nav class="toolrail" aria-label="Narzędzia rysowania">
+      <div class="tool-list" id="tools"></div>
+    </nav>
     <aside class="panel left">
       <div class="ptabs">
-        <button class="ptab active" data-ptab="project">🔧 Projekt</button>
-        <button class="ptab" data-ptab="pricing">💰 Wycena</button>
+        <button class="ptab active" data-ptab="add" title="Dodaj kształty, szablony i motywy">➕ Dodaj</button>
+        <button class="ptab" data-ptab="sheet" title="Arkusz, siatka i parametry">📄 Arkusz</button>
+        <button class="ptab" data-ptab="layers" title="Warstwy i kolejność elementów">▦ Warstwy</button>
+        <button class="ptab" data-ptab="pricing" title="Wycena projektu">💰 Wycena</button>
       </div>
-      <div class="ptab-body active" data-ptab-body="project">
-      <h2>Arkusz roboczy</h2>
-      <div class="field">
-        <label>Arkusz roboczy (mm)</label>
-        <div class="info-box" style="display:flex;align-items:center;gap:8px">
-          <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
-          <span class="muted-sm">— rozmiar stały</span>
+
+      <!-- ZAKŁADKA: DODAJ — szablony, bazy, motywy -->
+      <div class="ptab-body active" data-ptab-body="add">
+        <h2>Szablony startowe</h2>
+        <div class="tpl" id="templates"></div>
+        <h2>Galeria baz podstawowych</h2>
+        <div class="gallery" id="gallery"></div>
+        <label class="tbtn gallery-upload-btn" title="Wrzuć własny kształt SVG jako bazę">
+          📤 Wrzuć własną bazę (SVG)
+          <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
+        </label>
+        <h2>Galeria motywów</h2>
+        <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
+        <div class="gallery" id="motifs"></div>
+      </div><!-- /ptab-body add -->
+
+      <!-- ZAKŁADKA: ARKUSZ — rozmiar, siatka, parametry globalne -->
+      <div class="ptab-body" data-ptab-body="sheet">
+        <h2>Arkusz roboczy</h2>
+        <div class="field">
+          <label>Arkusz roboczy (mm)</label>
+          <div class="info-box" style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
+            <span class="muted-sm">— rozmiar stały</span>
+          </div>
+          <!-- Rozmiar arkusza jest stały (760×760 mm). Pola pozostają ukryte, aby
+               reszta logiki edytora działała bez zmian. -->
+          <input type="hidden" id="docWInput" value="760">
+          <input type="hidden" id="docHInput" value="760">
+          <select id="docPreset" style="display:none"><option value=""></option></select>
         </div>
-        <!-- Rozmiar arkusza jest stały (760×760 mm). Pola pozostają ukryte, aby
-             reszta logiki edytora działała bez zmian. -->
-        <input type="hidden" id="docWInput" value="760">
-        <input type="hidden" id="docHInput" value="760">
-        <select id="docPreset" style="display:none"><option value=""></option></select>
-      </div>
-      <div class="field">
-        <label>Siatka (mm)</label>
-        <div class="row2">
-          <input type="number" id="gridSizeInput" min="0.5" max="500" step="0.5" title="Odstęp linii siatki (mm)" aria-label="Rozmiar siatki (mm)">
-          <label class="check-label"><input type="checkbox" id="gridShowInput"> Pokaż siatkę</label>
+        <div class="field">
+          <label>Siatka (mm)</label>
+          <div class="row2">
+            <input type="number" id="gridSizeInput" min="0.5" max="500" step="0.5" title="Odstęp linii siatki (mm)" aria-label="Rozmiar siatki (mm)">
+            <label class="check-label"><input type="checkbox" id="gridShowInput"> Pokaż siatkę</label>
+          </div>
+          <label class="check-label" title="Wyłączone = elementy można stawiać i przesuwać płynnie, w dowolnym miejscu"><input type="checkbox" id="snapInput"> Przyciągaj do siatki</label>
         </div>
-        <label class="check-label" title="Wyłączone = elementy można stawiać i przesuwać płynnie, w dowolnym miejscu"><input type="checkbox" id="snapInput"> Przyciągaj do siatki</label>
-      </div>
-      <h2>Parametry globalne</h2>
-      <div class="params" id="params"></div>
-      <button type="button" class="tbtn addparam" id="addParamBtn">+ Dodaj parametr</button>
-      <h2>Szablony startowe</h2>
-      <div class="tpl" id="templates"></div>
-      <h2>Galeria baz podstawowych</h2>
-      <div class="gallery" id="gallery"></div>
-      <label class="tbtn gallery-upload-btn" title="Wrzuć własny kształt SVG jako bazę">
-        📤 Wrzuć własną bazę (SVG)
-        <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
-      </label>
-      <h2>Galeria motywów</h2>
-      <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
-      <div class="gallery" id="motifs"></div>
-      <h2>Warstwy 3D</h2>
-      <div class="depth-legend" id="depthLegend"></div>
-      <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
-      <h2>Kolejność elementów</h2>
-      <input type="text" id="layerSearch" class="layer-search" placeholder="🔍 Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
-      <div class="layers" id="layers"></div>
-      <div class="legend">
-        <span><i class="li-cut"></i> cięcie</span>
-        <span><i class="li-eng"></i> grawer</span>
-        <span><i class="li-sco"></i> nacięcie</span>
-      </div>
-      </div><!-- /ptab-body project -->
+        <h2>Parametry globalne</h2>
+        <div class="params" id="params"></div>
+        <button type="button" class="tbtn addparam" id="addParamBtn">+ Dodaj parametr</button>
+      </div><!-- /ptab-body sheet -->
+
+      <!-- ZAKŁADKA: WARSTWY — głębokość 3D i kolejność elementów -->
+      <div class="ptab-body" data-ptab-body="layers">
+        <h2>Warstwy 3D</h2>
+        <div class="depth-legend" id="depthLegend"></div>
+        <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
+        <h2>Kolejność elementów</h2>
+        <input type="text" id="layerSearch" class="layer-search" placeholder="🔍 Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
+        <div class="layers" id="layers"></div>
+        <div class="legend">
+          <span><i class="li-cut"></i> cięcie</span>
+          <span><i class="li-eng"></i> grawer</span>
+          <span><i class="li-sco"></i> nacięcie</span>
+        </div>
+      </div><!-- /ptab-body layers -->
 
       <div class="ptab-body" data-ptab-body="pricing">
         <!-- PROFIL WYCENY: zapisane zestawy cennika do wyboru -->
