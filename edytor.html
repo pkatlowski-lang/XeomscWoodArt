@@ -6479,11 +6479,21 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         },200,200,{ss:3,tol:1,minArea:20,smoothIter:1})},
       {id:'mo_boat', label:'Żaglówka', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>{ const u=W/200;
-          ctx.fillRect(96*u,24*u,8*u,128*u);                                                  // maszt (łączy żagle z kadłubem)
-          ctx.beginPath(); ctx.moveTo(96*u,30*u); ctx.lineTo(96*u,150*u); ctx.lineTo(44*u,150*u); ctx.closePath(); ctx.fill();    // żagiel lewy
-          ctx.beginPath(); ctx.moveTo(104*u,50*u); ctx.lineTo(104*u,150*u); ctx.lineTo(158*u,150*u); ctx.closePath(); ctx.fill(); // żagiel prawy
-          ctx.beginPath(); ctx.moveTo(24*u,150*u); ctx.lineTo(176*u,150*u); ctx.lineTo(150*u,180*u); ctx.lineTo(50*u,180*u); ctx.closePath(); ctx.fill(); // kadłub
-        },200,200,{ss:3,tol:1.1,minArea:30,smoothIter:0})},
+          ctx.fillRect(97*u,20*u,6*u,124*u);                                                  // maszt (łączy żagle z kadłubem)
+          ctx.beginPath(); ctx.moveTo(94*u,28*u); ctx.lineTo(94*u,140*u); ctx.lineTo(40*u,140*u); ctx.closePath(); ctx.fill();    // żagiel lewy (większy)
+          ctx.beginPath(); ctx.moveTo(106*u,46*u); ctx.lineTo(106*u,140*u); ctx.lineTo(150*u,140*u); ctx.closePath(); ctx.fill(); // żagiel prawy
+          ctx.fillStyle='#fff';                                                               // przerwa między żaglami = otwór (widać maszt)
+          ctx.beginPath(); ctx.moveTo(90*u,52*u); ctx.lineTo(90*u,136*u); ctx.lineTo(52*u,136*u); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(110*u,66*u); ctx.lineTo(110*u,136*u); ctx.lineTo(138*u,136*u); ctx.closePath(); ctx.fill();
+          ctx.fillStyle='#000';
+          ctx.beginPath(); ctx.moveTo(28*u,148*u); ctx.lineTo(172*u,148*u);                   // kadłub
+          ctx.quadraticCurveTo(160*u,182*u,140*u,182*u); ctx.lineTo(60*u,182*u);
+          ctx.quadraticCurveTo(40*u,182*u,28*u,148*u); ctx.closePath(); ctx.fill();
+          ctx.lineWidth=4*u; ctx.lineCap='round'; ctx.strokeStyle='#000';                     // fala pod łódką
+          ctx.beginPath(); ctx.moveTo(14*u,194*u);
+          ctx.quadraticCurveTo(40*u,186*u,66*u,194*u); ctx.quadraticCurveTo(92*u,202*u,118*u,194*u);
+          ctx.quadraticCurveTo(146*u,186*u,186*u,194*u); ctx.stroke();
+        },200,206,{ss:3,tol:1.1,minArea:24,smoothIter:1})},
       {id:'mo_wave', label:'Fala', fillRule:'nonzero',
         d:'M2 128 Q38 92 74 120 Q98 139 116 116 Q132 96 152 110 Q170 122 198 104 L198 176 L2 176 Z'},
       {id:'mo_flower', label:'Kwiat', fillRule:'evenodd',
