@@ -480,11 +480,11 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy</button>
       <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (do wczytania później)">💾 Zapisz projekt</button>
       <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json">📂 Otwórz projekt</button>
-      <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none">
+      <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none" aria-label="Otwórz projekt">
       <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
-      <input type="file" id="importImageInput" accept="image/*" style="display:none">
+      <input type="file" id="importImageInput" accept="image/*" style="display:none" aria-label="Importuj obraz">
       <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie (czerwony=cięcie, niebieski=nacięcie, czarny=grawer); napisy <text> importowane jako edytowalny tekst (lub kontury liter, jeśli mają obrót/skos)">📐 Importuj SVG</button>
-      <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" style="display:none">
+      <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" style="display:none" aria-label="Importuj SVG">
     </div>
     <div class="tgroup">
       <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
@@ -530,7 +530,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="field">
         <label>Siatka (mm)</label>
         <div class="row2">
-          <input type="number" id="gridSizeInput" min="0.5" max="500" step="0.5" title="Odstęp linii siatki (mm)">
+          <input type="number" id="gridSizeInput" min="0.5" max="500" step="0.5" title="Odstęp linii siatki (mm)" aria-label="Rozmiar siatki (mm)">
           <label class="check-label"><input type="checkbox" id="gridShowInput"> Pokaż siatkę</label>
         </div>
         <label class="check-label" title="Wyłączone = elementy można stawiać i przesuwać płynnie, w dowolnym miejscu"><input type="checkbox" id="snapInput"> Przyciągaj do siatki</label>
@@ -544,7 +544,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="gallery" id="gallery"></div>
       <label class="tbtn gallery-upload-btn" title="Wrzuć własny kształt SVG jako bazę">
         📤 Wrzuć własną bazę (SVG)
-        <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none">
+        <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
       </label>
       <h2>Galeria motywów</h2>
       <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
@@ -553,7 +553,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       <div class="depth-legend" id="depthLegend"></div>
       <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
       <h2>Kolejność elementów</h2>
-      <input type="text" id="layerSearch" class="layer-search" placeholder="🔍 Szukaj elementu po nazwie…">
+      <input type="text" id="layerSearch" class="layer-search" placeholder="🔍 Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
       <div class="layers" id="layers"></div>
       <div class="legend">
         <span><i class="li-cut"></i> cięcie</span>
@@ -593,14 +593,14 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <section class="stage">
       <div class="text-toolbar" id="textToolbar">
         <div class="font-dd" id="ttFontDD" title="Czcionka — najedź na nazwę, aby zobaczyć podgląd"></div>
-        <input type="number" id="ttSize" min="4" max="400" step="1" title="Wielkość czcionki (mm)">
+        <input type="number" id="ttSize" min="4" max="400" step="1" title="Wielkość czcionki (mm)" aria-label="Wielkość czcionki (mm)">
         <span class="tt-sep"></span>
         <button type="button" class="tbtn" id="ttBold" title="Pogrubienie"><b>B</b></button>
         <button type="button" class="tbtn" id="ttItalic" title="Kursywa"><i>I</i></button>
         <button type="button" class="tbtn" id="ttUnderline" title="Podkreślenie"><u>U</u></button>
         <span class="tt-sep"></span>
-        <label>Szer.</label><input type="number" id="ttW" min="1" step="1" title="Szerokość napisu (mm) — rozciąganie">
-        <label>Wys.</label><input type="number" id="ttH" min="1" step="1" title="Wysokość napisu (mm) — rozciąganie">
+        <label for="ttW">Szer.</label><input type="number" id="ttW" min="1" step="1" title="Szerokość napisu (mm) — rozciąganie">
+        <label for="ttH">Wys.</label><input type="number" id="ttH" min="1" step="1" title="Wysokość napisu (mm) — rozciąganie">
         <button type="button" class="tbtn" id="ttReset" aria-label="Przywróć proporcje 1:1" title="Przywróć proporcje 1:1">↺</button>
       </div>
       <div class="ruler-corner" id="rulerCorner" title="Dwuklik: usuń wszystkie linie pomocnicze"></div>
@@ -691,10 +691,10 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <button class="modal-close" aria-label="Zamknij" id="modalHingeClose" title="Zamknij">✕</button>
     <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
     <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec” (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
-    <div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
+    <div class="field"><label for="hingeH">Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <div class="field"><label>Pole lewe (mm)</label><input type="number" id="hingeLeft" min="0" max="700" step="1" value="70"></div>
-      <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
+      <div class="field"><label for="hingeLeft">Pole lewe (mm)</label><input type="number" id="hingeLeft" min="0" max="700" step="1" value="70"></div>
+      <div class="field"><label for="hingeZone">Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" id="hingeRight" min="0" max="700" step="1" value="90"></div>
     </div>
     <div class="form-sec">Nacięcia</div>
