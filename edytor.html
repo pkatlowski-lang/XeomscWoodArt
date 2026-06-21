@@ -682,7 +682,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
     <section class="stage">
       <div class="text-toolbar" id="textToolbar">
         <div class="font-dd" id="ttFontDD" title="Czcionka — najedź na nazwę, aby zobaczyć podgląd"></div>
-        <input type="number" id="ttSize" min="4" max="400" step="1" title="Wielkość czcionki (mm)" aria-label="Wielkość czcionki (mm)">
+        <input type="number" id="ttSize" min="4" max="2000" step="1" title="Wielkość czcionki (mm)" aria-label="Wielkość czcionki (mm)">
         <span class="tt-sep"></span>
         <button type="button" class="tbtn" id="ttBold" title="Pogrubienie"><b>B</b></button>
         <button type="button" class="tbtn" id="ttItalic" title="Kursywa"><i>I</i></button>
@@ -2788,7 +2788,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       o.sx=it.sx0*s; o.sy=it.sy0*s;
       o.x=newCenter.x-cx; o.y=newCenter.y-cy;
     } else if(o.type==='text'){
-      o.fontSize=clamp(it.fs0*s,4,400);
+      o.fontSize=clamp(it.fs0*s,4,2000);
       o.x=newCenter.x - s*(it.c0.x-it.x0);
       o.y=newCenter.y - s*(it.c0.y-it.y0);
     } else if(o.type==='line'){
@@ -2853,7 +2853,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       renderObjectEl(o); renderOverlay();
     } else if(drag.mode==='drawText'){
       const o=drag.o, dist=Math.hypot(docP.x-drag.ax,docP.y-drag.ay);
-      if(dist>2){ drag.moved=true; o.fontSize=clamp(Math.round(dist),4,400); }
+      if(dist>2){ drag.moved=true; o.fontSize=clamp(Math.round(dist),4,2000); }
       state.dragLabel={text:`Wielkość czcionki: ${fmt(o.fontSize)} mm`, x:docP.x, y:docP.y};
       renderObjectEl(o); renderOverlay(); syncPropsLive();
     } else if(drag.mode==='rotate'){
@@ -2958,7 +2958,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
       if(h.length===2 || shift || !d.naturalBB){
         const dist=Math.hypot(docP.x-c.x,docP.y-c.y);
         const startDist=Math.hypot((b.x+b.w)-c.x,(b.y+b.h)-c.y)||1;
-        o.fontSize=clamp(Math.round(d.startFont*dist/startDist),4,400);
+        o.fontSize=clamp(Math.round(d.startFont*dist/startDist),4,2000);
         return;
       }
       // krawędź (n/s/e/w) -> niezależne rozciąganie w poziomie LUB w pionie (tsx/tsy),
@@ -3329,7 +3329,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
         <button class="${o.italic?'on':''}" data-tstyle="italic" style="font-style:italic;font-size:.88rem" title="Kursywa">I</button>
         <button class="${o.underline?'on':''}" data-tstyle="underline" style="text-decoration:underline;font-size:.88rem" title="Podkreślenie">U</button>
       </div></div>`;
-      h+=rangeField('Wielkość (mm)','fontSize',o.fontSize||24,4,160,1,o);
+      h+=rangeField('Wielkość (mm)','fontSize',o.fontSize||24,4,2000,1,o);
       const tbb=objBBox(o);
       h+=`<div class="field"><label>Szerokość napisu (mm)</label><input type="number" id="textW" value="${fmt(tbb.w)}" min="1" step="1"></div>`;
       h+=`<div class="field"><label>Wysokość napisu (mm)</label><input type="number" id="textH" value="${fmt(tbb.h)}" min="1" step="1"></div>`;
@@ -3695,7 +3695,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
   }
   bindFontDD(ttFontDD, ()=>{ const o=getSel(); return (o&&o.type==='text')?o:null; },
     ()=>{ renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D(); updateTextToolbar(); });
-  ttSize.addEventListener('change',()=>{ const o=getSel(); if(!o||o.type!=='text') return; o.fontSize=clamp(Number(ttSize.value)||24,4,400); renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D(); });
+  ttSize.addEventListener('change',()=>{ const o=getSel(); if(!o||o.type!=='text') return; o.fontSize=clamp(Number(ttSize.value)||24,4,2000); renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D(); });
   [[ttBold,'bold'],[ttItalic,'italic'],[ttUnderline,'underline']].forEach(([btn,key])=>{
     btn.addEventListener('click',()=>{ const o=getSel(); if(!o||o.type!=='text') return; o[key]=!o[key]; renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D(); });
   });
