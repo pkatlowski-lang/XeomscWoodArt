@@ -359,9 +359,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Modal eksportu 3D ---- */
 /* visibility:hidden po zakończeniu animacji znikania — usuwa zamknięte modale (i ich pola
    formularzy) z kolejności Tab; przy otwarciu staje się widoczny natychmiast */
-.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s ease,visibility 0s linear .18s}
-.modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .18s ease,visibility 0s}
-.modal-box{background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg);transform:scale(.97) translateY(-10px);transition:transform .2s ease,opacity .18s ease;opacity:0}
+.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s ease,visibility 0s linear .2s}
+.modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .2s ease,visibility 0s}
+.modal-box{background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .2s ease;opacity:0}
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
 .modal-box h3{margin:0 0 14px;font-size:1.1rem;font-weight:800;padding-bottom:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--text),rgba(var(--accent-rgb),.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .14s,color .14s,border-color .14s,transform .1s}
@@ -373,7 +373,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700}
 .layer3d-card .lcount{font-size:.71rem;color:var(--muted)}
 .layer3d-card svg{width:120px;height:76px;overflow:visible;background:var(--bg);border-radius:6px;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.3)}
-.modal-note{margin-top:16px;font-size:.76rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:12px}
+.modal-note{margin-top:16px;font-size:.76rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:12px;background:rgba(var(--accent-rgb),.03);border-radius:0 0 var(--r-sm) var(--r-sm);padding:12px;margin-left:-12px;margin-right:-12px;margin-bottom:-12px}
 
 /* ---- Biblioteka materiałów (modal) ---- */
 .mat-list{display:flex;flex-direction:column;gap:6px;margin-top:14px}
@@ -443,7 +443,7 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .p3d-edge-b,.p3d-edge-r{position:absolute;transform-style:preserve-3d}
 .p3d-edge-b{bottom:0;left:0;width:100%;transform-origin:bottom center}
 .p3d-edge-r{top:0;right:0;height:100%;transform-origin:right center}
-.p3d-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.p3d-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:6px;padding:6px 8px;background:rgba(var(--accent-rgb),.03);border-radius:8px;border:1px solid rgba(var(--accent-rgb),.08)}
 .p3d-controls input[type=range]{width:120px;accent-color:var(--accent)}
 .p3d-controls b{color:var(--text);min-width:22px;display:inline-block}
 
@@ -579,8 +579,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 .tspacer{flex:1 1 auto}
 .dd{position:relative}
 .dd-toggle{display:inline-flex;align-items:center;gap:4px}
-.dd-caret{font-size:.65rem;opacity:.6;transition:transform .2s}
-.dd.open .dd-caret{transform:rotate(180deg)}
+.dd-caret{font-size:.65rem;opacity:.5;transition:transform .2s,opacity .2s}
+.dd.open .dd-caret{transform:rotate(180deg);opacity:.8}
 .dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:210px;background:linear-gradient(180deg,rgba(26,34,51,.96),rgba(12,16,25,.96));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r);padding:5px;box-shadow:var(--sh),0 0 0 1px rgba(0,0,0,.12);z-index:900;flex-direction:column}
 .dd.open .dd-menu{display:flex}
 .dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:7px;padding:8px 12px;font-size:.82rem;background:transparent;color:var(--text);transition:background .1s,color .1s}
@@ -972,7 +972,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       <div class="field"><label>Otwór osi (mm, 0 = brak)</label><input type="number" id="gearBore" min="0" max="200" step="0.5" value="6"></div>
     </div>
     <div style="display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px">
-      <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"></div>
+      <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)"></div>
       <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
     </div>
     <button type="button" class="tbtn tbtn-primary tbtn-block" id="gearGenerateBtn">⚙ Generuj koło zębate</button>
