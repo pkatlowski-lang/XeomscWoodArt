@@ -867,6 +867,66 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 /* === Hint tooltip — wrapping === */
 .hint::after{word-wrap:break-word;overflow-wrap:break-word}
 
+/* === Reduced motion — respektuj preferencje użytkownika === */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .gallery-card:hover,.tpl button:hover{transform:none}
+  .toolrail .tbtn:hover{transform:none}
+  .layer:active,.tbtn:active:not(:disabled){transform:none}
+  .modal-ov .modal-box,.confirm-box{transition:none}
+  .toast{animation:none}
+  .q-price-card:not(.empty){animation:none}
+}
+
+/* === Print — ukryj UI przy drukowaniu === */
+@media print{
+  .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov{display:none!important}
+  .app{height:auto;overflow:visible}
+  .workspace{flex-direction:column}
+  .stage{flex:none;min-height:auto;background:#fff}
+  #canvas{position:static;width:100%;height:auto}
+}
+
+/* === Polerka: panel h2 — hover akcent === */
+.panel h2{transition:color .12s}
+.panel h2:hover{color:var(--text)}
+
+/* === Polerka: pq-h — hover feedback === */
+.pq-h{transition:color .12s}
+.pq-h:hover{color:#fff}
+
+/* === Polerka: toolbar tgroup — subtelna separacja === */
+.tgroup{transition:border-color .14s}
+.tgroup:hover{border-color:rgba(var(--accent-rgb),.15)}
+
+/* === Polerka: workspace centralna sekcja — lepsza separacja === */
+.stage{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+
+/* === Polerka: modal note — lepsza czytelnść === */
+.modal-note code,.modal-note strong{color:var(--text);font-weight:600}
+
+/* === Polerka: layer drag state === */
+.layer.dragging{background:rgba(var(--accent-rgb),.04);border-color:var(--accent)}
+
+/* === Polerka: dd-sep — lepsza widoczność === */
+.dd-sep{opacity:.3;margin:5px 10px}
+
+/* === Polerka: check-label lepsza interakcja === */
+.check-label{cursor:pointer;transition:color .12s}
+.check-label:hover{color:#fff}
+
+/* === Polerka: info-box responsywność === */
+@media(max-width:640px){
+  .info-box{flex-direction:column;text-align:center;gap:4px}
+}
+
+/* === Polerka: lepsza hierarchia numerów w polach === */
+.field input[type=number]{font-variant-numeric:tabular-nums}
+.param-card input[type=number]{font-variant-numeric:tabular-nums}
+
+/* === Polerka: select w polach — spójny styl === */
+.field select{cursor:pointer}
+
 /* === Kontekstowe menu — ikony z odstępem === */
 .ctx-menu button .ico{margin-right:4px;font-size:.88rem}
 
