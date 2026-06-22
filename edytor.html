@@ -2742,6 +2742,75 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 /* === v76: Better quote send button === */
 .lq-send{position:relative;overflow:hidden;transition:background .14s,box-shadow .14s,transform .08s}
 .lq-send:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.2)}
+
+/* === v77: Nawigacja klawiaturowa w panelu warstw === */
+.layer[tabindex]{outline:none}
+.layer[tabindex]:focus{box-shadow:var(--glow);border-color:rgba(var(--accent-rgb),.5);z-index:2}
+.layer[tabindex]:focus .lname{color:#fff}
+.layer[tabindex]:focus .lico{opacity:.9}
+
+/* === v77: Autosave — wizualny mini-indicator === */
+@keyframes autosavePulse{0%{opacity:0;transform:scale(.8)}30%{opacity:1;transform:scale(1)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}
+.sb-autosave{color:var(--success);font-weight:600;font-size:.6rem;animation:autosavePulse 1.8s ease-out forwards;pointer-events:none}
+
+/* === v77: Lepsze tooltips na depth badge — rich info === */
+.d-badge[data-tooltip]::after{min-width:120px;white-space:normal;text-align:center;font-variant-numeric:tabular-nums}
+
+/* === v77: Karta szablonu — shimmer na hover === */
+.tpl button{position:relative;overflow:hidden}
+.tpl button::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transition:left .5s}
+.tpl button:hover::after{left:110%}
+
+/* === v77: Lepsze wyróżnienie aktywnego narzędzia toolrail === */
+.toolrail .tbtn.active::after{content:'';position:absolute;bottom:2px;left:30%;right:30%;height:2px;border-radius:2px;background:rgba(255,255,255,.5)}
+
+/* === v77: Poprawiony autosave indicator w statusbar === */
+.sb-autosave-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px rgba(84,214,153,.5);margin-right:4px;vertical-align:middle}
+
+/* === v77: Lepsze multi-select info w panelu właściwości === */
+.multi-sel-info{display:flex;gap:8px;flex-wrap:wrap;margin:8px 16px;font-size:.72rem}
+.multi-sel-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.15);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* === v77: Toolbar — responsywne etykiety narzędzi (ukryj na małych ekranach) === */
+@media(max-width:1100px){
+  .toolbar .tgroup .tbtn{padding:0 8px;font-size:.74rem}
+  .toolbar .tgroup .tbtn .ico+span{display:none}
+}
+
+/* === v77: Panel — lepsza wizualizacja scroll position === */
+.panel{position:relative}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.08),transparent);z-index:3;pointer-events:none;opacity:0;transition:opacity .2s}
+.panel:hover::before{opacity:1}
+
+/* === v77: Lepszy status bar — wyraźniejszy separator === */
+.sb-sep{color:rgba(var(--accent-rgb),.2);font-size:.5rem}
+
+/* === v77: Pq-mat-row — animacja przy dodawaniu === */
+@keyframes matRowIn{from{opacity:0;transform:translateY(-4px);max-height:0}to{opacity:1;transform:translateY(0);max-height:200px}}
+.pq-mat-row{animation:matRowIn .2s ease-out}
+
+/* === v77: Ulepszona galeria kart — gradient overlay na hover === */
+.gallery-card{position:relative;overflow:hidden}
+.gallery-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(var(--accent-rgb),.08));opacity:0;transition:opacity .2s;pointer-events:none;z-index:0;border-radius:var(--r)}
+.gallery-card:hover::before{opacity:1}
+
+/* === v77: Quick search — kategoria z ikoną === */
+.qs-category::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:var(--accent);margin-right:6px;vertical-align:middle;opacity:.5}
+
+/* === v77: Responsywność — bardzo duże ekrany (2K+) panele === */
+@media(min-width:2000px){
+  .panel{flex-basis:300px}
+  .panel h2{font-size:.72rem;padding:18px 20px 10px}
+  .field{padding:0 20px 12px}
+  .field label{font-size:.72rem;margin-bottom:6px}
+  .field input,.field select,.field textarea{font-size:.88rem;padding:9px 12px}
+  .layer{padding:6px 8px 6px 12px}
+  .layer .lname{font-size:.84rem}
+}
+
+/* === v77: Toolbar — group separator pulse na hover === */
+.tgroup::after{transition:opacity .2s}
+.tgroup:hover::after{opacity:1;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.25),transparent)}
 </style>
 </head>
 <body>
@@ -3201,6 +3270,14 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         <div class="sc-row"><span>Obróć 90° w lewo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>←</kbd></span></div>
         <div class="sc-row"><span>Odbij poziomo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
         <div class="sc-row"><span>Odbij pionowo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>J</kbd></span></div>
+      </div>
+      <div class="sc-group">
+        <h4>Nawigacja warstw</h4>
+        <div class="sc-row"><span>Następna warstwa</span><span class="sc-keys"><kbd>↓</kbd></span></div>
+        <div class="sc-row"><span>Poprzednia warstwa</span><span class="sc-keys"><kbd>↑</kbd></span></div>
+        <div class="sc-row"><span>Zaznacz warstwę</span><span class="sc-keys"><kbd>Enter</kbd> / <kbd>Spacja</kbd></span></div>
+        <div class="sc-row"><span>Usuń warstwę</span><span class="sc-keys"><kbd>Del</kbd></span></div>
+        <div class="sc-row"><span>Multi-select</span><span class="sc-keys"><kbd>Shift</kbd>+<kbd>Enter</kbd></span></div>
       </div>
       <div class="sc-group">
         <h4>Widok</h4>
@@ -6345,7 +6422,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       const dbadge=`<span class="d-badge ${dc}" title="Warstwa 3D ${d}">${d}</span>`;
       const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'🔒':'🔓';
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
-      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}" draggable="true">
+      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}" draggable="true" tabindex="0">
         <span class="drag-grip" title="Przeciągnij, aby zmienić kolejność">⠿</span>
         <span class="swatch ${sw}" title="${o.mode==='engrave'?'Grawer':o.mode==='score'?'Nacięcie':o.mode==='reference'?'Referencja':'Cięcie'}"></span>
         ${dbadge}
@@ -6422,6 +6499,23 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         state.objects.splice(insertAt,0,moved);
         pushHistory(); renderAll(); renderProps();
         showToast('Kolejność warstw zmieniona','info',1500);
+      });
+      row.addEventListener('keydown',e=>{
+        const layers=Array.from(layersEl.querySelectorAll('.layer'));
+        const idx=layers.indexOf(row);
+        if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+          e.preventDefault();
+          const next=e.key==='ArrowDown'?idx+1:idx-1;
+          if(next>=0&&next<layers.length) layers[next].focus();
+        }
+        if(e.key==='Enter'||e.key===' '){
+          e.preventDefault();
+          (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(id):select(id);
+        }
+        if(e.key==='Delete'){
+          e.preventDefault();
+          layerAction(id,'del');
+        }
       });
     });
   }
@@ -10415,9 +10509,23 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     }
   });
   /* Autosave do localStorage co 30 s (jeśli są niezapisane zmiany) */
+  let _autosaveCount=0;
   setInterval(()=>{
     if(state.objects.length && state.hIndex!==_savedAtIndex){
       try{ localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(serializeProject())); }catch(ex){}
+      _autosaveCount++;
+      const sbSave=document.getElementById('sbSave');
+      if(sbSave){
+        const dot=document.createElement('span');
+        dot.className='sb-autosave';
+        dot.textContent='✓ auto';
+        sbSave.parentNode.insertBefore(dot,sbSave.nextSibling);
+        setTimeout(()=>dot.remove(),2000);
+      }
+      if(_autosaveCount%4===0){
+        const sizeKB=(JSON.stringify(serializeProject()).length/1024).toFixed(0);
+        showToast('Autozapis ('+state.objects.length+' elem., '+sizeKB+' KB)','info',1200);
+      }
     }
   }, 30000);
   /* Próba odtworzenia autozapisu przy starcie */
@@ -10539,6 +10647,14 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     {ico:'🔗',label:'Grupuj zaznaczone',hint:'Ctrl+G',cat:'edycja',action:groupSel},
     {ico:'⛓',label:'Rozgrupuj',hint:'Ctrl+Shift+G',cat:'edycja',action:ungroupSel},
     {ico:'🔄',label:'Odwróć zaznaczenie',hint:'Ctrl+Shift+I',cat:'edycja',action:invertSelection},
+    {ico:'📐',label:'Wyrównaj do lewej',hint:'',cat:'wyrównanie',action:()=>alignSel('left')},
+    {ico:'📐',label:'Wyrównaj do prawej',hint:'',cat:'wyrównanie',action:()=>alignSel('right')},
+    {ico:'📐',label:'Wyśrodkuj w pionie',hint:'',cat:'wyrównanie',action:()=>alignSel('vcenter')},
+    {ico:'📐',label:'Wyśrodkuj w poziomie',hint:'',cat:'wyrównanie',action:()=>alignSel('hcenter')},
+    {ico:'📐',label:'Wyrównaj do góry',hint:'',cat:'wyrównanie',action:()=>alignSel('top')},
+    {ico:'📐',label:'Wyrównaj do dołu',hint:'',cat:'wyrównanie',action:()=>alignSel('bottom')},
+    {ico:'↔',label:'Rozłóż w poziomie',hint:'',cat:'wyrównanie',action:()=>distributeSel('h')},
+    {ico:'↕',label:'Rozłóż w pionie',hint:'',cat:'wyrównanie',action:()=>distributeSel('v')},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
