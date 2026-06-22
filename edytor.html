@@ -254,6 +254,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field label{display:block;font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
 .field .row2{display:flex;gap:8px}
 .field input[type=number],.field input[type=text],.field select,.field textarea{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;transition:border-color .14s,box-shadow .14s,background .14s}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:var(--border-strong)}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25),inset 0 0 0 1px rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.03)}
 #props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:var(--border);margin-top:2px;opacity:.55;transition:opacity .15s,border-color .12s,color .12s}
 #props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
@@ -957,7 +958,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   border:1px solid var(--border-strong);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.55);
   animation:toastIn .25s ease-out;transition:opacity .2s,transform .2s}
 .toast.toast-error{border-color:rgba(255,90,90,.45);background:linear-gradient(180deg,rgba(40,20,20,.96),rgba(20,10,10,.96))}
-.toast.toast-success{border-color:rgba(84,214,153,.4)}
+.toast.toast-success{border-color:rgba(84,214,153,.4);background:linear-gradient(180deg,rgba(15,40,30,.96),rgba(8,20,15,.96))}
+.toast.toast-info{border-color:rgba(var(--accent-rgb),.35);background:linear-gradient(180deg,rgba(15,25,45,.96),rgba(8,14,28,.96))}
+.toast.toast-warning{border-color:rgba(255,170,60,.45);background:linear-gradient(180deg,rgba(40,30,12,.96),rgba(20,15,6,.96))}
 .toast.toast-out{opacity:0;transform:translateX(20px)}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 
@@ -1608,8 +1611,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   const ACCENT='#3fc7ff';
   const _toastC=document.getElementById('toastContainer');
   function showToast(msg,type,duration){
+    const icons={success:'✓ ',error:'✗ ',info:'ℹ ',warning:'⚠ '};
     const el=document.createElement('div'); el.className='toast'+(type?' toast-'+type:'');
-    el.textContent=msg; _toastC.appendChild(el);
+    el.textContent=(icons[type]||'')+msg; _toastC.appendChild(el);
     setTimeout(()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); },duration||3500);
   }
   const _confirmOv=document.getElementById('confirmOverlay');
@@ -1755,6 +1759,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   async function loadLocalFonts(){
     if(!window.queryLocalFonts){ showToast('Ta przeglądarka nie udostępnia czcionek z komputera. Użyj Chrome lub Edge.','error',5000); return; }
     try{
+      document.body.style.cursor='wait';
+      showToast('Wczytywanie czcionek z komputera…','info');
       const fonts=await window.queryLocalFonts();
       const fams=[...new Set(fonts.map(f=>f.family))].sort((a,b)=>a.localeCompare(b));
       // queryLocalFonts() daje tylko NAZWY rodzin - Canvas2D (rasteryzacja konturów do
@@ -1782,8 +1788,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       renderProps(); renderAll();
       const note=embeddedFamilies.size<fams.length?` (zarejestrowano do wektoryzacji ${embeddedFamilies.size}/${fams.length})`:'';
       const fcnt=fams.length, fpl=fcnt===1?'czcionkę':fcnt<=4?'czcionki':'czcionek';
+      document.body.style.cursor='';
       showToast('Wczytano '+fcnt+' '+fpl+' z komputera'+note+'. Znajdziesz je na liście czcionek.','success',4000);
-    }catch(e){ showToast('Nie udało się wczytać czcionek: '+e.message,'error',4000); }
+    }catch(e){ document.body.style.cursor=''; showToast('Nie udało się wczytać czcionek: '+e.message,'error',4000); }
   }
 
   /* ---- Rozwijana lista czcionek z PODGLĄDEM NA ŻYWO: najechanie na nazwę od razu
@@ -2481,8 +2488,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const c=offsetShape(o,d); if(!c) return;
     c.name='Obwódka';
     const i=state.objects.findIndex(x=>x.id===o.id);
-    state.objects.splice(i,0,c);              // wstaw PRZED oryginałem -> rysuje się pod spodem
+    state.objects.splice(i,0,c);
     state.selectedIds=[c.id]; pushHistory(); renderAll(); renderProps();
+    showToast('Obwódka utworzona ('+d+' mm)','success');
   }
 
   /* ---- Konwertuj kształt (prostokąt/elipsa/wielokąt/gwiazda) na ścieżkę z edytowalnymi punktami ----
@@ -2499,6 +2507,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const i=state.objects.findIndex(x=>x.id===o.id);
     state.objects[i]=conv; state.selectedIds=[conv.id];
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
+    showToast('Kształt zamieniony na ścieżkę','success');
   }
 
   /* ---- Konwertuj napis na ścieżkę ze zwektoryzowanymi konturami liter (z otworami w "a","o","e"...) ----
@@ -2651,6 +2660,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     state.objects.splice(i,1,...newObjs);
     state.selectedIds=newObjs.map(x=>x.id);
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
+    showToast('Rozdzielono na '+newObjs.length+' podścieżek','success');
   }
 
   /* ---------------- Operacje boolowskie (suma / różnica / część wspólna) ---------------- */
@@ -3172,6 +3182,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const f=pts[0], l=pts[pts.length-1]; if(Math.hypot(f[0]-l[0],f[1]-l[1])<0.01) pts.pop();
     const d=smoothClosedPath(pts); if(!d) return;
     o.d=d; pushHistory(); renderObjects(); renderProps();
+    showToast('Ścieżka wygładzona krzywymi Béziera','success');
   }
 
   /* ---------------- Edycja punktów ścieżki ---------------- */
@@ -3806,6 +3817,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       x+=w+gap; rowH=Math.max(rowH,h);
     });
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
+    showToast('Rozmieszczono '+items.length+' elementów','success');
   }
   function renderMultiProps(sel){
     let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}</div>`;
@@ -4715,6 +4727,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   }
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
     downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`);
+    showToast('Projekt zapisany do pliku','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
     document.getElementById('loadProjectInput').click();
@@ -4727,6 +4740,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         const d=JSON.parse(reader.result);
         if(!Array.isArray(d.objects)) throw new Error('zły format pliku');
         applyProjectData(d);
+        showToast('Projekt wczytany — '+d.objects.length+' obiektów','success');
       }catch(err){ showToast('Nie udało się wczytać projektu: '+err.message,'error',5000); }
     };
     reader.readAsText(f);
@@ -6431,6 +6445,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     state.objects.push(outline,slits); state.selectedIds=[outline.id,slits.id];
     pushHistory(); renderAll(); renderProps(); zoomFit();
     modalHinge.classList.remove('open');
+    showToast('Zawias wstawiony na arkusz','success');
   });
 
   /* ---------------- Generator koła zębatego (zarys ewolwentowy) ---------------- */
@@ -6521,6 +6536,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     state.objects.push(...newObjs); state.selectedIds=newObjs.map(o=>o.id);
     pushHistory(); renderAll(); renderProps(); zoomFit();
     modalGear.classList.remove('open');
+    showToast('Koło zębate wstawione na arkusz','success');
   });
 
   /* ---------------- Galeria podkładów ---------------- */
@@ -6974,6 +6990,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       state.objects.push(...newObjs);
       state.selectedIds=newObjs.map(o=>o.id);
       pushHistory(); renderAll(); renderProps();
+      const cnt=newObjs.length, pl=cnt===1?'obiekt':cnt<=4?'obiekty':'obiektów';
+      showToast('Zaimportowano '+cnt+' '+pl+' z SVG','success');
     };
     reader.readAsText(file);
   }
