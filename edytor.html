@@ -2212,6 +2212,78 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 
 /* === v67: Statusbar separator — gradient dot === */
 .sb-sep{background:linear-gradient(180deg,var(--accent),var(--muted-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* === v68: Bottombar 3D — lepsza wizualizacja z ambient light === */
+.live3d-stage{background:radial-gradient(ellipse 75% 65% at 50% 58%,#241e10 0%,#0e0a04 55%,#050302 100%),radial-gradient(ellipse 40% 40% at 20% 20%,rgba(255,200,100,.03),transparent)}
+.live3d-stage::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 25% 15%,rgba(255,240,200,.03),transparent 50%);pointer-events:none}
+
+/* === v68: Lepsza karta warstwy 3D w modalu — gradient header === */
+.layer3d-card .card-head{background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),transparent);border-radius:var(--r-xs);padding:6px 10px;margin:-4px -6px 0}
+
+/* === v68: Lepsza wizualizacja legendy z ikoną operacji === */
+.legend span{padding:4px 8px;border-radius:var(--r-xs);transition:color .12s,background .12s}
+.legend span:hover{color:var(--text);background:rgba(255,255,255,.04)}
+
+/* === v68: Bottombar bb-head — subtelny gradient animowany === */
+.bb-head{background:linear-gradient(180deg,rgba(26,34,51,.95),var(--surface)),linear-gradient(90deg,rgba(var(--accent-rgb),.05),transparent,rgba(var(--accent2-rgb),.04))}
+
+/* === v68: Zoom badge — lepszy hover z transition scale === */
+.zoom-badge{transition:background .14s,border-color .14s,transform .1s,box-shadow .14s}
+.zoom-badge:hover{box-shadow:0 2px 8px rgba(var(--accent-rgb),.15)}
+
+/* === v68: Layer card SVG — border gradient === */
+.layer3d-card svg{border:1px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(135deg,var(--border),rgba(var(--accent-rgb),.2)) border-box}
+
+/* === v68: BB section — lepsza wizualna separacja === */
+.bb-sec{position:relative;overflow:hidden}
+.bb-sec::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.1),transparent);pointer-events:none}
+
+/* === v68: Lepszy styl info w summary modal === */
+.sum-row .sum-val{font-variant-numeric:tabular-nums;transition:color .12s,transform .08s}
+.sum-row:hover .sum-val{color:var(--text);transform:scale(1.04)}
+
+/* === v68: Lepsza wizualizacja parametrów globalnych === */
+.param-card{position:relative;overflow:hidden}
+.param-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--grad-accent);opacity:.3;transition:opacity .2s}
+.param-card:hover::before{opacity:.6}
+
+/* === v68: Focus trap w modalu — lepszy styl === */
+.modal-box:focus-visible{outline:none}
+.modal-box:focus-within{box-shadow:var(--sh-lg),0 0 0 2px rgba(var(--accent-rgb),.15)}
+
+/* === v68: Splash screen — lepszy gradient na brand === */
+.splash-brand{text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px}
+
+/* === v68: Toolbar tgroup — hover podświetlenie === */
+.tgroup{transition:border-color .14s,background .12s}
+.tgroup:hover{background:rgba(255,255,255,.015)}
+
+/* === v68: Range slider — lepsza wizualizacja track === */
+input[type=range]{height:6px;appearance:none;-webkit-appearance:none;background:linear-gradient(90deg,rgba(var(--accent-rgb),.25),var(--border));border-radius:3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(var(--accent-rgb),.4);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(var(--accent-rgb),.4);cursor:pointer}
+
+/* === v68: Gallery card — staggered hover z delay === */
+.gallery-card{transition:border-color .15s,color .15s,background .15s,transform .12s .02s,box-shadow .18s}
+
+/* === v68: Lepsza wizualizacja warstwy drag (reorder) === */
+.layer{position:relative}
+.layer::before{content:'⠿';position:absolute;left:2px;top:50%;transform:translateY(-50%);font-size:.55rem;color:var(--muted-2);opacity:0;transition:opacity .12s}
+.layer:hover::before{opacity:.6}
+
+/* === v68: Modal note — ikona z gradient === */
+.modal-note::before{content:'💡';font-size:.8rem;float:left;margin-right:6px;margin-top:1px}
+
+/* === v68: Depth badge — tooltipowy shadow na hover === */
+.d-badge{transition:transform .08s,box-shadow .08s,filter .12s}
+.d-badge:hover{filter:brightness(1.15)}
+
+/* === v68: SVG preview — checkered background === */
+.bb-svg svg{background:repeating-conic-gradient(#f5f5f5 0% 25%, #fff 0% 50%) 0 0/16px 16px}
+
+/* === v68: Quick search — lepszy empty state === */
+.quick-search-empty{padding:32px 20px;text-align:center;color:var(--muted);font-size:.82rem;line-height:1.6}
+.quick-search-empty::before{font-size:1.8rem;margin-bottom:8px;opacity:.4;filter:grayscale(.4)}
 </style>
 </head>
 <body>
