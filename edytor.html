@@ -5029,6 +5029,11 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         h+=ctxItem(`↔ Odbij poziomo${single.flipX?' ✓':''}`,'flipx');
         h+=ctxItem(`↕ Odbij pionowo${single.flipY?' ✓':''}`,'flipy');
       }
+      if(single){
+        h+=ctxItem(single.locked?'🔓 Odblokuj':'🔒 Zablokuj','togglelock');
+        h+=ctxItem(single.visible===false?'👁 Pokaż':'👁‍🗨 Ukryj','togglevis');
+        if(single.type==='path') h+=ctxItem('✏️ Edytuj węzły','editnodes');
+      }
       const gids=[...new Set(sel.map(o=>o.groupId).filter(Boolean))];
       const isWholeGroup = gids.length===1 && sel.every(o=>o.groupId===gids[0]) && state.objects.filter(o=>o.groupId===gids[0]).length===sel.length;
       if(isWholeGroup || sel.length>1){
@@ -5062,6 +5067,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       case 'ungroup': ungroupSel(); break;
       case 'flipx': if(o){ o.flipX=!o.flipX; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); } break;
       case 'flipy': if(o){ o.flipY=!o.flipY; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); } break;
+      case 'togglelock': if(o){ o.locked=!o.locked; pushHistory(); renderAll(); renderProps(); renderLayers(); showToast(o.locked?'Element zablokowany':'Element odblokowany','info',1500); } break;
+      case 'togglevis': if(o){ o.visible=o.visible===false?true:false; pushHistory(); renderAll(); renderProps(); renderLayers(); showToast(o.visible?'Element widoczny':'Element ukryty','info',1500); } break;
+      case 'editnodes': if(o&&o.type==='path'){ state.editingPathId=o.id; renderOverlay(); renderProps(); } break;
       case 'selectall': state.selectedIds=expandGroupSelection(state.objects.filter(x=>!x.locked).map(x=>x.id)); renderOverlay(); renderLayers(); renderProps(); break;
       case 'invertsel': invertSelection(); break;
       case 'zoomfit': zoomFit(); break;
