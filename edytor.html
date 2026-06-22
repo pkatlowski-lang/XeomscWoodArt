@@ -731,7 +731,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .layer.drop-target-below{border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.25)}
 .layer[draggable]{cursor:grab}
 .layer[draggable]:active{cursor:grabbing}
-.layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 0;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 2px;font-variant-numeric:tabular-nums;letter-spacing:.02em;animation:fadeInShort .15s ease-out}
+@keyframes fadeInShort{from{opacity:0}to{opacity:1}}
 
 /* === 3D preview — ulepszone tło i ramka === */
 .live3d-stage{background:radial-gradient(ellipse 72% 65% at 50% 60%,#201a0c 0%,#0a0804 50%,#050302 100%);
@@ -5842,6 +5843,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
     depthViewBtn.title=state.depthView?'Pokaż kolory cięcia/grawer':'Pokoloruj elementy według warstwy 3D';
     renderObjects(); renderOverlay();
+    showToast(state.depthView?'Tryb warstw 3D — kolory wg głębokości':'Tryb standardowy — kolory wg operacji','info',1500);
   });
 
   /* ---------------- 3D Preview (CSS preserve-3d stacked layers) ----------------
