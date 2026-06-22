@@ -71,7 +71,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .tbtn:disabled{opacity:.4;cursor:not-allowed}
 .tbtn-block{width:100%;justify-content:center;margin-top:6px}
 .tbtn .ico{font-size:1rem;line-height:1}
-.zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;transition:transform .08s ease}
+.zoomval.zoom-bump{transform:scale(1.12)}
 
 /* ---- Główny układ 3-kolumnowy ---- */
 /* Układ roboczy (od lewej): panel boczny (zakładki Projekt/Wycena) | strefa centralna | panel „Właściwości".
@@ -233,8 +234,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .geo-score-txt{fill:transparent;stroke:var(--score);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-hole{fill:rgba(155,93,229,.22);stroke:var(--hole);stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
 .geo-hole-txt{fill:rgba(155,93,229,.30);stroke:var(--hole);stroke-width:0.8px;vector-effect:non-scaling-stroke}
-.sel-box{fill:none;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:5 3}
-.sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
+.sel-box{fill:none;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:5 3;animation:marchingAnts 0.6s linear infinite}
+@keyframes marchingAnts{to{stroke-dashoffset:-8}}
+.sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.4))}
 .sel-rot-line{stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
 .sel-rot{fill:var(--accent);stroke:#fff;stroke-width:1.2px;vector-effect:non-scaling-stroke}
 .guide-line{stroke:#ff4fa6;stroke-width:1px;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;pointer-events:none}
@@ -1702,8 +1704,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 (function(){
   const SVG_NS='http://www.w3.org/2000/svg';
   const WALL_OVERLAP=0.75;
-  const COLORS={cut:'#ff2d2d',engrave:'#1c1c1c',score:'#2f7bd8',hole:'#9b5de5'};
-  const ACCENT='#3fc7ff';
+  const _cs=getComputedStyle(document.documentElement);
+  const COLORS={cut:_cs.getPropertyValue('--cut').trim()||'#ff2d2d',engrave:_cs.getPropertyValue('--engrave').trim()||'#1c1c1c',score:_cs.getPropertyValue('--score').trim()||'#2f7bd8',hole:_cs.getPropertyValue('--hole').trim()||'#9b5de5'};
+  const ACCENT=_cs.getPropertyValue('--accent').trim()||'#3fc7ff';
   const _toastC=document.getElementById('toastContainer');
   function showToast(msg,type,duration){
     const icons={success:'✓ ',error:'✗ ',info:'ℹ ',warning:'⚠ '};
@@ -2187,7 +2190,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     canvas.setAttribute('viewBox',`${fmt(v.x)} ${fmt(v.y)} ${fmt(v.w)} ${fmt(v.h)}`);
     canvas.setAttribute('preserveAspectRatio','xMidYMid meet');
     const z=Math.round(state.docW/state.view.w*100);
-    document.getElementById('zoomVal').textContent=z+'%';
+    const zEl=document.getElementById('zoomVal');
+    if(zEl.textContent!==z+'%'){ zEl.textContent=z+'%'; zEl.classList.add('zoom-bump'); clearTimeout(zEl._bt); zEl._bt=setTimeout(()=>zEl.classList.remove('zoom-bump'),120); }
     renderRulers();
     updateStatusBar();
   }
@@ -5545,10 +5549,27 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       e.stopPropagation();
       const wasOpen=dd.classList.contains('open');
       document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
-      if(!wasOpen) dd.classList.add('open');
+      if(!wasOpen){ dd.classList.add('open'); const first=dd.querySelector('.dd-menu .tbtn:not([disabled])'); if(first) first.focus(); }
     });
-    dd.querySelector('.dd-menu').addEventListener('click',e=>{
+    toggle.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'||e.key==='Enter'&&!dd.classList.contains('open')){
+        e.preventDefault(); dd.classList.add('open');
+        const first=dd.querySelector('.dd-menu .tbtn:not([disabled])'); if(first) first.focus();
+      }
+    });
+    const menu=dd.querySelector('.dd-menu');
+    menu.addEventListener('click',e=>{
       if(e.target.closest('.tbtn')) dd.classList.remove('open');
+    });
+    menu.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ dd.classList.remove('open'); toggle.focus(); return; }
+      if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+        e.preventDefault();
+        const btns=[...menu.querySelectorAll('.tbtn:not([disabled])')];
+        const cur=btns.indexOf(document.activeElement);
+        const next=e.key==='ArrowDown'?Math.min(cur+1,btns.length-1):Math.max(cur-1,0);
+        btns[next]?.focus();
+      }
     });
   });
   document.addEventListener('click',()=>{ document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open')); });
@@ -6260,16 +6281,20 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     celebrateExport();
   }
   function celebrateExport(){
-    const C=30, colors=['#3fc7ff','#8aa0ff','#ff3b3b','#f7b733','#54d699'];
+    const C=40, colors=['#3fc7ff','#8aa0ff','#ff3b3b','#f7b733','#54d699','#ff6fb5','#a78bfa'];
     for(let i=0;i<C;i++){
       const p=document.createElement('div');
-      p.style.cssText='position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:99999;'
-        +'left:'+(40+Math.random()*20)+'vw;top:50vh;background:'+colors[i%colors.length]
-        +';animation:confettiPop .7s cubic-bezier(.2,.6,.3,1) forwards;'
-        +'--cx:'+(Math.random()*160-80)+'px;--cy:'+(-120-Math.random()*180)+'px;'
-        +'animation-delay:'+(i*18)+'ms;opacity:0';
+      const sz=4+Math.random()*6;
+      const isRect=Math.random()>.6;
+      const rad=isRect?(sz*.2)+'px':'50%';
+      const rot=isRect?'rotate('+(Math.random()*90)+'deg)':'';
+      p.style.cssText='position:fixed;width:'+sz+'px;height:'+sz+'px;border-radius:'+rad+';pointer-events:none;z-index:99999;'
+        +'left:'+(30+Math.random()*40)+'vw;top:'+(40+Math.random()*20)+'vh;background:'+colors[i%colors.length]
+        +';animation:confettiPop '+(0.6+Math.random()*0.4)+'s cubic-bezier(.2,.6,.3,1) forwards;'
+        +'--cx:'+(Math.random()*240-120)+'px;--cy:'+(-100-Math.random()*250)+'px;'
+        +'animation-delay:'+(i*14)+'ms;opacity:0;transform:'+rot;
       document.body.appendChild(p);
-      setTimeout(()=>p.remove(),1200);
+      setTimeout(()=>p.remove(),1500);
     }
   }
 
