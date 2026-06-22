@@ -4979,7 +4979,7 @@ input[type=number]{position:relative}
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
       return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}" draggable="true">
         <span class="drag-grip" title="Przeciągnij, aby zmienić kolejność">⠿</span>
-        <span class="swatch ${sw}"></span>
+        <span class="swatch ${sw}" title="${o.mode==='engrave'?'Grawer':o.mode==='score'?'Nacięcie':o.mode==='reference'?'Referencja':'Cięcie'}"></span>
         ${dbadge}
         <span class="lname" title="Kliknij dwukrotnie, aby zmienić nazwę">${escapeXml(autoName(o))}</span>
         <button class="lico ${visCls}" data-act="vis" title="${o.visible?'Ukryj':'Pokaż'}">${visIco}</button>
@@ -6329,7 +6329,8 @@ input[type=number]{position:relative}
   function updateLive3D(){
     const W=state.docW,H=state.docH;
     const sh=live3dStage.clientHeight||200, sw0=live3dStage.clientWidth||300;
-    live3dTitle.textContent='🧊 Wizualizacja 3D — stos warstw materiału';
+    const tMM=totalStackMM();
+    live3dTitle.textContent='🧊 3D — '+tMM.toFixed(1)+' mm stosu';
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
