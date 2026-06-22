@@ -1328,6 +1328,78 @@ input[type=number]{position:relative}
 
 /* === Modal hint center — lepszy spacing === */
 .modal-hint-center{padding:8px 12px;background:rgba(var(--accent-rgb),.02);border-radius:var(--r-sm);border:1px solid rgba(var(--accent-rgb),.06)}
+
+/* === Toolrail tooltip — z prawej strony, nie z góry === */
+.toolrail .tbtn[data-tooltip]::after{bottom:auto;left:calc(100% + 10px);top:50%;transform:translateY(-50%) translateX(-4px);white-space:nowrap}
+.toolrail .tbtn[data-tooltip]:hover::after,.toolrail .tbtn[data-tooltip]:focus-visible::after{transform:translateY(-50%) translateX(0)}
+.toolrail .tbtn[data-tooltip]::before{bottom:auto;left:calc(100% + 5px);top:50%;transform:translateY(-50%);border-top-color:transparent;border-right-color:var(--border-strong);border-bottom-color:transparent;border-left-color:transparent}
+
+/* === Statusbar — ulepszone hover i separatory === */
+.statusbar{transition:background .2s}
+.statusbar:hover{background:linear-gradient(180deg,var(--surface2),var(--bg-2))}
+.sb-item{padding:2px 6px;border-radius:var(--r-xs);transition:color .12s,background .12s}
+.sb-item:hover{color:var(--text);background:rgba(var(--accent-rgb),.06)}
+.sb-zoom{transition:color .14s,transform .1s}
+.statusbar .sb-save{padding:2px 8px;border-radius:var(--r-xs);transition:color .2s,background .2s}
+.statusbar .sb-save:not(:empty){background:rgba(247,183,51,.08);animation:saveIndicatorPulse 2s ease-in-out infinite}
+@keyframes saveIndicatorPulse{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* === Ptab-body — animacja wyjścia/wejścia z fade === */
+.ptab-body.active{animation:ptabBodyIn .2s ease-out}
+@keyframes ptabBodyIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* === Toolbar tbtn — ripple feedback przy kliknięciu === */
+.tbtn{position:relative;overflow:hidden}
+.tbtn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.2);transform:scale(0);animation:rippleAnim .45s ease-out forwards;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(2.5);opacity:0}}
+
+/* === Panel scroll — smooth behavior === */
+.panel{scroll-behavior:smooth}
+.ptab-body{scroll-behavior:smooth}
+
+/* === Bottombar header — interaktywna animacja === */
+.bb-head{transition:background .14s}
+.bb-head:hover{background:linear-gradient(180deg,rgba(var(--accent-rgb),.06),var(--surface))}
+
+/* === Lyr-row inputs — spójny focus ring === */
+.lyr-mat:focus,.lyr-mm:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.15)}
+
+/* === Toolbar brand — gradient text animacja === */
+@keyframes brandShimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.toolbar .brand:hover .brand-name span{background-size:200% 100%;animation:brandShimmer 2s linear infinite}
+
+/* === Tgroup — lepsza wizualna separacja na hover === */
+.toolbar .tgroup:hover .tbtn:not(:hover):not(.active){opacity:.7}
+
+/* === Gallery empty state === */
+#gallery:empty::after,#motifs:empty::after{content:'Ładowanie…';display:block;padding:20px;text-align:center;color:var(--muted-2);font-size:.75rem}
+
+/* === Ptab — badge z ikoną aktywności === */
+.ptab{gap:3px}
+.ptab::before{content:'';width:6px;height:6px;border-radius:50%;background:transparent;transition:background .15s,box-shadow .15s;flex-shrink:0}
+.ptab.active::before{background:var(--accent-text);box-shadow:0 0 6px rgba(255,255,255,.3)}
+
+/* === Scroll shadow na panelu === */
+.panel.left::after{content:'';position:sticky;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent,var(--bg-2));pointer-events:none;z-index:1;flex-shrink:0}
+
+/* === Focus trap w modalu — lepsza widoczność pierwszego focusa === */
+.modal-ov.open .modal-close{animation:modalCloseIn .3s ease-out .15s backwards}
+@keyframes modalCloseIn{from{opacity:0;transform:rotate(-90deg) scale(.5)}to{opacity:1;transform:rotate(0) scale(1)}}
+
+/* === Ctrl+K wyszukiwarka — placeholder styl === */
+.quick-search-ov{display:none;position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding-top:20vh}
+.quick-search-ov.open{display:flex}
+.quick-search-box{width:90vw;max-width:480px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1.5px solid var(--border-strong);border-radius:var(--r);box-shadow:var(--sh-lg);overflow:hidden;animation:ddSlideIn .15s ease-out}
+.quick-search-input{width:100%;padding:14px 16px 14px 42px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:1rem;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:14px center}
+.quick-search-input:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+.quick-search-input::placeholder{color:var(--muted-2)}
+.quick-search-results{max-height:320px;overflow-y:auto;padding:4px 0}
+.quick-search-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;color:var(--text);transition:background .1s,padding-left .1s}
+.quick-search-item:hover,.quick-search-item.qs-active{background:rgba(var(--accent-rgb),.1);padding-left:20px}
+.quick-search-item .qs-ico{font-size:1rem;opacity:.6;flex-shrink:0}
+.quick-search-item .qs-label{flex:1}
+.quick-search-item .qs-hint{font-size:.68rem;color:var(--muted-2)}
+.quick-search-empty{padding:24px 16px;text-align:center;font-size:.82rem;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1606,6 +1678,14 @@ input[type=number]{position:relative}
 
 <div class="ctx-menu" id="ctxMenu"></div>
 
+<!-- Szybka wyszukiwarka Ctrl+K -->
+<div class="quick-search-ov" id="quickSearchOv">
+  <div class="quick-search-box">
+    <input type="text" class="quick-search-input" id="quickSearchInput" placeholder="Szukaj narzędzia, akcji, elementu… (Esc aby zamknąć)" autocomplete="off" spellcheck="false">
+    <div class="quick-search-results" id="quickSearchResults"></div>
+  </div>
+</div>
+
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wizualizacja 3D projektu" id="modal3dPrev">
   <div class="modal-box modal-xl">
     <button class="modal-close" aria-label="Zamknij" id="modal3dPrevClose" title="Zamknij">✕</button>
@@ -1755,6 +1835,7 @@ input[type=number]{position:relative}
         <div class="sc-row"><span>Dopasuj cały arkusz</span><span class="sc-keys"><kbd>1</kbd></span></div>
         <div class="sc-row"><span>Przybliż do zaznaczenia</span><span class="sc-keys"><kbd>2</kbd></span></div>
         <div class="sc-row"><span>Pokaż tę pomoc</span><span class="sc-keys"><kbd>?</kbd></span></div>
+        <div class="sc-row"><span>Szybka wyszukiwarka</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>K</kbd></span></div>
       </div>
       <div class="sc-group">
         <h4>Pole liczbowe / suwak</h4>
@@ -5804,9 +5885,19 @@ input[type=number]{position:relative}
       document.querySelectorAll('.ptab-body').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       const body=document.querySelector(`[data-ptab-body="${btn.dataset.ptab}"]`);
-      if(body) body.classList.add('active');
+      if(body){ body.classList.add('active'); body.scrollTop=0; }
       if(btn.dataset.ptab==='pricing') fillPqPanel();
     });
+  });
+  /* Klawisze strzałek do nawigacji między zakładkami */
+  document.querySelector('.ptabs')?.addEventListener('keydown',e=>{
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight') return;
+    const tabs=[...document.querySelectorAll('.ptab')];
+    const cur=tabs.indexOf(document.activeElement);
+    if(cur<0) return;
+    e.preventDefault();
+    const next=e.key==='ArrowRight'?Math.min(cur+1,tabs.length-1):Math.max(cur-1,0);
+    tabs[next].focus(); tabs[next].click();
   });
   // Aktywuje zakładkę „Wycena" (z paska narzędzi 💰 Wycena / ⚙ Cennik)
   function activatePricingTab(openCfg){
@@ -8732,6 +8823,89 @@ input[type=number]{position:relative}
   // renderuje CSS, które nie ma tego problemu). Gdy wszystkie czcionki są już gotowe,
   // czyścimy cache i przerysowujemy, żeby naprawić ewentualne wcześniejsze, błędne obrysy.
   document.fonts.ready.then(()=>{ _textOutlineCache.clear(); renderAll(); }).catch(()=>{});
+
+  /* ---------------- Tooltips na toolrailu (data-tooltip z prawej) ---------------- */
+  toolsEl.querySelectorAll('.tbtn[data-tool]').forEach(btn=>{
+    const t=TOOLS.find(x=>x.key===btn.dataset.tool);
+    if(t) btn.setAttribute('data-tooltip',`${t.label} (${t.hotkey})`);
+  });
+
+  /* ---------------- Ripple efekt na przyciskach ---------------- */
+  function addRipple(btn,x,y){
+    const r=document.createElement('span'); r.className='ripple';
+    const rect=btn.getBoundingClientRect();
+    const sz=Math.max(rect.width,rect.height)*2;
+    r.style.width=r.style.height=sz+'px';
+    r.style.left=((x||rect.left+rect.width/2)-rect.left-sz/2)+'px';
+    r.style.top=((y||rect.top+rect.height/2)-rect.top-sz/2)+'px';
+    btn.appendChild(r);
+    setTimeout(()=>r.remove(),500);
+  }
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest('.tbtn'); if(!btn||btn.disabled) return;
+    addRipple(btn,e.clientX,e.clientY);
+  });
+
+  /* ---------------- Szybka wyszukiwarka Ctrl+K ---------------- */
+  const qsOv=document.getElementById('quickSearchOv');
+  const qsInput=document.getElementById('quickSearchInput');
+  const qsResults=document.getElementById('quickSearchResults');
+  let _qsIdx=-1;
+  const QS_COMMANDS=[
+    {ico:'↖',label:'Zaznaczanie',hint:'V',action:()=>{state.tool='select';syncToolButtons();}},
+    {ico:'▭',label:'Prostokąt',hint:'R',action:()=>{state.tool='rect';syncToolButtons();}},
+    {ico:'◯',label:'Elipsa',hint:'O',action:()=>{state.tool='ellipse';syncToolButtons();}},
+    {ico:'⬡',label:'Wielokąt',hint:'P',action:()=>{state.tool='polygon';syncToolButtons();}},
+    {ico:'★',label:'Gwiazda',hint:'S',action:()=>{state.tool='star';syncToolButtons();}},
+    {ico:'╱',label:'Linia',hint:'L',action:()=>{state.tool='line';syncToolButtons();}},
+    {ico:'✎',label:'Pióro',hint:'N',action:()=>{state.tool='pen';syncToolButtons();}},
+    {ico:'T',label:'Tekst',hint:'T',action:()=>{state.tool='text';syncToolButtons();}},
+    {ico:'✋',label:'Przesuwanie',hint:'H',action:()=>{state.tool='pan';syncToolButtons();}},
+    {ico:'↶',label:'Cofnij',hint:'Ctrl+Z',action:undo},
+    {ico:'↷',label:'Ponów',hint:'Ctrl+Y',action:redo},
+    {ico:'⎘',label:'Kopiuj zaznaczone',hint:'Ctrl+C',action:copySel},
+    {ico:'📋',label:'Wklej',hint:'Ctrl+V',action:pasteClipboard},
+    {ico:'⧉',label:'Duplikuj zaznaczone',hint:'Ctrl+D',action:duplicateSel},
+    {ico:'🗑',label:'Usuń zaznaczone',hint:'Delete',action:deleteSel},
+    {ico:'📐',label:'Rozmieść automatycznie',hint:'',action:autoArrange},
+    {ico:'⊞',label:'Siatka wł/wył',hint:'G',action:()=>setSnap(!state.snap,true)},
+    {ico:'🔎',label:'Dopasuj widok',hint:'1',action:zoomFit},
+    {ico:'⌖',label:'Przybliż do zaznaczenia',hint:'2',action:zoomToSelection},
+    {ico:'📊',label:'Podsumowanie projektu',hint:'',action:()=>document.getElementById('summaryBtn')?.click()},
+    {ico:'⌨',label:'Skróty klawiszowe',hint:'?',action:()=>document.getElementById('helpBtn')?.click()},
+    {ico:'💾',label:'Zapisz projekt',hint:'Ctrl+S',action:()=>document.getElementById('saveProjectBtn')?.click()},
+    {ico:'📂',label:'Otwórz projekt',hint:'Ctrl+O',action:()=>document.getElementById('loadProjectBtn')?.click()},
+    {ico:'🎯',label:'Podgląd 3D',hint:'',action:()=>document.getElementById('preview3dBtn')?.click()},
+    {ico:'🆕',label:'Nowy projekt',hint:'',action:()=>document.getElementById('newProjectBtn')?.click()},
+    {ico:'💰',label:'Wycena',hint:'',action:()=>activatePricingTab(false)},
+  ];
+  function openQuickSearch(){
+    qsOv.classList.add('open');
+    qsInput.value='';_qsIdx=-1;
+    renderQsResults('');
+    setTimeout(()=>qsInput.focus(),50);
+  }
+  function closeQuickSearch(){ qsOv.classList.remove('open'); qsInput.blur(); }
+  function renderQsResults(q){
+    const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)):QS_COMMANDS;
+    if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników</div>'; return; }
+    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${c.label}</span>${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
+    qsResults.querySelectorAll('.quick-search-item').forEach((el,i)=>{
+      el.addEventListener('click',()=>{ const ci=filtered[i]; if(ci){ closeQuickSearch(); ci.action(); } });
+    });
+  }
+  qsInput.addEventListener('input',()=>{ _qsIdx=-1; renderQsResults(qsInput.value.trim().toLowerCase()); });
+  qsInput.addEventListener('keydown',e=>{
+    const items=qsResults.querySelectorAll('.quick-search-item');
+    if(e.key==='ArrowDown'){ e.preventDefault(); _qsIdx=Math.min(_qsIdx+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('qs-active',i===_qsIdx)); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); _qsIdx=Math.max(_qsIdx-1,0); items.forEach((el,i)=>el.classList.toggle('qs-active',i===_qsIdx)); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
+    else if(e.key==='Enter'){ e.preventDefault(); if(_qsIdx>=0) items[_qsIdx]?.click(); else if(items.length) items[0].click(); }
+    else if(e.key==='Escape'){ closeQuickSearch(); }
+  });
+  qsOv.addEventListener('click',e=>{ if(e.target===qsOv) closeQuickSearch(); });
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); if(qsOv.classList.contains('open')) closeQuickSearch(); else openQuickSearch(); }
+  });
 
   // Hak debugowy do testów (Playwright) — bez wpływu na działanie edytora
   window.__lzr={state, buildSeparatedSVG, buildLayerScene, mergeLayerRings, unionAll, objSubPolys, objSubPolysLocal, objSubPolysRepeated, textOutlinePolys, objBBox, rotatedBBox, selBBox, polyArea, polyPerimeter, objInkArea, computeProjectStats, computeQuote, quotePathLen, quoteMaterialArea, quoteTimeBreakdown, quoteEngraveTimeMin, polysBBoxMulti, polyToPathD, polyToSmoothPathD, renderAll, updateLive3D, renderProps, select, defaultsFor, zoomFit, repeatTransforms, exportSVG, buildGearPoints, simplifyRing, rasterizeTextOutlines, textNaturalBox, getTextRaster};
