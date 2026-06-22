@@ -78,12 +78,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Pionowy pasek narzędzi rysowania (lewa krawędź) ---- */
 .toolrail{flex:0 0 60px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh-sm);z-index:5}
 .toolrail .tool-list{display:flex;flex-direction:column;gap:4px;align-items:center}
-.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.55rem;font-weight:700;border-radius:10px;padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted);transition:background .14s,color .14s,transform .14s,box-shadow .14s;position:relative}
+.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.55rem;font-weight:700;border-radius:10px;padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:#b0bdd4;transition:background .14s,color .14s,transform .14s,box-shadow .14s;position:relative}
 .toolrail .tbtn .ico{font-size:1.24rem;line-height:1}
 .toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}
 .toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 3px 3px 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8)}
-.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto}
+.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth}
 .panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15)}
 .panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15)}
 .panel h2{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:16px 16px 8px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
@@ -91,11 +91,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .panel h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 /* ---- Zakładki panelu bocznego (segmentowane, premium) ---- */
 .ptabs{display:flex;gap:3px;padding:9px 9px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(180deg,var(--bg-2),rgba(8,11,18,.6))}
-.ptab{flex:1;padding:9px 4px;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:9px;cursor:pointer;transition:color .15s,background .15s,box-shadow .15s,border-color .15s,transform .08s;text-align:center;position:relative}
+.ptab{flex:1;padding:9px 4px;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:var(--text);background:transparent;border:1px solid transparent;border-radius:9px;cursor:pointer;transition:color .15s,background .15s,box-shadow .15s,border-color .15s,transform .08s;text-align:center;position:relative;opacity:.7}
 .ptab:active{transform:scale(.96)}
-.ptab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.ptab:hover{color:var(--text);background:rgba(255,255,255,.04);opacity:1}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
-.ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6)}
+.ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);opacity:1}
 .ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:relative}
 .ptab-body.active{display:flex}
 .ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
@@ -429,7 +429,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote .lq-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .live-quote select{padding:3px 5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.72rem;max-width:120px;transition:border-color .14s}
 .live-quote select:focus{border-color:var(--accent)}
-.live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color .2s,transform .15s}
+.live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color .2s,transform .15s;font-variant-numeric:tabular-nums}
 .live-quote .lq-price.lq-flash{animation:lqFlash .35s ease-out}
 @keyframes lqFlash{0%{transform:scale(1.08);color:#fff}100%{transform:scale(1);color:var(--accent)}}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
@@ -658,6 +658,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   border:1px solid var(--border-strong);box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.1);
   opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s ease,transform .15s ease,visibility 0s linear .15s;z-index:9000}
 [data-tooltip]:hover::after,[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:opacity .15s ease .35s,transform .15s ease .35s,visibility 0s linear .35s}
+[data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border-strong);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s ease,visibility 0s linear .15s;z-index:9001}
+[data-tooltip]:hover::before,[data-tooltip]:focus-visible::before{opacity:1;visibility:visible;transition:opacity .15s ease .35s,visibility 0s linear .35s}
+[data-tooltip].tip-down::before{bottom:auto;top:calc(100% + 3px);border-top-color:transparent;border-bottom-color:var(--border-strong)}
 [data-tooltip].tip-down::after{bottom:auto;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px)}
 [data-tooltip].tip-down:hover::after,[data-tooltip].tip-down:focus-visible::after{transform:translateX(-50%) translateY(0)}
 
@@ -678,6 +681,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Warstwa — lepsza widoczność ikon === */
 .layer .lico{opacity:0;transition:opacity .12s,background .12s,color .12s,transform .08s}
 .layer:hover .lico{opacity:.65}
+.layer .lico:focus-visible{opacity:1;box-shadow:var(--glow)}
 .layer .lico:hover{opacity:1;background:rgba(255,255,255,.1);color:var(--text);transform:scale(1.08)}
 .layer .lico.lico-del:hover{background:rgba(255,80,80,.15);color:var(--danger);transform:scale(1.08)}
 .layer .lico.lico-vis.hidden-ico{opacity:.5}
@@ -934,6 +938,13 @@ kbd{letter-spacing:.02em}
 .op-del:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,90,90,.35)}
 .gallery-card .del-base:focus-visible{outline:none;box-shadow:var(--glow)}
 .q-cfg-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
+.dd-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
+.lyr-pick:focus-visible{outline:none;box-shadow:var(--glow)}
+.lyr-eye:focus-visible{outline:none;box-shadow:var(--glow)}
+.lyr-mat:focus-visible{outline:none;border-color:var(--accent)}
+.lyr-mm:focus-visible{outline:none;border-color:var(--accent)}
+.mat-row .mat-del:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,90,90,.35)}
+.font-dd-btn:focus-visible{outline:none;box-shadow:var(--glow)}
 .gear-preview-row{display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px}
 .gear-preview-box{flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
 .gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
@@ -967,7 +978,7 @@ kbd{letter-spacing:.02em}
     <div class="tspacer"></div>
     <!-- MENU: PLIK -->
     <div class="dd" data-dd>
-      <button class="tbtn dd-toggle" type="button" title="Projekt: nowy, zapis, otwarcie, import">📂 Plik <span class="dd-caret">▾</span></button>
+      <button class="tbtn dd-toggle" type="button" title="Projekt: nowy, zapis, otwarcie, import" aria-label="Menu Plik">📂 Plik <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
         <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy projekt</button>
         <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (do wczytania później)">💾 Zapisz projekt</button>
@@ -982,7 +993,7 @@ kbd{letter-spacing:.02em}
     </div>
     <!-- MENU: NARZĘDZIA -->
     <div class="dd" data-dd>
-      <button class="tbtn dd-toggle" type="button" title="Dodatkowe narzędzia i generatory">🧩 Narzędzia <span class="dd-caret">▾</span></button>
+      <button class="tbtn dd-toggle" type="button" title="Dodatkowe narzędzia i generatory" aria-label="Menu Narzędzia">🧩 Narzędzia <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
         <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
         <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)">🎨 Tryb warstw 3D</button>
@@ -994,7 +1005,7 @@ kbd{letter-spacing:.02em}
     </div>
     <!-- MENU: WIĘCEJ -->
     <div class="dd" data-dd>
-      <button class="tbtn dd-toggle" type="button" title="Podsumowanie, wycena, skróty">📊 Więcej <span class="dd-caret">▾</span></button>
+      <button class="tbtn dd-toggle" type="button" title="Podsumowanie, wycena, skróty" aria-label="Menu Więcej">📊 Więcej <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
         <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
         <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny">💰 Wycena</button>
@@ -1004,7 +1015,7 @@ kbd{letter-spacing:.02em}
     </div>
     <!-- MENU: EKSPORT -->
     <div class="dd" data-dd>
-      <button class="tbtn tbtn-primary dd-toggle" type="button" title="Pobierz gotowe pliki produkcyjne">⬇ Eksport <span class="dd-caret">▾</span></button>
+      <button class="tbtn tbtn-primary dd-toggle" type="button" title="Pobierz gotowe pliki produkcyjne" aria-label="Menu Eksport">⬇ Eksport <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
         <button class="tbtn" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
         <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
@@ -1019,10 +1030,10 @@ kbd{letter-spacing:.02em}
     </nav>
     <aside class="panel left">
       <div class="ptabs">
-        <button class="ptab active" data-ptab="add" title="Dodaj kształty, szablony i motywy">➕ Dodaj</button>
-        <button class="ptab" data-ptab="sheet" title="Arkusz, siatka i parametry">📄 Arkusz</button>
-        <button class="ptab" data-ptab="layers" title="Warstwy i kolejność elementów">▦ Warstwy</button>
-        <button class="ptab" data-ptab="pricing" title="Wycena projektu">💰 Wycena</button>
+        <button class="ptab active" data-ptab="add" title="Dodaj kształty, szablony i motywy" aria-label="Zakładka Dodaj">➕ Dodaj</button>
+        <button class="ptab" data-ptab="sheet" title="Arkusz, siatka i parametry" aria-label="Zakładka Arkusz">📄 Arkusz</button>
+        <button class="ptab" data-ptab="layers" title="Warstwy i kolejność elementów" aria-label="Zakładka Warstwy">▦ Warstwy</button>
+        <button class="ptab" data-ptab="pricing" title="Wycena projektu" aria-label="Zakładka Wycena">💰 Wycena</button>
       </div>
 
       <!-- ZAKŁADKA: DODAJ — szablony, bazy, motywy -->
@@ -1502,6 +1513,13 @@ kbd{letter-spacing:.02em}
     if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(false); }
     if(e.key==='Enter' && _confirmMode==='confirm'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
     if(e.key==='Enter' && _confirmMode==='prompt'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
+    if(e.key==='Tab'){
+      const focusable=[_confirmInput,_confirmCancel,_confirmOk].filter(el=>el.offsetParent!==null);
+      if(!focusable.length) return;
+      const first=focusable[0], last=focusable[focusable.length-1];
+      if(e.shiftKey){ if(document.activeElement===first){ e.preventDefault(); last.focus(); } }
+      else { if(document.activeElement===last){ e.preventDefault(); first.focus(); } }
+    }
   });
   const FONTS=[
     // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
