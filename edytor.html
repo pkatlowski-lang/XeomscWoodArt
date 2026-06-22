@@ -85,7 +85,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolrail .tbtn .ico{font-size:1.24rem;line-height:1}
 .toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}
-.toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 3px 3px 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8)}
+.toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 3px 3px 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn .2s ease-out}
+@keyframes toolIndicatorIn{from{height:0;opacity:0}to{height:22px;opacity:1}}
 .panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth}
 .panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15)}
 .panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15)}
@@ -172,7 +173,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
    po napisie "podświetlało" litery na niebiesko i otwierało systemowe menu zaznaczenia */
 #canvas *{user-select:none;-webkit-user-select:none}
 #canvas text{pointer-events:bounding-box;cursor:move}
-.stage .hint-empty{position:absolute;left:calc(50% + 11px);top:34px;transform:translateX(-50%);font-size:.8rem;color:var(--muted);background:linear-gradient(180deg,rgba(18,24,38,.6),rgba(8,11,18,.6));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 16px;border-radius:100px;pointer-events:none;border:1px solid rgba(var(--accent-rgb),.12);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.stage .hint-empty{position:absolute;left:calc(50% + 11px);top:34px;transform:translateX(-50%);font-size:.8rem;color:var(--text);background:linear-gradient(180deg,rgba(18,24,38,.75),rgba(8,11,18,.75));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 16px;border-radius:100px;pointer-events:none;border:1px solid rgba(var(--accent-rgb),.22);box-shadow:0 4px 12px rgba(0,0,0,.3)}
 
 /* ---- Linijki (rulery) wzdłuż krawędzi płótna ---- */
 .ruler{position:absolute;background:linear-gradient(180deg,var(--surface2),var(--surface));overflow:hidden;pointer-events:none;z-index:2;font-size:10px;color:var(--muted);font-family:var(--font-b)}
@@ -183,10 +184,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ruler-tick{position:absolute}
 .ruler-h .ruler-tick{top:0;bottom:0;border-left:1px solid var(--border)}
 .ruler-h .ruler-tick.minor{border-left-color:var(--surface)}
-.ruler-h .ruler-tick .rt-label{position:absolute;left:3px;top:2px;white-space:nowrap}
+.ruler-h .ruler-tick .rt-label{position:absolute;left:3px;top:2px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .ruler-v .ruler-tick{left:0;right:0;border-top:1px solid var(--border)}
 .ruler-v .ruler-tick.minor{border-top-color:var(--surface)}
-.ruler-v .ruler-tick .rt-label{position:absolute;left:2px;top:2px;white-space:nowrap}
+.ruler-v .ruler-tick .rt-label{position:absolute;left:2px;top:2px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 
 /* ---- Pływający pasek edycji tekstu (góra obszaru roboczego) ---- */
 .text-toolbar{display:none;position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:10;
@@ -302,7 +303,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer.lyr-engrave{border-left-color:var(--hole)}
 .layer.lyr-engrave.sel{border-color:var(--accent);border-left-color:var(--hole)}
 .layer .lname{flex:1;font-size:.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.layer .lname input{width:100%;background:transparent;border:none;color:var(--text);font:inherit;font-size:.8rem;outline:none}
+.layer .lname input{width:100%;background:transparent;border:1px solid transparent;color:var(--text);font:inherit;font-size:.8rem;outline:none;border-radius:var(--r-xs);padding:1px 4px;caret-color:var(--accent);transition:background .12s,border-color .12s}
+.layer .lname input:hover{background:rgba(var(--accent-rgb),.03)}
+.layer .lname input:focus{background:rgba(var(--accent-rgb),.06);border-color:var(--accent)}
 .layer .lico{font-size:.78rem;opacity:0;cursor:pointer;background:none;border:none;color:var(--muted);padding:2px 4px;border-radius:var(--r-xs);transition:opacity .12s,background .12s,color .12s,transform .08s;line-height:1;flex-shrink:0}
 .layer .lico:hover{background:rgba(255,255,255,.08);color:var(--text);transform:scale(1.1)}
 .layer .lico:active{transform:scale(.9)}
@@ -442,7 +445,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote select:focus{border-color:var(--accent)}
 .live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color .2s,transform .15s;font-variant-numeric:tabular-nums}
 .live-quote .lq-price.lq-flash{animation:lqFlash .35s ease-out}
-@keyframes lqFlash{0%{transform:scale(1.08);color:#fff}100%{transform:scale(1);color:var(--accent)}}
+@keyframes lqFlash{0%{transform:scale(1.08);color:#fff}40%{transform:scale(1.02);color:rgba(var(--accent-rgb),.8)}100%{transform:scale(1);color:var(--accent)}}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:36px;font-size:.76rem;margin-top:4px;position:relative;overflow:hidden}
@@ -705,14 +708,15 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Warstwa — lepsza widoczność ikon === */
 .layer .lico{opacity:0;transition:opacity .12s,background .12s,color .12s,transform .08s}
-.layer:hover .lico{opacity:.65}
+.layer:hover .lico{opacity:.8}
 .layer .lico:focus-visible{opacity:1;box-shadow:var(--glow)}
 .layer .lico:hover{opacity:1;background:rgba(255,255,255,.1);color:var(--text);transform:scale(1.08)}
 .layer .lico.lico-del:hover{background:rgba(255,80,80,.15);color:var(--danger);transform:scale(1.08)}
 .layer .lico.lico-vis.hidden-ico{opacity:.5}
 .layer:hover .lico.lico-vis.hidden-ico{opacity:.75}
 .layer .lico.lico-locked{opacity:.9;color:var(--accent)}
-.layer.dragging{opacity:.6;transform:scale(.98);transition:opacity .12s,transform .12s}
+.layer.dragging{opacity:.6;transform:scale(.98) rotate(-.5deg);transition:opacity .12s,transform .12s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.layer.drop-target{border-bottom:2px solid var(--accent);box-shadow:0 2px 0 rgba(var(--accent-rgb),.3)}
 
 /* === 3D preview — ulepszone tło i ramka === */
 .live3d-stage{background:radial-gradient(ellipse 72% 65% at 50% 60%,#201a0c 0%,#0a0804 50%,#050302 100%);
@@ -929,8 +933,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 /* === Polerka: modal note — lepsza czytelnść === */
 .modal-note code,.modal-note strong{color:var(--text);font-weight:600}
 
-/* === Polerka: layer drag state === */
-.layer.dragging{background:rgba(var(--accent-rgb),.04);border-color:var(--accent)}
+/* === Polerka: layer drag state (rozszerzone) === */
 
 /* === Polerka: dd-sep — doprecyzowanie marginesów === */
 .dd-sep{margin:5px 10px}
@@ -1809,7 +1812,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       // rejestrujemy ją jako prawdziwy FontFace z odpowiednim weight/style - dzięki
       // temu canvas używa tych SAMYCH glifów co podgląd 2D, również dla pogrubienia/kursywy.
       const embeddedFamilies=new Set();
-      for(const fd of fonts){
+      for(let i=0;i<fonts.length;i++){
+        const fd=fonts[i];
         try{
           const blob=await fd.blob();
           const s=(fd.style||'').toLowerCase();
@@ -1820,6 +1824,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
           document.fonts.add(ff);
           embeddedFamilies.add(fd.family);
         }catch(e){}
+        if(i>0 && i%50===0) showToast(`Ładowanie czcionek… ${i}/${fonts.length}`,'info',1500);
       }
       localFonts=fams.map(f=>[`"${f}"`, f]);
       _textOutlineCache.clear();
