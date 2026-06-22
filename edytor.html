@@ -2650,6 +2650,55 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 /* === v74: Quote price card animation === */
 .q-price-card:not(.empty){transition:box-shadow .2s,border-color .14s,transform .12s}
 .q-price-card:not(.empty):hover{transform:translateY(-2px)}
+
+/* === v75: Inline text editor — lepsza wizualizacja z label === */
+.inline-text-editor{animation:inlineEditorIn .15s ease-out}
+@keyframes inlineEditorIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+/* === v75: Lepsza wizualizacja text toolbar z animacją === */
+.text-toolbar.show{animation:ttSlideIn .18s ease-out}
+
+/* === v75: Template card hover — depth shadow === */
+.tpl button:hover{box-shadow:var(--sh),0 8px 20px rgba(var(--accent-rgb),.08)}
+
+/* === v75: Ruler — click area na hover === */
+.ruler-h:hover{box-shadow:inset 0 -2px 4px rgba(var(--accent-rgb),.06)}
+.ruler-v:hover{box-shadow:inset -2px 0 4px rgba(var(--accent-rgb),.06)}
+.ruler-corner:hover{background:rgba(var(--accent-rgb),.08)}
+
+/* === v75: Layer rename input — lepsza wizualizacja === */
+.layer .lname input:focus{background:rgba(var(--accent-rgb),.08);border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.15)}
+
+/* === v75: Lepsze placeholder w polach formularza === */
+.field input::placeholder{color:var(--muted-2);font-style:italic;font-size:.8rem}
+.field textarea::placeholder{color:var(--muted-2);font-style:italic;font-size:.8rem}
+
+/* === v75: Lepsza wizualizacja selection count w warstwie === */
+.layer.sel .swatch{box-shadow:0 0 6px rgba(var(--accent-rgb),.3),0 1px 3px rgba(0,0,0,.35)}
+
+/* === v75: Gradient overlay na bb-svg na empty state === */
+.bb-svg .bb-empty{padding:30px 20px;line-height:1.7;display:flex;flex-direction:column;align-items:center;gap:8px}
+.bb-svg .bb-empty::before{content:'📐';font-size:1.4rem;opacity:.4}
+
+/* === v75: Lepsza wizualizacja mat library w modalu === */
+.mat-row:hover{transform:translateX(3px);box-shadow:var(--sh-sm)}
+
+/* === v75: Guide line — lepsza wizualizacja usuwania === */
+.guide-line-vis.guide-deleting{stroke:var(--danger);stroke-dasharray:3 3;opacity:.7}
+
+/* === v75: Lepsza wizualizacja na button z pełną szerokością === */
+.tbtn-full,.tbtn.tbtn-full,.btn-full-center{width:100%;justify-content:center}
+.tbtn-full:hover{transform:translateY(-1px);box-shadow:var(--sh-sm)}
+
+/* === v75: Better node editing visual === */
+.node-handle-vis{transition:fill .12s,r .08s}
+.node-outline{stroke-dasharray:5 4;animation:marchingAnts .6s linear infinite}
+
+/* === v75: Layer icon tooltips — consistent === */
+.layer .lico[data-act]{position:relative}
+
+/* === v75: Improved Q total style === */
+.q-total .q-total-val{background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -8259,6 +8308,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     b.addEventListener('click',()=>{
       const objs=t.build(); objs.forEach(o=>{o.id=uid();}); state.objects.push(...objs); state.selectedIds=[objs[objs.length-1].id];
       pushHistory(); renderAll(); renderProps(); zoomFit();
+      showToast('Szablon: '+txt+' ('+objs.length+' elem.)','success',1500);
     });
     tplEl.appendChild(b);
   });
