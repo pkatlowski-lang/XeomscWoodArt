@@ -1400,6 +1400,67 @@ input[type=number]{position:relative}
 .quick-search-item .qs-label{flex:1}
 .quick-search-item .qs-hint{font-size:.68rem;color:var(--muted-2)}
 .quick-search-empty{padding:24px 16px;text-align:center;font-size:.82rem;color:var(--muted)}
+
+/* === Statusbar zoom — dblclick hint === */
+.sb-zoom{cursor:pointer;padding:2px 8px;border-radius:var(--r-xs);transition:color .12s,background .12s,transform .1s}
+.sb-zoom:hover{background:rgba(var(--accent-rgb),.1);transform:scale(1.05)}
+
+/* === Toolbar zoomval — dblclick hint === */
+.zoomval{cursor:pointer;padding:2px 8px;border-radius:var(--r-xs)}
+.zoomval:hover{background:rgba(var(--accent-rgb),.08)}
+
+/* === Animacja wejścia warstwy po dodaniu obiektu === */
+@keyframes newObjectPulse{0%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.4)}70%{box-shadow:0 0 0 8px rgba(var(--accent-rgb),0)}100%{box-shadow:none}}
+.layer.just-added{animation:newObjectPulse .6s ease-out}
+
+/* === Separator narzędzi — lepsza widoczność w toolrail === */
+.toolrail .tool-sep{width:36px;height:1px;margin:6px 0;background:linear-gradient(90deg,transparent 10%,var(--border) 50%,transparent 90%);opacity:.6}
+
+/* === Przycisk eksportu — animacja ikony === */
+.tbtn-primary.dd-toggle .ico{transition:transform .2s}
+.tbtn-primary.dd-toggle:hover .ico{transform:translateY(2px)}
+
+/* === Modal — skala wejścia jeszcze gładniejsza === */
+.modal-ov{transition:opacity .25s ease,visibility 0s linear .25s}
+.modal-ov.open{transition:opacity .25s ease,visibility 0s}
+
+/* === Lepsza responsywność statusbar === */
+@media(max-width:480px){
+  .statusbar .sb-sep:nth-child(2),.statusbar .sb-item:nth-child(3){display:none}
+}
+
+/* === Przycisk w panelu wyceny — hover efekt === */
+.qbar-btns .tbtn{position:relative;overflow:hidden}
+.qbar-btns .tbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--accent-rgb),.05),transparent);opacity:0;transition:opacity .12s}
+.qbar-btns .tbtn:hover::after{opacity:1}
+
+/* === Poprawka — focus ring na quick search input === */
+.quick-search-input:focus{border-bottom-color:var(--accent);box-shadow:0 1px 0 var(--accent)}
+
+/* === Hint strzałkowy na zakładkach panelu === */
+.ptabs{position:relative}
+
+/* === Animation for new depth layers appearing === */
+@keyframes depthLegendIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.lyr-row{animation:depthLegendIn .15s ease-out backwards}
+
+/* === Lepsza wizualizacja — gradient wewnętrzny na modal-box === */
+.modal-box{background:linear-gradient(180deg,var(--surface) 0%,var(--bg-2) 60%)}
+
+/* === Karta warstwy 3D w modalu — animowane wejście === */
+@keyframes layer3dCardIn{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.layer3d-card{animation:layer3dCardIn .2s ease-out backwards}
+.layer3d-card:nth-child(2){animation-delay:40ms}
+.layer3d-card:nth-child(3){animation-delay:80ms}
+.layer3d-card:nth-child(4){animation-delay:120ms}
+.layer3d-card:nth-child(5){animation-delay:160ms}
+.layer3d-card:nth-child(n+6){animation-delay:200ms}
+
+/* === Sum-row — animacja wejścia === */
+@keyframes sumRowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.sum-row{animation:sumRowIn .15s ease-out backwards}
+.sum-row:nth-child(2){animation-delay:30ms}
+.sum-row:nth-child(3){animation-delay:60ms}
 </style>
 </head>
 <body>
@@ -5046,7 +5107,7 @@ input[type=number]{position:relative}
   TOOLS.forEach((t,i)=>{
     if(i===2){
       const sep=document.createElement('div');
-      sep.style.cssText='width:32px;height:1px;margin:4px 0;background:linear-gradient(90deg,transparent,var(--border),transparent)';
+      sep.className='tool-sep';
       toolsEl.appendChild(sep);
     }
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
@@ -5058,6 +5119,7 @@ input[type=number]{position:relative}
   function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); updateStatusBar(); }
   function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
   const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom');
+  if(_sbZoom){ _sbZoom.style.cursor='pointer'; _sbZoom.title='Podwójne kliknięcie = dopasuj widok'; _sbZoom.addEventListener('dblclick',zoomFit); }
   const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
   function updateStatusBar(){
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
@@ -5076,6 +5138,9 @@ input[type=number]{position:relative}
   document.getElementById('zoomOut').addEventListener('click',()=>zoomBy(1.2));
   document.getElementById('zoomFit').addEventListener('click',zoomFit);
   document.getElementById('zoomSelBtn').addEventListener('click',zoomToSelection);
+  document.getElementById('zoomVal').addEventListener('dblclick',zoomFit);
+  document.getElementById('zoomVal').style.cursor='pointer';
+  document.getElementById('zoomVal').title='Podwójne kliknięcie = dopasuj widok';
   const snapBtn=document.getElementById('snapBtn');
   const exportBtn=document.getElementById('exportBtn');
   if(window.xeoDesktop && window.xeoDesktop.isDesktop){
