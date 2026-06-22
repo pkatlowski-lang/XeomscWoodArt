@@ -5531,8 +5531,14 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
     if(_sbObj){
       const n=state.objects.length; const s=state.selectedIds.length;
+      const locked=state.objects.filter(o=>o.locked).length;
+      const hidden=state.objects.filter(o=>!o.visible).length;
       _sbObj.textContent=n+' elem.'+(s?' ('+s+' wyb.)':'');
-      _sbObj.title=n+' elementów na płótnie'+(s?', '+s+' zaznaczonych':'');
+      let tip=n+' elementów na płótnie';
+      if(s) tip+=', '+s+' zaznaczonych';
+      if(locked) tip+=', '+locked+' zablokowanych';
+      if(hidden) tip+=', '+hidden+' ukrytych';
+      _sbObj.title=tip;
     }
     if(_sbDoc) _sbDoc.textContent=state.docW+'×'+state.docH+' mm';
     if(_sbZoom){
@@ -5549,7 +5555,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     if(_sbHistory){
       const hi=state.hIndex, hl=state.history.length-1;
       _sbHistory.textContent='↶ '+hi+'/'+hl;
-      _sbHistory.title='Historia: pozycja '+hi+' z '+hl+(hi<hl?' (można ponowić '+(hl-hi)+')':'');
+      const redoCount=hl-hi;
+      _sbHistory.title='Historia: pozycja '+hi+' z '+hl+(redoCount>0?' — '+redoCount+' krok'+(redoCount===1?'':'ów')+' do ponowienia':'');
     }
   }
 
@@ -6135,11 +6142,14 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     const totalElements=s.cutCount+s.scoreCount+s.engraveCount;
     const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))].sort((a,b)=>a-b);
     const depthInfo=depths.length>1?' · '+depths.length+' warstw 3D':'';
+    const totalLen=s.cutLen+s.scoreLen;
+    const cutPct=totalLen>0?Math.round(s.cutLen/totalLen*100):0;
+    const scorePct=totalLen>0?Math.round(s.scoreLen/totalLen*100):0;
     document.getElementById('summaryStats').innerHTML=
-      `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm</span></div>`
-      +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm</span></div>`
+      `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm${totalLen>0?' ('+cutPct+'%)':''}</span></div>`
+      +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm${totalLen>0?' ('+scorePct+'%)':''}</span></div>`
       +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`
-      +`<div style="font-size:.72rem;color:var(--muted);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums">Łącznie: ${totalElements} elementów · ${fmt(s.cutLen+s.scoreLen)} mm tras${depthInfo}</div>`;
+      +`<div style="font-size:.72rem;color:var(--muted);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums">Łącznie: ${totalElements} elementów · ${fmt(totalLen)} mm tras${depthInfo}</div>`;
     const cutSpeed=Math.max(1,Number(sumCutSpeed.value)||1);
     const scoreSpeed=Math.max(1,Number(sumScoreSpeed.value)||1);
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
@@ -7135,9 +7145,11 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    const expCount=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference').length;
+    const expObjs=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference');
+    const expCount=expObjs.length;
     const sizeKB=(blob.size/1024).toFixed(1);
-    showToast('SVG wyeksportowany ('+expCount+' elem., '+sizeKB+' KB)','success');
+    const depths=[...new Set(expObjs.map(o=>o.depth||1))].length;
+    showToast('SVG wyeksportowany ('+expCount+' elem., '+depths+' warstw, '+sizeKB+' KB)','success');
     markSaved();
     celebrateExport();
   }
