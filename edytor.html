@@ -586,6 +586,9 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .grid-2{grid-template-columns:1fr}
   .grid-3{grid-template-columns:1fr}
   .confirm-box{width:95vw}
+  .live-quote .lq-head{flex-wrap:wrap}
+  .dd-kbd{display:none}
+  .sc-search{font-size:.78rem}
 }
 @media(max-width:480px){
   .toolbar{padding:6px 8px;gap:4px}
@@ -1183,6 +1186,98 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .layer .drag-grip{flex:0 0 auto;cursor:grab;color:var(--muted-2);font-size:.7rem;padding:2px 3px 2px 0;opacity:0;transition:opacity .12s,color .12s;user-select:none;line-height:1}
 .layer:hover .drag-grip{opacity:.6}
 .layer .drag-grip:hover{opacity:1;color:var(--muted)}
+
+/* === Przycisk wysyłki — stany ładowania z CSS spinner === */
+.tbtn.btn-loading{pointer-events:none;position:relative;color:transparent!important}
+.tbtn.btn-loading::after{content:'';position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:btnSpin .6s linear infinite}
+@keyframes btnSpin{to{transform:rotate(360deg)}}
+.tbtn.btn-success{background:linear-gradient(135deg,var(--success),#3abf80)!important;border-color:var(--success)!important;color:#fff!important;pointer-events:none}
+
+/* === Input number — precyzyjny scroll hint === */
+input[type=number]{position:relative}
+.field input[type=number]:hover{border-color:var(--border-strong);cursor:ns-resize}
+.field input[type=number]:focus{cursor:text}
+
+/* === Legend — interaktywne hover na poszczególnych operacjach === */
+.legend span{padding:4px 8px;border-radius:var(--r-xs);cursor:default;transition:color .12s,background .12s}
+.legend span:hover{background:rgba(255,255,255,.05)}
+
+/* === Empty states — wspólny styl z ikoną === */
+.live3d-empty{position:relative}
+.live3d-empty .empty-action{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none;transition:color .12s}
+.live3d-empty .empty-action:hover{color:#fff}
+.bb-svg .bb-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 16px;text-align:center}
+.bb-svg .bb-empty::before{content:'📄';font-size:1.4rem;opacity:.4}
+
+/* === Context menu — danger items === */
+.ctx-menu button.ctx-danger:hover:not(:disabled){background:linear-gradient(135deg,rgba(255,60,60,.2),rgba(255,60,60,.1));color:var(--danger)}
+.ctx-menu button.ctx-danger:hover:not(:disabled) .ctx-key{color:rgba(255,138,138,.7)}
+
+/* === Modal send — step indicator === */
+.send-steps{display:flex;align-items:center;gap:0;margin:0 0 18px;padding:0}
+.send-step{flex:1;text-align:center;font-size:.68rem;font-weight:700;color:var(--muted-2);padding:8px 4px;position:relative;transition:color .2s}
+.send-step::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--border);border-radius:2px;transition:background .2s}
+.send-step.active{color:var(--accent)}
+.send-step.active::after{background:var(--accent)}
+.send-step.done{color:var(--success)}
+.send-step.done::after{background:var(--success)}
+
+/* === Panel right — empty state z lepszym wyglądem === */
+#props .empty-note{text-align:center}
+#props .empty-note .empty-icon{font-size:1.8rem;display:block;margin-bottom:8px;opacity:.4;filter:grayscale(.4)}
+
+/* === Toolbar separatory — subtelny gradient === */
+.tgroup::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.12),transparent);pointer-events:none}
+.tgroup{position:relative}
+.tgroup:last-child::after{display:none}
+
+/* === Smooth transitions dla paneli bocznych === */
+.panel{transition:box-shadow .2s}
+.panel:hover{box-shadow:2px 0 12px rgba(0,0,0,.2)}
+.panel.right:hover{box-shadow:-2px 0 12px rgba(0,0,0,.2)}
+
+/* === Ruler corner — interaktywny === */
+.ruler-corner{display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--muted-2);transition:background .12s,color .12s,box-shadow .14s}
+.ruler-corner:hover{color:var(--accent);background:rgba(var(--accent-rgb),.08)}
+.ruler-corner:active{transform:scale(.95)}
+
+/* === Stage hint — lepsza widoczność i interakcja === */
+.hint-empty{pointer-events:auto;cursor:default;transition:opacity .3s,border-color .2s}
+.hint-empty:hover{border-color:rgba(var(--accent-rgb),.4);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+
+/* === Lepsza wizualna kart parametrów — gradient header === */
+.param-card{position:relative;overflow:hidden}
+.param-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-accent);opacity:0;transition:opacity .14s}
+.param-card:hover::before{opacity:.5}
+.param-card:focus-within::before{opacity:1}
+
+/* === Shortcut search — wyszukiwarka skrótów klawiszowych === */
+.sc-search{width:100%;padding:8px 12px 8px 34px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.82rem;margin-bottom:14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;transition:border-color .14s,box-shadow .14s}
+.sc-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15)}
+.sc-search:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+
+/* === Inputy — lepsze grupowanie w row2 === */
+.row2{align-items:center}
+.row2>input,.row2>select{flex:1;min-width:0}
+
+/* === Depth badge — tooltip na hover z numerem warstwy === */
+.d-badge{cursor:default;position:relative}
+
+/* === Bottombar section headers — gradient overlay === */
+.bb-head{position:relative;overflow:hidden}
+.bb-head::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad-accent);opacity:.5}
+
+/* === Lepsza animacja live quote flash === */
+@keyframes lqFlashV2{0%{transform:scale(1.06);filter:brightness(1.4)}30%{transform:scale(1.01);filter:brightness(1.1)}100%{transform:scale(1);filter:brightness(1)}}
+.live-quote .lq-price.lq-flash{animation:lqFlashV2 .4s ease-out}
+
+/* === Q-field — lepsza label wizualizacja === */
+.q-field>span.lbl{position:relative;padding-left:10px}
+.q-field>span.lbl::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:12px;border-radius:2px;background:rgba(var(--accent-rgb),.3)}
+
+/* === Modal box — subtilny top accent line === */
+.modal-box{position:relative}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r-lg) var(--r-lg) 0 0;background:var(--grad-accent);opacity:.6}
 </style>
 </head>
 <body>
@@ -1565,6 +1660,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   <div class="modal-box modal-lg">
     <button class="modal-close" aria-label="Zamknij" id="modalHelpClose" title="Zamknij">✕</button>
     <h3>⌨ Skróty klawiszowe</h3>
+    <input type="text" class="sc-search" id="scSearch" placeholder="Szukaj skrótu…" aria-label="Szukaj skrótu klawiszowego">
     <div class="shortcuts-grid">
       <div class="sc-group">
         <h4>Edycja</h4>
@@ -4116,7 +4212,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note">Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note"><span class="empty-icon">🎯</span>Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // ---- nazwa + operacja ----
@@ -5143,7 +5239,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   const ctxMenu=document.getElementById('ctxMenu');
   function closeCtxMenu(){ ctxMenu.classList.remove('open'); ctxMenu.innerHTML=''; }
   function ctxItem(label,action,opts){ opts=opts||{};
-    return `<button type="button" data-ctx="${action}"${opts.disabled?' disabled':''}>${label}</button>`; }
+    const cls=opts.danger?' class="ctx-danger"':'';
+    return `<button type="button" data-ctx="${action}"${cls}${opts.disabled?' disabled':''}>${label}</button>`; }
   function openCtxMenu(x,y,html){
     ctxMenu.innerHTML=html; ctxMenu.classList.add('open');
     const r=ctxMenu.getBoundingClientRect();
@@ -5161,7 +5258,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       const single=sel.length===1?sel[0]:null;
       h+=ctxItem('⧉ Duplikuj <span class="ctx-key">Ctrl+D</span>','duplicate');
       h+=ctxItem('⎘ Kopiuj <span class="ctx-key">Ctrl+C</span>','copy');
-      h+=ctxItem('🗑 Usuń <span class="ctx-key">Del</span>','delete');
+      h+=ctxItem('🗑 Usuń <span class="ctx-key">Del</span>','delete',{danger:true});
       h+=ctxItem('🔄 Odwróć zaznaczenie <span class="ctx-key">Ctrl+Shift+I</span>','invertsel',{disabled:!state.objects.some(o=>!o.locked)});
       h+='<hr>';
       h+=ctxItem('⤒ Na wierzch <span class="ctx-key">Ctrl+Shift+]</span>','front');
@@ -5301,6 +5398,19 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   document.getElementById('helpBtn').addEventListener('click', showHelp);
   document.getElementById('modalHelpClose').addEventListener('click', hideHelp);
   modalHelp.addEventListener('click', e=>{ if(e.target===modalHelp) hideHelp(); });
+  const scSearchEl=document.getElementById('scSearch');
+  scSearchEl.addEventListener('input',()=>{
+    const q=scSearchEl.value.trim().toLowerCase();
+    modalHelp.querySelectorAll('.sc-row').forEach(row=>{
+      const text=row.textContent.toLowerCase();
+      row.style.display=(!q||text.includes(q))?'':'none';
+    });
+    modalHelp.querySelectorAll('.sc-group').forEach(g=>{
+      const visible=g.querySelectorAll('.sc-row:not([style*="display: none"])').length;
+      g.style.display=visible?'':'none';
+    });
+  });
+  modalHelp.addEventListener('transitionend',()=>{ if(modalHelp.classList.contains('open')) scSearchEl.focus(); });
 
   /* ---------------- Podsumowanie projektu ---------------- */
   // Sumuje długości tras cięcia/nacinania oraz powierzchnię grawerowania dla
@@ -5971,7 +6081,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<br><span style="font-size:.65rem;margin-top:4px;display:block">Użyj narzędzi rysowania lub szablonów z panelu po lewej</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -5982,7 +6092,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   function scheduleSvgSplit(){ clearTimeout(svgSplitTimer); svgSplitTimer=setTimeout(updateSvgSplit, 280); }
   function updateSvgSplit(){
     let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
-    bbSvgEl.innerHTML = r ? r.svg : '<div class="bb-empty">Dodaj elementy — tu pojawi się plik z rozdzielonymi warstwami</div>';
+    bbSvgEl.innerHTML = r ? r.svg : '<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się plik z rozdzielonymi warstwami</div>';
   }
 
   live3dStage.addEventListener('contextmenu',e=>e.preventDefault());
@@ -6065,7 +6175,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   /* ----- Powiększony podgląd rozdzielonego SVG ----- */
   function showSvgPreview(){
     let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
-    document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.</div>';
+    document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.<br><span style="font-size:.68rem;color:var(--muted-2)">Narysuj elementy na płycie, aby wygenerować plik SVG</span></div>';
     document.getElementById('modalSvgPrev').classList.add('open');
   }
   document.getElementById('svgPrevDownload').addEventListener('click',downloadSeparatedSVG);
@@ -6314,7 +6424,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    showToast('Plik SVG wyeksportowany','success');
+    const expCount=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference').length;
+    showToast('Plik SVG wyeksportowany ('+expCount+' elem.)','success');
+    markSaved();
     celebrateExport();
   }
   function celebrateExport(){
@@ -8585,16 +8697,24 @@ submitBtn.addEventListener('click', async ()=>{
   const email=document.getElementById('sendQuoteEmail').value.trim();
   const name=document.getElementById('sendQuoteName').value.trim();
   const userMsg=document.getElementById('sendQuoteMsg').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ setStatus('Podaj poprawny adres e-mail.',true); return; }
-  submitBtn.disabled=true; submitBtn.textContent='⏳ Przygotowuję…'; setStatus('Przygotowuję projekt…');
+  const emailInput=document.getElementById('sendQuoteEmail');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+    setStatus('Podaj poprawny adres e-mail.',true);
+    emailInput.style.borderColor='var(--cut)';
+    emailInput.style.boxShadow='0 0 0 3px rgba(255,59,59,.2)';
+    emailInput.focus();
+    emailInput.addEventListener('input',function fix(){ emailInput.style.borderColor=''; emailInput.style.boxShadow=''; emailInput.removeEventListener('input',fix); },{once:true});
+    return;
+  }
+  submitBtn.disabled=true; submitBtn.classList.add('btn-loading'); submitBtn.textContent=''; setStatus('Przygotowuję projekt…');
   try{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
-    if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
+    if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; submitBtn.classList.remove('btn-loading'); submitBtn.textContent='Wyślij projekt'; return; }
     const q=payload.quote;
     const exTxt=(q.extras&&q.extras.length)?'\nPozycje dodatkowe: '+q.extras.map(e=>`${e.label} ${e.amount.toFixed(2).replace('.',',')} zł`).join(', '):'';
     const qtyTxt=(q.qty&&q.qty>1)?`\nIlość: ${q.qty} szt. (cena/szt.: ${(q.perPiece||0).toFixed(2).replace('.',',')} zł)`:'';
     const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}${qtyTxt}\nCena${q.qty>1?' razem':''}: ${q.price.toFixed(2).replace('.',',')} zł${exTxt}\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
-    submitBtn.textContent='📡 Wysyłam…'; setStatus('Wysyłam do pracowni…');
+    setStatus('Wysyłam do pracowni…');
     const db=await ensureDb();
     await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
       name: name||'Klient edytora wyceny',
@@ -8610,11 +8730,13 @@ submitBtn.addEventListener('click', async ()=>{
       status:'new',
       read:false
     });
+    submitBtn.classList.remove('btn-loading');
+    submitBtn.classList.add('btn-success');
+    submitBtn.textContent='✓ Wysłano!';
     setStatus('✅ Wysłano! Odpowiemy na '+email);
-    submitBtn.textContent='Wysłano ✓';
     showToast('Projekt wysłany do pracowni!','success',4000);
     celebrateExport();
-    setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.textContent='Wyślij projekt'; },2500);
+    setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.classList.remove('btn-success'); submitBtn.textContent='Wyślij projekt'; },2500);
   }catch(err){
     const msg=err?.code==='unavailable'?'Serwer niedostępny — sprawdź połączenie z internetem':
               err?.code==='permission-denied'?'Brak uprawnień — odśwież stronę i spróbuj ponownie':
@@ -8622,6 +8744,7 @@ submitBtn.addEventListener('click', async ()=>{
     setStatus('Błąd wysyłki: '+msg,true);
     showToast('Nie udało się wysłać wyceny','error',4000);
     submitBtn.disabled=false;
+    submitBtn.classList.remove('btn-loading');
     submitBtn.textContent='Wyślij projekt';
   }
 });
