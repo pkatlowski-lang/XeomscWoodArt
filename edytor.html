@@ -536,8 +536,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .workspace{flex-direction:column;overflow:visible}
   .toolrail{display:none}
   .bottombar{flex:0 0 auto;border-left:none;border-right:none;border-top:2px solid var(--accent-dark)}
-  .bottombar>.bb-sec:first-child{flex:0 0 auto;min-height:340px}
-  .bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:300px}
+  .bottombar>.bb-sec:first-child{flex:0 0 auto;min-height:300px}
+  .bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:260px}
   .panel{flex:0 0 auto;max-height:none;width:100%;border:none;border-top:1px solid var(--border)}
   .stage{order:1;min-height:62vh;flex:0 0 auto}
   .panel.right{order:2} .bottombar{order:3} .panel.left{order:4}
@@ -5151,7 +5151,9 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   document.getElementById('summaryBtn').addEventListener('click',()=>{ renderSummary(); modalSummary.classList.add('open'); });
   document.getElementById('modalSummaryClose').addEventListener('click',()=>modalSummary.classList.remove('open'));
   modalSummary.addEventListener('click',e=>{ if(e.target===modalSummary) modalSummary.classList.remove('open'); });
-  [sumCutSpeed,sumScoreSpeed,sumEngraveSpeed,sumEngraveSpacing].forEach(inp=>inp.addEventListener('input',renderSummary));
+  let _sumTimer;
+  function debouncedSummary(){ clearTimeout(_sumTimer); _sumTimer=setTimeout(renderSummary,120); }
+  [sumCutSpeed,sumScoreSpeed,sumEngraveSpeed,sumEngraveSpacing].forEach(inp=>inp.addEventListener('input',debouncedSummary));
 
   /* ---------------- Wycena projektu ---------------- */
   // Stałe parametry wyceny — celowo NIE są pokazywane w interfejsie ani edytowalne;
@@ -5312,7 +5314,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         +`<button type="button" class="pq-del" title="Usuń pozycję">✕</button>`;
       const ins=row.querySelectorAll('input');
       ins[0].addEventListener('input',()=>{ quoteExtras[i].label=ins[0].value; });
-      ins[1].addEventListener('input',()=>{ quoteExtras[i].amount=ins[1].value; renderQuoteAll(); });
+      ins[1].addEventListener('input',()=>{ quoteExtras[i].amount=ins[1].value; scheduleLiveQuote(); });
       row.querySelector('.pq-del').addEventListener('click',()=>{ quoteExtras.splice(i,1); renderExtras(); renderQuoteAll(); });
       box.appendChild(row);
     });
@@ -5356,7 +5358,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderQuoteAll,200); }
   quoteMatSel.addEventListener('change',()=>{ lqMat.value=quoteMatSel.value; renderQuoteAll(); });
   lqMat.addEventListener('change',()=>{ quoteMatSel.value=lqMat.value; renderQuoteAll(); });
-  qQtyInput.addEventListener('input',()=>{ quoteQty=Math.max(1,Math.round(parseFloat(qQtyInput.value)||1)); renderQuoteAll(); });
+  qQtyInput.addEventListener('input',()=>{ quoteQty=Math.max(1,Math.round(parseFloat(qQtyInput.value)||1)); scheduleLiveQuote(); });
   document.getElementById('qAddExtra').addEventListener('click',()=>{ quoteExtras.push({label:'',amount:''}); renderExtras(); });
 
   /* ---------------- Edycja cennika aktywnego profilu (materiały + parametry) ---------------- */
@@ -8271,7 +8273,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   // podręcznej (litery w eksporcie/3D w innym kroju niż w podglądzie <text> - ten
   // renderuje CSS, które nie ma tego problemu). Gdy wszystkie czcionki są już gotowe,
   // czyścimy cache i przerysowujemy, żeby naprawić ewentualne wcześniejsze, błędne obrysy.
-  document.fonts.ready.then(()=>{ _textOutlineCache.clear(); renderAll(); });
+  document.fonts.ready.then(()=>{ _textOutlineCache.clear(); renderAll(); }).catch(()=>{});
 
   // Hak debugowy do testów (Playwright) — bez wpływu na działanie edytora
   window.__lzr={state, buildSeparatedSVG, buildLayerScene, mergeLayerRings, unionAll, objSubPolys, objSubPolysLocal, objSubPolysRepeated, textOutlinePolys, objBBox, rotatedBBox, selBBox, polyArea, polyPerimeter, objInkArea, computeProjectStats, computeQuote, quotePathLen, quoteMaterialArea, quoteTimeBreakdown, quoteEngraveTimeMin, polysBBoxMulti, polyToPathD, polyToSmoothPathD, renderAll, updateLive3D, renderProps, select, defaultsFor, zoomFit, repeatTransforms, exportSVG, buildGearPoints, simplifyRing, rasterizeTextOutlines, textNaturalBox, getTextRaster};
