@@ -4756,7 +4756,13 @@ input[type=number]{position:relative}
   /* ---------------- Panel warstw ---------------- */
   const layersEl=document.getElementById('layers');
   const layerSearchEl=document.getElementById('layerSearch');
-  layerSearchEl.addEventListener('input',renderLayers);
+  layerSearchEl.addEventListener('input',()=>{
+    renderLayers();
+    layerSearchEl.style.borderColor=layerSearchEl.value?'var(--accent)':'';
+  });
+  layerSearchEl.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ layerSearchEl.value=''; layerSearchEl.style.borderColor=''; renderLayers(); layerSearchEl.blur(); }
+  });
   function renderLayers(){
     const total=state.objects.length;
     const locked=state.objects.filter(o=>o.locked).length;
@@ -4906,7 +4912,12 @@ input[type=number]{position:relative}
 
   /* ---------------- Podpięcie paska narzędzi ---------------- */
   const toolsEl=document.getElementById('tools');
-  TOOLS.forEach(t=>{
+  TOOLS.forEach((t,i)=>{
+    if(i===2){
+      const sep=document.createElement('div');
+      sep.style.cssText='width:32px;height:1px;margin:4px 0;background:linear-gradient(90deg,transparent,var(--border),transparent)';
+      toolsEl.appendChild(sep);
+    }
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
     b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
     b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`);
@@ -4916,7 +4927,7 @@ input[type=number]{position:relative}
   function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); updateStatusBar(); }
   function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
   const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom');
-  const TOOL_LABELS={select:'Zaznaczanie',rect:'Prostokąt',circle:'Elipsa',poly:'Wielokąt',star:'Gwiazda',line:'Linia',pen:'Pióro',text:'Tekst',pan:'Przesuwanie',eraser:'Gumka'};
+  const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
   function updateStatusBar(){
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
     if(_sbObj){ const n=state.objects.length; const s=state.selectedIds.length; _sbObj.textContent=n+' elem.'+(s?' ('+s+' wyb.)':''); }
@@ -5399,18 +5410,26 @@ input[type=number]{position:relative}
   document.getElementById('modalHelpClose').addEventListener('click', hideHelp);
   modalHelp.addEventListener('click', e=>{ if(e.target===modalHelp) hideHelp(); });
   const scSearchEl=document.getElementById('scSearch');
-  scSearchEl.addEventListener('input',()=>{
+  function filterShortcuts(){
     const q=scSearchEl.value.trim().toLowerCase();
+    let totalVisible=0;
     modalHelp.querySelectorAll('.sc-row').forEach(row=>{
-      const text=row.textContent.toLowerCase();
-      row.style.display=(!q||text.includes(q))?'':'none';
+      const vis=!q||row.textContent.toLowerCase().includes(q);
+      row.style.display=vis?'':'none';
+      if(vis) totalVisible++;
     });
     modalHelp.querySelectorAll('.sc-group').forEach(g=>{
       const visible=g.querySelectorAll('.sc-row:not([style*="display: none"])').length;
       g.style.display=visible?'':'none';
     });
+  }
+  scSearchEl.addEventListener('input',filterShortcuts);
+  scSearchEl.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(scSearchEl.value){ scSearchEl.value=''; filterShortcuts(); e.stopPropagation(); }
+    }
   });
-  modalHelp.addEventListener('transitionend',()=>{ if(modalHelp.classList.contains('open')) scSearchEl.focus(); });
+  modalHelp.addEventListener('transitionend',()=>{ if(modalHelp.classList.contains('open')){ scSearchEl.value=''; filterShortcuts(); scSearchEl.focus(); } });
 
   /* ---------------- Podsumowanie projektu ---------------- */
   // Sumuje długości tras cięcia/nacinania oraz powierzchnię grawerowania dla
@@ -5453,10 +5472,12 @@ input[type=number]{position:relative}
   if(!sumEngraveSpacing.value) sumEngraveSpacing.value=0.1;
   function renderSummary(){
     const s=computeProjectStats();
+    const totalElements=s.cutCount+s.scoreCount+s.engraveCount;
     document.getElementById('summaryStats').innerHTML=
       `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm</span></div>`
       +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm</span></div>`
-      +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`;
+      +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`
+      +`<div style="font-size:.72rem;color:var(--muted);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums">Łącznie: ${totalElements} elementów · ${fmt(s.cutLen+s.scoreLen)} mm tras</div>`;
     const cutSpeed=Math.max(1,Number(sumCutSpeed.value)||1);
     const scoreSpeed=Math.max(1,Number(sumScoreSpeed.value)||1);
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
@@ -5670,7 +5691,10 @@ input[type=number]{position:relative}
     if(lqPrice){ const newVal=zl(q.qty>1?q.total:q.perPiece); const changed=lqPrice.textContent!==newVal;
       lqPrice.classList.remove('lq-empty'); lqPrice.textContent=newVal;
       if(changed){ lqPrice.classList.remove('lq-flash'); void lqPrice.offsetWidth; lqPrice.classList.add('lq-flash'); } }
-    if(lqTime) lqTime.textContent='⏱ '+formatQuoteTime(q.timeMin)+' min.sek pracy lasera'+(q.qty>1?` · ${q.qty} szt.`:'');
+    if(lqTime){
+      const areaCm=Math.round(quoteMaterialArea());
+      lqTime.textContent='⏱ '+formatQuoteTime(q.timeMin)+' min.sek · '+areaCm+' cm²'+(q.qty>1?` · ${q.qty} szt.`:'');
+    }
   }
   // Alias zgodności (wołane z renderObjects/renderObjectEl po każdej edycji projektu)
   function renderLiveQuote(){ renderQuoteAll(); }
