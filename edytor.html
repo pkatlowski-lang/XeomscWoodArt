@@ -1278,6 +1278,56 @@ input[type=number]{position:relative}
 /* === Modal box — subtilny top accent line === */
 .modal-box{position:relative}
 .modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r-lg) var(--r-lg) 0 0;background:var(--grad-accent);opacity:.6}
+
+/* === Layer items — staggered animation === */
+@keyframes layerSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.layers .layer{animation:layerSlideIn .15s ease-out backwards}
+.layers .layer:nth-child(n+2){animation-delay:20ms}
+.layers .layer:nth-child(n+4){animation-delay:40ms}
+.layers .layer:nth-child(n+8){animation-delay:60ms}
+.layers .layer:nth-child(n+12){animation-delay:0ms}
+
+/* === Splash screen — lepsza animacja === */
+.splash-brand{animation:splashBrandIn .5s ease-out}
+@keyframes splashBrandIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.splash-hint{animation:splashHintIn .4s ease-out .2s backwards}
+@keyframes splashHintIn{from{opacity:0}to{opacity:1}}
+.splash-bar{animation:splashBarIn .3s ease-out .1s backwards}
+@keyframes splashBarIn{from{opacity:0;transform:scaleX(.6)}to{opacity:1;transform:scaleX(1)}}
+
+/* === Zoom badge — pulsujący akcent przy zmianie === */
+.zoom-badge.zoom-changed{animation:zoomBadgePulse .3s ease-out}
+@keyframes zoomBadgePulse{0%{transform:scale(1.08);box-shadow:0 0 12px rgba(var(--accent-rgb),.3)}100%{transform:scale(1)}}
+
+/* === Toolbar brand — hover glow === */
+.toolbar .brand{cursor:default}
+.toolbar .brand:hover .brand-name{filter:brightness(1.1)}
+
+/* === Gallery card — numeracja === */
+.gallery-card{counter-increment:gallery-counter}
+
+/* === Depth legend row — hover akcent === */
+.lyr-row{position:relative}
+.lyr-row::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:transparent;transition:background .12s;border-radius:2px}
+.lyr-row:hover::after{background:rgba(var(--accent-rgb),.2)}
+.lyr-row.on::after{background:var(--accent)}
+
+/* === Pq-mat-row — lepsze interakcje === */
+.pq-mat-row{transition:border-color .12s,box-shadow .12s}
+.pq-mat-row:focus-within{border-color:rgba(var(--accent-rgb),.3);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.08)}
+
+/* === Toast — ikona z lepszym stylem === */
+.toast{display:flex;align-items:flex-start;gap:6px}
+
+/* === Przycisk „Rozmieść" — lepszy feedback === */
+#arrangeBtn{transition:background .14s,color .14s,border-color .14s,box-shadow .14s,transform .08s}
+
+/* === Check label — checkbox animacja === */
+.check-label input[type=checkbox]{transition:transform .1s}
+.check-label input[type=checkbox]:active{transform:scale(.85)}
+
+/* === Modal hint center — lepszy spacing === */
+.modal-hint-center{padding:8px 12px;background:rgba(var(--accent-rgb),.02);border-radius:var(--r-sm);border:1px solid rgba(var(--accent-rgb),.06)}
 </style>
 </head>
 <body>
@@ -6088,7 +6138,8 @@ input[type=number]{position:relative}
   const bbSvgEl=document.getElementById('bbSvg');
   function applyLiveRot(){
     live3dScene.style.transform=`translate(${fmt(liveZoom.x)}px,${fmt(liveZoom.y)}px) scale(${fmt(liveZoom.scale)}) rotateX(${liveRot.x}deg) rotateZ(${liveRot.z}deg)`;
-    live3dZoomLabel.textContent=Math.round(liveZoom.scale*100)+'%';
+    const newZ=Math.round(liveZoom.scale*100)+'%';
+    if(live3dZoomLabel.textContent!==newZ){ live3dZoomLabel.textContent=newZ; live3dZoomLabel.classList.remove('zoom-changed'); void live3dZoomLabel.offsetWidth; live3dZoomLabel.classList.add('zoom-changed'); }
   }
   // Zoom kółkiem myszy wyśrodkowany na pozycji kursora: punkt sceny pod kursorem
   // zostaje w tym samym miejscu na ekranie po zmianie skali (translate+scale są
@@ -6162,7 +6213,8 @@ input[type=number]{position:relative}
   const P3D_HINT_NET='Grubości warstw ustawiasz w mm w panelu „Warstwy 3D" po lewej — model 3D odwzorowuje je proporcjonalnie.';
   function applyP3DTransform(){
     p3dScene.style.transform=`translate(${fmt(p3dZoom.x)}px,${fmt(p3dZoom.y)}px) scale(${fmt(p3dZoom.scale)}) rotateX(${p3dRot.x}deg) rotateZ(${p3dRot.z}deg)`;
-    p3dZoomLabel.textContent=Math.round(p3dZoom.scale*100)+'%';
+    const newPZ=Math.round(p3dZoom.scale*100)+'%';
+    if(p3dZoomLabel.textContent!==newPZ){ p3dZoomLabel.textContent=newPZ; p3dZoomLabel.classList.remove('zoom-changed'); void p3dZoomLabel.offsetWidth; p3dZoomLabel.classList.add('zoom-changed'); }
   }
   function renderP3D(){
     const W=state.docW, H=state.docH;
