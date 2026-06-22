@@ -1474,6 +1474,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     <div class="shortcuts-grid">
       <div class="sc-group">
         <h4>Edycja</h4>
+        <div class="sc-row"><span>Zapisz projekt</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>S</kbd></span></div>
+        <div class="sc-row"><span>Otwórz projekt</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>O</kbd></span></div>
         <div class="sc-row"><span>Cofnij</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>Z</kbd></span></div>
         <div class="sc-row"><span>Ponów</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>Y</kbd></span></div>
         <div class="sc-row"><span>Kopiuj</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>C</kbd></span></div>
@@ -4857,6 +4859,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     if(e.code==='Space' && !typing){ spaceDown=true; if(!drag) canvas.style.cursor='grab'; e.preventDefault(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){ e.preventDefault(); redo(); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`); showToast('Projekt zapisany do pliku','success'); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='o'){ e.preventDefault(); document.getElementById('loadProjectInput').click(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){ e.preventDefault(); duplicateSel(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='g'){ e.preventDefault(); e.shiftKey?ungroupSel():groupSel(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'){ if(!typing){ e.preventDefault(); copySel(); } return; }
