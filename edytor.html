@@ -1829,6 +1829,66 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 
 /* === v60: Lepsza wizualizacja depth badge z tooltip === */
 .d-badge[data-tooltip]::after{font-size:.65rem;padding:4px 8px;white-space:nowrap}
+
+/* === v62: Send modal — connectors między krokami === */
+.send-step-connector{width:24px;height:2px;background:var(--border);flex-shrink:0;border-radius:2px;transition:background .2s;margin-top:-12px}
+.send-step.done~.send-step-connector{background:var(--success)}
+.send-step.active~.send-step-connector{background:var(--accent)}
+
+/* === v62: Send step — lepsza wizualizacja z animation === */
+.send-step.active .step-num{animation:stepNumPulse .5s ease-out}
+@keyframes stepNumPulse{0%{transform:scale(1.3);box-shadow:0 0 12px rgba(var(--accent-rgb),.4)}100%{transform:scale(1);box-shadow:none}}
+.send-step.done .step-num::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.5rem}
+
+/* === v62: Grid — subtelniejsze linie z lepszym kontrastem === */
+.grid-line{stroke:rgba(0,0,0,.06);transition:stroke .2s}
+.grid-line.major{stroke:rgba(0,0,0,.14)}
+
+/* === v62: Gallery card — efekt glassmorphism na hover === */
+.gallery-card:hover::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--accent-rgb),.06),transparent 50%);border-radius:var(--r);pointer-events:none;z-index:0}
+
+/* === v62: Lepsza wizualizacja ramki dokumentu === */
+.doc-border{stroke:var(--accent-dark);stroke-dasharray:none;transition:stroke .3s}
+
+/* === v62: Ulepszone karty parametrów globalnych === */
+.param-card .prow{transition:padding-left .12s}
+.param-card:hover .prow{padding-left:2px}
+
+/* === v62: Informacja o materiale w modalu eksportu 3D === */
+.layer3d-card .card-mat{font-size:.62rem;color:var(--muted);font-weight:500;margin-top:-2px}
+
+/* === v62: Lepszy styl autosave toast === */
+.toast.toast-info .toast-msg{font-size:.8rem}
+
+/* === v62: Lepsze podpowiedzi na pustych kartach galerii === */
+.gallery-card[data-custom]::before{content:'';position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 4px rgba(var(--accent-rgb),.5);opacity:0;transition:opacity .15s}
+.gallery-card[data-custom]:hover::before{opacity:1}
+
+/* === v62: Lepsze transition na legend bar === */
+.legend{transition:background .2s,padding .12s}
+.legend:hover{background:rgba(0,0,0,.18);padding:12px 16px}
+
+/* === v62: Bardziej interaktywna nazwa warstwy === */
+.layer .lname{transition:color .12s,padding-left .1s}
+.layer:hover .lname{padding-left:2px}
+.layer.sel .lname{color:#fff}
+
+/* === v62: Ulepszone tło modalu podsumowania z kolorową ramką === */
+.modal-ov[aria-label*="Podsumowanie"] .modal-box{border-top:2px solid var(--accent)}
+.modal-ov[aria-label*="Wizualizacja"] .modal-box{border-top:2px solid var(--accent)}
+.modal-ov[aria-label*="Eksport"] .modal-box{border-top:2px solid var(--accent)}
+
+/* === v62: Pola liczbowe — placeholder style === */
+.field input[type=number]::placeholder{color:var(--muted-2);font-style:italic}
+
+/* === v62: Depth ctrl buttons — lepsze wizualnie === */
+.depth-ctrl .dbtn{font-weight:700;transition:border-color .12s,color .12s,background .12s,transform .08s,box-shadow .14s}
+.depth-ctrl .dval{transition:color .12s}
+.depth-ctrl:hover .dval{color:var(--accent)}
+
+/* === v62: Lepszy hover na warstwie w panelu === */
+.layer{transition:background .12s,border-color .12s,box-shadow .12s,transform .08s,padding-left .1s}
+.layer:hover{padding-left:12px}
 </style>
 </head>
 <body>
@@ -2351,7 +2411,9 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     <h3>📨 Wyślij projekt do pracowni</h3>
     <div class="send-steps" id="sendSteps">
       <div class="send-step active" data-step="1"><span class="step-num">1</span> Dane</div>
+      <div class="send-step-connector"></div>
       <div class="send-step" data-step="2"><span class="step-num">2</span> Wysyłka</div>
+      <div class="send-step-connector"></div>
       <div class="send-step" data-step="3"><span class="step-num">3</span> Gotowe</div>
     </div>
     <p class="modal-hint mb-6">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
@@ -2959,8 +3021,14 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     const W=state.docW, H=state.docH, g=state.grid;
     let s=`<rect class="doc-bg" x="0" y="0" width="${W}" height="${H}"/>`;
     if(state.showGrid&&g>0){
-      for(let x=0;x<=W+0.01;x+=g) s+=`<line class="grid-line ${x%50===0?'major':''}" x1="${x}" y1="0" x2="${x}" y2="${H}"/>`;
-      for(let y=0;y<=H+0.01;y+=g) s+=`<line class="grid-line ${y%50===0?'major':''}" x1="0" y1="${y}" x2="${W}" y2="${y}"/>`;
+      for(let x=0;x<=W+0.01;x+=g){
+        const isMajor=x%50===0;
+        s+=`<line class="grid-line ${isMajor?'major':''}" x1="${x}" y1="0" x2="${x}" y2="${H}"/>`;
+      }
+      for(let y=0;y<=H+0.01;y+=g){
+        const isMajor=y%50===0;
+        s+=`<line class="grid-line ${isMajor?'major':''}" x1="0" y1="${y}" x2="${W}" y2="${y}"/>`;
+      }
     }
     s+=`<rect class="doc-border" x="0" y="0" width="${W}" height="${H}"/>`;
     gGrid.innerHTML=s;
@@ -5667,7 +5735,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     downloadJSON(proj, `projekt-laser-${Date.now()}.json`);
     markSaved();
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
-    showToast('Projekt zapisany ('+state.objects.length+' elem., '+sizeKB+' KB)','success');
+    const now=new Date(); const timeStr=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    showToast('Projekt zapisany o '+timeStr+' ('+state.objects.length+' elem., '+sizeKB+' KB)','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
     document.getElementById('loadProjectInput').click();
@@ -5682,7 +5751,9 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
         applyProjectData(d);
         markSaved();
         const depths=[...new Set(d.objects.map(o=>o.depth||1))];
-        showToast('Projekt wczytany — '+d.objects.length+' obiektów, '+depths.length+' warst'+(depths.length===1?'wa':'w'),'success');
+        const types={}; d.objects.forEach(o=>{types[o.type]=(types[o.type]||0)+1;});
+        const typeStr=Object.entries(types).map(([t,c])=>c+'× '+t).join(', ');
+        showToast('Projekt wczytany — '+d.objects.length+' obiektów ('+typeStr+'), '+depths.length+' warst'+(depths.length===1?'wa':'w'),'success',4000);
       }catch(err){ showToast('Nie udało się wczytać projektu: '+err.message,'error',5000); }
     };
     reader.readAsText(f);
@@ -9405,8 +9476,9 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
       const data=JSON.parse(saved);
       if(data && Array.isArray(data.objects) && data.objects.length>0){
         const sizeKB=(saved.length/1024).toFixed(0);
-        showConfirm('Znaleziono autozapis z '+data.objects.length+' elementami ('+sizeKB+' KB). Przywrócić?',{icon:'💾',ok:'Przywróć'}).then(ok=>{
-          if(ok){ applyProjectData(data); showToast('Przywrócono autozapis ('+data.objects.length+' elem.)','success'); }
+        const depthCount=[...new Set(data.objects.map(o=>o.depth||1))].length;
+        showConfirm('Znaleziono autozapis z '+data.objects.length+' elementami ('+sizeKB+' KB, '+depthCount+' warstw). Przywrócić?',{icon:'💾',ok:'Przywróć'}).then(ok=>{
+          if(ok){ applyProjectData(data); showToast('Przywrócono autozapis ('+data.objects.length+' elem., '+depthCount+' warstw)','success'); }
           else { try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){} }
         });
       }
