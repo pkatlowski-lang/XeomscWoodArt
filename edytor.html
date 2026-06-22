@@ -213,7 +213,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd{position:relative;min-width:150px}
 .font-dd-btn{width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);font-size:.85rem;padding:5px 8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:border-color .14s,box-shadow .14s}
 .font-dd-btn:hover{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.12)}
-.font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:280px;overflow-y:auto;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.1);padding:4px 0}
+.font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:320px;overflow-y:auto;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.1);padding:4px 0}
+.font-dd-search{position:sticky;top:0;width:calc(100% - 8px);margin:4px;padding:6px 10px 6px 28px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);font-family:inherit;font-size:.78rem;z-index:1;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center;transition:border-color .14s,box-shadow .14s}
+.font-dd-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15)}
 .font-dd.open .font-dd-list{display:block}
 .font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:var(--r-xs);margin:0 4px;transition:background .12s,color .12s}
 .font-dd-item:hover{background:var(--grad-accent);color:var(--accent-text);box-shadow:0 2px 6px rgba(var(--accent-rgb),.3)}
@@ -1163,6 +1165,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .sb-sep{opacity:.35}
 .sb-spacer{flex:1}
 .sb-zoom{color:var(--accent);font-weight:600}
+.sb-save{font-size:.6rem;font-weight:600;transition:opacity .2s}
 
 /* === Splash screen / loading overlay === */
 .splash-ov{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
@@ -1449,6 +1452,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     <span class="sb-item" id="sbObjects">0 elementów</span>
     <span class="sb-sep">·</span>
     <span class="sb-item" id="sbDoc">300×200 mm</span>
+    <span class="sb-item sb-save" id="sbSave"></span>
     <span class="sb-spacer"></span>
     <span class="sb-item sb-zoom" id="sbZoom">100%</span>
   </div>
@@ -1905,13 +1909,19 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const all=availableFonts();
     const curLabel=(all.find(f=>f[0]===cur)||[cur,String(cur||'').replace(/"/g,'')])[1];
     const items=all.map(([v,l])=>`<div class="font-dd-item${v===cur?' cur':''}" data-font="${escapeXml(v)}" style="font-family:${escapeXml(v)}">${escapeXml(l)}${localFonts.some(f=>f[0]===v)?' <span class="pc">• PC</span>':''}</div>`).join('');
-    return `<button type="button" class="font-dd-btn" style="font-family:${escapeXml(cur||'inherit')}">${escapeXml(curLabel)} ▾</button><div class="font-dd-list">${items}</div>`;
+    return `<button type="button" class="font-dd-btn" style="font-family:${escapeXml(cur||'inherit')}">${escapeXml(curLabel)} ▾</button><div class="font-dd-list"><input type="text" class="font-dd-search" placeholder="Szukaj czcionki…" autocomplete="off">${items}</div>`;
   }
   function bindFontDD(dd, getObj, onCommit){
-    let orig=null;                 // czcionka sprzed otwarcia listy — do przywrócenia, gdy podgląd nie zostanie zatwierdzony
+    let orig=null;
     const preview=f=>{ const o=getObj(); if(!o) return; o.font=f; renderObjects(); renderOverlay(); };
     const close=(restore)=>{ dd.classList.remove('open'); if(restore && orig!=null) preview(orig); orig=null; };
+    const filterFonts=(q)=>{
+      const items=dd.querySelectorAll('.font-dd-item');
+      const lq=q.toLowerCase();
+      items.forEach(it=>{ it.style.display=it.textContent.toLowerCase().includes(lq)?'':'none'; });
+    };
     dd.addEventListener('click',e=>{
+      if(e.target.closest('.font-dd-search')) return;
       const it=e.target.closest('.font-dd-item');
       if(it){
         e.stopPropagation();
@@ -1928,8 +1938,16 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         if(dd.classList.contains('open')){ close(true); return; }
         orig=o.font;
         dd.classList.add('open');
+        const search=dd.querySelector('.font-dd-search');
+        if(search){ search.value=''; filterFonts(''); setTimeout(()=>search.focus(),50); }
         const curIt=dd.querySelector('.font-dd-item.cur'); if(curIt) curIt.scrollIntoView({block:'center'});
       }
+    });
+    dd.addEventListener('input',e=>{
+      if(e.target.classList.contains('font-dd-search')) filterFonts(e.target.value);
+    });
+    dd.addEventListener('keydown',e=>{
+      if(e.target.classList.contains('font-dd-search') && e.key==='Escape'){ close(true); }
     });
     dd.addEventListener('mouseover',e=>{
       if(!dd.classList.contains('open')) return;
@@ -4755,11 +4773,20 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 
   /* ---------------- Historia (cofnij / ponów) ---------------- */
   function snapshot(){ return JSON.stringify({objects:state.objects,selectedIds:state.selectedIds,params:state.params,docW:state.docW,docH:state.docH,layerMM:state.layerMM}); }
+  let _savedAtIndex=-1;
   function pushHistory(){
     state.history=state.history.slice(0,state.hIndex+1);
     state.history.push(snapshot()); state.hIndex=state.history.length-1;
-    if(state.history.length>120){ state.history.shift(); state.hIndex--; }
+    if(state.history.length>120){ state.history.shift(); state.hIndex--; if(_savedAtIndex>=0) _savedAtIndex--; }
     updateUndoButtons();
+    updateSaveIndicator();
+  }
+  function markSaved(){ _savedAtIndex=state.hIndex; updateSaveIndicator(); }
+  function updateSaveIndicator(){
+    const unsaved=state.objects.length>0 && state.hIndex!==_savedAtIndex;
+    const el=document.getElementById('sbSave');
+    if(el) el.textContent=unsaved?'● niezapisany':'';
+    if(el) el.style.color=unsaved?'var(--operator)':'';
   }
   function restore(s){
     const d=JSON.parse(s);
@@ -4776,8 +4803,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     if(docChanged){ docWInput.value=state.docW; docHInput.value=state.docH; renderGrid(); }
     renderAll(); renderProps(); renderParams();
   }
-  function undo(){ if(state.hIndex>0){ state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); } }
-  function redo(){ if(state.hIndex<state.history.length-1){ state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); } }
+  function undo(){ if(state.hIndex>0){ state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); } }
+  function redo(){ if(state.hIndex<state.history.length-1){ state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); } }
   function updateUndoButtons(){ document.getElementById('undoBtn').disabled=state.hIndex<=0; document.getElementById('redoBtn').disabled=state.hIndex>=state.history.length-1; }
 
   /* ---------------- Podpięcie paska narzędzi ---------------- */
@@ -4899,6 +4926,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   }
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
     downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`);
+    markSaved();
     showToast('Projekt zapisany do pliku','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
@@ -4912,6 +4940,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         const d=JSON.parse(reader.result);
         if(!Array.isArray(d.objects)) throw new Error('zły format pliku');
         applyProjectData(d);
+        markSaved();
         showToast('Projekt wczytany — '+d.objects.length+' obiektów','success');
       }catch(err){ showToast('Nie udało się wczytać projektu: '+err.message,'error',5000); }
     };
