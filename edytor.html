@@ -2349,6 +2349,70 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 /* === v69: Bottombar — resize handle visual === */
 .bb-sec+.bb-sec{border-top:1px solid var(--border);position:relative}
 .bb-sec+.bb-sec::before{content:'';position:absolute;top:-1px;left:30%;right:30%;height:2px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.12),transparent);pointer-events:none}
+
+/* === v70: Accessibility — focus-visible na toolrail === */
+.toolrail .tbtn:focus-visible{outline:none;box-shadow:var(--glow),0 0 0 2px rgba(var(--accent-rgb),.4)}
+.toolrail .tbtn:focus-visible .ico{transform:scale(1.1)}
+
+/* === v70: Improved responsywność — scroll na toolrail mobilnie === */
+@media(max-width:820px){
+  .toolrail{display:flex;flex-direction:row;flex:0 0 auto;border-right:none;border-bottom:1px solid var(--border);padding:6px 10px;overflow-x:auto;gap:4px}
+  .toolrail .tool-list{flex-direction:row}
+  .toolrail .tbtn{flex-direction:row;width:auto;height:36px;min-width:36px;gap:4px;font-size:.5rem}
+  .toolrail .tbtn.active::before{display:none}
+  .tool-sep{width:2px;height:20px;margin:0 4px}
+}
+
+/* === v70: Skip-to-content link (accessibility) === */
+.skip-link{position:absolute;top:-40px;left:0;background:var(--accent);color:var(--accent-text);padding:8px 16px;z-index:10000;font-weight:700;font-size:.8rem;border-radius:0 0 var(--r-sm) 0;transition:top .2s}
+.skip-link:focus{top:0}
+
+/* === v70: Toast stacking — max 4 visible === */
+.toast-container .toast:nth-child(n+5){display:none}
+
+/* === v70: Improved modal scroll na bardzo małych ekranach === */
+@media(max-height:500px){
+  .modal-ov{padding-top:20px}
+  .modal-box{max-height:90vh;overflow-y:auto}
+}
+
+/* === v70: Lepsza wizualizacja pola live quote === */
+.live-quote{transition:transform .2s,box-shadow .2s,opacity .2s}
+.live-quote:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.5);opacity:1}
+
+/* === v70: Toolbar — active button text shadow === */
+.tbtn.active{text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.tbtn-primary{text-shadow:0 1px 2px rgba(0,0,0,.3)}
+
+/* === v70: Better print styles === */
+@media print{
+  .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov,.statusbar,.splash-ov{display:none!important}
+  .stage{position:static!important;width:100%!important;height:auto!important}
+  #canvas{position:static!important;width:100%!important;height:auto!important}
+  body{overflow:visible!important}
+  .app{height:auto!important}
+}
+
+/* === v70: Panel transition na scroll-shadow === */
+.panel.left,.panel.right{position:relative}
+
+/* === v70: Animacja placeholder na pustym panelu właściwości === */
+.empty-note{position:relative;overflow:hidden}
+.empty-note::before{background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),transparent);animation:emptyNoteBg 5s ease-in-out infinite alternate}
+@keyframes emptyNoteBg{from{opacity:.3}to{opacity:.7}}
+
+/* === v70: Lepsza wizualizacja ikonki brand w toolbarze === */
+.toolbar .brand::before{transition:transform .2s,box-shadow .2s}
+.toolbar .brand:hover::before{transform:rotate(15deg) scale(1.06);box-shadow:0 4px 18px rgba(var(--accent-rgb),.65)}
+
+/* === v70: Layers counter badge — lepsza wizualizacja === */
+.lc-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;padding:0 5px;border-radius:10px;background:rgba(var(--accent-rgb),.12);color:var(--accent);font-weight:800;font-size:.68rem;font-variant-numeric:tabular-nums}
+
+/* === v70: Depth view toggle — lepsza wizualizacja stanu === */
+#depthViewBtn.active{background:linear-gradient(135deg,rgba(var(--accent-rgb),.15),rgba(var(--accent2-rgb),.1));border-color:var(--accent);color:var(--accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.2)}
+
+/* === v70: Improved selection hint na canvas === */
+.stage .hint-empty span{font-weight:600;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -2364,6 +2428,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   </div>
   <div class="splash-hint" id="splashHint">Ładowanie edytora…</div>
 </div>
+<a class="skip-link" href="#canvas" tabindex="1">Przejdź do płótna</a>
 <div class="app">
   <div class="toolbar">
     <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.style.display='none'"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
@@ -9990,6 +10055,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     const last=_splashStages.querySelector(`[data-stage="${_splashCurrentStage}"]`);
     if(last){ last.classList.remove('stage-active'); last.classList.add('stage-done'); last.querySelector('.stage-check').textContent='✓'; }
   }
+  if(_splashHint) _splashHint.textContent='Edytor gotowy — powodzenia!';
   requestAnimationFrame(()=>{ _splashOv.classList.add('hide'); setTimeout(()=>_splashOv.remove(),500); });
   (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   // Podpowiedzi „?" dostępne z klawiatury: fokusowalne + nazwa dla czytnika ekranu
