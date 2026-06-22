@@ -601,6 +601,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .pq-sec{margin:8px 10px;padding:10px 11px}
   .live-quote{padding:8px 10px}
   .hint-empty{font-size:.72rem;padding:6px 12px}
+  .statusbar{padding:2px 8px;font-size:.6rem}
+  .statusbar .sb-sep:nth-child(4),.statusbar .sb-item:nth-child(5){display:none}
 }
 </style>
 <style>
@@ -704,6 +706,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Ikony w menu dropdown — subtelna separacja wizualna emoji === */
 .dd-menu .tbtn .ico{margin-right:2px;font-size:.92rem}
+.dd-kbd{margin-left:auto;font-size:.6rem;font-weight:600;color:var(--muted-2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:inherit;line-height:1.3}
 
 /* === Inline text editor na płycie — premium styl === */
 .inline-text-editor{position:fixed;z-index:9999;resize:none;overflow:hidden;text-align:center;line-height:1.15;box-sizing:border-box;
@@ -1212,8 +1215,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <button class="tbtn dd-toggle" type="button" title="Projekt: nowy, zapis, otwarcie, import" aria-label="Menu Plik">📂 Plik <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
         <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy projekt</button>
-        <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (do wczytania później)">💾 Zapisz projekt</button>
-        <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json">📂 Otwórz projekt</button>
+        <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (Ctrl+S)">💾 Zapisz projekt <kbd class="dd-kbd">Ctrl+S</kbd></button>
+        <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json (Ctrl+O)">📂 Otwórz projekt <kbd class="dd-kbd">Ctrl+O</kbd></button>
         <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none" aria-label="Otwórz projekt">
         <hr class="dd-sep">
         <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
@@ -1240,7 +1243,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <div class="dd-menu">
         <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
         <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny">💰 Wycena</button>
-        <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty klawiszowe</button>
+        <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty klawiszowe <kbd class="dd-kbd">?</kbd></button>
         <button class="tbtn cfgbtn" id="pricingCfgBtn" style="display:none" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
       </div>
     </div>
@@ -4246,13 +4249,15 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     let h='';
     h+=`<div class="empty-note note-compact">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz", aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
+    h+=`<div class="form-sec">📐 Pozycja i rozmiar</div>`;
     h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="imgW" value="${fmt(o.w)}" min="1" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="imgH" value="${fmt(o.h)}" min="1" step="1" title="${WHEEL_HINT}"></div>`;
-    h+=`<div class="field"><label class="check-label"><input type="checkbox" id="imgLockRatio" ${o.lockAspect?'checked':''}> Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
+    h+=`<div class="field"><label class="check-label"><input type="checkbox" id="imgLockRatio" ${o.lockAspect?'checked':''}> 🔗 Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=rangeField('Krycie (%)','opacity',o.opacity??100,0,100,1);
+    h+=`<div class="form-sec">🔧 Narzędzia</div>`;
     h+=`<div class="field"><button type="button" id="imgReplaceBtn" class="tbtn tbtn-full" title="Podmień grafikę na inną, zachowując pozycję i rozmiar">🔄 Zamień obraz</button></div>`;
     h+=`<div class="field"><button type="button" id="imgTraceBtn" class="tbtn tbtn-full" title="Tworzy nowy element 'ścieżka' z konturu obrazu — do cięcia lub grawerowania. Najlepiej działa dla prostych, kontrastowych grafik (logo, sylwetka), najlepiej z przezroczystym tłem.">🪄 Obrysuj obraz → ścieżka do cięcia</button></div>`;
     propsEl.innerHTML=lockedWrap(h,o);
@@ -4833,6 +4838,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     state.snap=v;
     snapBtn.classList.toggle('active',v); snapBtn.setAttribute('aria-pressed',v?'true':'false');
     snapInput.checked=v;
+    if(save) showToast(v?'Siatka włączona ('+state.grid+' mm)':'Siatka wyłączona','info',1200);
   }
   setSnap(state.snap,false);
   snapBtn.addEventListener('click',()=>setSnap(!state.snap,true));
