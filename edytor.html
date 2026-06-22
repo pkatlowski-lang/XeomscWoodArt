@@ -2143,6 +2143,75 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 
 /* === v66: Lepszy styl na canvas doc-border hover === */
 .doc-border{transition:stroke .2s,stroke-width .2s}
+
+/* === v67: Undo/redo — subtelny flash na statusbar history === */
+.sb-history-flash{animation:sbHistFlash .4s ease-out}
+@keyframes sbHistFlash{0%{color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.5)}100%{color:inherit;text-shadow:none}}
+
+/* === v67: Lepsza wizualizacja usuwania — czerwony flash na warstwy === */
+@keyframes deleteFlash{0%{background:rgba(255,59,59,.15)}100%{background:transparent}}
+.layers-delete-flash{animation:deleteFlash .3s ease-out}
+
+/* === v67: Zoom smooth transition na wartość w statusbar === */
+.sb-zoom-transition{transition:color .2s,transform .15s}
+.zoom-changed{color:var(--accent)!important;transform:scale(1.08)}
+
+/* === v67: Context menu — badge z liczbą zaznaczonych === */
+.ctx-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:10px;background:rgba(var(--accent-rgb),.15);color:var(--accent);font-size:.62rem;font-weight:800;margin-left:6px;font-variant-numeric:tabular-nums}
+
+/* === v67: Toolrail — active tool glow pulse === */
+.toolrail .tbtn.active{animation:toolGlow 2s ease-in-out infinite}
+@keyframes toolGlow{0%,100%{box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}50%{box-shadow:0 4px 18px -2px rgba(var(--accent-rgb),.75),0 0 6px rgba(var(--accent-rgb),.2)}}
+
+/* === v67: Confirm dialog — backdrop blur i scale animation === */
+.confirm-ov{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.confirm-ov .confirm-box{animation:confirmScaleIn .18s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes confirmScaleIn{from{opacity:0;transform:scale(.92) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* === v67: Panel h2 — animowany separator z gradient sweep === */
+.panel h2::after{background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.2),var(--border));background-size:200% 100%;animation:h2SweepGrad 4s linear infinite}
+@keyframes h2SweepGrad{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* === v67: Warstwy — lepszy drag preview z cieniem === */
+.layer.dragging{opacity:.6;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:scale(1.02);z-index:100}
+
+/* === v67: Lepsza wizualizacja wielokrotnego zaznaczenia w statusbar === */
+.sb-sel-count{color:var(--accent);font-weight:700}
+
+/* === v67: Pulsujący wskaźnik niezapisanych zmian === */
+@keyframes unsavedPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.sb-unsaved{color:var(--operator)!important;animation:unsavedPulse 2s ease-in-out infinite}
+
+/* === v67: Lepsze wizualne rozdzielenie grup w kontekście === */
+.ctx-menu hr{margin:6px 8px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),var(--border-strong),rgba(var(--accent-rgb),.15),transparent)}
+
+/* === v67: Karta warstwy — hover z gradient border left === */
+.layer:hover{border-left-color:var(--accent)!important}
+.layer.sel:hover{border-left-color:var(--accent)!important}
+
+/* === v67: Better panel scroll fade === */
+.panel.left::after,.panel.right::after{content:'';position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(to top,var(--bg-2),transparent);pointer-events:none;z-index:2}
+
+/* === v67: Tooltip strzałka na dolnym pasku === */
+.statusbar [data-tooltip]{position:relative}
+
+/* === v67: Empty state canvas — lepsza wizualizacja z pulsem === */
+.stage .hint-empty{animation:hintPulse 3s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{border-color:rgba(var(--accent-rgb),.22);box-shadow:0 4px 12px rgba(0,0,0,.3)}50%{border-color:rgba(var(--accent-rgb),.4);box-shadow:0 4px 16px rgba(0,0,0,.35),0 0 8px rgba(var(--accent-rgb),.1)}}
+
+/* === v67: Quick search — focus ring z animacją === */
+#quickSearchInput:focus{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.3),inset 0 1px 0 rgba(255,255,255,.05);border-color:var(--accent)}
+
+/* === v67: Lepszy styl lock/vis icon w warstwie === */
+.layer .lico.lico-locked{opacity:.6;color:var(--operator)}
+.layer .lico.lico-hidden{opacity:.6;color:var(--muted-2)}
+
+/* === v67: Segment button — active state z ripple === */
+@keyframes segRipple{from{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.4)}to{box-shadow:0 0 0 8px rgba(var(--accent-rgb),0)}}
+.seg button.on{animation:segRipple .4s ease-out}
+
+/* === v67: Statusbar separator — gradient dot === */
+.sb-sep{background:linear-gradient(180deg,var(--accent),var(--muted-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 </style>
 </head>
 <body>
@@ -2594,6 +2663,20 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
         <div class="sc-row"><span>Siatka wł/wył</span><span class="sc-keys"><kbd>G</kbd></span></div>
         <div class="sc-row"><span>Pokaż tę pomoc</span><span class="sc-keys"><kbd>?</kbd></span></div>
         <div class="sc-row"><span>Szybka wyszukiwarka</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>K</kbd></span></div>
+      </div>
+      <div class="sc-group">
+        <h4>Transformacja</h4>
+        <div class="sc-row"><span>Obróć 90° w prawo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>→</kbd></span></div>
+        <div class="sc-row"><span>Obróć 90° w lewo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>←</kbd></span></div>
+        <div class="sc-row"><span>Odbij poziomo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>H</kbd></span></div>
+        <div class="sc-row"><span>Odbij pionowo</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>J</kbd></span></div>
+      </div>
+      <div class="sc-group">
+        <h4>Widok</h4>
+        <div class="sc-row"><span>Dopasuj widok</span><span class="sc-keys"><kbd>1</kbd></span></div>
+        <div class="sc-row"><span>Przybliż do zaznaczenia</span><span class="sc-keys"><kbd>2</kbd></span></div>
+        <div class="sc-row"><span>Zoom +/-</span><span class="sc-keys"><kbd>Scroll</kbd> na płótnie</span></div>
+        <div class="sc-row"><span>Przesuwanie</span><span class="sc-keys"><kbd>Spacja</kbd>+przeciągnij</span></div>
       </div>
       <div class="sc-group">
         <h4>Pole liczbowe / suwak</h4>
@@ -3453,6 +3536,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     const ids=state.objects.filter(o=>!o.locked && !cur.has(o.id)).map(o=>o.id);
     state.selectedIds=expandGroupSelection(ids);
     renderOverlay(); renderLayers(); renderProps();
+    showToast('Odwrócono zaznaczenie — '+state.selectedIds.length+' elem.','info',1200);
   }
   function select(id){
     const next = id? expandGroupSelection([id]) : [];
@@ -4913,6 +4997,8 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
       else if(mode==='vcenter') o.y += (miny+maxy)/2-(bb.miny+bb.maxy)/2;
     });
     pushHistory(); renderAll(); renderProps();
+    const labels={left:'Do lewej',right:'Do prawej',hcenter:'Wyśrodkuj H',top:'Do góry',bottom:'Do dołu',vcenter:'Wyśrodkuj V'};
+    showToast('Wyrównano '+(labels[mode]||mode)+' — '+sel.length+' elem.','info',1200);
   }
   function distributeSel(axis){
     const sel=getSelected(); if(sel.length<3) return;
@@ -4923,6 +5009,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     bs.forEach((b,i)=>{ if(i===0||i===bs.length-1) return; const target=c0+step*i, cur=cen(b);
       if(axis==='h') b.o.x+=target-cur; else b.o.y+=target-cur; });
     pushHistory(); renderAll(); renderProps();
+    showToast('Rozłożono równomiernie '+(axis==='h'?'↔ poziomo':'↕ pionowo')+' — '+sel.length+' elem.','info',1200);
   }
   /* ---- Automatyczne rozmieszczenie elementów na arkuszu (oszczędność materiału) ----
      Układa wszystkie odblokowane elementy (grupy traktowane jako jedna całość) jeden
@@ -5826,8 +5913,11 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
   function updateSaveIndicator(){
     const unsaved=state.objects.length>0 && state.hIndex!==_savedAtIndex;
     const el=document.getElementById('sbSave');
-    if(el) el.textContent=unsaved?'● niezapisany':'';
-    if(el) el.style.color=unsaved?'var(--operator)':'';
+    if(el){
+      el.textContent=unsaved?'● niezapisany':'';
+      el.style.color=unsaved?'var(--operator)':'';
+      if(unsaved) el.classList.add('sb-unsaved'); else el.classList.remove('sb-unsaved');
+    }
   }
   function restore(s){
     const d=JSON.parse(s);
@@ -5844,8 +5934,8 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     if(docChanged){ docWInput.value=state.docW; docHInput.value=state.docH; renderGrid(); }
     renderAll(); renderProps(); renderParams();
   }
-  function undo(){ if(state.hIndex>0){ state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); } }
-  function redo(){ if(state.hIndex<state.history.length-1){ state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); } }
+  function undo(){ if(state.hIndex>0){ const prevCount=state.objects.length; state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Cofnięto (krok '+state.hIndex+'/'+((state.history.length-1))); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
+  function redo(){ if(state.hIndex<state.history.length-1){ const prevCount=state.objects.length; state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Ponowiono (krok '+state.hIndex+'/'+((state.history.length-1))); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
   function updateUndoButtons(){ document.getElementById('undoBtn').disabled=state.hIndex<=0; document.getElementById('redoBtn').disabled=state.hIndex>=state.history.length-1; }
 
   /* ---------------- Podpięcie paska narzędzi ---------------- */
@@ -6084,7 +6174,11 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     const dupDepths=[...new Set(copies.map(c=>c.depth||1))].length;
     showToast('Powielono '+copies.length+' elem. ('+dupInfo+', '+dupDepths+' warst'+(dupDepths===1?'wa':'w')+')','info',1500); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
-    state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps(); }
+    const deleted=state.objects.filter(o=>ids.includes(o.id));
+    const delTypes={}; deleted.forEach(o=>{delTypes[o.type]=(delTypes[o.type]||0)+1;});
+    const delInfo=Object.entries(delTypes).map(([t,n])=>n+'× '+t).join(', ');
+    state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps();
+    showToast('Usunięto '+deleted.length+' elem. ('+delInfo+')','warning',1800); }
 
   /* ---------------- Schowek: kopiuj / wklej (Ctrl+C / Ctrl+V) ---------------- */
   let clipboard=[];
@@ -6185,7 +6279,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='g'){ e.preventDefault(); e.shiftKey?ungroupSel():groupSel(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'){ if(!typing){ e.preventDefault(); copySel(); } return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='v'){ if(!typing){ e.preventDefault(); pasteClipboard(); } return; }
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){ if(!typing){ e.preventDefault(); state.selectedIds=expandGroupSelection(state.objects.filter(o=>!o.locked).map(o=>o.id)); renderOverlay(); renderLayers(); renderProps(); } return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){ if(!typing){ e.preventDefault(); state.selectedIds=expandGroupSelection(state.objects.filter(o=>!o.locked).map(o=>o.id)); renderOverlay(); renderLayers(); renderProps(); if(state.selectedIds.length) showToast('Zaznaczono '+state.selectedIds.length+' elem.','info',1000); } return; }
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='i'){ if(!typing){ e.preventDefault(); invertSelection(); } return; }
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='b'){ if(!typing){ e.preventDefault();
       const o=getSel(); if(o) breakApartPath(o);
@@ -6226,6 +6320,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     state.objects=state.objects.filter(o=>!ids.includes(o.id));
     state.objects.push(...sel);
     pushHistory(); renderAll(); renderProps();
+    showToast('Na wierzch — '+sel.length+' elem.','info',1000);
   }
   function sendToBack(){
     const ids=state.selectedIds.slice(); if(!ids.length) return;
@@ -6233,6 +6328,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     state.objects=state.objects.filter(o=>!ids.includes(o.id));
     state.objects.unshift(...sel);
     pushHistory(); renderAll(); renderProps();
+    showToast('Na spód — '+sel.length+' elem.','info',1000);
   }
   function bringForward(){
     const ids=state.selectedIds.slice(); if(!ids.length) return;
@@ -6242,7 +6338,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
         [state.objects[i],state.objects[i+1]]=[state.objects[i+1],state.objects[i]]; changed=true;
       }
     }
-    if(changed){ pushHistory(); renderAll(); renderProps(); }
+    if(changed){ pushHistory(); renderAll(); renderProps(); showToast('Przesunięto wyżej','info',800); }
   }
   function sendBackward(){
     const ids=state.selectedIds.slice(); if(!ids.length) return;
@@ -6252,13 +6348,14 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
         [state.objects[i],state.objects[i-1]]=[state.objects[i-1],state.objects[i]]; changed=true;
       }
     }
-    if(changed){ pushHistory(); renderAll(); renderProps(); }
+    if(changed){ pushHistory(); renderAll(); renderProps(); showToast('Przesunięto niżej','info',800); }
   }
   // obraca każdy zaznaczony element o 90° (dir: 1 = w prawo, -1 = w lewo) wokół jego własnego środka
   function rotate90(dir){
     const sel=getSelected().filter(o=>!o.locked); if(!sel.length) return;
     sel.forEach(o=>{ o.rotation=((((o.rotation||0)+dir*90)%360)+360)%360; });
     renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D();
+    showToast('Obrót '+(dir>0?'90° w prawo':'90° w lewo')+' ('+sel.length+' elem.)','info',1200);
   }
   // precyzyjny obrót o deltaDeg (np. 5° klawiszami , / . , Shift = 1°) wokół własnego środka elementu
   function rotateBy(deltaDeg){
@@ -6302,7 +6399,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     let h='';
     if(sel.length){
       const single=sel.length===1?sel[0]:null;
-      h+='<span class="ctx-group-label">Edycja</span>';
+      h+='<span class="ctx-group-label">Edycja'+(sel.length>1?' <span class="ctx-count-badge">'+sel.length+'</span>':'')+'</span>';
       h+=ctxItem('⧉ Duplikuj <span class="ctx-key">Ctrl+D</span>','duplicate');
       h+=ctxItem('⎘ Kopiuj <span class="ctx-key">Ctrl+C</span>','copy');
       h+=ctxItem('🗑 Usuń <span class="ctx-key">Del</span>','delete',{danger:true});
@@ -6360,12 +6457,12 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
       case 'rot90ccw': rotate90(-1); break;
       case 'group': groupSel(); break;
       case 'ungroup': ungroupSel(); break;
-      case 'flipx': if(o){ o.flipX=!o.flipX; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); } break;
-      case 'flipy': if(o){ o.flipY=!o.flipY; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); } break;
+      case 'flipx': if(o){ o.flipX=!o.flipX; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); showToast('Odbito poziomo'+(o.flipX?' (aktywne)':' (wyłączone)'),'info',1200); } break;
+      case 'flipy': if(o){ o.flipY=!o.flipY; renderProps(); renderAll(); pushHistory(); scheduleLive3D(); showToast('Odbito pionowo'+(o.flipY?' (aktywne)':' (wyłączone)'),'info',1200); } break;
       case 'togglelock': if(o){ o.locked=!o.locked; pushHistory(); renderAll(); renderProps(); renderLayers(); showToast(o.locked?'Element zablokowany':'Element odblokowany','info',1500); } break;
       case 'togglevis': if(o){ o.visible=o.visible===false?true:false; pushHistory(); renderAll(); renderProps(); renderLayers(); showToast(o.visible?'Element widoczny':'Element ukryty','info',1500); } break;
       case 'editnodes': if(o&&o.type==='path'){ state.editingPathId=o.id; renderOverlay(); renderProps(); } break;
-      case 'selectall': state.selectedIds=expandGroupSelection(state.objects.filter(x=>!x.locked).map(x=>x.id)); renderOverlay(); renderLayers(); renderProps(); break;
+      case 'selectall': state.selectedIds=expandGroupSelection(state.objects.filter(x=>!x.locked).map(x=>x.id)); renderOverlay(); renderLayers(); renderProps(); if(state.selectedIds.length) showToast('Zaznaczono '+state.selectedIds.length+' elem.','info',1000); break;
       case 'invertsel': invertSelection(); break;
       case 'zoomfit': zoomFit(); break;
     }
@@ -9894,6 +9991,13 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
     {ico:'⊛',label:'Zaznacz wszystkie',hint:'Ctrl+A',cat:'edycja',action:()=>{state.selectedIds=state.objects.map(o=>o.id);renderAll();renderProps();}},
     {ico:'⊞',label:'Centruj zaznaczone na płycie',hint:'',cat:'edycja',action:()=>{const s=getSelected();if(!s.length)return;const bb=selBBox(s);const dx=(state.docW-bb.w)/2-bb.minx;const dy=(state.docH-bb.h)/2-bb.miny;s.forEach(o=>{o.x+=dx;o.y+=dy;});pushHistory();renderAll();renderProps();showToast('Wycentrowano '+s.length+' elem.','info',1500);}},
     {ico:'📏',label:'Zmień rozmiar płyty',hint:'',cat:'projekt',action:()=>{const el=document.getElementById('docWInput');if(el){el.focus();el.select();}}},
+    {ico:'↻',label:'Obróć 90° w prawo',hint:'',cat:'transformacja',action:()=>rotate90(1)},
+    {ico:'↺',label:'Obróć 90° w lewo',hint:'',cat:'transformacja',action:()=>rotate90(-1)},
+    {ico:'↔',label:'Odbij poziomo',hint:'',cat:'transformacja',action:()=>{const o=getSel();if(o){o.flipX=!o.flipX;renderProps();renderAll();pushHistory();scheduleLive3D();}}},
+    {ico:'↕',label:'Odbij pionowo',hint:'',cat:'transformacja',action:()=>{const o=getSel();if(o){o.flipY=!o.flipY;renderProps();renderAll();pushHistory();scheduleLive3D();}}},
+    {ico:'🔗',label:'Grupuj zaznaczone',hint:'Ctrl+G',cat:'edycja',action:groupSel},
+    {ico:'⛓',label:'Rozgrupuj',hint:'Ctrl+Shift+G',cat:'edycja',action:ungroupSel},
+    {ico:'🔄',label:'Odwróć zaznaczenie',hint:'Ctrl+Shift+I',cat:'edycja',action:invertSelection},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
