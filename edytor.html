@@ -280,6 +280,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .flex-label{display:flex;align-items:center;gap:4px}
 .info-box{display:flex;align-items:center;gap:8px;padding:10px 13px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.3);border-radius:9px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.06);transition:border-color .14s}
 .info-box:hover{border-color:rgba(var(--accent-rgb),.45)}
+.info-box-size{font-weight:700;font-size:.98rem}
 .muted-sm{font-size:.75rem;color:var(--muted);line-height:1.55}
 
 /* ---- Warstwy ---- */
@@ -548,6 +549,9 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .shortcuts-grid{grid-template-columns:1fr}
   .tpl{grid-template-columns:1fr}
   .gallery{grid-template-columns:1fr 1fr}
+  .grid-2{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr}
+  .confirm-box{width:95vw}
 }
 @media(max-width:480px){
   .toolbar{padding:6px 8px;gap:4px}
@@ -762,6 +766,25 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .input-flex-fixed{flex:0 0 70px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 .field-hint{font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:4px}
+
+/* === Focus-visible na wszystkich interaktywnych elementach === */
+.modal-close:focus-visible{outline:none;box-shadow:var(--glow)}
+.ctx-menu button:focus-visible{outline:none;box-shadow:var(--glow);background:rgba(var(--accent-rgb),.12)}
+.gallery-card:focus-visible{outline:none;box-shadow:var(--glow);border-color:var(--accent)}
+.layer:focus-visible{outline:none;box-shadow:var(--glow)}
+.lyr-row:focus-visible{outline:none;box-shadow:var(--glow)}
+.d-badge:focus-visible{outline:none;box-shadow:var(--glow)}
+.depth-ctrl .dbtn:focus-visible{outline:none;box-shadow:var(--glow)}
+.pq-del:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,90,90,.35)}
+.param-card:focus-visible{outline:none;box-shadow:var(--glow)}
+.la-btn:focus-visible{outline:none;box-shadow:var(--glow)}
+.gallery-upload-btn:focus-visible{outline:none;box-shadow:var(--glow)}
+.tpl button:focus-visible{outline:none;box-shadow:var(--glow);border-color:var(--accent)}
+.seg button:focus-visible{outline:none;box-shadow:var(--glow)}
+.check-label input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.op-del:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,90,90,.35)}
+.gallery-card .del-base:focus-visible{outline:none;box-shadow:var(--glow)}
+.q-cfg-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
 .gear-preview-row{display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px}
 .gear-preview-box{flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
 .gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
@@ -872,7 +895,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <div class="field">
           <label>Arkusz roboczy (mm)</label>
           <div class="info-box">
-            <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
+            <span class="info-box-size">760 × 760&nbsp;mm</span>
             <span class="muted-sm">— rozmiar stały</span>
           </div>
           <!-- Rozmiar arkusza jest stały (760×760 mm). Pola pozostają ukryte, aby
@@ -1236,7 +1259,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
      ilość, cena na żywo, wysyłka). -->
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wyślij projekt do pracowni" id="modalSendQuote">
-  <div class="modal-box modal-sm" style="max-width:440px">
+  <div class="modal-box modal-md" style="max-width:440px">
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
     <p class="modal-hint" style="margin-bottom:6px">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
@@ -3682,7 +3705,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     // ---- sekcja: treść tekstu ----
     if(o.type==='text'){
       h+=`<div class="form-sec">Treść i wygląd</div>`;
-      h+=`<div class="field"><label>Tekst</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" style="resize:vertical;font-family:inherit" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p style="font-size:.7rem;color:var(--muted);margin:3px 0 0;line-height:1.4">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
+      h+=`<div class="field"><label>Tekst</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p class="field-hint" style="margin-top:3px">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
       h+=`<div class="field"><label>Czcionka</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
       h+=`<div class="field"><label>Styl pisma</label><div class="seg" data-seg="textstyle">
         <button class="${o.bold?'on':''}" data-tstyle="bold" style="font-weight:700;font-size:.88rem" title="Pogrubienie">B</button>
