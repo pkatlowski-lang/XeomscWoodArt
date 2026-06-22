@@ -1545,6 +1545,125 @@ input[type=number]{position:relative}
 .layer.dragging{background:rgba(var(--accent-rgb),.08);border:1.5px dashed var(--accent)}
 .layers .layer.drop-target-above::before{content:'';position:absolute;top:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
 .layers .layer.drop-target-below::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
+
+/* === v58: Toolbar micro-interactions — przycisk zoom pulsuje po zmianie === */
+.zoomval.zoom-active{color:#fff;text-shadow:0 0 8px rgba(var(--accent-rgb),.6)}
+
+/* === v58: Gradient akcentowy na aktywnej zakładce panelu — bardziej wyraźny === */
+.ptab.active{text-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* === v58: Lepsza wizualizacja zaznaczenia wielu elementów === */
+.layer.sel .lname{font-weight:600}
+
+/* === v58: Dokument — cień wewnętrzny na płycie === */
+.doc-bg{filter:drop-shadow(0 2px 6px rgba(0,0,0,.12))}
+
+/* === v58: Lepsza wizualizacja pustych stanów w podglądzie SVG === */
+.bb-svg .bb-empty{opacity:.75;transition:opacity .2s}
+.bb-svg:hover .bb-empty{opacity:1}
+
+/* === v58: Toolrail separator — pulsujący akcent === */
+.toolrail .tool-sep{transition:opacity .3s}
+.toolrail:hover .tool-sep{opacity:.9}
+
+/* === v58: Quick search — lepszy focus i animacja === */
+.quick-search-ov.open{animation:qsOvIn .15s ease-out}
+@keyframes qsOvIn{from{opacity:0}to{opacity:1}}
+.quick-search-item{position:relative}
+.quick-search-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform .1s}
+.quick-search-item:hover::before,.quick-search-item.qs-active::before{transform:scaleY(1)}
+
+/* === v58: Udoskonalony confetti — więcej kształtów i kolory === */
+@keyframes confettiSpin{0%{transform:translate(0,0) rotate(0deg) scale(1)}100%{transform:translate(var(--cx),var(--cy)) rotate(var(--cr,720deg)) scale(.3);opacity:0}}
+
+/* === v58: Statusbar — klikalne sekcje z tooltipem === */
+.sb-item[title]{cursor:help}
+.sb-history{cursor:default;padding:2px 8px;border-radius:var(--r-xs)}
+.sb-history:hover{background:rgba(var(--accent-rgb),.06)}
+
+/* === v58: Panel properties — lepsza animacja pustego stanu === */
+#props .empty-note{animation:emptyNoteIn .25s ease-out}
+@keyframes emptyNoteIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* === v58: Lepszy depth badge hover tooltip === */
+.d-badge{transition:transform .08s,box-shadow .08s,filter .12s}
+.d-badge:hover{filter:brightness(1.2)}
+
+/* === v58: Swatch kolorowy — hover z glow efektem === */
+.layer .swatch{transition:box-shadow .12s,transform .1s}
+.layer:hover .swatch{transform:scale(1.15);box-shadow:0 0 6px currentColor}
+
+/* === v58: Lepszy styl toast close — auto-dismiss indicator === */
+.toast{cursor:pointer}
+.toast:hover::after{animation-play-state:paused}
+
+/* === v58: Galeria kart — licznik w narożniku === */
+.gallery-card::after{content:counter(gallery-counter);position:absolute;top:4px;left:5px;font-size:.55rem;color:var(--muted-2);opacity:0;transition:opacity .12s;font-weight:700;font-variant-numeric:tabular-nums}
+.gallery-card:hover::after{opacity:.6}
+
+/* === v58: Lepsza sekcja form-sec z gradientem na hover === */
+.form-sec{position:relative;overflow:hidden}
+.form-sec::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(var(--accent-rgb),.08);transition:width .2s}
+.form-sec:hover::before{width:100%}
+
+/* === v58: Karta wyceny — lepszy styl pustego stanu === */
+.q-price-card.empty{position:relative}
+.q-price-card.empty::after{content:'💰';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:1.4rem;opacity:.15}
+
+/* === v58: Confirm modal — lepszy backdrop z vignette === */
+.confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(0,0,0,.4),rgba(0,0,0,.85) 100%)}
+
+/* === v58: Seg buttons — aktywny stan z cieniem === */
+.seg button.on{text-shadow:0 1px 2px rgba(0,0,0,.3)}
+
+/* === v58: Lepsza animacja modali — wejście z bounce === */
+@keyframes modalBoxIn{0%{transform:scale(.92) translateY(-16px);opacity:0}60%{transform:scale(1.01) translateY(1px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+.modal-ov.open .modal-box{animation:modalBoxIn .3s ease-out forwards}
+
+/* === v58: Canvas grid major — lepsza widoczność === */
+.grid-line.major{stroke:rgba(0,0,0,.2)}
+
+/* === v58: Context menu — aktywna pozycja z ikoną === */
+.ctx-menu button.ctx-focus{position:relative}
+.ctx-menu button.ctx-focus::before{content:'›';position:absolute;left:4px;color:var(--accent);font-weight:700;font-size:1rem}
+
+/* === v58: Depth ctrl buttons — gradient na hover === */
+.depth-ctrl .dbtn:hover{background:linear-gradient(180deg,rgba(var(--accent-rgb),.12),rgba(var(--accent-rgb),.04))}
+
+/* === v58: Layer row focus — klawiatura === */
+.layer:focus{outline:none;box-shadow:var(--glow)}
+.layer{position:relative}
+
+/* === v58: Input number spinners — ukryte, cleaner look === */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{opacity:0;height:0}
+input[type=number]:hover::-webkit-inner-spin-button,
+input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
+
+/* === v58: Modal close — hover efekt z rotacją === */
+.modal-close:hover{transform:rotate(90deg) scale(1.08)}
+
+/* === v58: Lepszy styl inline text editor === */
+.inline-text-editor{animation:iteIn .15s ease-out}
+@keyframes iteIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+/* === v58: Subtle gradient na stage hint-empty === */
+.hint-empty{background:linear-gradient(180deg,rgba(18,24,38,.82),rgba(8,11,18,.82))}
+
+/* === v58: Parametry globalne — lepsza wizualizacja powiązania === */
+.param-card .ptag{background:rgba(var(--accent-rgb),.06);padding:2px 6px;border-radius:var(--r-xs)}
+
+/* === v58: Gallery motif card — lepsza animacja wejścia === */
+@keyframes galleryCardIn{from{opacity:0;transform:scale(.94) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.gallery-card{animation:galleryCardIn .2s ease-out backwards}
+.gallery-card:nth-child(2n){animation-delay:30ms}
+.gallery-card:nth-child(3n){animation-delay:60ms}
+
+/* === v58: Modal send — lepsza wizualizacja kroków === */
+.send-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px}
+.send-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);font-size:.6rem;font-weight:800;transition:border-color .2s,background .2s,color .2s}
+.send-step.active .step-num{border-color:var(--accent);background:rgba(var(--accent-rgb),.15);color:var(--accent)}
+.send-step.done .step-num{border-color:var(--success);background:rgba(84,214,153,.15);color:var(--success)}
 </style>
 </head>
 <body>
@@ -1974,6 +2093,7 @@ input[type=number]{position:relative}
         <div class="sc-row"><span>Linia</span><span class="sc-keys"><kbd>L</kbd></span></div>
         <div class="sc-row"><span>Pióro (ścieżka)</span><span class="sc-keys"><kbd>N</kbd></span></div>
         <div class="sc-row"><span>Tekst</span><span class="sc-keys"><kbd>T</kbd></span></div>
+        <div class="sc-row"><span>Edytuj punkty ścieżki</span><span class="sc-keys"><kbd>E</kbd></span></div>
       </div>
       <div class="sc-group">
         <h4>Widok</h4>
@@ -2058,9 +2178,9 @@ input[type=number]{position:relative}
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
     <div class="send-steps" id="sendSteps">
-      <div class="send-step active" data-step="1">① Dane</div>
-      <div class="send-step" data-step="2">② Wysyłka</div>
-      <div class="send-step" data-step="3">③ Gotowe</div>
+      <div class="send-step active" data-step="1"><span class="step-num">1</span> Dane</div>
+      <div class="send-step" data-step="2"><span class="step-num">2</span> Wysyłka</div>
+      <div class="send-step" data-step="3"><span class="step-num">3</span> Gotowe</div>
     </div>
     <p class="modal-hint mb-6">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
     <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
@@ -2108,7 +2228,9 @@ input[type=number]{position:relative}
       el.textContent=msg;
     }
     _toastC.appendChild(el);
-    setTimeout(()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); },dur);
+    const dismiss=()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); };
+    el.addEventListener('click',dismiss);
+    setTimeout(dismiss,dur);
   }
   const _confirmOv=document.getElementById('confirmOverlay');
   const _confirmMsg=document.getElementById('confirmMsg');
@@ -4337,7 +4459,12 @@ input[type=number]{position:relative}
     const typeCounts={};
     sel.forEach(o=>{ const t=o.type==='path'?'ścieżka':o.type==='rect'?'prostokąt':o.type==='ellipse'?'elipsa':o.type==='text'?'tekst':o.type==='polygon'?'wielokąt':o.type==='star'?'gwiazda':o.type==='line'?'linia':o.type==='image'?'obraz':o.type; typeCounts[t]=(typeCounts[t]||0)+1; });
     const typeInfo=Object.entries(typeCounts).map(([t,c])=>c+'× '+t).join(', ');
-    let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}<br><span class="muted-sm">${typeInfo}</span></div>`;
+    const lockedInSel=sel.filter(o=>o.locked).length;
+    const hiddenInSel=sel.filter(o=>!o.visible).length;
+    let selInfoExtra='';
+    if(lockedInSel) selInfoExtra+=' · '+lockedInSel+' 🔒';
+    if(hiddenInSel) selInfoExtra+=' · '+hiddenInSel+' ukr.';
+    let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}${selInfoExtra}<br><span class="muted-sm">${typeInfo}</span></div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
     // proporcjonalnie (Sz./Wys., zakotwiczone w lewym górnym rogu) całe zaznaczenie naraz
     const mb=selBBox(sel);
@@ -4505,7 +4632,7 @@ input[type=number]{position:relative}
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note"><span class="empty-icon">🎯</span>Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.</div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note"><span class="empty-icon">🎯</span>Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.<br><br><span class="muted-sm" style="font-size:.68rem">💡 Wyszukaj komendę: <kbd style="font-size:.6rem;padding:1px 4px">Ctrl</kbd>+<kbd style="font-size:.6rem;padding:1px 4px">K</kbd></span></div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // ---- nazwa + operacja ----
@@ -5069,7 +5196,7 @@ input[type=number]{position:relative}
       if(hidden) parts+=` · ${hidden} ukr.`;
       counter=`<div class="layers-counter">${parts}</div>`;
     }
-    if(!total){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów na płycie.<br><span style="font-size:.7rem;color:var(--muted-2)">Narysuj kształt lub wybierz szablon z galerii</span></div>`; return; }
+    if(!total){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów na płycie.<br><span style="font-size:.7rem;color:var(--muted-2)">Narysuj kształt lub wybierz szablon z galerii</span><br><span style="font-size:.65rem;color:var(--muted-2);margin-top:4px;display:block">Skrót: <kbd style="font-size:.6rem;padding:1px 4px">R</kbd> prostokąt · <kbd style="font-size:.6rem;padding:1px 4px">O</kbd> elipsa · <kbd style="font-size:.6rem;padding:1px 4px">T</kbd> tekst</span></div>`; return; }
     const q=(layerSearchEl.value||'').trim().toLowerCase();
     const list=q?state.objects.filter(o=>autoName(o).toLowerCase().includes(q)):state.objects;
     if(!list.length){ layersEl.innerHTML=counter+`<div class="layers-empty">Brak elementów spełniających wyszukiwanie.</div>`; return; }
@@ -5215,7 +5342,7 @@ input[type=number]{position:relative}
     }
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
     b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
-    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`);
+    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`); b.setAttribute('data-tooltip',`${t.label} — ${t.hotkey}`);
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
@@ -5237,12 +5364,16 @@ input[type=number]{position:relative}
       const prev=_sbZoom.textContent;
       _sbZoom.textContent=z+'%';
       if(prev!==_sbZoom.textContent){
-        _sbZoom.style.transform='scale(1.1)';
-        setTimeout(()=>_sbZoom.style.transform='',150);
+        _sbZoom.classList.add('zoom-changed');
+        setTimeout(()=>_sbZoom.classList.remove('zoom-changed'),300);
+        const zv=document.getElementById('zoomVal');
+        if(zv){ zv.classList.add('zoom-bump'); setTimeout(()=>zv.classList.remove('zoom-bump'),120); }
       }
     }
     if(_sbHistory){
-      _sbHistory.textContent='↶ '+state.hIndex+'/'+(state.history.length-1);
+      const hi=state.hIndex, hl=state.history.length-1;
+      _sbHistory.textContent='↶ '+hi+'/'+hl;
+      _sbHistory.title='Historia: pozycja '+hi+' z '+hl+(hi<hl?' (można ponowić '+(hl-hi)+')':'');
     }
   }
 
@@ -5518,6 +5649,7 @@ input[type=number]{position:relative}
     }
     if(e.key.toLowerCase()==='g' && !e.ctrlKey && !e.metaKey){ e.preventDefault(); setSnap(!state.snap,true); return; }
     if(e.key.toLowerCase()==='f' && !e.ctrlKey && !e.metaKey){ e.preventDefault(); zoomFit(); return; }
+    if(e.key.toLowerCase()==='e' && !e.ctrlKey && !e.metaKey){ const o=getSel(); if(o && o.type==='path'){ e.preventDefault(); toggleNodeEdit(o); return; } }
     const map={v:'select',h:'pan',r:'rect',o:'ellipse',p:'polygon',s:'star',l:'line',n:'pen',t:'text'};
     if(map[e.key.toLowerCase()]){ if(state.penDraft) penCancel(); state.tool=map[e.key.toLowerCase()]; syncToolButtons(); }
   });
@@ -6464,7 +6596,7 @@ input[type=number]{position:relative}
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<br><span style="font-size:.65rem;margin-top:4px;display:block">Użyj narzędzi rysowania lub szablonów z panelu po lewej</span></div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<br><span style="font-size:.65rem;margin-top:4px;display:block">Narzędzia rysowania: <kbd style="font-size:.58rem;padding:1px 3px">R</kbd> <kbd style="font-size:.58rem;padding:1px 3px">O</kbd> <kbd style="font-size:.58rem;padding:1px 3px">P</kbd> <kbd style="font-size:.58rem;padding:1px 3px">T</kbd> lub szablony z panelu</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -6809,25 +6941,26 @@ input[type=number]{position:relative}
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     const expCount=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference').length;
-    showToast('Plik SVG wyeksportowany ('+expCount+' elem.)','success');
+    const sizeKB=(blob.size/1024).toFixed(1);
+    showToast('SVG wyeksportowany ('+expCount+' elem., '+sizeKB+' KB)','success');
     markSaved();
     celebrateExport();
   }
   function celebrateExport(){
-    const C=40, colors=['#3fc7ff','#8aa0ff','#ff3b3b','#f7b733','#54d699','#ff6fb5','#a78bfa'];
+    const C=50, colors=['#3fc7ff','#8aa0ff','#ff3b3b','#f7b733','#54d699','#ff6fb5','#a78bfa','#ffd700','#00e5ff'];
+    const shapes=['50%','4px','0','50% 0 50% 50%'];
     for(let i=0;i<C;i++){
       const p=document.createElement('div');
-      const sz=4+Math.random()*6;
-      const isRect=Math.random()>.6;
-      const rad=isRect?(sz*.2)+'px':'50%';
-      const rot=isRect?'rotate('+(Math.random()*90)+'deg)':'';
-      p.style.cssText='position:fixed;width:'+sz+'px;height:'+sz+'px;border-radius:'+rad+';pointer-events:none;z-index:99999;'
-        +'left:'+(30+Math.random()*40)+'vw;top:'+(40+Math.random()*20)+'vh;background:'+colors[i%colors.length]
-        +';animation:confettiPop '+(0.6+Math.random()*0.4)+'s cubic-bezier(.2,.6,.3,1) forwards;'
-        +'--cx:'+(Math.random()*240-120)+'px;--cy:'+(-100-Math.random()*250)+'px;'
-        +'animation-delay:'+(i*14)+'ms;opacity:0;transform:'+rot;
+      const sz=3+Math.random()*8;
+      const shape=shapes[Math.floor(Math.random()*shapes.length)];
+      const spinDeg=360+Math.random()*720;
+      p.style.cssText='position:fixed;width:'+sz+'px;height:'+sz+'px;border-radius:'+shape+';pointer-events:none;z-index:99999;'
+        +'left:'+(25+Math.random()*50)+'vw;top:'+(35+Math.random()*25)+'vh;background:'+colors[i%colors.length]
+        +';animation:confettiSpin '+(0.7+Math.random()*0.5)+'s cubic-bezier(.2,.6,.3,1) forwards;'
+        +'--cx:'+(Math.random()*300-150)+'px;--cy:'+(-120-Math.random()*280)+'px;--cr:'+spinDeg+'deg;'
+        +'animation-delay:'+(i*12)+'ms;opacity:0;box-shadow:0 0 '+Math.floor(3+Math.random()*4)+'px '+colors[i%colors.length];
       document.body.appendChild(p);
-      setTimeout(()=>p.remove(),1500);
+      setTimeout(()=>p.remove(),1800);
     }
   }
 
@@ -6946,7 +7079,8 @@ input[type=number]{position:relative}
     const blob=new Blob([dxf],{type:'application/dxf'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.dxf`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    showToast('Plik DXF wyeksportowany ('+objs.length+' elem., '+depths.length+' warstw)','success');
+    const sizeKB=(blob.size/1024).toFixed(1);
+    showToast('DXF wyeksportowany ('+objs.length+' elem., '+depths.length+' warstw, '+sizeKB+' KB)','success');
     markSaved();
     celebrateExport();
   }
@@ -9138,6 +9272,11 @@ input[type=number]{position:relative}
     {ico:'🧊',label:'Eksport 3D',hint:'',action:()=>document.getElementById('export3dBtn')?.click()},
     {ico:'🎨',label:'Tryb warstw 3D',hint:'',action:()=>document.getElementById('depthViewBtn')?.click()},
     {ico:'📨',label:'Wyślij do wyceny',hint:'',action:()=>document.getElementById('lqSend')?.click()},
+    {ico:'✏',label:'Edytuj punkty ścieżki',hint:'E',action:()=>{const o=getSel();if(o&&o.type==='path') toggleNodeEdit(o);}},
+    {ico:'🔒',label:'Zablokuj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.locked=true);pushHistory();renderAll();}},
+    {ico:'🔓',label:'Odblokuj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.locked=false);pushHistory();renderAll();}},
+    {ico:'👁',label:'Ukryj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.visible=false);pushHistory();renderAll();}},
+    {ico:'👁',label:'Pokaż wszystkie',hint:'',action:()=>{state.objects.forEach(o=>o.visible=true);pushHistory();renderAll();}},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
