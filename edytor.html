@@ -498,7 +498,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);background:rgba(0,0,0,.12)}
 .legend span{display:inline-flex;align-items:center;gap:6px;transition:color .12s}
 .legend span:hover{color:var(--text)}
-.legend i{width:16px;height:16px;border-radius:4px;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.legend i{width:16px;height:16px;border-radius:var(--r-xs);display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .li-cut{background:none;border:2px solid var(--cut)} .li-eng{background:var(--engrave);border:1px solid #666} .li-sco{background:none;border:2px dashed var(--score)}
 
 /* ---- Manager warstw 3D ---- */
@@ -639,6 +639,7 @@ input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(
 input[type=checkbox],input[type=radio]{accent-color:var(--accent);cursor:pointer}
 /* --- Placeholdery — subtelny kolor, spójny w całej aplikacji --- */
 ::placeholder{color:var(--muted-2);opacity:1}
+:focus::placeholder{color:var(--muted);opacity:.6}
 ::-webkit-input-placeholder{color:var(--muted-2)}
 /* --- Wspólny pierścień fokusu dla wszystkich pól tekstowych/liczbowych/list --- */
 input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
@@ -995,11 +996,11 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .modal-hint-sm{font-size:.74rem;color:var(--muted);line-height:1.5}
 .modal-hint-center{font-size:.72rem;color:var(--muted);text-align:center;margin-top:8px}
 .modal-sec-title{margin:14px 0 8px;font-size:.8rem;color:var(--muted)}
-.tbtn-full{width:100%;justify-content:center}
+.tbtn-full{width:100%;justify-content:center;margin-top:2px}
 .input-flex-2{flex:2}
 .input-flex-fixed{flex:0 0 70px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-.field-hint{font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:4px}
+.field-hint{font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:4px;padding:5px 8px;background:rgba(var(--accent-rgb),.03);border-left:2px solid rgba(var(--accent-rgb),.15);border-radius:0 var(--r-xs) var(--r-xs) 0}
 
 /* === Utility spacery — przeniesione z inline style === */
 .mt-4{margin-top:4px}
