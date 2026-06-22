@@ -3395,15 +3395,18 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     sel.forEach(o=>o.groupId=gid);
     state.selectedIds=sel.map(o=>o.id);
     pushHistory(); renderAll(); renderProps();
-    showToast('Zgrupowano '+sel.length+' elementów','success');
+    const grpTypes={}; sel.forEach(o=>{grpTypes[o.type]=(grpTypes[o.type]||0)+1;});
+    const grpInfo=Object.entries(grpTypes).map(([t,n])=>n+'× '+t).join(', ');
+    showToast('Zgrupowano '+sel.length+' elementów ('+grpInfo+')','success');
   }
   function ungroupSel(){
     const sel=getSelected();
     const gids=[...new Set(sel.map(o=>o.groupId).filter(Boolean))];
     if(!gids.length) return;
+    const ungroupCount=state.objects.filter(o=>gids.includes(o.groupId)).length;
     state.objects.forEach(o=>{ if(gids.includes(o.groupId)) delete o.groupId; });
     pushHistory(); renderAll(); renderProps();
-    showToast('Grupa rozwiązana','success');
+    showToast('Rozgrupowano '+ungroupCount+' elementów z '+gids.length+' grup','success');
   }
   function rotatedBBox(o){
     const b=objBBox(o), c={x:b.x+b.w/2,y:b.y+b.h/2}, rot=deg2rad(o.rotation||0);
@@ -4878,9 +4881,11 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     const typeInfo=Object.entries(typeCounts).map(([t,c])=>c+'× '+t).join(', ');
     const lockedInSel=sel.filter(o=>o.locked).length;
     const hiddenInSel=sel.filter(o=>!o.visible).length;
+    const depthsInSel=[...new Set(sel.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let selInfoExtra='';
     if(lockedInSel) selInfoExtra+=' · '+lockedInSel+' 🔒';
     if(hiddenInSel) selInfoExtra+=' · '+hiddenInSel+' ukr.';
+    if(depthsInSel.length>1) selInfoExtra+=' · '+depthsInSel.length+' warstw';
     let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}${selInfoExtra}<br><span class="muted-sm">${typeInfo}</span></div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
     // proporcjonalnie (Sz./Wys., zakotwiczone w lewym górnym rogu) całe zaznaczenie naraz
@@ -5266,7 +5271,8 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
           const w=Math.max(1,Math.round(nw0*fit)), h=Math.max(1,Math.round(nh0*fit));
           const o={...defaultsFor('image'), src, naturalW:nw0, naturalH:nh0, w, h, x:Math.round((state.docW-w)/2), y:Math.round((state.docH-h)/2)};
           addObject(o);
-          showToast('Obraz zaimportowany','success');
+          const imgSizeKB=Math.round(src.length*0.75/1024);
+          showToast('Obraz zaimportowany ('+nw0+'×'+nh0+' px, '+imgSizeKB+' KB) — warstwa pomocnicza','success');
         }
       };
       img.onerror=()=>showToast('Nie udało się wczytać obrazu.','error');
@@ -5945,11 +5951,13 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     const proj=serializeProject();
     const projStr=JSON.stringify(proj,null,1);
     const sizeKB=(new Blob([projStr]).size/1024).toFixed(1);
-    downloadJSON(proj, `projekt-laser-${Date.now()}.json`);
+    const fname=`projekt-laser-${Date.now()}.json`;
+    downloadJSON(proj, fname);
     markSaved();
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
     const now=new Date(); const timeStr=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-    showToast('Projekt zapisany o '+timeStr+' ('+state.objects.length+' elem., '+sizeKB+' KB)','success');
+    const depths=[...new Set(state.objects.map(o=>o.depth||1))].length;
+    showToast('Projekt zapisany o '+timeStr+' ('+state.objects.length+' elem., '+depths+' warstw, '+sizeKB+' KB)','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
     document.getElementById('loadProjectInput').click();
@@ -5979,7 +5987,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     }
     applyProjectData({docW:760,docH:760,objects:[],params:[{id:'p_grubosc',name:'grubość_materiału',value:3,min:1,max:12,step:0.5}],layerMM:{},hiddenDepths:[],depthView:true});
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
-    showToast('Nowy projekt — czyste płótno','success');
+    showToast('Nowy projekt — czyste płótno 760×760 mm','success');
   });
 
   function duplicateSel(){ const sel=getSelected(); if(!sel.length) return;
@@ -5990,7 +5998,8 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
     const dupTypes={};copies.forEach(c=>{const t=c.type;dupTypes[t]=(dupTypes[t]||0)+1;});
     const dupInfo=Object.entries(dupTypes).map(([t,n])=>n+'× '+t).join(', ');
-    showToast('Powielono '+copies.length+' elem. ('+dupInfo+')','info',1500); }
+    const dupDepths=[...new Set(copies.map(c=>c.depth||1))].length;
+    showToast('Powielono '+copies.length+' elem. ('+dupInfo+', '+dupDepths+' warst'+(dupDepths===1?'wa':'w')+')','info',1500); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
     state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps(); }
 
@@ -8382,7 +8391,8 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
       const cnt=newObjs.length, pl=cnt===1?'obiekt':cnt<=4?'obiekty':'obiektów';
       const impTypes={}; newObjs.forEach(o=>{impTypes[o.type]=(impTypes[o.type]||0)+1;});
       const impInfo=Object.entries(impTypes).map(([t,n])=>n+'× '+t).join(', ');
-      showToast('Zaimportowano '+cnt+' '+pl+' z SVG ('+impInfo+')','success');
+      const impDepths=[...new Set(newObjs.map(o=>o.depth||1))].length;
+      showToast('Zaimportowano '+cnt+' '+pl+' z SVG ('+impInfo+', '+impDepths+' warst'+(impDepths===1?'wa':'w')+')','success');
     };
     reader.readAsText(file);
   }
@@ -9797,6 +9807,9 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     {ico:'🔓',label:'Odblokuj zaznaczone',hint:'',cat:'edycja',action:()=>{const s=getSelected();s.forEach(o=>o.locked=false);pushHistory();renderAll();}},
     {ico:'👁',label:'Ukryj zaznaczone',hint:'',cat:'edycja',action:()=>{const s=getSelected();s.forEach(o=>o.visible=false);pushHistory();renderAll();}},
     {ico:'👁',label:'Pokaż wszystkie',hint:'',cat:'edycja',action:()=>{state.objects.forEach(o=>o.visible=true);pushHistory();renderAll();}},
+    {ico:'⊛',label:'Zaznacz wszystkie',hint:'Ctrl+A',cat:'edycja',action:()=>{state.selectedIds=state.objects.map(o=>o.id);renderAll();renderProps();}},
+    {ico:'⊞',label:'Centruj zaznaczone na płycie',hint:'',cat:'edycja',action:()=>{const s=getSelected();if(!s.length)return;const bb=selBBox(s);const dx=(state.docW-bb.w)/2-bb.minx;const dy=(state.docH-bb.h)/2-bb.miny;s.forEach(o=>{o.x+=dx;o.y+=dy;});pushHistory();renderAll();renderProps();showToast('Wycentrowano '+s.length+' elem.','info',1500);}},
+    {ico:'📏',label:'Zmień rozmiar płyty',hint:'',cat:'projekt',action:()=>{const el=document.getElementById('docWInput');if(el){el.focus();el.select();}}},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
