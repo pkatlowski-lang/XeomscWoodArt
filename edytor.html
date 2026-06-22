@@ -473,7 +473,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .bb-sec{flex:1;background:var(--surface);display:flex;flex-direction:column;min-width:0;min-height:0;position:relative;box-shadow:inset 0 1px 4px rgba(0,0,0,.15)}
 .bottombar>.bb-sec:first-child{flex:2}
 .bottombar>.bb-sec:last-child{flex:1}
-.bb-head{display:flex;align-items:center;gap:6px;padding:8px 11px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(26,34,51,.95),var(--surface));overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.03) inset;letter-spacing:.01em;text-transform:uppercase;letter-spacing:.04em}
+.bb-head{display:flex;align-items:center;gap:6px;padding:8px 11px;font-size:.74rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(26,34,51,.95),var(--surface));overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.03) inset;text-transform:uppercase;letter-spacing:.04em}
 .bb-head>span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1}
 .bb-spacer{flex:0;min-width:0}
 .bb-btn{border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);font-size:.72rem;font-weight:600;height:30px;padding:0 11px;display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-sm);cursor:pointer;transition:border-color .14s,color .14s,background .14s,box-shadow .14s,transform .08s;white-space:nowrap}
@@ -769,6 +769,78 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 .field-hint{font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:4px}
 
+/* === Utility spacery — przeniesione z inline style === */
+.mt-4{margin-top:4px}
+.mt-8{margin-top:8px}
+.mt-10{margin-top:10px}
+.mb-6{margin-bottom:6px}
+.mb-8{margin-bottom:8px}
+.mb-10{margin-bottom:10px}
+.modal-hint-block{display:block;margin:2px 0 4px}
+.status-msg{min-height:18px;margin:2px 0 6px}
+.modal-box.modal-send{max-width:440px}
+.btn-sm-font{font-size:.72rem}
+.btn-sm-font-2{font-size:.74rem;margin-top:6px}
+.note-compact{padding-bottom:4px}
+.note-compact strong{color:var(--text)}
+.layers-empty{padding:4px 6px;font-size:.78rem;color:var(--muted)}
+.field-tight{margin-top:-6px}
+.tbtn-link{font-size:.72rem;text-decoration:none}
+.live3d-empty{color:var(--muted);font-size:.74rem;transform:none}
+.unit-label{font-size:.75rem;color:var(--muted)}
+.depth-info{font-size:.7rem;color:var(--muted);margin-left:6px}
+.depth-ctrl-field{margin-top:7px}
+.d-badge-inline{margin-left:4px}
+.locked-fieldset{border:0;padding:0;margin:0}
+.tstyle-bold{font-weight:700;font-size:.88rem}
+.tstyle-italic{font-style:italic;font-size:.88rem}
+.tstyle-underline{text-decoration:underline;font-size:.88rem}
+.btn-flex-center{flex:1;justify-content:center}
+.btn-full-center{width:100%;justify-content:center}
+.input-offset{flex:0 0 90px}
+.btn-flex-min{flex:1;justify-content:center;min-width:0}
+.input-flex-1{flex:1}
+
+/* === Ulepszenia param-card — interakcja i czytelność === */
+.param-card:focus-within{border-color:rgba(var(--accent-rgb),.4);box-shadow:var(--sh-sm),0 0 0 2px rgba(var(--accent-rgb),.1)}
+.param-card .ptag{transition:color .12s}
+.param-card:hover .ptag{color:var(--text)}
+
+/* === mat-row — lepsza hierarchia wizualna === */
+.mat-row{position:relative;overflow:hidden}
+.mat-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .12s}
+.mat-row:hover::before{opacity:1}
+
+/* === sum-row — lepsza interakcja === */
+.sum-row{cursor:default}
+.sum-row .sum-val{transition:color .12s,transform .12s}
+.sum-row:hover .sum-val{color:#fff;transform:scale(1.02)}
+
+/* === dl-note — lepsza widoczność === */
+.dl-note{border:1px solid rgba(var(--accent-rgb),.08);transition:border-color .14s}
+.dl-note:hover{border-color:rgba(var(--accent-rgb),.2)}
+
+/* === pq-sec — aktywna sekcja z lepszą wizualną === */
+.pq-sec:focus-within{border-left-color:var(--accent);box-shadow:0 3px 12px rgba(0,0,0,.18),0 0 0 1px rgba(var(--accent-rgb),.08)}
+
+/* === form-sec — ikona rotacji przy hover === */
+.form-sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--accent-rgb),.2),transparent)}
+
+/* === Animacja wejścia modalu — lepsza sprężystość === */
+.modal-ov.open .modal-box{transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .22s ease}
+
+/* === Toolbar brand — subtelna animacja === */
+.toolbar .brand::before{transition:transform .2s,box-shadow .2s}
+.toolbar .brand:hover::before{transform:rotate(15deg) scale(1.08);box-shadow:0 4px 18px rgba(var(--accent-rgb),.65),0 0 0 1px rgba(255,255,255,.12) inset}
+
+/* === Toolrail — aktywne narzędzie pulsacja === */
+@keyframes toolActivePulse{0%,100%{box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}50%{box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.35)}}
+.toolrail .tbtn.active{animation:toolActivePulse 2.5s ease-in-out infinite}
+
+/* === Scrollbar — lepszy wygląd w panelach bocznych === */
+.panel::-webkit-scrollbar-thumb{background:var(--surface3)}
+.panel::-webkit-scrollbar-thumb:hover{background:rgba(var(--accent-rgb),.25)}
+
 /* === Focus-visible na wszystkich interaktywnych elementach === */
 .modal-close:focus-visible{outline:none;box-shadow:var(--glow)}
 .ctx-menu button:focus-visible{outline:none;box-shadow:var(--glow);background:rgba(var(--accent-rgb),.12)}
@@ -790,6 +862,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .gear-preview-row{display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px}
 .gear-preview-box{flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
 .gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
+.gear-preview-info strong{color:var(--text)}
+.gear-warn{color:var(--cut-light)}
 </style>
 </head>
 <body>
@@ -966,7 +1040,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           <div class="pq-h">➕ Pozycje dodatkowe</div>
           <p class="pq-help">Ręczne dopłaty doliczane do ceny każdej sztuki (np. „Malowanie", „Personalizacja"). Doliczane po marży.</p>
           <div id="qExtras"></div>
-          <button type="button" class="tbtn add-action tbtn-full" style="font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
+          <button type="button" class="tbtn add-action tbtn-full btn-sm-font" id="qAddExtra">＋ Dodaj pozycję</button>
         </div>
         <!-- KONFIGURACJA CENNIKA: edycja materiałów i parametrów aktywnego profilu (zwijana) -->
         <button type="button" class="q-cfg-toggle" id="qCfgToggle"><span class="chev">▸</span> ⚙ Cennik i parametry (edycja profilu)</button>
@@ -975,7 +1049,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
             <div class="pq-h">📦 Materiały</div>
             <p class="pq-help">Dla każdego materiału: nazwa, grubość (mm), koszt za 1&nbsp;cm² oraz prędkość cięcia (mm/min).</p>
             <div id="pqMaterials"></div>
-            <button type="button" class="tbtn add-action tbtn-full" style="margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
+            <button type="button" class="tbtn add-action tbtn-full btn-sm-font-2" id="pqAddMat">＋ Dodaj materiał</button>
           </div>
           <div class="pq-sec">
             <div class="pq-h">⚙ Parametry</div>
@@ -1098,7 +1172,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   <div class="modal-box modal-sm">
     <button class="modal-close" aria-label="Zamknij" id="modalHingeClose" title="Zamknij">✕</button>
     <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
-    <p class="modal-hint" style="margin-bottom:8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec" (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
+    <p class="modal-hint mb-8">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec" (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
     <div class="field"><label for="hingeH">Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
     <div class="grid-3">
       <div class="field"><label for="hingeLeft">Pole lewe (mm)</label><input type="number" id="hingeLeft" min="0" max="700" step="1" value="70"></div>
@@ -1123,7 +1197,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <option value="in">Do wewnątrz — wycięcia w obrysie panelu</option>
       </select>
     </div>
-    <label class="modal-hint-sm" style="display:block;margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
+    <label class="modal-hint-sm modal-hint-block">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
     <div class="flex-wrap-row">
       <label class="flex-label"><input type="checkbox" id="hingeTabLeft"> Lewa</label>
       <label class="flex-label"><input type="checkbox" id="hingeTabRight"> Prawa</label>
@@ -1138,7 +1212,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   <div class="modal-box modal-sm">
     <button class="modal-close" aria-label="Zamknij" id="modalGearClose" title="Zamknij">✕</button>
     <h3>⚙ Generator koła zębatego</h3>
-    <p class="modal-hint" style="margin-bottom:8px">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
+    <p class="modal-hint mb-8">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
     <div class="grid-2">
       <div class="field"><label>Liczba zębów</label><input type="number" id="gearTeeth" min="6" max="200" step="1" value="20"></div>
       <div class="field"><label>Moduł (mm)</label><input type="number" id="gearModule" min="0.2" max="20" step="0.1" value="2"></div>
@@ -1225,14 +1299,14 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   <div class="modal-box modal-md">
     <button class="modal-close" aria-label="Zamknij" id="modalMaterialsClose" title="Zamknij">✕</button>
     <h3>📦 Biblioteka materiałów</h3>
-    <p class="modal-hint" style="margin-bottom:10px">Dodaj własne materiały (nazwa + grubość w mm), aby szybko ustawiać grubość warstw 3D z listy „Materiał…" przy warstwie.</p>
+    <p class="modal-hint mb-10">Dodaj własne materiały (nazwa + grubość w mm), aby szybko ustawiać grubość warstw 3D z listy „Materiał…" przy warstwie.</p>
     <div class="field"><label>Nowy materiał</label>
       <div class="row2">
         <input type="text" id="matName" placeholder="np. Sklejka topolowa" class="input-flex-2" aria-label="Nazwa materiału">
         <input type="number" id="matMM" placeholder="mm" min="0.1" max="60" step="0.5" class="input-flex-fixed" aria-label="Grubość materiału (mm)">
       </div>
     </div>
-    <button type="button" class="tbtn tbtn-full" id="matAddBtn" style="margin-top:4px">+ Dodaj materiał</button>
+    <button type="button" class="tbtn tbtn-full mt-4" id="matAddBtn">+ Dodaj materiał</button>
     <div class="mat-list" id="matList"></div>
   </div>
 </div>
@@ -1252,7 +1326,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       <div class="field"><label>Odstęp linii graweru (mm)</label><input type="number" id="sumEngraveSpacing" min="0.01" step="0.01"></div>
     </div>
     <div class="sum-time" id="summaryTime"></div>
-    <p class="modal-hint-sm" style="margin-top:10px">Szacunek orientacyjny — nie uwzględnia czasu przejazdów między elementami, przyspieszeń ani liczby przejść.</p>
+    <p class="modal-hint-sm mt-10">Szacunek orientacyjny — nie uwzględnia czasu przejazdów między elementami, przyspieszeń ani liczby przejść.</p>
   </div>
 </div>
 
@@ -1261,14 +1335,14 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
      ilość, cena na żywo, wysyłka). -->
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wyślij projekt do pracowni" id="modalSendQuote">
-  <div class="modal-box modal-md" style="max-width:440px">
+  <div class="modal-box modal-send">
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
-    <p class="modal-hint" style="margin-bottom:6px">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
+    <p class="modal-hint mb-6">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
     <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
     <div class="field"><label>Twój e-mail *</label><input type="email" id="sendQuoteEmail" maxlength="120" placeholder="adres@email.pl" required></div>
     <div class="field"><label>Wiadomość (opcjonalnie)</label><textarea id="sendQuoteMsg" rows="3" maxlength="1500" placeholder="Uwagi do projektu, termin, ilość sztuk…"></textarea></div>
-    <div id="sendQuoteStatus" class="modal-hint-sm" style="min-height:18px;margin:2px 0 6px"></div>
+    <div id="sendQuoteStatus" class="modal-hint-sm status-msg"></div>
     <div class="field-actions">
       <button type="button" class="tbtn" id="sendQuoteCancel">Anuluj</button>
       <button type="button" class="tbtn tbtn-primary" id="sendQuoteSubmit">Wyślij projekt</button>
@@ -3484,7 +3558,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
   }
   function renderMultiProps(sel){
-    let h=`<div class="empty-note" style="padding-bottom:4px">Zaznaczono <strong style="color:var(--text)">${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}</div>`;
+    let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}</div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
     // proporcjonalnie (Sz./Wys., zakotwiczone w lewym górnym rogu) całe zaznaczenie naraz
     const mb=selBBox(sel);
@@ -3519,7 +3593,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       h+=`<div class="form-sec">Operacje na kształtach</div>`;
       h+=`<div class="field"><div class="seg">
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
-        <p class="field-hint" style="margin-top:7px">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
+        <p class="field-hint mt-8">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
     h+=`<div class="empty-note">Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę. Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
@@ -3567,7 +3641,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
      ale zmieniają ISTNIEJĄCĄ parę obiektów (obrys+nacięcia) bez tworzenia nowych ---- */
   function renderHingeProps(outline,slits){
     const m=outline.hinge;
-    let h=`<div class="empty-note" style="padding-bottom:4px">🪗 Zawias (living hinge) — zmiany od razu przeliczają obrys i nacięcia, bez tworzenia nowej kopii.</div>`;
+    let h=`<div class="empty-note note-compact">🪗 Zawias (living hinge) — zmiany od razu przeliczają obrys i nacięcia, bez tworzenia nowej kopii.</div>`;
     h+=`<div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" data-hinge="H" value="${fmt(m.H)}" min="10" max="760" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="grid-3">
       <div class="field"><label>Pole lewe (mm)</label><input type="number" data-hinge="leftW" value="${fmt(m.leftW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
@@ -3591,7 +3665,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <option value="out" ${(m.tabDir||'out')==='out'?'selected':''}>Na zewnątrz — wystają poza obrys panelu</option>
         <option value="in" ${m.tabDir==='in'?'selected':''}>Do wewnątrz — wycięcia w obrysie panelu</option>
       </select></div>`;
-    h+=`<label class="modal-hint-sm" style="display:block;margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
+    h+=`<label class="modal-hint-sm modal-hint-block">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
       <div class="flex-wrap-row">
         <label class="flex-label"><input type="checkbox" data-hinge-tab="left" ${m.tabs.left?'checked':''}> Lewa</label>
         <label class="flex-label"><input type="checkbox" data-hinge-tab="right" ${m.tabs.right?'checked':''}> Prawa</label>
@@ -3685,11 +3759,11 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       h+=numField('Szerokość (mm)','w',o,{step:1,min:1});
       h+=numField('Wysokość (mm)','h',o,{step:1,min:1});
       if(['rect','ellipse','polygon','star'].includes(o.type)){
-        h+=`<div class="field" style="margin-top:-6px"><label class="check-label"><input type="checkbox" id="shapeLockRatio" ${o.lockRatio?'checked':''}> 🔗 Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
+        h+=`<div class="field field-tight"><label class="check-label"><input type="checkbox" id="shapeLockRatio" ${o.lockRatio?'checked':''}> 🔗 Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
       }
     }
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
-    h+=`<div class="field" style="margin-top:-6px"><div class="seg">
+    h+=`<div class="field field-tight"><div class="seg">
       <button type="button" data-rot90="-1" title="Obróć o 90° w lewo">↺ 90° w lewo</button>
       <button type="button" data-rot90="1" title="Obróć o 90° w prawo">↻ 90° w prawo</button>
     </div></div>`;
@@ -3707,12 +3781,12 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     // ---- sekcja: treść tekstu ----
     if(o.type==='text'){
       h+=`<div class="form-sec">Treść i wygląd</div>`;
-      h+=`<div class="field"><label>Tekst</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p class="field-hint" style="margin-top:3px">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
+      h+=`<div class="field"><label>Tekst</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p class="field-hint">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
       h+=`<div class="field"><label>Czcionka</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
       h+=`<div class="field"><label>Styl pisma</label><div class="seg" data-seg="textstyle">
-        <button class="${o.bold?'on':''}" data-tstyle="bold" style="font-weight:700;font-size:.88rem" title="Pogrubienie">B</button>
-        <button class="${o.italic?'on':''}" data-tstyle="italic" style="font-style:italic;font-size:.88rem" title="Kursywa">I</button>
-        <button class="${o.underline?'on':''}" data-tstyle="underline" style="text-decoration:underline;font-size:.88rem" title="Podkreślenie">U</button>
+        <button class="${o.bold?'on':''} tstyle-bold" data-tstyle="bold" title="Pogrubienie">B</button>
+        <button class="${o.italic?'on':''} tstyle-italic" data-tstyle="italic" title="Kursywa">I</button>
+        <button class="${o.underline?'on':''} tstyle-underline" data-tstyle="underline" title="Podkreślenie">U</button>
       </div></div>`;
       h+=rangeField('Wielkość (mm)','fontSize',o.fontSize||24,4,2000,1,o);
       const tbb=objBBox(o);
@@ -3750,8 +3824,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       h+=`<div class="field"><label>Ramka cięcia wokół tekstu</label>
         <div class="frame-ctrl">
           <input type="number" id="frameOffsetVal" value="3" min="0.5" step="0.5" title="Powiększenie ramki od krawędzi tekstu (mm)">
-          <span style="font-size:.75rem;color:var(--muted)">mm odstępu</span>
-          <button type="button" id="frameAddBtn" class="tbtn" style="flex:1;justify-content:center;min-width:0">✂ Dodaj</button>
+          <span class="unit-label">mm odstępu</span>
+          <button type="button" id="frameAddBtn" class="tbtn btn-flex-min">✂ Dodaj</button>
         </div>
         <p class="field-hint">Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
       h+=`<div class="field"><button type="button" id="convertTextPathBtn" class="tbtn tbtn-full" title="Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi">✏ Konwertuj na ścieżkę (kontury liter)</button></div>`;
@@ -3759,17 +3833,17 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     if(['rect','ellipse','polygon','star'].includes(o.type)){
       h+=`<div class="field"><button type="button" id="convertPathBtn" class="tbtn tbtn-full" title="Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać">✏ Konwertuj na ścieżkę</button></div>`;
       h+=`<div class="field"><label>Obwódka (mm)</label><div class="row2">
-        <input type="number" id="offsetVal" value="5" step="1" style="flex:0 0 90px" title="Odległość obwódki od krawędzi kształtu (mm)">
-        <button type="button" id="offsetBtn" class="tbtn" style="flex:1;justify-content:center">+ Utwórz obwódkę</button></div></div>`;
+        <input type="number" id="offsetVal" value="5" step="1" class="input-offset" title="Odległość obwódki od krawędzi kształtu (mm)">
+        <button type="button" id="offsetBtn" class="tbtn btn-flex-center">+ Utwórz obwódkę</button></div></div>`;
     }
     if(o.type==='path'){
       h+=`<div class="field"><label>Obwódka (mm)</label><div class="row2">
-        <input type="number" id="offsetVal" value="5" step="1" style="flex:0 0 90px" title="Odległość obwódki od krawędzi kształtu (mm)">
-        <button type="button" id="offsetBtn" class="tbtn" style="flex:1;justify-content:center">+ Utwórz obwódkę</button></div></div>`;
+        <input type="number" id="offsetVal" value="5" step="1" class="input-offset" title="Odległość obwódki od krawędzi kształtu (mm)">
+        <button type="button" id="offsetBtn" class="tbtn btn-flex-center">+ Utwórz obwódkę</button></div></div>`;
     }
     if(o.type==='path' && isEditablePolygonPath(o)){
       const editing=state.editingPathId===o.id;
-      h+=`<div class="field"><button type="button" id="nodeEditBtn" class="tbtn ${editing?'active':''}" style="width:100%;justify-content:center">${editing?'✓ Zakończ edycję punktów':'✏ Edytuj punkty ścieżki'}</button>
+      h+=`<div class="field"><button type="button" id="nodeEditBtn" class="tbtn btn-full-center ${editing?'active':''}">${editing?'✓ Zakończ edycję punktów':'✏ Edytuj punkty ścieżki'}</button>
         ${editing?`<p class="field-hint">Przeciągnij punkt, aby zmienić kształt. Dwuklik na punkcie usuwa go (min. 3). Dwuklik na krawędzi dodaje nowy punkt. <kbd>Esc</kbd> kończy edycję.</p>`:''}
       </div>`;
     }
@@ -3788,12 +3862,12 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     laBtns+=`<button type="button" class="la-btn la-new" data-setdepth="${maxDep+1}" title="Nowa warstwa ${maxDep+1}">+ W${maxDep+1}</button>`;
     h+=`<div class="field"><label>Kliknij, aby przenieść element na warstwę</label>
       <div class="layer-assign">${laBtns}</div>
-      <div class="depth-ctrl" style="margin-top:7px">
+      <div class="depth-ctrl depth-ctrl-field">
         <button type="button" class="dbtn" id="depthDown">−</button>
         <span class="dval" id="depthVal">${dep}</span>
         <button type="button" class="dbtn" id="depthUp">+</button>
-        <span class="d-badge ${dc2}" style="margin-left:4px">${dep}</span>
-        <span style="font-size:.7rem;color:var(--muted);margin-left:6px">${fmt(layerMM(dep))} mm grubości</span>
+        <span class="d-badge ${dc2} d-badge-inline">${dep}</span>
+        <span class="depth-info">${fmt(layerMM(dep))} mm grubości</span>
       </div>
     </div>`;
     propsEl.innerHTML=lockedWrap(h,o);
@@ -3802,7 +3876,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   /* ---- Właściwości obrazu pomocniczego (kalka do przerysowania) ---- */
   function renderImageProps(o){
     let h='';
-    h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz", aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
+    h+=`<div class="empty-note note-compact">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz", aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
     h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1" title="${WHEEL_HINT}"></div>`;
@@ -3925,7 +3999,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   // a baner na górze tłumaczy, dlaczego nie reagują na kliknięcia.
   function lockedWrap(h,o){
     if(!o.locked) return h;
-    return `<div class="empty-note empty-note-warning">🔒 Element zablokowany — odblokuj go w panelu „Warstwy" (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled style="border:0;padding:0;margin:0">${h}</fieldset>`;
+    return `<div class="empty-note empty-note-warning">🔒 Element zablokowany — odblokuj go w panelu „Warstwy" (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled class="locked-fieldset">${h}</fieldset>`;
   }
   function bindProps(){
     const o=getSel(); if(!o) return;
@@ -4194,10 +4268,10 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   const layerSearchEl=document.getElementById('layerSearch');
   layerSearchEl.addEventListener('input',renderLayers);
   function renderLayers(){
-    if(!state.objects.length){ layersEl.innerHTML=`<div style="padding:4px 6px;font-size:.78rem;color:var(--muted)">Brak elementów.</div>`; return; }
+    if(!state.objects.length){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów.</div>`; return; }
     const q=(layerSearchEl.value||'').trim().toLowerCase();
     const list=q?state.objects.filter(o=>autoName(o).toLowerCase().includes(q)):state.objects;
-    if(!list.length){ layersEl.innerHTML=`<div style="padding:4px 6px;font-size:.78rem;color:var(--muted)">Brak elementów spełniających wyszukiwanie.</div>`; return; }
+    if(!list.length){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów spełniających wyszukiwanie.</div>`; return; }
     layersEl.innerHTML=list.slice().reverse().map(o=>{
       const sw=o.mode==='engrave'?'sw-engrave':o.mode==='score'?'sw-score':o.mode==='reference'?'sw-reference':'sw-cut';
       const modeCls=o.mode==='engrave'?'lyr-engrave':o.mode==='score'?'lyr-score':o.mode==='reference'?'':'lyr-cut';
@@ -4724,7 +4798,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <div class="card-head"><span class="d-badge d${Math.min(dep,6)}" style="background:${col}">W${dep}</span> Warstwa ${dep}</div>
         <svg viewBox="0 0 ${W} ${H}" xmlns="${SVG_NS}">${previewBody}</svg>
         <div class="lcount">${cnt} ${cnt===1?'element':cnt>=2&&cnt<=4?'elementy':'elementów'}</div>
-        <a href="${url}" download="warstwa-3d-${dep}.svg" class="tbtn" style="font-size:.72rem;text-decoration:none">⬇ Pobierz SVG</a>
+        <a href="${url}" download="warstwa-3d-${dep}.svg" class="tbtn tbtn-link">⬇ Pobierz SVG</a>
       </div>`;
     }).join('');
 
@@ -5064,7 +5138,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     const row=document.createElement('div');
     row.className='pq-mat-row'; row.dataset.key=key;
     row.innerHTML=
-      `<div class="pq-row-top"><input type="text" data-f="label" value="${String(m.label||'').replace(/"/g,'&quot;')}" placeholder="np. Sklejka 4 mm" style="flex:1"><button type="button" class="pq-del" title="Usuń materiał">✕</button></div>`
+      `<div class="pq-row-top"><input type="text" data-f="label" value="${String(m.label||'').replace(/"/g,'&quot;')}" placeholder="np. Sklejka 4 mm" class="input-flex-1"><button type="button" class="pq-del" title="Usuń materiał">✕</button></div>`
       +`<div class="pq-row-nums">`
       +`<label>Grubość mm<input type="number" data-f="mm" step="0.5" min="0" value="${m.mm!=null?m.mm:''}"></label>`
       +`<label>zł/cm²<input type="number" data-f="pricePerCm2" step="0.0001" min="0" value="${m.pricePerCm2!=null?m.pricePerCm2:''}"></label>`
@@ -5398,7 +5472,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div style="color:var(--muted);font-size:.74rem;transform:none">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy, aby zobaczyć wizualizację 3D</div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -6154,8 +6228,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     const alpha=clamp(Number(document.getElementById('gearPressure').value)||20,10,30);
     const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
     const {pts,rp,ra,rf}=buildGearPoints(z,m,alpha);
-    let info=`Śr. podziałowa: <strong style="color:var(--text)">${fmt(2*rp)} mm</strong><br>Śr. zewnętrzna: <strong style="color:var(--text)">${fmt(2*ra)} mm</strong><br>Śr. podstaw: <strong style="color:var(--text)">${fmt(2*rf)} mm</strong>`;
-    if(bore>0 && bore>=2*rf-0.5) info+='<br><span style="color:var(--cut-light)">⚠ otwór za duży!</span>';
+    let info=`Śr. podziałowa: <strong>${fmt(2*rp)} mm</strong><br>Śr. zewnętrzna: <strong>${fmt(2*ra)} mm</strong><br>Śr. podstaw: <strong>${fmt(2*rf)} mm</strong>`;
+    if(bore>0 && bore>=2*rf-0.5) info+='<br><span class="gear-warn">⚠ otwór za duży!</span>';
     document.getElementById('gearInfo').innerHTML=info;
     // Mini-podgląd SVG koła
     const prevEl=document.getElementById('gearPreview');
