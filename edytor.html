@@ -518,7 +518,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .bb-svg{flex:1;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:10px;box-shadow:inset 0 2px 8px rgba(0,0,0,.2)}
 .bb-svg svg{max-width:100%;max-height:100%;background:#fff;border-radius:var(--r-xs);box-shadow:0 4px 16px rgba(0,0,0,.35)}
 .bb-svg .bb-empty{color:var(--muted);font-size:.74rem}
-.live3d-empty{color:var(--muted);font-size:.74rem;text-align:center;padding:20px;line-height:1.6;opacity:.7}
+.live3d-empty{color:var(--muted);font-size:.74rem;text-align:center;padding:30px 20px;line-height:1.7;opacity:.65;display:flex;flex-direction:column;align-items:center;gap:8px}
+.live3d-empty::before{content:'🧊';font-size:1.6rem;opacity:.5;filter:grayscale(.5)}
 
 .legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);background:rgba(0,0,0,.12);position:relative}
 .legend::before{content:'';position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.1),transparent);pointer-events:none}
@@ -785,6 +786,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Form-sec — lepsza interakcja i hierarchia === */
 .form-sec{cursor:default;user-select:none}
+.form-sec:hover{background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent2-rgb),.06));border-color:rgba(var(--accent-rgb),.25)}
 
 /* === Field label — lepsze wyrównanie i czytelność === */
 .field label{user-select:none}
@@ -1053,8 +1055,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .modal-box.modal-send{max-width:440px;border-top:2px solid var(--accent);background:linear-gradient(180deg,rgba(var(--accent-rgb),.03),var(--bg-2) 40%)}
 .btn-sm-font{font-size:.72rem}
 .btn-sm-font-2{font-size:.74rem;margin-top:6px}
-.note-compact{padding-bottom:4px}
-.note-compact strong{color:var(--text)}
+.note-compact{padding:10px 12px;font-size:.78rem}
+.note-compact strong{color:var(--accent);font-variant-numeric:tabular-nums}
 .layers-empty{padding:16px 14px;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.6;border:1px dashed var(--border);border-radius:var(--r-sm);margin:8px 10px;background:rgba(var(--accent-rgb),.02)}
 .field-tight{margin-top:-6px}
 .tbtn-link{font-size:.72rem;text-decoration:none}
@@ -1501,14 +1503,14 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <div class="field"><label for="hingeZone">Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" id="hingeRight" min="0" max="700" step="1" value="90"></div>
     </div>
-    <div class="form-sec">Nacięcia</div>
+    <div class="form-sec">✂️ Nacięcia</div>
     <div class="grid-2">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" id="hingeLen" min="5" max="200" step="1" value="20"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
     </div>
-    <div class="form-sec">Łączenie — zaczepy „na palec"</div>
+    <div class="form-sec">🔩 Łączenie — zaczepy „na palec"</div>
     <div class="grid-2">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
@@ -3932,14 +3934,14 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <input type="number" id="mbH" value="${fmt(mb.h)}" min="1" step="1" title="${WHEEL_HINT}"></div></div>`;
     const gids=[...new Set(sel.map(o=>o.groupId).filter(Boolean))];
     const isWholeGroup = gids.length===1 && sel.every(o=>o.groupId===gids[0]) && state.objects.filter(o=>o.groupId===gids[0]).length===sel.length;
-    h+=`<div class="form-sec">Grupowanie i tryb</div>`;
+    h+=`<div class="form-sec">🔗 Grupowanie i tryb</div>`;
     h+=`<div class="field"><div class="seg">`;
     if(isWholeGroup) h+=`<button data-group="ungroup">⛓ Rozgrupuj (Ctrl+Shift+G)</button>`;
     else h+=`<button data-group="group">🔗 Grupuj (Ctrl+G)</button>`;
     h+=`</div></div>`;
     h+=`<div class="field"><label>Operacja lasera dla wszystkich</label><div class="seg" data-seg="mmode">
       <button class="cut" data-mode="cut" title="Laser tnie materiał na wylot">Cięcie</button><button class="engrave" data-mode="engrave" title="Laser graweruje wzór na powierzchni">Grawer</button><button class="score" data-mode="score" title="Delikatne nacięcie — linia łamania/zginania">Nacięcie</button></div></div>`;
-    h+=`<div class="form-sec">Wyrównanie i rozmieszczenie</div>`;
+    h+=`<div class="form-sec">📏 Wyrównanie i rozmieszczenie</div>`;
     h+=`<div class="field"><label>Wyrównaj w poziomie</label><div class="seg">
       <button data-align="left">⊣ Lewa</button><button data-align="hcenter">┼ Środek</button><button data-align="right">⊢ Prawa</button></div></div>`;
     h+=`<div class="field"><label>Wyrównaj w pionie</label><div class="seg">
@@ -3952,7 +3954,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     if(boolCount>=2){
       const xorBtn=boolCount===2?'<button data-bool="xor" title="XOR — usuń część wspólną, zostaw resztę obu kształtów">⊕ XOR</button>':'';
       const xorInfo=boolCount===2?' · XOR = usuń część wspólną, zostaw resztę obu kształtów':'';
-      h+=`<div class="form-sec">Operacje na kształtach</div>`;
+      h+=`<div class="form-sec">⚙️ Operacje na kształtach</div>`;
       h+=`<div class="field"><div class="seg">
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
         <p class="field-hint mt-8">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
@@ -4010,14 +4012,14 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" data-hinge="zoneW" value="${fmt(m.zoneW)}" min="5" max="700" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" data-hinge="rightW" value="${fmt(m.rightW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
     </div>`;
-    h+=`<div class="form-sec">Nacięcia</div>`;
+    h+=`<div class="form-sec">✂️ Nacięcia</div>`;
     h+=`<div class="grid-2">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" data-hinge="slitLen" value="${fmt(m.slitLen)}" min="5" max="200" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" data-hinge="kerf" value="${fmt(m.kerf)}" min="0.2" max="5" step="0.1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" data-hinge="pitchX" value="${fmt(m.pitchX)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" data-hinge="bridge" value="${fmt(m.bridge)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
     </div>`;
-    h+=`<div class="form-sec">Łączenie — zaczepy „na palec"</div>`;
+    h+=`<div class="form-sec">🔩 Łączenie — zaczepy „na palec"</div>`;
     h+=`<div class="grid-2">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" data-hinge="T" value="${fmt(m.T)}" min="0.5" max="20" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" data-hinge="F" value="${fmt(m.F)}" min="2" max="100" step="1" title="${WHEEL_HINT}"></div>
@@ -4105,7 +4107,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         ${o.role==='hole'?`<p class="field-hint">${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
     }
     // ---- sekcja: pozycja i rozmiar ----
-    h+=`<div class="form-sec">Pozycja i rozmiar</div>`;
+    h+=`<div class="form-sec">📐 Pozycja i rozmiar</div>`;
     if(o.type==='text'||o.type==='path'){
       h+=numField('Pozycja X (mm)','x',o,{step:1});
       h+=numField('Pozycja Y (mm)','y',o,{step:1});
@@ -4142,7 +4144,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     if(o.type==='line') h+=`<div class="field"><label>Kierunek linii</label><div class="seg" data-seg="flip"><button class="${!o.flip?'on':''}" data-flip="0">↘ prawy dół</button><button class="${o.flip?'on':''}" data-flip="1">↗ prawy góra</button></div></div>`;
     // ---- sekcja: treść tekstu ----
     if(o.type==='text'){
-      h+=`<div class="form-sec">Treść i wygląd</div>`;
+      h+=`<div class="form-sec">✏️ Treść i wygląd</div>`;
       h+=`<div class="field"><label>Tekst</label><textarea data-prop="text" maxlength="240" rows="${Math.min(6,Math.max(2,(o.text||'').split('\n').length+1))}" title="Enter = nowa linia · dwuklik na napisie na płycie = szybka edycja">${escapeXml(o.text||'')}</textarea><p class="field-hint">Enter = nowa linia · dwuklik na napisie = szybka edycja</p></div>`;
       h+=`<div class="field"><label>Czcionka</label><div class="font-dd" id="propsFontDD">${fontDDMarkup(o.font)}</div></div>`;
       h+=`<div class="field"><label>Styl pisma</label><div class="seg" data-seg="textstyle">
@@ -4157,7 +4159,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       h+=`<div class="field"><button type="button" id="textReset" class="tbtn tbtn-full" title="Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości napisu">↺ Przywróć proporcje 1:1</button></div>`;
     }
     // ---- sekcja: powielanie ----
-    h+=`<div class="form-sec">Powielanie</div>`;
+    h+=`<div class="form-sec">🔁 Powielanie</div>`;
     const r=o.repeat||{type:'none'};
     h+=`<div class="field"><label>Typ powielania</label><select data-prop="repeat.type">
       ${[['none','Brak (pojedynczy element)'],['linear','Liniowe (rząd)'],['grid','Siatka (kolumny × wiersze)'],['circular','Okrągłe (wokół środka)'],['mirror','Lustro (odbicie)']].map(([v,l])=>`<option value="${v}" ${r.type===v?'selected':''}>${l}</option>`).join('')}
@@ -4181,7 +4183,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     }
     // ---- sekcja: narzędzia ----
     const hasTools=(o.type==='text')||(['rect','ellipse','polygon','star','path'].includes(o.type));
-    if(hasTools) h+=`<div class="form-sec">Narzędzia</div>`;
+    if(hasTools) h+=`<div class="form-sec">🔧 Narzędzia</div>`;
     if(o.type==='text'){
       h+=`<div class="field"><label>Ramka cięcia wokół tekstu</label>
         <div class="frame-ctrl">
@@ -4216,7 +4218,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       h+=`<div class="field"><button type="button" id="breakApartBtn" class="tbtn tbtn-full" title="Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie">✂ Rozdziel na podścieżki <span class="ctx-key">Ctrl+Shift+B</span></button></div>`;
     }
     // ---- sekcja: warstwa 3D ----
-    h+=`<div class="form-sec">Warstwa 3D</div>`;
+    h+=`<div class="form-sec">🧊 Warstwa 3D</div>`;
     const dep = o.depth||1; const dc2=dep<=6?`d${dep}`:'dN';
     const maxDep=Math.max(1,...state.objects.map(x=>x.depth||1));
     let laBtns='';
@@ -8552,9 +8554,13 @@ submitBtn.addEventListener('click', async ()=>{
     celebrateExport();
     setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.textContent='Wyślij projekt'; },2500);
   }catch(err){
-    console.error('Błąd wysyłki wyceny',err);
-    setStatus('Błąd wysyłki: '+(err?.message||'spróbuj ponownie'),true);
+    const msg=err?.code==='unavailable'?'Serwer niedostępny — sprawdź połączenie z internetem':
+              err?.code==='permission-denied'?'Brak uprawnień — odśwież stronę i spróbuj ponownie':
+              err?.message||'Nieznany błąd — spróbuj ponownie';
+    setStatus('Błąd wysyłki: '+msg,true);
+    showToast('Nie udało się wysłać wyceny','error',4000);
     submitBtn.disabled=false;
+    submitBtn.textContent='Wyślij projekt';
   }
 });
 </script>
