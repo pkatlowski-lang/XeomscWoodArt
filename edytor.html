@@ -2060,6 +2060,89 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 
 /* === v64: Skrót klawiszowy w statusbar — wizualnie wyróżniony === */
 .sb-item kbd{font-size:.55rem;padding:0 3px;background:var(--surface3);border:1px solid var(--border);border-radius:2px;margin-left:3px}
+
+/* === v66: Kolorowe górne paski modali wg typu === */
+.modal-ov[aria-label*="Generator"] .modal-box::before{background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--operator))}
+.modal-ov[aria-label*="Biblioteka"] .modal-box::before{background:linear-gradient(90deg,var(--operator),var(--accent))}
+.modal-ov[aria-label*="Wyślij"] .modal-box::before{background:linear-gradient(90deg,var(--success),var(--accent))}
+.modal-ov[aria-label*="Skróty"] .modal-box::before{background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+
+/* === v66: Lepsza wizualizacja modalu 3D — lampa punktowa === */
+.preview3d-wrap{position:relative}
+.preview3d-wrap::before{content:'';position:absolute;top:10%;left:30%;width:40%;height:30%;background:radial-gradient(ellipse,rgba(255,240,200,.04),transparent 70%);pointer-events:none;z-index:1}
+
+/* === v66: Tooltip systemu — lepsza czytelność z line-height === */
+[data-tooltip]::after{line-height:1.5;letter-spacing:.01em}
+
+/* === v66: Klawiatura w shortcuts — lepszy 3D === */
+kbd{background:linear-gradient(180deg,var(--surface3),var(--surface2));border-bottom:2px solid rgba(0,0,0,.35);text-shadow:0 1px 0 rgba(255,255,255,.06)}
+kbd:active{border-bottom-width:1px;margin-top:1px}
+
+/* === v66: Lepsza wizualizacja listy czcionek — kategorie === */
+.font-dd-list{scroll-behavior:smooth;scrollbar-gutter:stable}
+
+/* === v66: Hover state na swatch warstwy 3D === */
+.lyr-row .lyr-pick{position:relative;overflow:hidden}
+.lyr-row .lyr-pick::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .12s}
+.lyr-row:hover .lyr-pick::after{opacity:1}
+
+/* === v66: Live3d title — dynamiczny gradient === */
+.bb-head span:first-child{background:linear-gradient(90deg,var(--text),rgba(var(--accent-rgb),.7));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* === v66: Lepszy styl pola tekstowego warstwy === */
+.layer .lname input{caret-color:var(--accent);transition:background .12s,border-color .12s,box-shadow .12s}
+.layer .lname input:focus{box-shadow:0 0 0 2px rgba(var(--accent-rgb),.15)}
+
+/* === v66: Gallery kart — gradient na bottom (text fade) === */
+.gallery-card span{position:relative;z-index:1}
+
+/* === v66: Modal box — subtelny vignette === */
+.modal-box::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,transparent 60%,rgba(0,0,0,.06));pointer-events:none;border-radius:var(--r-lg);z-index:0}
+.modal-box>*{position:relative;z-index:1}
+
+/* === v66: Toolbar brand — subtelna animacja na hover === */
+.toolbar .brand:hover .brand-name{transition:letter-spacing .3s}
+.toolbar .brand:hover .brand-name{letter-spacing:.5px}
+
+/* === v66: Dropdown menu — staggered animation === */
+.dd.open .dd-menu .tbtn{animation:ddItemIn .12s ease-out backwards}
+.dd.open .dd-menu .tbtn:nth-child(2){animation-delay:20ms}
+.dd.open .dd-menu .tbtn:nth-child(3){animation-delay:40ms}
+.dd.open .dd-menu .tbtn:nth-child(4){animation-delay:60ms}
+.dd.open .dd-menu .tbtn:nth-child(5){animation-delay:80ms}
+.dd.open .dd-menu .tbtn:nth-child(n+6){animation-delay:100ms}
+@keyframes ddItemIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+
+/* === v66: Lepsza wizualizacja scroll position w panelu === */
+.panel.left{position:relative}
+.panel.right{position:relative}
+
+/* === v66: Breadcrumb section — lepsza ikonka emoji === */
+.form-sec{line-height:1.1}
+
+/* === v66: Info box — gradient text === */
+.info-box-size{background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* === v66: Responsywny toolrail na bardzo szerokich ekranach === */
+@media(min-width:1800px){
+  .toolrail{flex:0 0 70px}
+  .toolrail .tbtn{width:56px;height:52px;font-size:.6rem}
+  .toolrail .tbtn .ico{font-size:1.35rem}
+}
+
+/* === v66: Poprawka depth-changed animacja na button === */
+.lyr-pick.depth-changed{animation:lyrPickChange .3s ease-out}
+@keyframes lyrPickChange{0%{transform:scale(1.2);box-shadow:0 0 12px currentColor}100%{transform:scale(1);box-shadow:0 1px 3px rgba(0,0,0,.3)}}
+
+/* === v66: Lepsza wizualizacja zaznaczenia — multi-sel info === */
+.empty-note.note-compact{border-left:3px solid var(--accent);animation:noteCompactIn .2s ease-out}
+@keyframes noteCompactIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+
+/* === v66: Canvas drag select — lepsza wizualizacja === */
+.sel-box{fill:rgba(var(--accent-rgb),.05)}
+
+/* === v66: Lepszy styl na canvas doc-border hover === */
+.doc-border{transition:stroke .2s,stroke-width .2s}
 </style>
 </head>
 <body>
@@ -7096,7 +7179,8 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
     const W=state.docW,H=state.docH;
     const sh=live3dStage.clientHeight||200, sw0=live3dStage.clientWidth||300;
     const tMM=totalStackMM();
-    live3dTitle.textContent='🧊 3D — '+tMM.toFixed(1)+' mm stosu';
+    const depthList=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))];
+    live3dTitle.textContent='🧊 3D — '+tMM.toFixed(1)+' mm · '+depthList.length+' warst'+(depthList.length===1?'wa':'w');
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
