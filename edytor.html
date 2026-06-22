@@ -36,6 +36,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;border:2px solid transparent;background-clip:padding-box;transition:background .2s}
 ::-webkit-scrollbar-thumb:hover{background:rgba(var(--accent-rgb),.35);background-clip:padding-box;border:2px solid transparent}
 *{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+::selection{background:rgba(var(--accent-rgb),.3);color:var(--text)}
 .app{height:100vh;display:flex;flex-direction:column;background:
   radial-gradient(1300px 540px at 12% -12%, rgba(var(--accent-rgb),.07), transparent 60%),
   radial-gradient(1100px 640px at 112% 2%, rgba(var(--accent2-rgb),.06), transparent 55%),
@@ -200,10 +201,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd{position:relative;min-width:150px}
 .font-dd-btn{width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem;padding:5px 8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:border-color .14s,box-shadow .14s}
 .font-dd-btn:hover{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.12)}
-.font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:280px;overflow-y:auto;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.6);padding:4px 0}
+.font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:280px;overflow-y:auto;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.1);padding:4px 0}
 .font-dd.open .font-dd-list{display:block}
 .font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:6px;margin:0 4px;transition:background .1s,color .1s}
-.font-dd-item:hover{background:var(--grad-accent);color:var(--accent-text)}
+.font-dd-item:hover{background:var(--grad-accent);color:var(--accent-text);box-shadow:0 2px 6px rgba(var(--accent-rgb),.3)}
 .font-dd-item.cur{background:rgba(var(--accent-rgb),.18)}
 .font-dd-item .pc{font-family:var(--font-b);font-size:.68rem;color:var(--muted)}
 .font-dd-item:hover .pc{color:var(--accent-text)}
@@ -536,11 +537,19 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 @media(max-width:480px){
   .toolbar{padding:6px 8px;gap:4px}
   .toolbar .brand{margin-right:6px;font-size:.92rem}
+  .toolbar .brand::before{width:24px;height:24px;border-radius:7px;font-size:.72rem}
   .tgroup{padding-right:6px;margin-right:2px;gap:3px}
   .tbtn{min-width:32px;height:33px;padding:0 8px;font-size:.74rem}
   .modal-box{padding:14px 12px 16px}
+  .modal-box h3{font-size:.95rem}
   .ptabs{padding:6px}
   .ptab{padding:7px 3px;font-size:.62rem}
+  .gallery{gap:6px}
+  .gallery-card{font-size:.65rem;border-radius:10px}
+  .gallery-card svg{height:50px}
+  .pq-sec{margin:8px 10px;padding:10px 11px}
+  .live-quote{padding:8px 10px}
+  .hint-empty{font-size:.72rem;padding:6px 12px}
 }
 </style>
 <style>
@@ -680,6 +689,14 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Empty state — lepszy styl === */
 .hint-empty{animation:hintFadeIn .5s ease-out}
 @keyframes hintFadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* === Drop zone feedback === */
+.stage.drop-active{outline:2px dashed var(--accent);outline-offset:-4px;background:
+  radial-gradient(1000px 680px at 50% 38%, rgba(var(--accent-rgb),.08), #080b12 82%)}
+.stage.drop-active::after{content:'Upuść plik SVG lub obraz';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-size:.9rem;font-weight:700;color:var(--accent);background:rgba(8,11,18,.85);
+  padding:12px 24px;border-radius:12px;border:1.5px solid rgba(var(--accent-rgb),.4);
+  box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:5;pointer-events:none}
 
 /* === Loading state — skeleton pulse do ponownego użycia === */
 @keyframes skeletonPulse{0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -4113,7 +4130,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     toolsEl.appendChild(b);
   });
   function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); }
-  function updateCanvasCursor(){ canvas.style.cursor = state.tool==='pan'?'grab' : (state.tool==='select'?'default':'crosshair'); }
+  function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
 
   document.getElementById('undoBtn').addEventListener('click',undo);
   document.getElementById('redoBtn').addEventListener('click',redo);
@@ -7687,8 +7704,11 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   ['dragenter','dragover'].forEach(evt=>stageEl.addEventListener(evt, e=>{
     if(!e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
     e.preventDefault(); e.dataTransfer.dropEffect='copy';
+    stageEl.classList.add('drop-active');
   }));
+  stageEl.addEventListener('dragleave', ()=>stageEl.classList.remove('drop-active'));
   stageEl.addEventListener('drop', e=>{
+    stageEl.classList.remove('drop-active');
     const files=e.dataTransfer && e.dataTransfer.files; if(!files || !files.length) return;
     e.preventDefault();
     for(const file of files){
@@ -7715,6 +7735,16 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   // (tooltip pokazuje się też na :focus — patrz CSS .hint:focus::after).
   document.querySelectorAll('.hint[data-tip]').forEach(h=>{
     h.tabIndex=0; h.setAttribute('role','note'); h.setAttribute('aria-label','Podpowiedź: '+h.getAttribute('data-tip'));
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Tab') return;
+    const modal=document.querySelector('.modal-ov.open .modal-box');
+    if(!modal) return;
+    const focusable=modal.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+    if(!focusable.length) return;
+    const first=focusable[0], last=focusable[focusable.length-1];
+    if(e.shiftKey){ if(document.activeElement===first||!modal.contains(document.activeElement)){ e.preventDefault(); last.focus(); } }
+    else { if(document.activeElement===last||!modal.contains(document.activeElement)){ e.preventDefault(); first.focus(); } }
   });
   let _resizeRAF=0;
   window.addEventListener('resize',()=>{ cancelAnimationFrame(_resizeRAF); _resizeRAF=requestAnimationFrame(()=>{ applyView(); renderOverlay(); }); });
