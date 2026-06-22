@@ -4081,7 +4081,7 @@ input[type=number]{position:relative}
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
         <p class="field-hint mt-8">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
-    h+=`<div class="empty-note">Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę. Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
+    h+=`<div class="empty-note" style="font-size:.74rem">💡 Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę.<br>Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
     propsEl.querySelectorAll('[data-align]').forEach(b=>b.addEventListener('click',()=>alignSel(b.dataset.align)));
     propsEl.querySelectorAll('[data-dist]').forEach(b=>b.addEventListener('click',()=>distributeSel(b.dataset.dist)));
@@ -5035,7 +5035,7 @@ input[type=number]{position:relative}
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
     downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`);
     markSaved();
-    showToast('Projekt zapisany do pliku','success');
+    showToast('Projekt zapisany ('+state.objects.length+' elem.)','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
     document.getElementById('loadProjectInput').click();
@@ -5069,21 +5069,24 @@ input[type=number]{position:relative}
     const copies=sel.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
-    state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
+    state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
+    showToast('Powielono '+copies.length+' elem.','info',1200); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
     state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps(); }
 
   /* ---------------- Schowek: kopiuj / wklej (Ctrl+C / Ctrl+V) ---------------- */
   let clipboard=[];
   function copySel(){ const sel=getSelected(); if(!sel.length) return;
-    clipboard=sel.map(o=>JSON.parse(JSON.stringify(o))); }
+    clipboard=sel.map(o=>JSON.parse(JSON.stringify(o)));
+    showToast('Skopiowano '+clipboard.length+' elem.','info',1000); }
   function pasteClipboard(){ if(!clipboard.length) return;
     const gidMap={};
     const copies=clipboard.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
     clipboard=copies.map(c=>JSON.parse(JSON.stringify(c))); // kolejne Ctrl+V odsuwa dalej, jak w Illustratorze/Cuttle
-    state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps(); }
+    state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
+    showToast('Wklejono '+copies.length+' elem.','info',1000); }
   function zoomBy(f){ const v=state.view; const cx=v.x+v.w/2, cy=v.y+v.h/2;
     v.w*=f; v.h*=f; v.x=cx-v.w/2; v.y=cy-v.h/2; applyView(); renderOverlay(); }
   // Domyślny widok: arkusz wypełnia pole edycji maksymalnie, wycentrowany,
@@ -5854,18 +5857,21 @@ input[type=number]{position:relative}
   if(_pNew) _pNew.addEventListener('click',async()=>{
     const name=(await showPrompt('Nazwa nowego profilu:','Nowy profil')||'').trim(); if(!name) return;
     addProfile(name, JSON.parse(JSON.stringify(QUOTE_DEFAULTS)));
+    showToast('Utworzono profil „'+name+'"','success',2000);
   });
   const _pDup=document.getElementById('qProfDup');
   if(_pDup) _pDup.addEventListener('click',async()=>{
     const cur=activeProfile(); if(!cur) return;
     const name=(await showPrompt('Nazwa kopii profilu:',cur.name+' (kopia)')||'').trim(); if(!name) return;
     addProfile(name, JSON.parse(JSON.stringify(cur.config)));
+    showToast('Powielono profil jako „'+name+'"','success',2000);
   });
   const _pRen=document.getElementById('qProfRename');
   if(_pRen) _pRen.addEventListener('click',async()=>{
     const cur=activeProfile(); if(!cur) return;
     const name=(await showPrompt('Nowa nazwa profilu:',cur.name)||'').trim(); if(!name) return;
     cur.name=name; saveProfiles(); renderProfileSelect();
+    showToast('Zmieniono nazwę profilu','info',1500);
   });
   const _pDel=document.getElementById('qProfDel');
   if(_pDel) _pDel.addEventListener('click',async()=>{
@@ -6586,7 +6592,8 @@ input[type=number]{position:relative}
     const blob=new Blob([dxf],{type:'application/dxf'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.dxf`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    showToast('Plik DXF wyeksportowany','success');
+    showToast('Plik DXF wyeksportowany ('+objs.length+' elem., '+depths.length+' warstw)','success');
+    markSaved();
     celebrateExport();
   }
 
