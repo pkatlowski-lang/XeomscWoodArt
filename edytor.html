@@ -2470,6 +2470,61 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v71: Lepszy styl na depth-ctrl minus/plus hover === */
 .depth-ctrl .dbtn:hover{background:rgba(var(--accent-rgb),.12);transform:scale(1.06)}
+
+/* === v72: Lepsza wizualizacja galerii — fade-in animacja na załadowanie === */
+.gallery-card{animation:galleryCardIn .2s ease-out backwards}
+.gallery-card:nth-child(1){animation-delay:0ms}
+.gallery-card:nth-child(2){animation-delay:30ms}
+.gallery-card:nth-child(3){animation-delay:60ms}
+.gallery-card:nth-child(4){animation-delay:90ms}
+.gallery-card:nth-child(5){animation-delay:120ms}
+.gallery-card:nth-child(6){animation-delay:150ms}
+.gallery-card:nth-child(n+7){animation-delay:180ms}
+@keyframes galleryCardIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* === v72: Template card — fade-in staggered === */
+.tpl button{animation:galleryCardIn .2s ease-out backwards}
+.tpl button:nth-child(1){animation-delay:0ms}
+.tpl button:nth-child(2){animation-delay:40ms}
+.tpl button:nth-child(3){animation-delay:80ms}
+.tpl button:nth-child(4){animation-delay:120ms}
+
+/* === v72: Better statusbar layout — flex gap === */
+.statusbar{gap:4px}
+.sb-sep{padding:0 2px}
+
+/* === v72: Podsumowanie modal — lepsze karty statystyk === */
+.sum-row{transition:background .12s,box-shadow .14s,transform .08s,border-left-color .12s}
+.sum-row:hover{border-left-color:var(--accent)}
+
+/* === v72: Quote card — animated number change === */
+.q-pp-val{transition:transform .2s cubic-bezier(.2,.9,.3,1.1),color .15s,text-shadow .2s}
+
+/* === v72: Lepsza wizualizacja lyr-row.on === */
+.lyr-row.on{position:relative}
+.lyr-row.on::after{content:'';position:absolute;right:6px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.5);animation:lyrDotPulse 2s ease-in-out infinite}
+@keyframes lyrDotPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* === v72: Gallery card — SVG stroke animation na hover === */
+.gallery-card:hover svg path{stroke-dasharray:200;stroke-dashoffset:200;animation:svgStrokeDraw 1s ease-out forwards}
+@keyframes svgStrokeDraw{to{stroke-dashoffset:0}}
+
+/* === v72: Lepsza wizualizacja dd-menu z backdrop-filter === */
+.dd-menu{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+/* === v72: Improved toolbar buttons — subtle border gradient === */
+.tbtn:hover{border-image:linear-gradient(180deg,rgba(var(--accent-rgb),.2),var(--border-strong)) 1}
+
+/* === v72: Panel section headers — hover z ikony === */
+.form-sec{transition:background .12s,border-color .12s,padding-left .1s}
+.form-sec:hover{padding-left:12px}
+
+/* === v72: Depth layers — lepsze wyrównanie mm input === */
+.lyr-mm{font-variant-numeric:tabular-nums}
+.lyr-mm:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.18)}
+
+/* === v72: Splash hint — animowana zmiana tekstu === */
+.splash-hint{transition:opacity .2s}
 </style>
 </head>
 <body>
@@ -8865,6 +8920,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
       x:state.docW/2-(bx2+bw2/2), y:state.docH/2-(by2+bh2/2),
       rotation:0, mode:'cut', visible:true, locked:false, depth:1, repeat:{type:'none'}
     });
+    showToast('Dodano: '+(base.label||'Baza')+' ('+fmt(bw2)+'×'+fmt(bh2)+' mm)','success',1500);
   }
 
   function addCustomBase(base){
