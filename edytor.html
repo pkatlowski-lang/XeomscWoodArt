@@ -309,7 +309,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer .lico{font-size:.78rem;opacity:0;cursor:pointer;background:none;border:none;color:var(--muted);padding:2px 4px;border-radius:var(--r-xs);transition:opacity .12s,background .12s,color .12s,transform .08s;line-height:1;flex-shrink:0}
 .layer .lico:hover{background:rgba(255,255,255,.08);color:var(--text);transform:scale(1.1)}
 .layer .lico:active{transform:scale(.9)}
-.layer .swatch{width:10px;height:10px;border-radius:3px;flex:0 0 auto;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.layer .swatch{width:10px;height:10px;border-radius:var(--r-xs);flex:0 0 auto;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .sw-cut{background:var(--cut)} .sw-engrave{background:var(--engrave);border:1px solid var(--muted-2)} .sw-score{background:var(--score)}
 .sw-reference{background:repeating-linear-gradient(45deg,var(--muted),var(--muted) 2px,var(--surface3) 2px,var(--surface3) 4px);border:1px solid var(--muted-2)}
 .layer.layer-hidden .lname{opacity:.45}
@@ -718,8 +718,12 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .layer .lico.lico-vis.hidden-ico{opacity:.5}
 .layer:hover .lico.lico-vis.hidden-ico{opacity:.75}
 .layer .lico.lico-locked{opacity:.9;color:var(--accent)}
-.layer.dragging{opacity:.6;transform:scale(.98) rotate(-.5deg);transition:opacity .12s,transform .12s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.layer.drop-target{border-bottom:2px solid var(--accent);box-shadow:0 2px 0 rgba(var(--accent-rgb),.3)}
+.layer.dragging{opacity:.5;transform:scale(.96) rotate(-.8deg);transition:opacity .12s,transform .12s;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:100;pointer-events:none}
+.layer.drop-target-above{border-top:2px solid var(--accent);box-shadow:0 -2px 8px rgba(var(--accent-rgb),.25)}
+.layer.drop-target-below{border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.25)}
+.layer[draggable]{cursor:grab}
+.layer[draggable]:active{cursor:grabbing}
+.layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 0;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 
 /* === 3D preview — ulepszone tło i ramka === */
 .live3d-stage{background:radial-gradient(ellipse 72% 65% at 50% 60%,#201a0c 0%,#0a0804 50%,#050302 100%);
@@ -763,8 +767,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .ptab.active{position:relative;overflow:hidden}
 .ptab.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:rgba(var(--accent-rgb),.4);border-radius:2px}
 
-/* === Empty note — ładniejszy styl z ikoną === */
-.empty-note::after{content:'';position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(var(--accent-rgb),.04),transparent 70%);border-radius:50%;pointer-events:none}
+/* === Empty note — ładniejszy styl z ikoną i subtelna pulsacja === */
+.empty-note::after{content:'';position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(var(--accent-rgb),.06),transparent 70%);border-radius:50%;pointer-events:none;animation:emptyNotePulse 4s ease-in-out infinite}
+@keyframes emptyNotePulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
 
 /* === Q-break row — tabular nums dla czytelności === */
 .q-break .br-row b{font-variant-numeric:tabular-nums}
@@ -911,7 +916,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 
 /* === Print — ukryj UI przy drukowaniu === */
 @media print{
-  .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov{display:none!important}
+  .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov,.statusbar,.splash-ov{display:none!important}
   .app{height:auto;overflow:visible}
   .workspace{flex-direction:column}
   .stage{flex:none;min-height:auto;background:#fff}
@@ -1050,7 +1055,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .btn-sm-font-2{font-size:.74rem;margin-top:6px}
 .note-compact{padding-bottom:4px}
 .note-compact strong{color:var(--text)}
-.layers-empty{padding:4px 6px;font-size:.78rem;color:var(--muted)}
+.layers-empty{padding:16px 14px;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.6;border:1px dashed var(--border);border-radius:var(--r-sm);margin:8px 10px;background:rgba(var(--accent-rgb),.02)}
 .field-tight{margin-top:-6px}
 .tbtn-link{font-size:.72rem;text-decoration:none}
 /* live3d-empty — zdefiniowany wyżej */
@@ -1144,9 +1149,37 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
 .gear-preview-info strong{color:var(--text)}
 .gear-warn{color:var(--cut-light)}
+
+/* === Status bar — dolny pasek informacyjny === */
+.statusbar{display:flex;align-items:center;gap:6px;padding:3px 14px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-top:1px solid var(--border);font-size:.65rem;color:var(--muted-2);flex-shrink:0;min-height:22px;user-select:none}
+.sb-item{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.sb-sep{opacity:.35}
+.sb-spacer{flex:1}
+.sb-zoom{color:var(--accent);font-weight:600}
+
+/* === Splash screen / loading overlay === */
+.splash-ov{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:radial-gradient(ellipse 800px 500px at 50% 45%,rgba(var(--accent-rgb),.06),var(--bg));transition:opacity .4s ease,visibility 0s linear .4s}
+.splash-ov.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px}
+.splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
+  background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
+.splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden}
+.splash-bar-fill{width:0%;height:100%;border-radius:2px;background:var(--grad-accent);transition:width .3s ease}
+.splash-hint{font-size:.75rem;color:var(--muted-2);letter-spacing:.03em}
+
+/* === Layers panel — number badge + drag grip === */
+.layer .drag-grip{flex:0 0 auto;cursor:grab;color:var(--muted-2);font-size:.7rem;padding:2px 3px 2px 0;opacity:0;transition:opacity .12s,color .12s;user-select:none;line-height:1}
+.layer:hover .drag-grip{opacity:.6}
+.layer .drag-grip:hover{opacity:1;color:var(--muted)}
 </style>
 </head>
 <body>
+<div class="splash-ov" id="splashOv">
+  <div class="splash-brand">Xeomsc<span style="background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">-Laser</span></div>
+  <div class="splash-bar"><div class="splash-bar-fill" id="splashBar"></div></div>
+  <div class="splash-hint">Ładowanie edytora…</div>
+</div>
 <div class="app">
   <div class="toolbar">
     <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.style.display='none'"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
@@ -1403,6 +1436,15 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       <div id="props"></div>
     </aside>
   </div>
+  <div class="statusbar" id="statusbar">
+    <span class="sb-item" id="sbTool">Zaznaczanie</span>
+    <span class="sb-sep">·</span>
+    <span class="sb-item" id="sbObjects">0 elementów</span>
+    <span class="sb-sep">·</span>
+    <span class="sb-item" id="sbDoc">300×200 mm</span>
+    <span class="sb-spacer"></span>
+    <span class="sb-item sb-zoom" id="sbZoom">100%</span>
+  </div>
 </div>
 
 <div class="ctx-menu" id="ctxMenu"></div>
@@ -1579,6 +1621,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         <div class="sc-row"><span>Zakończ ścieżkę (pióro)</span><span class="sc-keys"><kbd>Enter</kbd></span></div>
         <div class="sc-row"><span>Anuluj / zamknij okno</span><span class="sc-keys"><kbd>Esc</kbd></span></div>
         <div class="sc-row"><span>Menu kontekstowe</span><span class="sc-keys"><kbd>PPM</kbd></span></div>
+        <div class="sc-row"><span>Zmień kolejność warstw</span><span class="sc-keys">Przeciągnij w panelu warstw</span></div>
       </div>
     </div>
   </div>
@@ -2144,6 +2187,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const z=Math.round(state.docW/state.view.w*100);
     document.getElementById('zoomVal').textContent=z+'%';
     renderRulers();
+    updateStatusBar();
   }
   /* ---------------- Linijki (rulery, mm) ---------------- */
   const rulerH=document.getElementById('rulerH'), rulerV=document.getElementById('rulerV');
@@ -2351,7 +2395,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     gOverlay.innerHTML=s;
   }
 
-  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').style.display=state.objects.length?'none':''; if(typeof scheduleLive3D==='function') scheduleLive3D(); }
+  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').style.display=state.objects.length?'none':''; if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar(); }
 
   /* ---------------- Pomocniki zaznaczenia ---------------- */
   function getSelected(){ return state.objects.filter(o=>state.selectedIds.includes(o.id)); }
@@ -4588,18 +4632,29 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   const layerSearchEl=document.getElementById('layerSearch');
   layerSearchEl.addEventListener('input',renderLayers);
   function renderLayers(){
-    if(!state.objects.length){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów.</div>`; return; }
+    const total=state.objects.length;
+    const locked=state.objects.filter(o=>o.locked).length;
+    const hidden=state.objects.filter(o=>!o.visible).length;
+    let counter='';
+    if(total){
+      const parts=[total+' elem.'];
+      if(locked) parts.push(locked+' 🔒');
+      if(hidden) parts.push(hidden+' ukr.');
+      counter=`<div class="layers-counter">${parts.join(' · ')}</div>`;
+    }
+    if(!total){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów na płycie.<br><span style="font-size:.7rem;color:var(--muted-2)">Narysuj kształt lub wybierz szablon z galerii</span></div>`; return; }
     const q=(layerSearchEl.value||'').trim().toLowerCase();
     const list=q?state.objects.filter(o=>autoName(o).toLowerCase().includes(q)):state.objects;
-    if(!list.length){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów spełniających wyszukiwanie.</div>`; return; }
-    layersEl.innerHTML=list.slice().reverse().map(o=>{
+    if(!list.length){ layersEl.innerHTML=counter+`<div class="layers-empty">Brak elementów spełniających wyszukiwanie.</div>`; return; }
+    layersEl.innerHTML=counter+list.slice().reverse().map(o=>{
       const sw=o.mode==='engrave'?'sw-engrave':o.mode==='score'?'sw-score':o.mode==='reference'?'sw-reference':'sw-cut';
       const modeCls=o.mode==='engrave'?'lyr-engrave':o.mode==='score'?'lyr-score':o.mode==='reference'?'':'lyr-cut';
       const d=o.depth||1; const dc=d<=6?`d${d}`:'dN';
       const dbadge=`<span class="d-badge ${dc}" title="Warstwa 3D ${d}">${d}</span>`;
       const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'🔒':'🔓';
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
-      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}">
+      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}" draggable="true">
+        <span class="drag-grip" title="Przeciągnij, aby zmienić kolejność">⠿</span>
         <span class="swatch ${sw}"></span>
         ${dbadge}
         <span class="lname" title="Kliknij dwukrotnie, aby zmienić nazwę">${escapeXml(autoName(o))}</span>
@@ -4636,8 +4691,49 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         });
         inp.addEventListener('blur',()=>finish(true));
       });
+      row.addEventListener('dragstart',e=>{
+        _layerDragId=id;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed='move';
+        e.dataTransfer.setData('text/plain',id);
+      });
+      row.addEventListener('dragend',()=>{
+        row.classList.remove('dragging');
+        _layerDragId=null;
+        layersEl.querySelectorAll('.drop-target-above,.drop-target-below').forEach(el=>el.classList.remove('drop-target-above','drop-target-below'));
+      });
+      row.addEventListener('dragover',e=>{
+        if(!_layerDragId || _layerDragId===id) return;
+        e.preventDefault(); e.dataTransfer.dropEffect='move';
+        const rect=row.getBoundingClientRect();
+        const mid=rect.top+rect.height/2;
+        const above=e.clientY<mid;
+        row.classList.toggle('drop-target-above',above);
+        row.classList.toggle('drop-target-below',!above);
+      });
+      row.addEventListener('dragleave',()=>{
+        row.classList.remove('drop-target-above','drop-target-below');
+      });
+      row.addEventListener('drop',e=>{
+        e.preventDefault();
+        row.classList.remove('drop-target-above','drop-target-below');
+        if(!_layerDragId || _layerDragId===id) return;
+        const rect=row.getBoundingClientRect();
+        const dropAbove=e.clientY<rect.top+rect.height/2;
+        const fromIdx=state.objects.findIndex(o=>o.id===_layerDragId);
+        const toIdx=state.objects.findIndex(o=>o.id===id);
+        if(fromIdx<0||toIdx<0||fromIdx===toIdx) return;
+        const [moved]=state.objects.splice(fromIdx,1);
+        let insertAt=toIdx>fromIdx?toIdx:toIdx;
+        if(dropAbove) insertAt=Math.min(insertAt+1,state.objects.length);
+        else insertAt=Math.max(0,insertAt);
+        state.objects.splice(insertAt,0,moved);
+        pushHistory(); renderAll(); renderProps();
+        showToast('Kolejność warstw zmieniona','info',1500);
+      });
     });
   }
+  let _layerDragId=null;
   function layerAction(id,act){
     const i=state.objects.findIndex(o=>o.id===id); if(i<0) return; const o=state.objects[i];
     if(act==='vis'){ o.visible=!o.visible; pushHistory(); }
@@ -4682,8 +4778,16 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
-  function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); }
+  function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); updateStatusBar(); }
   function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
+  const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom');
+  const TOOL_LABELS={select:'Zaznaczanie',rect:'Prostokąt',circle:'Elipsa',poly:'Wielokąt',star:'Gwiazda',line:'Linia',pen:'Pióro',text:'Tekst',pan:'Przesuwanie',eraser:'Gumka'};
+  function updateStatusBar(){
+    if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
+    if(_sbObj){ const n=state.objects.length; const s=state.selectedIds.length; _sbObj.textContent=n+' elem.'+(s?' ('+s+' wyb.)':''); }
+    if(_sbDoc) _sbDoc.textContent=state.docW+'×'+state.docH+' mm';
+    if(_sbZoom){ const z=Math.round(state.docW/state.view.w*100); _sbZoom.textContent=z+'%'; }
+  }
 
   document.getElementById('undoBtn').addEventListener('click',undo);
   document.getElementById('redoBtn').addEventListener('click',redo);
@@ -5077,7 +5181,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     closeCtxMenu();
   });
   window.addEventListener('pointerdown',e=>{ if(ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) closeCtxMenu(); });
-  window.addEventListener('scroll',closeCtxMenu,true);
+  window.addEventListener('scroll',closeCtxMenu,{capture:true,passive:true});
   window.addEventListener('resize',closeCtxMenu);
 
   /* ---------------- Obramowanie tekstu ---------------- */
@@ -8323,18 +8427,25 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   });
 
   /* ---------------- Inicjalizacja ---------------- */
+  const _splashBar=document.getElementById('splashBar');
+  const _splashOv=document.getElementById('splashOv');
+  function splashProgress(pct){ if(_splashBar) _splashBar.style.width=Math.min(100,pct)+'%'; }
+  splashProgress(10);
   buildCanvasSkeleton();
-  // Każde wejście do edytora zaczyna NOWĄ, pustą sesję — projekt zapisuje się wyłącznie
-  // do pliku (przycisk „Zapisz projekt"). Czyścimy ewentualny stary autozapis z localStorage
-  // pozostawiony przez wcześniejsze wersje, żeby nie zalegał.
+  splashProgress(25);
   try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
-  zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams(); renderGallery(); renderMotifs();
+  splashProgress(40);
+  zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
+  splashProgress(60);
+  renderGallery(); renderMotifs();
+  splashProgress(80);
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
-  // wygeneruj motywy dopiero po pierwszym malowaniu (edytor startuje natychmiast)
+  splashProgress(100);
+  requestAnimationFrame(()=>{ _splashOv.classList.add('hide'); setTimeout(()=>_splashOv.remove(),500); });
   (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   // Podpowiedzi „?" dostępne z klawiatury: fokusowalne + nazwa dla czytnika ekranu
   // (tooltip pokazuje się też na :focus — patrz CSS .hint:focus::after).
