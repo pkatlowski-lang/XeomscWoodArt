@@ -40,7 +40,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .app{height:100vh;display:flex;flex-direction:column;background:
   radial-gradient(1300px 540px at 12% -12%, rgba(var(--accent-rgb),.07), transparent 60%),
   radial-gradient(1100px 640px at 112% 2%, rgba(var(--accent2-rgb),.06), transparent 55%),
-  var(--bg)}
+  var(--bg);animation:appFadeIn .4s ease-out}
+@keyframes appFadeIn{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
+@keyframes confettiPop{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--cx),var(--cy)) scale(.4)}}
 
 /* ---- Górny pasek narzędzi (szklisty, premium) ---- */
 .toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px 14px;
@@ -6084,6 +6086,20 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast('Plik SVG wyeksportowany','success');
+    celebrateExport();
+  }
+  function celebrateExport(){
+    const C=30, colors=['#3fc7ff','#8aa0ff','#ff3b3b','#f7b733','#54d699'];
+    for(let i=0;i<C;i++){
+      const p=document.createElement('div');
+      p.style.cssText='position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:99999;'
+        +'left:'+(40+Math.random()*20)+'vw;top:50vh;background:'+colors[i%colors.length]
+        +';animation:confettiPop .7s cubic-bezier(.2,.6,.3,1) forwards;'
+        +'--cx:'+(Math.random()*160-80)+'px;--cy:'+(-120-Math.random()*180)+'px;'
+        +'animation-delay:'+(i*18)+'ms;opacity:0';
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(),1200);
+    }
   }
 
   /* ---------------- Wysyłka projektu do wyceny (panel administratora) ---------------- */
@@ -6202,6 +6218,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.dxf`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast('Plik DXF wyeksportowany','success');
+    celebrateExport();
   }
 
   /* ---------------- Szablony ---------------- */
