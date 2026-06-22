@@ -1670,7 +1670,7 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
 <div class="splash-ov" id="splashOv">
   <div class="splash-brand">Xeomsc<span style="background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">-Laser</span></div>
   <div class="splash-bar"><div class="splash-bar-fill" id="splashBar"></div></div>
-  <div class="splash-hint">Ładowanie edytora…</div>
+  <div class="splash-hint" id="splashHint">Ładowanie edytora…</div>
 </div>
 <div class="app">
   <div class="toolbar">
@@ -4453,7 +4453,9 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
       x+=w+gap; rowH=Math.max(rowH,h);
     });
     pushHistory(); renderAll(); renderProps(); scheduleLive3D();
-    showToast('Rozmieszczono '+items.length+' elementów','success');
+    const usedH=Math.ceil(y+rowH+gap);
+    const pct=Math.min(100,Math.round(usedH/state.docH*100));
+    showToast('Rozmieszczono '+items.length+' elem. — zajęto '+pct+'% wysokości arkusza','success');
   }
   function renderMultiProps(sel){
     const typeCounts={};
@@ -5478,10 +5480,13 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
-    downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`);
+    const proj=serializeProject();
+    const projStr=JSON.stringify(proj,null,1);
+    const sizeKB=(new Blob([projStr]).size/1024).toFixed(1);
+    downloadJSON(proj, `projekt-laser-${Date.now()}.json`);
     markSaved();
     try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
-    showToast('Projekt zapisany ('+state.objects.length+' elem.)','success');
+    showToast('Projekt zapisany ('+state.objects.length+' elem., '+sizeKB+' KB)','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
     document.getElementById('loadProjectInput').click();
@@ -5495,7 +5500,8 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
         if(!Array.isArray(d.objects)) throw new Error('zły format pliku');
         applyProjectData(d);
         markSaved();
-        showToast('Projekt wczytany — '+d.objects.length+' obiektów','success');
+        const depths=[...new Set(d.objects.map(o=>o.depth||1))];
+        showToast('Projekt wczytany — '+d.objects.length+' obiektów, '+depths.length+' warst'+(depths.length===1?'wa':'w'),'success');
       }catch(err){ showToast('Nie udało się wczytać projektu: '+err.message,'error',5000); }
     };
     reader.readAsText(f);
@@ -5517,7 +5523,9 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
-    showToast('Powielono '+copies.length+' elem.','info',1200); }
+    const dupTypes={};copies.forEach(c=>{const t=c.type;dupTypes[t]=(dupTypes[t]||0)+1;});
+    const dupInfo=Object.entries(dupTypes).map(([t,n])=>n+'× '+t).join(', ');
+    showToast('Powielono '+copies.length+' elem. ('+dupInfo+')','info',1500); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
     state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps(); }
 
@@ -5848,13 +5856,15 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
       const svgContent=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm">\n${body}\n</svg>`;
       const blob=new Blob([svgContent],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
+      const sizeKB=(blob.size/1024).toFixed(1);
       const previewBody=objs.map(o=>objMarkup(o,false)).join('');
       const col=depthColor(dep);
       const cnt=objs.length;
+      const mmTxt=state.layerMM[dep]?(' · '+state.layerMM[dep]+' mm'):'';
       return `<div class="layer3d-card">
         <div class="card-head"><span class="d-badge d${Math.min(dep,6)}" style="background:${col}">W${dep}</span> Warstwa ${dep}</div>
         <svg viewBox="0 0 ${W} ${H}" xmlns="${SVG_NS}">${previewBody}</svg>
-        <div class="lcount">${cnt} ${cnt===1?'element':cnt>=2&&cnt<=4?'elementy':'elementów'}</div>
+        <div class="lcount">${cnt} ${cnt===1?'element':cnt>=2&&cnt<=4?'elementy':'elementów'}${mmTxt} · ${sizeKB} KB</div>
         <a href="${url}" download="warstwa-3d-${dep}.svg" class="tbtn tbtn-link">⬇ Pobierz SVG</a>
       </div>`;
     }).join('');
@@ -7883,7 +7893,9 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
       state.selectedIds=newObjs.map(o=>o.id);
       pushHistory(); renderAll(); renderProps();
       const cnt=newObjs.length, pl=cnt===1?'obiekt':cnt<=4?'obiekty':'obiektów';
-      showToast('Zaimportowano '+cnt+' '+pl+' z SVG','success');
+      const impTypes={}; newObjs.forEach(o=>{impTypes[o.type]=(impTypes[o.type]||0)+1;});
+      const impInfo=Object.entries(impTypes).map(([t,n])=>n+'× '+t).join(', ');
+      showToast('Zaimportowano '+cnt+' '+pl+' z SVG ('+impInfo+')','success');
     };
     reader.readAsText(file);
   }
@@ -9124,21 +9136,22 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
   /* ---------------- Inicjalizacja ---------------- */
   const _splashBar=document.getElementById('splashBar');
   const _splashOv=document.getElementById('splashOv');
-  function splashProgress(pct){ if(_splashBar) _splashBar.style.width=Math.min(100,pct)+'%'; }
-  splashProgress(10);
+  const _splashHint=document.getElementById('splashHint');
+  function splashProgress(pct,msg){ if(_splashBar) _splashBar.style.width=Math.min(100,pct)+'%'; if(msg&&_splashHint) _splashHint.textContent=msg; }
+  splashProgress(10,'Budowanie płótna…');
   buildCanvasSkeleton();
-  splashProgress(25);
+  splashProgress(25,'Konfiguracja arkusza…');
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
-  splashProgress(40);
+  splashProgress(40,'Renderowanie sceny…');
   zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
-  splashProgress(60);
+  splashProgress(60,'Ładowanie galerii…');
   renderGallery(); renderMotifs();
-  splashProgress(80);
+  splashProgress(80,'Inicjalizacja widoku 3D…');
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
-  splashProgress(100);
+  splashProgress(100,'Gotowe!');
   requestAnimationFrame(()=>{ _splashOv.classList.add('hide'); setTimeout(()=>_splashOv.remove(),500); });
   (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   // Podpowiedzi „?" dostępne z klawiatury: fokusowalne + nazwa dla czytnika ekranu
@@ -9176,7 +9189,8 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
     if(saved && state.objects.length===0){
       const data=JSON.parse(saved);
       if(data && Array.isArray(data.objects) && data.objects.length>0){
-        showConfirm('Znaleziono autozapis z '+data.objects.length+' elementami. Przywrócić?',{icon:'💾',ok:'Przywróć'}).then(ok=>{
+        const sizeKB=(saved.length/1024).toFixed(0);
+        showConfirm('Znaleziono autozapis z '+data.objects.length+' elementami ('+sizeKB+' KB). Przywrócić?',{icon:'💾',ok:'Przywróć'}).then(ok=>{
           if(ok){ applyProjectData(data); showToast('Przywrócono autozapis ('+data.objects.length+' elem.)','success'); }
           else { try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){} }
         });
