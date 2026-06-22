@@ -169,7 +169,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-cfg-body.open{display:block}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;contain:layout style;background:
   radial-gradient(1000px 680px at 50% 38%, #131b2e, #080b12 82%);box-shadow:inset 0 0 30px rgba(0,0,0,.2)}
-#canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+#canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
 /* blokada natywnego zaznaczania tekstu przeglądarki na płótnie — bez tego przeciąganie
    po napisie "podświetlało" litery na niebiesko i otwierało systemowe menu zaznaczenia */
 #canvas *{user-select:none;-webkit-user-select:none}
@@ -1461,6 +1461,59 @@ input[type=number]{position:relative}
 .sum-row{animation:sumRowIn .15s ease-out backwards}
 .sum-row:nth-child(2){animation-delay:30ms}
 .sum-row:nth-child(3){animation-delay:60ms}
+
+/* === v56: Statusbar history indicator === */
+.sb-history{color:var(--muted-2);transition:color .12s}
+.sb-history:hover{color:var(--text)}
+
+/* === v56: Context menu keyboard navigation === */
+.ctx-menu button:focus-visible{outline:none;box-shadow:var(--glow);background:rgba(var(--accent-rgb),.12)}
+.ctx-menu button.ctx-focus{background:rgba(var(--accent-rgb),.1);padding-left:14px}
+.ctx-menu button.ctx-focus .ctx-key{color:var(--text);opacity:.6}
+
+/* === v56: Toast accessibility — aria-live region === */
+.toast-container{pointer-events:none}
+.toast .toast-ico{font-size:.9rem;flex-shrink:0;line-height:1}
+.toast .toast-msg{flex:1}
+
+/* === v56: Quick search — podświetlenie dopasowania === */
+.qs-match{color:var(--accent);font-weight:700}
+
+/* === v56: Lepsza legenda — interaktywne elementy operacji === */
+.legend span{padding:5px 10px;border-radius:var(--r-xs);cursor:pointer;transition:color .12s,background .12s,transform .08s}
+.legend span:hover{background:rgba(255,255,255,.08);transform:scale(1.04)}
+.legend span.legend-active{background:rgba(var(--accent-rgb),.12);color:var(--accent)}
+
+/* === v56: Ulepszony send modal — krokowość === */
+.send-steps{display:flex;align-items:center;gap:0;margin:0 0 18px;padding:0}
+.send-step{flex:1;text-align:center;font-size:.68rem;font-weight:700;color:var(--muted-2);padding:8px 4px;position:relative;transition:color .2s}
+.send-step.active{color:var(--accent)}
+.send-step.done{color:var(--success)}
+.send-step::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--border);border-radius:2px;transition:background .2s}
+.send-step.active::after{background:var(--accent)}
+.send-step.done::after{background:var(--success)}
+
+/* === v56: Canvas aria-label === */
+#canvas{outline:none}
+#canvas:focus-visible{outline:2px solid rgba(var(--accent-rgb),.3);outline-offset:-2px}
+
+/* === v56: Quick search input — aria-label === */
+.quick-search-results{scroll-behavior:smooth}
+.quick-search-item[aria-selected="true"]{background:rgba(var(--accent-rgb),.12);padding-left:20px}
+
+/* === v56: Tooltip na legendzie dla dłuższych opisów === */
+.legend i{transition:transform .12s,box-shadow .12s}
+.legend span:hover i{transform:scale(1.15);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+
+/* === v56: Dropdown role=menu === */
+.dd-menu[role="menu"] .tbtn[role="menuitem"]:focus-visible{background:rgba(var(--accent-rgb),.12)}
+
+/* === v56: Email input error state via klasa CSS === */
+.input-error{border-color:var(--cut)!important;box-shadow:0 0 0 3px rgba(255,59,59,.2)!important}
+.input-error:focus{border-color:var(--cut)!important;box-shadow:0 0 0 3px rgba(255,59,59,.25)!important}
+
+/* === v56: Field required indicator === */
+.field label .req{color:var(--cut-light);font-weight:400;margin-left:2px}
 </style>
 </head>
 <body>
@@ -1603,10 +1656,10 @@ input[type=number]{position:relative}
         <h2>Kolejność elementów</h2>
         <input type="text" id="layerSearch" class="layer-search" placeholder="Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
         <div class="layers" id="layers"></div>
-        <div class="legend">
-          <span><i class="li-cut"></i> cięcie</span>
-          <span><i class="li-eng"></i> grawer</span>
-          <span><i class="li-sco"></i> nacięcie</span>
+        <div class="legend" id="legendBar">
+          <span data-filter="cut" title="Kliknij, aby podświetlić elementy cięcia"><i class="li-cut"></i> cięcie</span>
+          <span data-filter="engrave" title="Kliknij, aby podświetlić elementy grawerowania"><i class="li-eng"></i> grawer</span>
+          <span data-filter="score" title="Kliknij, aby podświetlić elementy nacięcia"><i class="li-sco"></i> nacięcie</span>
         </div>
       </div><!-- /ptab-body layers -->
 
@@ -1731,19 +1784,21 @@ input[type=number]{position:relative}
     <span class="sb-item" id="sbObjects">0 elementów</span>
     <span class="sb-sep">·</span>
     <span class="sb-item" id="sbDoc">300×200 mm</span>
+    <span class="sb-sep">·</span>
+    <span class="sb-item sb-history" id="sbHistory" title="Pozycja w historii cofania">↶ 0/0</span>
     <span class="sb-item sb-save" id="sbSave"></span>
     <span class="sb-spacer"></span>
     <span class="sb-item sb-zoom" id="sbZoom">100%</span>
   </div>
 </div>
 
-<div class="ctx-menu" id="ctxMenu"></div>
+<div class="ctx-menu" id="ctxMenu" role="menu"></div>
 
 <!-- Szybka wyszukiwarka Ctrl+K -->
 <div class="quick-search-ov" id="quickSearchOv">
   <div class="quick-search-box">
-    <input type="text" class="quick-search-input" id="quickSearchInput" placeholder="Szukaj narzędzia, akcji, elementu… (Esc aby zamknąć)" autocomplete="off" spellcheck="false">
-    <div class="quick-search-results" id="quickSearchResults"></div>
+    <input type="text" class="quick-search-input" id="quickSearchInput" placeholder="Szukaj narzędzia, akcji, elementu… (Esc aby zamknąć)" autocomplete="off" spellcheck="false" aria-label="Szybkie wyszukiwanie komend" role="combobox" aria-expanded="true" aria-controls="quickSearchResults">
+    <div class="quick-search-results" id="quickSearchResults" role="listbox"></div>
   </div>
 </div>
 
@@ -1970,9 +2025,14 @@ input[type=number]{position:relative}
   <div class="modal-box modal-send">
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
+    <div class="send-steps" id="sendSteps">
+      <div class="send-step active" data-step="1">① Dane</div>
+      <div class="send-step" data-step="2">② Wysyłka</div>
+      <div class="send-step" data-step="3">③ Gotowe</div>
+    </div>
     <p class="modal-hint mb-6">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
     <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
-    <div class="field"><label>Twój e-mail *</label><input type="email" id="sendQuoteEmail" maxlength="120" placeholder="adres@email.pl" required></div>
+    <div class="field"><label>Twój e-mail <span class="req">*</span></label><input type="email" id="sendQuoteEmail" maxlength="120" placeholder="adres@email.pl" required aria-required="true"></div>
     <div class="field"><label>Wiadomość (opcjonalnie)</label><textarea id="sendQuoteMsg" rows="3" maxlength="1500" placeholder="Uwagi do projektu, termin, ilość sztuk…"></textarea></div>
     <div id="sendQuoteStatus" class="modal-hint-sm status-msg"></div>
     <div class="field-actions">
@@ -1982,7 +2042,7 @@ input[type=number]{position:relative}
   </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false" role="status"></div>
 <div class="confirm-ov" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
@@ -2005,11 +2065,17 @@ input[type=number]{position:relative}
   const ACCENT=_cs.getPropertyValue('--accent').trim()||'#3fc7ff';
   const _toastC=document.getElementById('toastContainer');
   function showToast(msg,type,duration){
-    const icons={success:'✓ ',error:'✗ ',info:'ℹ ',warning:'⚠ '};
+    const icons={success:'✓',error:'✗',info:'ℹ',warning:'⚠'};
     const dur=duration||3500;
     const el=document.createElement('div'); el.className='toast'+(type?' toast-'+type:'');
+    el.setAttribute('role','alert');
     el.style.setProperty('--toast-dur',(dur/1000)+'s');
-    el.textContent=(icons[type]||'')+msg; _toastC.appendChild(el);
+    if(icons[type]){
+      el.innerHTML='<span class="toast-ico">'+icons[type]+'</span><span class="toast-msg">'+msg.replace(/</g,'&lt;')+'</span>';
+    } else {
+      el.textContent=msg;
+    }
+    _toastC.appendChild(el);
     setTimeout(()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); },dur);
   }
   const _confirmOv=document.getElementById('confirmOverlay');
@@ -5118,7 +5184,7 @@ input[type=number]{position:relative}
   });
   function syncToolButtons(){ toolsEl.querySelectorAll('.tbtn').forEach(b=>{ const on=b.dataset.tool===state.tool; b.classList.toggle('active',on); b.setAttribute('aria-pressed',on?'true':'false'); }); updateCanvasCursor(); updateStatusBar(); }
   function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
-  const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom');
+  const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom'), _sbHistory=document.getElementById('sbHistory');
   if(_sbZoom){ _sbZoom.style.cursor='pointer'; _sbZoom.title='Podwójne kliknięcie = dopasuj widok'; _sbZoom.addEventListener('dblclick',zoomFit); }
   const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
   function updateStatusBar(){
@@ -5137,6 +5203,9 @@ input[type=number]{position:relative}
         _sbZoom.style.transform='scale(1.1)';
         setTimeout(()=>_sbZoom.style.transform='',150);
       }
+    }
+    if(_sbHistory){
+      _sbHistory.textContent='↶ '+state.hIndex+'/'+(state.history.length-1);
     }
   }
 
@@ -5462,16 +5531,32 @@ input[type=number]{position:relative}
     renderObjects(); renderOverlay(); renderProps(); pushHistory(); scheduleLive3D();
   }
   const ctxMenu=document.getElementById('ctxMenu');
-  function closeCtxMenu(){ ctxMenu.classList.remove('open'); ctxMenu.innerHTML=''; }
+  let _ctxFocusIdx=-1;
+  function closeCtxMenu(){ ctxMenu.classList.remove('open'); ctxMenu.innerHTML=''; _ctxFocusIdx=-1; }
   function ctxItem(label,action,opts){ opts=opts||{};
     const cls=opts.danger?' class="ctx-danger"':'';
-    return `<button type="button" data-ctx="${action}"${cls}${opts.disabled?' disabled':''}>${label}</button>`; }
+    return `<button type="button" data-ctx="${action}" role="menuitem"${cls}${opts.disabled?' disabled':''}>${label}</button>`; }
   function openCtxMenu(x,y,html){
-    ctxMenu.innerHTML=html; ctxMenu.classList.add('open');
+    ctxMenu.innerHTML=html; ctxMenu.setAttribute('role','menu'); ctxMenu.classList.add('open');
+    _ctxFocusIdx=-1;
     const r=ctxMenu.getBoundingClientRect();
     ctxMenu.style.left=Math.max(4,Math.min(x,window.innerWidth-r.width-6))+'px';
     ctxMenu.style.top=Math.max(4,Math.min(y,window.innerHeight-r.height-6))+'px';
+    const first=ctxMenu.querySelector('button:not([disabled])');
+    if(first){ first.focus(); _ctxFocusIdx=0; }
   }
+  ctxMenu.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeCtxMenu(); return; }
+    const btns=[...ctxMenu.querySelectorAll('button:not([disabled])')];
+    if(!btns.length) return;
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      _ctxFocusIdx=e.key==='ArrowDown'?Math.min(_ctxFocusIdx+1,btns.length-1):Math.max(_ctxFocusIdx-1,0);
+      btns[_ctxFocusIdx]?.focus();
+    }
+    if(e.key==='Home'){ e.preventDefault(); _ctxFocusIdx=0; btns[0]?.focus(); }
+    if(e.key==='End'){ e.preventDefault(); _ctxFocusIdx=btns.length-1; btns[btns.length-1]?.focus(); }
+  });
   canvas.addEventListener('contextmenu', e=>{
     e.preventDefault();
     if(state.tool!=='select'){ closeCtxMenu(); return; }
@@ -5925,28 +6010,32 @@ input[type=number]{position:relative}
   const IS_OPERATOR = !!(window.xeoDesktop && window.xeoDesktop.isDesktop) || new URLSearchParams(location.search).has('admin');
   if(IS_OPERATOR){ const pcb=document.getElementById('pricingCfgBtn'); if(pcb) pcb.style.display=''; }
 
-  /* ---------------- Menu rozwijalne (dropdown) ---------------- */
+  /* ---------------- Menu rozwijalne (dropdown) — ARIA role=menu ---------------- */
   document.querySelectorAll('.dd[data-dd]').forEach(dd=>{
     const toggle=dd.querySelector('.dd-toggle');
     if(!toggle) return;
+    const menu=dd.querySelector('.dd-menu');
+    menu.setAttribute('role','menu');
+    menu.querySelectorAll('.tbtn').forEach(b=>b.setAttribute('role','menuitem'));
+    toggle.setAttribute('aria-haspopup','true');
+    toggle.setAttribute('aria-expanded','false');
     toggle.addEventListener('click',e=>{
       e.stopPropagation();
       const wasOpen=dd.classList.contains('open');
-      document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
-      if(!wasOpen){ dd.classList.add('open'); const first=dd.querySelector('.dd-menu .tbtn:not([disabled])'); if(first) first.focus(); }
+      document.querySelectorAll('.dd.open').forEach(d=>{d.classList.remove('open');d.querySelector('.dd-toggle')?.setAttribute('aria-expanded','false');});
+      if(!wasOpen){ dd.classList.add('open'); toggle.setAttribute('aria-expanded','true'); const first=dd.querySelector('.dd-menu .tbtn:not([disabled])'); if(first) first.focus(); }
     });
     toggle.addEventListener('keydown',e=>{
       if(e.key==='ArrowDown'||e.key==='Enter'&&!dd.classList.contains('open')){
-        e.preventDefault(); dd.classList.add('open');
+        e.preventDefault(); dd.classList.add('open'); toggle.setAttribute('aria-expanded','true');
         const first=dd.querySelector('.dd-menu .tbtn:not([disabled])'); if(first) first.focus();
       }
     });
-    const menu=dd.querySelector('.dd-menu');
     menu.addEventListener('click',e=>{
-      if(e.target.closest('.tbtn')) dd.classList.remove('open');
+      if(e.target.closest('.tbtn')){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
     });
     menu.addEventListener('keydown',e=>{
-      if(e.key==='Escape'){ dd.classList.remove('open'); toggle.focus(); return; }
+      if(e.key==='Escape'){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); return; }
       if(e.key==='ArrowDown'||e.key==='ArrowUp'){
         e.preventDefault();
         const btns=[...menu.querySelectorAll('.tbtn:not([disabled])')];
@@ -5954,6 +6043,8 @@ input[type=number]{position:relative}
         const next=e.key==='ArrowDown'?Math.min(cur+1,btns.length-1):Math.max(cur-1,0);
         btns[next]?.focus();
       }
+      if(e.key==='Home'){ e.preventDefault(); const btns=[...menu.querySelectorAll('.tbtn:not([disabled])')]; btns[0]?.focus(); }
+      if(e.key==='End'){ e.preventDefault(); const btns=[...menu.querySelectorAll('.tbtn:not([disabled])')]; btns[btns.length-1]?.focus(); }
     });
   });
   document.addEventListener('click',()=>{ document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open')); });
@@ -8934,6 +9025,24 @@ input[type=number]{position:relative}
     if(t) btn.setAttribute('data-tooltip',`${t.label} (${t.hotkey})`);
   });
 
+  /* ---------------- Legenda — kliknięcie filtruje/podświetla po operacji ---------------- */
+  document.getElementById('legendBar')?.addEventListener('click',e=>{
+    const span=e.target.closest('[data-filter]');
+    if(!span) return;
+    const mode=span.dataset.filter;
+    const wasActive=span.classList.contains('legend-active');
+    document.querySelectorAll('#legendBar [data-filter]').forEach(s=>s.classList.remove('legend-active'));
+    if(wasActive){
+      state.selectedIds=[];
+    } else {
+      span.classList.add('legend-active');
+      const ids=state.objects.filter(o=>o.mode===mode && o.visible!==false && !o.locked).map(o=>o.id);
+      state.selectedIds=expandGroupSelection(ids);
+      showToast(state.selectedIds.length+' elem. ('+mode+')','info',1200);
+    }
+    renderOverlay(); renderLayers(); renderProps();
+  });
+
   /* ---------------- Ripple efekt na przyciskach ---------------- */
   function addRipple(btn,x,y){
     const r=document.createElement('span'); r.className='ripple';
@@ -8998,10 +9107,16 @@ input[type=number]{position:relative}
     setTimeout(()=>qsInput.focus(),50);
   }
   function closeQuickSearch(){ qsOv.classList.remove('open'); qsInput.blur(); }
+  function highlightMatch(text,q){
+    if(!q) return text;
+    const idx=text.toLowerCase().indexOf(q);
+    if(idx<0) return text;
+    return text.slice(0,idx)+'<span class="qs-match">'+text.slice(idx,idx+q.length)+'</span>'+text.slice(idx+q.length);
+  }
   function renderQsResults(q){
     const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)):QS_COMMANDS;
-    if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników</div>'; return; }
-    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${c.label}</span>${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
+    if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników dla „'+q+'"</div>'; return; }
+    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}" role="option" aria-selected="${i===_qsIdx}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${highlightMatch(c.label,q)}</span>${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
     qsResults.querySelectorAll('.quick-search-item').forEach((el,i)=>{
       el.addEventListener('click',()=>{ const ci=filtered[i]; if(ci){ closeQuickSearch(); ci.action(); } });
     });
@@ -9054,10 +9169,18 @@ const ov=document.getElementById('modalSendQuote');
 const statusEl=document.getElementById('sendQuoteStatus');
 const submitBtn=document.getElementById('sendQuoteSubmit');
 const openBtn=document.getElementById('sendQuoteOpenBtn');
+const sendSteps=document.querySelectorAll('#sendSteps .send-step');
+function setSendStep(n){
+  sendSteps.forEach(s=>{
+    const sn=parseInt(s.dataset.step);
+    s.classList.toggle('active',sn===n);
+    s.classList.toggle('done',sn<n);
+  });
+}
 const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'var(--cut-light)':'var(--muted)'; };
 
-openBtn.addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
-document.getElementById('lqSend').addEventListener('click',()=>{ setStatus(''); ov.classList.add('open'); });
+openBtn.addEventListener('click',()=>{ setStatus(''); setSendStep(1); ov.classList.add('open'); });
+document.getElementById('lqSend').addEventListener('click',()=>{ setStatus(''); setSendStep(1); ov.classList.add('open'); });
 document.getElementById('modalSendQuoteClose').addEventListener('click',()=>ov.classList.remove('open'));
 document.getElementById('sendQuoteCancel').addEventListener('click',()=>ov.classList.remove('open'));
 ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); });
@@ -9069,16 +9192,16 @@ submitBtn.addEventListener('click', async ()=>{
   const emailInput=document.getElementById('sendQuoteEmail');
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
     setStatus('Podaj poprawny adres e-mail.',true);
-    emailInput.style.borderColor='var(--cut)';
-    emailInput.style.boxShadow='0 0 0 3px rgba(255,59,59,.2)';
+    emailInput.classList.add('input-error');
+    emailInput.setAttribute('aria-invalid','true');
     emailInput.focus();
-    emailInput.addEventListener('input',function fix(){ emailInput.style.borderColor=''; emailInput.style.boxShadow=''; emailInput.removeEventListener('input',fix); },{once:true});
+    emailInput.addEventListener('input',function fix(){ emailInput.classList.remove('input-error'); emailInput.removeAttribute('aria-invalid'); emailInput.removeEventListener('input',fix); },{once:true});
     return;
   }
-  submitBtn.disabled=true; submitBtn.classList.add('btn-loading'); submitBtn.textContent=''; setStatus('Przygotowuję projekt…');
+  submitBtn.disabled=true; submitBtn.classList.add('btn-loading'); submitBtn.textContent=''; setSendStep(2); setStatus('Przygotowuję projekt…');
   try{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
-    if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; submitBtn.classList.remove('btn-loading'); submitBtn.textContent='Wyślij projekt'; return; }
+    if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); setSendStep(1); submitBtn.disabled=false; submitBtn.classList.remove('btn-loading'); submitBtn.textContent='Wyślij projekt'; return; }
     const q=payload.quote;
     const exTxt=(q.extras&&q.extras.length)?'\nPozycje dodatkowe: '+q.extras.map(e=>`${e.label} ${e.amount.toFixed(2).replace('.',',')} zł`).join(', '):'';
     const qtyTxt=(q.qty&&q.qty>1)?`\nIlość: ${q.qty} szt. (cena/szt.: ${(q.perPiece||0).toFixed(2).replace('.',',')} zł)`:'';
@@ -9102,6 +9225,7 @@ submitBtn.addEventListener('click', async ()=>{
     submitBtn.classList.remove('btn-loading');
     submitBtn.classList.add('btn-success');
     submitBtn.textContent='✓ Wysłano!';
+    setSendStep(3);
     setStatus('✅ Wysłano! Odpowiemy na '+email);
     showToast('Projekt wysłany do pracowni!','success',4000);
     celebrateExport();
@@ -9111,6 +9235,7 @@ submitBtn.addEventListener('click', async ()=>{
               err?.code==='permission-denied'?'Brak uprawnień — odśwież stronę i spróbuj ponownie':
               err?.message||'Nieznany błąd — spróbuj ponownie';
     setStatus('Błąd wysyłki: '+msg,true);
+    setSendStep(1);
     showToast('Nie udało się wysłać wyceny','error',4000);
     submitBtn.disabled=false;
     submitBtn.classList.remove('btn-loading');
