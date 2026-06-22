@@ -641,6 +641,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--accent);cursor:pointer
 ::placeholder{color:var(--muted-2);opacity:1}
 :focus::placeholder{color:var(--muted);opacity:.6}
 ::-webkit-input-placeholder{color:var(--muted-2)}
+input:disabled,select:disabled,textarea:disabled{opacity:.5;cursor:not-allowed}
 /* --- Wspólny pierścień fokusu dla wszystkich pól tekstowych/liczbowych/list --- */
 input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
 /* --- Custom dropdown arrow na select --- */
