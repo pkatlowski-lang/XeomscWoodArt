@@ -135,14 +135,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-price-card.empty{background:var(--surface2);border-color:var(--border)}
 .q-pp{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .q-pp .q-pp-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
-.q-pp .q-pp-val{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;font-variant-numeric:tabular-nums}
+.q-pp .q-pp-val{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;font-variant-numeric:tabular-nums;transition:transform .15s,color .15s}
+.q-pp .q-pp-val.price-flash{animation:lqFlash .35s ease-out}
 .q-total{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--border)}
 .q-total .q-total-lbl{font-size:.74rem;color:var(--text);font-weight:600}
 .q-total .q-total-val{font-size:1.05rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
 .q-empty-msg{font-size:.78rem;color:var(--muted);font-weight:500;line-height:1.5}
 .q-break{display:flex;flex-direction:column;gap:4px;margin-top:9px}
-.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
-.q-break .br-row b{color:var(--text);font-weight:600}
+.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);padding:3px 0;border-bottom:1px solid rgba(var(--accent-rgb),.04);transition:color .12s}
+.q-break .br-row:last-child{border-bottom:none}
+.q-break .br-row:hover{color:var(--text)}
+.q-break .br-row b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .q-extra-row{display:flex;gap:5px;align-items:center;margin-bottom:5px}
 .q-extra-row input.ex-name{flex:1;min-width:0}
 .q-extra-row input.ex-amt{width:74px;flex:none;text-align:right}
@@ -416,7 +419,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote .lq-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .live-quote select{padding:3px 5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.72rem;max-width:120px;transition:border-color .14s}
 .live-quote select:focus{border-color:var(--accent)}
-.live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color .2s}
+.live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color .2s,transform .15s}
+.live-quote .lq-price.lq-flash{animation:lqFlash .35s ease-out}
+@keyframes lqFlash{0%{transform:scale(1.08);color:#fff}100%{transform:scale(1);color:var(--accent)}}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:36px;font-size:.76rem}
@@ -1399,15 +1404,15 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   }
 
   const TOOLS=[
-    {key:'select',label:'Wskaźnik',ico:'↖'},
-    {key:'pan',label:'Rączka',ico:'✋'},
-    {key:'rect',label:'Prostokąt',ico:'▭'},
-    {key:'ellipse',label:'Elipsa',ico:'◯'},
-    {key:'polygon',label:'Wielokąt',ico:'⬡'},
-    {key:'star',label:'Gwiazda',ico:'★'},
-    {key:'line',label:'Linia',ico:'╱'},
-    {key:'pen',label:'Pióro',ico:'✎'},
-    {key:'text',label:'Tekst',ico:'T'}
+    {key:'select',label:'Wskaźnik',ico:'↖',hotkey:'V'},
+    {key:'pan',label:'Rączka',ico:'✋',hotkey:'H'},
+    {key:'rect',label:'Prostokąt',ico:'▭',hotkey:'R'},
+    {key:'ellipse',label:'Elipsa',ico:'◯',hotkey:'O'},
+    {key:'polygon',label:'Wielokąt',ico:'⬡',hotkey:'P'},
+    {key:'star',label:'Gwiazda',ico:'★',hotkey:'S'},
+    {key:'line',label:'Linia',ico:'╱',hotkey:'L'},
+    {key:'pen',label:'Pióro',ico:'✎',hotkey:'N'},
+    {key:'text',label:'Tekst',ico:'T',hotkey:'T'}
   ];
 
   /* ---------------- Geometria ---------------- */
@@ -4125,7 +4130,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   TOOLS.forEach(t=>{
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
     b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
-    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=t.label;
+    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`;
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
@@ -4831,7 +4836,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     if(!q) return;
     if(card) card.classList.remove('empty');
     if(emptyMsg) emptyMsg.style.display='none';
-    if(ppEl) ppEl.textContent=zl(q.perPiece);
+    if(ppEl){ const nv=zl(q.perPiece); if(ppEl.textContent!==nv){ppEl.classList.remove('price-flash');void ppEl.offsetWidth;ppEl.classList.add('price-flash');} ppEl.textContent=nv; }
     if(qtyEcho) qtyEcho.textContent=q.qty;
     if(totEl) totEl.textContent=zl(q.total);
     if(brk) brk.innerHTML=
@@ -4840,7 +4845,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       +`<div class="br-row"><span>Pakowanie</span><b>${zl(q.pack)}</b></div>`
       +`<div class="br-row"><span>Marża ${Math.round(PRICING.margin*100)}%</span><b>${zl(q.marginAmt)}</b></div>`
       +(q.extrasSum>0?`<div class="br-row"><span>Pozycje dodatkowe</span><b>${zl(q.extrasSum)}</b></div>`:'');
-    if(lqPrice){ lqPrice.classList.remove('lq-empty'); lqPrice.textContent=zl(q.qty>1?q.total:q.perPiece); }
+    if(lqPrice){ const newVal=zl(q.qty>1?q.total:q.perPiece); const changed=lqPrice.textContent!==newVal;
+      lqPrice.classList.remove('lq-empty'); lqPrice.textContent=newVal;
+      if(changed){ lqPrice.classList.remove('lq-flash'); void lqPrice.offsetWidth; lqPrice.classList.add('lq-flash'); } }
     if(lqTime) lqTime.textContent='⏱ '+formatQuoteTime(q.timeMin)+' min.sek pracy lasera'+(q.qty>1?` · ${q.qty} szt.`:'');
   }
   // Alias zgodności (wołane z renderObjects/renderObjectEl po każdej edycji projektu)
