@@ -2699,6 +2699,49 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v75: Improved Q total style === */
 .q-total .q-total-val{background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
+
+/* === v76: Accessibility — reduced motion === */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+  .gallery-card,.tpl button{animation:none!important}
+  .toolrail .tbtn.active{animation:none!important}
+  .toast{animation:none!important}
+}
+
+/* === v76: Lepsza wizualizacja focus na tablecie === */
+@media(hover:none){
+  .layer .lico{opacity:.7}
+  .gallery-card:hover,.tpl button:hover{transform:none}
+}
+
+/* === v76: Better scrollbar na panelach === */
+.panel::-webkit-scrollbar{width:6px}
+.panel::-webkit-scrollbar-thumb{background:rgba(var(--accent-rgb),.15);border-radius:3px}
+.panel::-webkit-scrollbar-thumb:hover{background:rgba(var(--accent-rgb),.3)}
+
+/* === v76: Poprawiony styl canvas placeholder na pustym projekcie === */
+.stage .hint-empty{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-weight:500;letter-spacing:.02em}
+
+/* === v76: Lepsza wizualizacja multiselection info box === */
+.empty-note.note-compact strong{color:var(--accent)}
+.empty-note.note-compact .muted-sm{line-height:1.5;margin-top:2px}
+
+/* === v76: Better focus ring na przyciskach === */
+button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4)}
+
+/* === v76: Improved segmented control spacing === */
+.seg button{min-height:34px;transition:border-color .14s,color .14s,background .14s,box-shadow .14s,transform .08s,font-weight .1s}
+.seg button.on{font-weight:700}
+
+/* === v76: Gallery card SVG — better viewBox rendering === */
+.gallery-card svg{transition:background .15s}
+
+/* === v76: Lepsza wizualizacja select dropdown arrow === */
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3bd' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 8px) center;padding-right:26px}
+
+/* === v76: Better quote send button === */
+.lq-send{position:relative;overflow:hidden;transition:background .14s,box-shadow .14s,transform .08s}
+.lq-send:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.2)}
 </style>
 </head>
 <body>
