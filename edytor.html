@@ -2985,6 +2985,107 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 /* === v81: Poprawiony dropdown kbd na hover === */
 .dd-kbd{transition:color .12s,background .12s}
 .dd-menu .tbtn:hover .dd-kbd{color:var(--accent-text);background:rgba(255,255,255,.15)}
+
+/* === v82: Quick Search — grupowanie po kategoriach z nagłówkami wizualnymi === */
+.qs-category{display:flex;align-items:center;gap:6px;padding:8px 16px 4px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none}
+.qs-category::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.qs-cat-count{font-size:.5rem;font-weight:600;padding:1px 5px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.06);color:var(--accent);margin-left:auto}
+.quick-search-item .qs-badge{font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.08);color:var(--accent);margin-left:auto;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em;transition:background .12s}
+.quick-search-item:hover .qs-badge,.quick-search-item.qs-active .qs-badge{background:rgba(var(--accent-rgb),.2)}
+
+/* === v82: Quick Search — lepsza animacja wyników z stagger === */
+@keyframes qsItemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.quick-search-item{animation:qsItemIn .12s ease-out backwards}
+.quick-search-item:nth-child(2){animation-delay:15ms}
+.quick-search-item:nth-child(3){animation-delay:30ms}
+.quick-search-item:nth-child(n+4){animation-delay:45ms}
+.quick-search-item:nth-child(n+8){animation-delay:0ms}
+
+/* === v82: Statusbar — wskaźnik rozmiaru projektu === */
+.sb-size{font-size:.55rem;color:var(--muted-2);font-variant-numeric:tabular-nums;opacity:.7;transition:opacity .2s,color .2s}
+.sb-size:hover{opacity:1;color:var(--muted)}
+.sb-size.sb-size-warn{color:var(--operator);opacity:1}
+
+/* === v82: Statusbar — wskaźnik autosave z odliczaniem === */
+.sb-autosave-timer{font-size:.55rem;color:var(--muted-2);font-variant-numeric:tabular-nums;transition:color .2s}
+.sb-autosave-timer:hover{color:var(--muted)}
+
+/* === v82: Panel właściwości — breadcrumb nawigacja === */
+.props-breadcrumb{display:flex;align-items:center;gap:4px;padding:8px 16px 4px;font-size:.62rem;color:var(--muted-2);user-select:none}
+.props-breadcrumb .bc-item{color:var(--muted);transition:color .12s;cursor:pointer}
+.props-breadcrumb .bc-item:hover{color:var(--accent)}
+.props-breadcrumb .bc-sep{font-size:.5rem;opacity:.4}
+.props-breadcrumb .bc-current{color:var(--accent);font-weight:700}
+
+/* === v82: Panel warstw — mini podgląd kształtu === */
+.layer .layer-preview{flex:0 0 18px;width:18px;height:18px;border-radius:3px;background:var(--bg);border:1px solid rgba(var(--accent-rgb),.1);overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .12s,transform .08s}
+.layer:hover .layer-preview{border-color:rgba(var(--accent-rgb),.3);transform:scale(1.1)}
+.layer .layer-preview svg{width:14px;height:14px}
+
+/* === v82: Ulepszona wizualizacja zaznaczenia wielu === */
+.multi-sel-actions{display:flex;flex-wrap:wrap;gap:4px;margin:4px 16px 8px}
+.multi-sel-actions .tbtn{height:28px;font-size:.68rem;padding:0 10px}
+
+/* === v82: Panel boczny — sekcja collapsible === */
+.collapsible-header{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);cursor:pointer;transition:color .12s,background .12s;border-bottom:1px solid rgba(var(--accent-rgb),.04);user-select:none}
+.collapsible-header:hover{color:var(--text);background:rgba(var(--accent-rgb),.03)}
+.collapsible-header .coll-chev{transition:transform .15s;font-size:.5rem;opacity:.5}
+.collapsible-header.open .coll-chev{transform:rotate(90deg)}
+.collapsible-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease,padding .2s ease}
+.collapsible-body.open{max-height:2000px;opacity:1}
+
+/* === v82: Lepszy styl pola z podpowiedzią — interaktywne === */
+.field-hint{cursor:help;transition:border-color .12s,background .12s}
+.field-hint:hover{border-color:rgba(var(--accent-rgb),.3);background:rgba(var(--accent-rgb),.06)}
+
+/* === v82: Ulepszona galeria — wyszukiwanie z filtrowaniem === */
+.gallery-search-wrap{position:relative;margin:8px 14px}
+.gallery-search{width:100%;padding:7px 10px 7px 30px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.78rem;box-sizing:border-box;transition:border-color .14s,box-shadow .14s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+.gallery-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+.gallery-count{font-size:.6rem;color:var(--muted-2);text-align:right;padding:2px 14px;font-variant-numeric:tabular-nums}
+
+/* === v82: Lepsza animacja przejść na panelach bocznych === */
+.panel.left{transition:box-shadow .2s,flex-basis .25s ease}
+.panel.right{transition:box-shadow .2s,flex-basis .25s ease}
+
+/* === v82: Ulepszony empty state — ikony kształtów z animacją === */
+.empty-note .empty-shapes{display:flex;gap:12px;justify-content:center;margin:12px 0 4px;opacity:.4}
+.empty-note .empty-shapes span{font-size:1.4rem;transition:transform .2s,opacity .2s;cursor:default}
+.empty-note .empty-shapes span:hover{transform:scale(1.3) translateY(-3px);opacity:1}
+
+/* === v82: Toolbar — dynamiczny label z aktywnym narzędziem === */
+.toolbar .active-tool-hint{font-size:.58rem;color:var(--muted-2);margin-left:4px;transition:opacity .2s;opacity:0}
+.toolbar:hover .active-tool-hint{opacity:1}
+
+/* === v82: Lepszy styl na seg buttons z micro-interaction === */
+.seg button{position:relative;overflow:hidden}
+.seg button::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,255,255,.08),transparent 70%);opacity:0;transition:opacity .15s}
+.seg button:hover:not(.on)::before{opacity:1}
+
+/* === v82: Modal — lepszy close button z count-down === */
+.modal-close{z-index:2}
+.modal-close:focus-visible{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.3)}
+
+/* === v82: Responsywność — panel collapse na mały ekran === */
+@media(max-width:1400px){
+  .panel{flex-basis:230px}
+}
+@media(min-width:1800px){
+  .toolrail{flex:0 0 70px}
+  .toolrail .tbtn{width:56px;height:52px;font-size:.6rem}
+  .toolrail .tbtn .ico{font-size:1.35rem}
+}
+
+/* === v82: Input group — sąsiadujące inputy z lepszym łączeniem === */
+.input-group{display:flex;gap:0}
+.input-group input:first-child{border-radius:var(--r-xs) 0 0 var(--r-xs);border-right:none}
+.input-group input:last-child{border-radius:0 var(--r-xs) var(--r-xs) 0}
+.input-group input:not(:first-child):not(:last-child){border-radius:0;border-right:none}
+.input-group input:focus{z-index:1}
+
+/* === v82: Lepsza wizualizacja — gradient separator na workspace === */
+.workspace{position:relative}
+.workspace::after{content:'';position:absolute;top:0;bottom:0;right:0;width:1px;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.06),transparent);pointer-events:none;z-index:1}
 </style>
 </head>
 <body>
@@ -3266,6 +3367,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     <span class="sb-sep">·</span>
     <span class="sb-item sb-history" id="sbHistory" title="Pozycja w historii cofania">↶ 0/0</span>
     <span class="sb-item sb-save" id="sbSave"></span>
+    <span class="sb-item sb-size" id="sbSize" title="Rozmiar projektu w pamięci"></span>
     <span class="sb-spacer"></span>
     <span class="sb-item sb-coords" id="sbCoords" title="Pozycja kursora na płótnie (mm)"></span>
     <span class="sb-sep">·</span>
@@ -6751,8 +6853,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     if(docChanged){ docWInput.value=state.docW; docHInput.value=state.docH; renderGrid(); }
     renderAll(); renderProps(); renderParams();
   }
-  function undo(){ if(state.hIndex>0){ const prevCount=state.objects.length; state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Cofnięto (krok '+state.hIndex+'/'+((state.history.length-1))); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
-  function redo(){ if(state.hIndex<state.history.length-1){ const prevCount=state.objects.length; state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Ponowiono (krok '+state.hIndex+'/'+((state.history.length-1))); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
+  function undo(){ if(state.hIndex>0){ const prevCount=state.objects.length; state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Cofnięto (krok '+state.hIndex+'/'+(state.history.length-1); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
+  function redo(){ if(state.hIndex<state.history.length-1){ const prevCount=state.objects.length; state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Ponowiono (krok '+state.hIndex+'/'+(state.history.length-1); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
   function updateUndoButtons(){ document.getElementById('undoBtn').disabled=state.hIndex<=0; document.getElementById('redoBtn').disabled=state.hIndex>=state.history.length-1; }
 
   /* ---------------- Podpięcie paska narzędzi ---------------- */
@@ -6808,7 +6910,21 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       const redoCount=hl-hi;
       _sbHistory.title='Historia: pozycja '+hi+' z '+hl+(redoCount>0?' — '+redoCount+' krok'+(redoCount===1?'':'ów')+' do ponowienia':'');
     }
+    // v82: lekki wskaźnik rozmiaru projektu — przeliczany tylko gdy zmieni się historia (nie na każdym renderze)
+    const _sbSize=document.getElementById('sbSize');
+    if(_sbSize && state.hIndex!==_lastSizeHIndex){
+      _lastSizeHIndex=state.hIndex;
+      if(state.objects.length){
+        try{
+          const kb=JSON.stringify(serializeProject()).length/1024;
+          _sbSize.textContent=kb<1024?('· '+kb.toFixed(0)+' KB'):('· '+(kb/1024).toFixed(1)+' MB');
+          _sbSize.classList.toggle('sb-size-warn',kb>800);
+          _sbSize.title='Rozmiar projektu w pamięci: '+kb.toFixed(1)+' KB ('+state.objects.length+' elem.)';
+        }catch(ex){ _sbSize.textContent=''; }
+      } else { _sbSize.textContent=''; _sbSize.classList.remove('sb-size-warn'); }
+    }
   }
+  let _lastSizeHIndex=-1;
 
   const _sbCoords=document.getElementById('sbCoords');
   const _sbSession=document.getElementById('sbSession');
@@ -10874,10 +10990,22 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     return text.slice(0,idx)+'<span class="qs-match">'+text.slice(idx,idx+q.length)+'</span>'+text.slice(idx+q.length);
   }
   function renderQsResults(q){
-    const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)):QS_COMMANDS;
+    const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)||c.cat.toLowerCase().includes(q)):QS_COMMANDS;
     if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników dla „'+q+'"</div>'; return; }
-    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}" role="option" aria-selected="${i===_qsIdx}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${highlightMatch(c.label,q)}</span>${c.cat?`<span class="qs-badge">${c.cat}</span>`:''}${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
-    qsResults.querySelectorAll('.quick-search-item').forEach((el,i)=>{
+    const grouped=new Map();
+    filtered.forEach(c=>{ const cat=c.cat||'inne'; if(!grouped.has(cat)) grouped.set(cat,[]); grouped.get(cat).push(c); });
+    let html='';let globalIdx=0;
+    const CAT_ICONS={narzędzie:'🔧',edycja:'✏',widok:'👁',projekt:'📊',plik:'📁',pomoc:'❓',generator:'⚙',eksport:'📤',transformacja:'🔄',wyrównanie:'📐'};
+    for(const[cat,items]of grouped){
+      html+=`<div class="qs-category">${CAT_ICONS[cat]||'•'} ${cat} <span class="qs-cat-count">${items.length}</span></div>`;
+      items.forEach(c=>{
+        html+=`<div class="quick-search-item${globalIdx===_qsIdx?' qs-active':''}" data-idx="${globalIdx}" role="option" aria-selected="${globalIdx===_qsIdx}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${highlightMatch(c.label,q)}</span>${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`;
+        globalIdx++;
+      });
+    }
+    qsResults.innerHTML=html;
+    const allItems=qsResults.querySelectorAll('.quick-search-item');
+    allItems.forEach((el,i)=>{
       el.addEventListener('click',()=>{ const ci=filtered[i]; if(ci){ closeQuickSearch(); ci.action(); } });
     });
   }
