@@ -274,8 +274,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .empty-note{margin:14px 16px;padding:16px 15px;font-size:.8rem;color:var(--muted);line-height:1.7;background:linear-gradient(180deg,rgba(var(--accent-rgb),.05),var(--surface2));border:1px dashed var(--border-strong);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.12);position:relative;overflow:hidden}
 .empty-note::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-accent);opacity:.3}
 .empty-note strong{color:var(--text)}
+.empty-note-warning{background:rgba(255,170,60,.12);border:1px solid rgba(255,170,60,.35);border-radius:8px;padding:8px 10px;margin:0 0 4px;font-size:.8rem;color:var(--muted);line-height:1.7}
+.empty-note-warning::before{display:none}
 .flex-label{display:flex;align-items:center;gap:4px}
-.info-box{padding:10px 13px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.3);border-radius:9px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.06);transition:border-color .14s}
+.info-box{display:flex;align-items:center;gap:8px;padding:10px 13px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.3);border-radius:9px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.06);transition:border-color .14s}
 .info-box:hover{border-color:rgba(var(--accent-rgb),.45)}
 .muted-sm{font-size:.75rem;color:var(--muted);line-height:1.55}
 
@@ -630,6 +632,8 @@ input[type=checkbox],input[type=radio]{accent-color:var(--accent);cursor:pointer
 ::-webkit-input-placeholder{color:var(--muted-2)}
 /* --- Wspólny pierścień fokusu dla wszystkich pól tekstowych/liczbowych/list --- */
 input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
+/* --- Custom dropdown arrow na select --- */
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3bd' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px!important}
 /* --- Textarea — spójny wygląd premium --- */
 textarea{resize:vertical;min-height:56px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;padding:8px 11px;transition:border-color .14s,box-shadow .14s}
 textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.2),inset 0 0 0 1px rgba(var(--accent-rgb),.3)}
@@ -732,6 +736,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .confirm-box .confirm-msg{font-size:.86rem;line-height:1.55;color:var(--text);margin-bottom:18px}
 .confirm-box .confirm-actions{display:flex;justify-content:flex-end;gap:8px}
 .confirm-box .confirm-actions .tbtn{min-width:90px;justify-content:center}
+.confirm-box .confirm-input{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;margin-bottom:14px;transition:border-color .14s,box-shadow .14s}
+.confirm-box .confirm-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25)}
 
 /* === Klasy utility dla modali i formularzy === */
 .modal-box.modal-sm{max-width:420px}
@@ -861,7 +867,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <h2>Arkusz roboczy</h2>
         <div class="field">
           <label>Arkusz roboczy (mm)</label>
-          <div class="info-box" style="display:flex;align-items:center;gap:8px">
+          <div class="info-box">
             <span style="font-weight:700;font-size:.98rem">760 × 760&nbsp;mm</span>
             <span class="muted-sm">— rozmiar stały</span>
           </div>
@@ -1246,6 +1252,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   <div class="confirm-box">
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
     <div class="confirm-msg" id="confirmMsg"></div>
+    <input type="text" class="confirm-input" id="confirmInput" style="display:none">
     <div class="confirm-actions">
       <button type="button" class="tbtn" id="confirmCancel">Anuluj</button>
       <button type="button" class="tbtn tbtn-primary" id="confirmOk">OK</button>
@@ -1270,23 +1277,44 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   const _confirmIcon=document.getElementById('confirmIcon');
   const _confirmOk=document.getElementById('confirmOk');
   const _confirmCancel=document.getElementById('confirmCancel');
+  const _confirmInput=document.getElementById('confirmInput');
   let _confirmResolve=null;
+  let _confirmMode='confirm';
   function showConfirm(msg,opts){
     opts=opts||{};
+    _confirmMode='confirm';
     _confirmMsg.textContent=msg;
     _confirmIcon.textContent=opts.icon||'⚠️';
     _confirmOk.textContent=opts.ok||'OK';
     _confirmCancel.textContent=opts.cancel||'Anuluj';
+    _confirmInput.style.display='none';
     if(opts.danger){ _confirmOk.className='tbtn tbtn-danger'; } else { _confirmOk.className='tbtn tbtn-primary'; }
     _confirmOv.classList.add('open');
     _confirmOk.focus();
-    return new Promise(resolve=>{
-      _confirmResolve=resolve;
-    });
+    return new Promise(resolve=>{ _confirmResolve=resolve; });
+  }
+  function showPrompt(msg,defaultVal,opts){
+    opts=opts||{};
+    _confirmMode='prompt';
+    _confirmMsg.textContent=msg;
+    _confirmIcon.textContent=opts.icon||'✏️';
+    _confirmOk.textContent=opts.ok||'OK';
+    _confirmCancel.textContent=opts.cancel||'Anuluj';
+    _confirmOk.className='tbtn tbtn-primary';
+    _confirmInput.style.display='';
+    _confirmInput.value=defaultVal||'';
+    _confirmOv.classList.add('open');
+    _confirmInput.focus();
+    _confirmInput.select();
+    return new Promise(resolve=>{ _confirmResolve=resolve; });
   }
   function _closeConfirm(val){
     _confirmOv.classList.remove('open');
-    if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; }
+    if(_confirmResolve){
+      if(_confirmMode==='prompt') _confirmResolve(val?_confirmInput.value:null);
+      else _confirmResolve(val);
+      _confirmResolve=null;
+    }
   }
   _confirmOk.addEventListener('click',()=>_closeConfirm(true));
   _confirmCancel.addEventListener('click',()=>_closeConfirm(false));
@@ -1294,7 +1322,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   document.addEventListener('keydown',e=>{
     if(!_confirmOv.classList.contains('open')) return;
     if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(false); }
-    if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
+    if(e.key==='Enter' && _confirmMode==='confirm'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
+    if(e.key==='Enter' && _confirmMode==='prompt'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
   });
   const FONTS=[
     // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
@@ -3867,7 +3896,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   // a baner na górze tłumaczy, dlaczego nie reagują na kliknięcia.
   function lockedWrap(h,o){
     if(!o.locked) return h;
-    return `<div class="empty-note" style="background:rgba(255,170,60,.12);border:1px solid rgba(255,170,60,.35);border-radius:8px;padding:8px 10px;margin:0 0 4px">🔒 Element zablokowany — odblokuj go w panelu „Warstwy" (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled style="border:0;padding:0;margin:0">${h}</fieldset>`;
+    return `<div class="empty-note empty-note-warning">🔒 Element zablokowany — odblokuj go w panelu „Warstwy" (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled style="border:0;padding:0;margin:0">${h}</fieldset>`;
   }
   function bindProps(){
     const o=getSel(); if(!o) return;
@@ -5087,20 +5116,20 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   }
   if(qProfileSel) qProfileSel.addEventListener('change',()=>switchProfile(qProfileSel.value));
   const _pNew=document.getElementById('qProfNew');
-  if(_pNew) _pNew.addEventListener('click',()=>{
-    const name=(prompt('Nazwa nowego profilu:','Nowy profil')||'').trim(); if(!name) return;
+  if(_pNew) _pNew.addEventListener('click',async()=>{
+    const name=(await showPrompt('Nazwa nowego profilu:','Nowy profil')||'').trim(); if(!name) return;
     addProfile(name, JSON.parse(JSON.stringify(QUOTE_DEFAULTS)));
   });
   const _pDup=document.getElementById('qProfDup');
-  if(_pDup) _pDup.addEventListener('click',()=>{
+  if(_pDup) _pDup.addEventListener('click',async()=>{
     const cur=activeProfile(); if(!cur) return;
-    const name=(prompt('Nazwa kopii profilu:',cur.name+' (kopia)')||'').trim(); if(!name) return;
+    const name=(await showPrompt('Nazwa kopii profilu:',cur.name+' (kopia)')||'').trim(); if(!name) return;
     addProfile(name, JSON.parse(JSON.stringify(cur.config)));
   });
   const _pRen=document.getElementById('qProfRename');
-  if(_pRen) _pRen.addEventListener('click',()=>{
+  if(_pRen) _pRen.addEventListener('click',async()=>{
     const cur=activeProfile(); if(!cur) return;
-    const name=(prompt('Nowa nazwa profilu:',cur.name)||'').trim(); if(!name) return;
+    const name=(await showPrompt('Nowa nazwa profilu:',cur.name)||'').trim(); if(!name) return;
     cur.name=name; saveProfiles(); renderProfileSelect();
   });
   const _pDel=document.getElementById('qProfDel');
