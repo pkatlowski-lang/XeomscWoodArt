@@ -1729,12 +1729,119 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 .toast.toast-error .toast-ico{background:rgba(255,90,90,.15);color:var(--danger)}
 .toast.toast-info .toast-ico{background:rgba(var(--accent-rgb),.15);color:var(--accent)}
 .toast.toast-warning .toast-ico{background:rgba(255,170,60,.15);color:var(--operator)}
+
+/* === v60: Context menu — lepsze grupowanie z nagłówkami sekcji === */
+.ctx-menu .ctx-group-label{display:block;padding:4px 10px 2px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none;pointer-events:none}
+.ctx-menu button{position:relative}
+.ctx-menu button .ctx-ico{width:18px;text-align:center;font-size:.82rem;flex-shrink:0;opacity:.7;transition:opacity .12s}
+.ctx-menu button:hover:not(:disabled) .ctx-ico{opacity:1}
+
+/* === v60: Toolrail — sekcje z mini-nagłówkami === */
+.toolrail .tool-section-label{font-size:.45rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);text-align:center;padding:2px 4px;margin-top:6px;user-select:none;opacity:.6;transition:opacity .2s}
+.toolrail:hover .tool-section-label{opacity:.9}
+
+/* === v60: Panel properties — ulepszona pusta strona === */
+.empty-note .empty-shortcuts{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.empty-note .empty-shortcuts .es-item{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);background:rgba(var(--accent-rgb),.04);border:1px solid rgba(var(--accent-rgb),.1);border-radius:var(--r-xs);padding:3px 8px;transition:border-color .12s,color .12s}
+.empty-note .empty-shortcuts .es-item:hover{border-color:rgba(var(--accent-rgb),.3);color:var(--text)}
+.empty-note .empty-shortcuts .es-item kbd{font-size:.6rem;padding:1px 4px}
+
+/* === v60: Splash — etapy z checkmarkami === */
+.splash-stages{display:flex;flex-direction:column;gap:3px;margin-top:6px;min-width:180px}
+.splash-stage{display:flex;align-items:center;gap:8px;font-size:.68rem;color:var(--muted-2);transition:color .2s,opacity .2s;opacity:.4}
+.splash-stage.stage-active{color:var(--accent);opacity:1;animation:stageActivePulse .4s ease-out}
+.splash-stage.stage-done{color:var(--success);opacity:.7}
+.splash-stage .stage-check{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.5rem;transition:background .2s,border-color .2s}
+.splash-stage.stage-done .stage-check{background:rgba(84,214,153,.15);border-color:var(--success)}
+.splash-stage.stage-active .stage-check{border-color:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.3)}
+@keyframes stageActivePulse{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+
+/* === v60: Lepsza wizualizacja rozdzielenia grup narzędziowych w toolrail === */
+.toolrail .tool-sep{background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.12),transparent);height:1px;width:40px;margin:8px 0}
+
+/* === v60: Gallery — miniaturka SVG z cieniem === */
+.gallery-card svg{transition:filter .15s,transform .15s}
+.gallery-card:hover svg{filter:drop-shadow(0 2px 6px rgba(var(--accent-rgb),.2));transform:scale(1.04)}
+
+/* === v60: Lepsze karty 3D w modalu — gradient na hover === */
+.layer3d-card:hover{background:linear-gradient(180deg,rgba(var(--accent-rgb),.06),var(--surface))}
+
+/* === v60: Info-box — ikona rozmiarów z gradientem === */
+.info-box::before{content:'⊞';font-size:1rem;opacity:.4;flex-shrink:0;transition:opacity .15s}
+.info-box:hover::before{opacity:.7}
+
+/* === v60: Q-field — lepszy wizualny styl selectów === */
+.q-field select{cursor:pointer;transition:border-color .14s,box-shadow .14s,background .14s}
+.q-field select:hover{background:rgba(var(--accent-rgb),.03)}
+
+/* === v60: Lepszy focus state na depth ctrl === */
+.depth-ctrl .dbtn:focus-visible{box-shadow:var(--glow);border-color:var(--accent)}
+
+/* === v60: Lyr-row — animacja selekcji === */
+.lyr-row.on{animation:lyrRowActivate .2s ease-out}
+@keyframes lyrRowActivate{from{background:rgba(var(--accent-rgb),.2)}to{background:rgba(var(--accent-rgb),.08)}}
+
+/* === v60: Quick search — grupowanie wyników z kategoriami === */
+.qs-category{display:block;padding:6px 16px 2px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none}
+.quick-search-item .qs-badge{font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.08);color:var(--accent);margin-left:auto;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em}
+
+/* === v60: StatusBar — lepszy dblclick zoom hint === */
+.sb-zoom::after{content:'';display:inline-block;width:0;height:0;transition:width .15s}
+.sb-zoom:hover::after{content:' 2×klik=reset';font-size:.5rem;color:var(--muted-2);margin-left:3px;white-space:nowrap}
+
+/* === v60: Panel — header z counter badge === */
+.panel h2 .h2-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.1);color:var(--accent);font-size:.58rem;font-weight:700;margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* === v60: Lepszy responsywny bottom bar === */
+@media(max-width:820px){
+  .bottombar{flex-direction:column;border-left:none;border-top:2px solid var(--accent-dark)}
+  .bottombar::before{display:none}
+  .bottombar>.bb-sec:first-child,.bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:200px}
+  .live-quote{border-radius:var(--r-sm);margin:6px 8px}
+}
+
+/* === v60: Overlay modali — lepsza elewacja === */
+.modal-ov{background:rgba(0,0,0,.75) radial-gradient(ellipse at 50% 30%,rgba(var(--accent-rgb),.04),transparent 70%)}
+
+/* === v60: Context menu — subtelna animacja === */
+.ctx-menu.open{animation:ctxMenuIn .12s ease-out}
+@keyframes ctxMenuIn{from{opacity:0;transform:scale(.94) translateY(-4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* === v60: Toast z numerem w serii (jeśli wiele toastów) === */
+.toast:nth-child(n+2){margin-top:2px}
+.toast:nth-child(n+4){opacity:.8;transform:scale(.96)}
+.toast:nth-child(n+6){opacity:.6;transform:scale(.92)}
+
+/* === v60: Lepsza wizualizacja warstw 3D — kolory warstw z gradient border === */
+.lyr-row .lyr-pick{border-radius:var(--r-xs);transition:filter .12s,transform .08s,box-shadow .12s}
+.lyr-row:hover .lyr-pick{box-shadow:0 2px 8px rgba(0,0,0,.4)}
+
+/* === v60: Ulepszony empty state live3d === */
+.live3d-empty{position:relative;padding:36px 24px}
+.live3d-empty .empty-hint{display:block;font-size:.65rem;color:var(--muted-2);margin-top:6px}
+
+/* === v60: Toolbar button grupowy highlight — informacja o aktywnej grupie === */
+.tgroup:has(.tbtn.active){border-color:rgba(var(--accent-rgb),.12)}
+
+/* === v60: Panel ptab — ikona przejścia z lewej === */
+.ptab{position:relative;transition:color .15s,background .15s,box-shadow .15s,border-color .15s,transform .08s,padding-left .12s}
+.ptab:hover{padding-left:2px}
+
+/* === v60: Lepsza wizualizacja depth badge z tooltip === */
+.d-badge[data-tooltip]::after{font-size:.65rem;padding:4px 8px;white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="splash-ov" id="splashOv">
   <div class="splash-brand">Xeomsc<span style="background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">-Laser</span></div>
   <div class="splash-bar"><div class="splash-bar-fill" id="splashBar"></div></div>
+  <div class="splash-stages" id="splashStages">
+    <div class="splash-stage" data-stage="canvas"><span class="stage-check"></span> Budowanie płótna</div>
+    <div class="splash-stage" data-stage="sheet"><span class="stage-check"></span> Konfiguracja arkusza</div>
+    <div class="splash-stage" data-stage="render"><span class="stage-check"></span> Renderowanie sceny</div>
+    <div class="splash-stage" data-stage="gallery"><span class="stage-check"></span> Ładowanie galerii</div>
+    <div class="splash-stage" data-stage="3d"><span class="stage-check"></span> Inicjalizacja widoku 3D</div>
+  </div>
   <div class="splash-hint" id="splashHint">Ładowanie edytora…</div>
 </div>
 <div class="app">
@@ -1865,10 +1972,10 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 
       <!-- ZAKŁADKA: WARSTWY — głębokość 3D i kolejność elementów -->
       <div class="ptab-body" data-ptab-body="layers">
-        <h2>Warstwy 3D</h2>
+        <h2>Warstwy 3D <span class="h2-badge" id="depthCountBadge">0</span></h2>
         <div class="depth-legend" id="depthLegend"></div>
         <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
-        <h2>Kolejność elementów</h2>
+        <h2>Kolejność elementów <span class="h2-badge" id="layerCountBadge">0</span></h2>
         <input type="text" id="layerSearch" class="layer-search" placeholder="Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
         <div class="layers" id="layers"></div>
         <div class="legend" id="legendBar">
@@ -4699,7 +4806,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     }
     if(selArr.length>1){ renderMultiProps(selArr); return; }
     const o=getSel();
-    if(!o){ propsEl.innerHTML=`<div class="empty-note"><span class="empty-icon">🎯</span>Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.<br><br><span class="muted-sm" style="font-size:.68rem">💡 Wyszukaj komendę: <kbd style="font-size:.6rem;padding:1px 4px">Ctrl</kbd>+<kbd style="font-size:.6rem;padding:1px 4px">K</kbd></span></div>`; return; }
+    if(!o){ propsEl.innerHTML=`<div class="empty-note"><span class="empty-icon">🎯</span>Nic nie zaznaczono.<br><br>Wybierz narzędzie u góry i narysuj kształt na płycie, albo kliknij gotowy szablon po lewej. Potem zaznacz element, aby zmieniać jego rozmiar, obrót, tryb (cięcie / grawer / nacięcie) i powielanie.<br><br>Aby zaznaczyć kilka elementów naraz: trzymaj <strong>Shift</strong> i klikaj, albo zaznacz je <strong>ramką</strong> na pustym polu.<div class="empty-shortcuts"><span class="es-item"><kbd>R</kbd> Prostokąt</span><span class="es-item"><kbd>O</kbd> Elipsa</span><span class="es-item"><kbd>T</kbd> Tekst</span><span class="es-item"><kbd>P</kbd> Ścieżka</span><span class="es-item"><kbd>L</kbd> Linia</span><span class="es-item"><kbd>Ctrl+K</kbd> Szukaj</span></div></div>`; return; }
     if(o.type==='image'){ renderImageProps(o); return; }
     let h='';
     // ---- nazwa + operacja ----
@@ -5254,6 +5361,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     const total=state.objects.length;
     const locked=state.objects.filter(o=>o.locked).length;
     const hidden=state.objects.filter(o=>!o.visible).length;
+    const lcBadge=document.getElementById('layerCountBadge');
+    if(lcBadge) lcBadge.textContent=total;
     let counter='';
     if(total){
       const sel=state.selectedIds.length;
@@ -5810,16 +5919,19 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     let h='';
     if(sel.length){
       const single=sel.length===1?sel[0]:null;
+      h+='<span class="ctx-group-label">Edycja</span>';
       h+=ctxItem('⧉ Duplikuj <span class="ctx-key">Ctrl+D</span>','duplicate');
       h+=ctxItem('⎘ Kopiuj <span class="ctx-key">Ctrl+C</span>','copy');
       h+=ctxItem('🗑 Usuń <span class="ctx-key">Del</span>','delete',{danger:true});
       h+=ctxItem('🔄 Odwróć zaznaczenie <span class="ctx-key">Ctrl+Shift+I</span>','invertsel',{disabled:!state.objects.some(o=>!o.locked)});
       h+='<hr>';
+      h+='<span class="ctx-group-label">Kolejność</span>';
       h+=ctxItem('⤒ Na wierzch <span class="ctx-key">Ctrl+Shift+]</span>','front');
       h+=ctxItem('⬆ Wyżej <span class="ctx-key">Ctrl+]</span>','forward');
       h+=ctxItem('⬇ Niżej <span class="ctx-key">Ctrl+[</span>','backward');
       h+=ctxItem('⤓ Na spód <span class="ctx-key">Ctrl+Shift+[</span>','back');
       h+='<hr>';
+      h+='<span class="ctx-group-label">Transformacja</span>';
       h+=ctxItem('↻ Obróć o 90° w prawo','rot90cw');
       h+=ctxItem('↺ Obróć o 90° w lewo','rot90ccw');
       if(single&&(single.type==='path'||single.type==='text')){
@@ -5827,6 +5939,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
         h+=ctxItem(`↕ Odbij pionowo${single.flipY?' ✓':''}`,'flipy');
       }
       if(single){
+        h+='<hr>';
+        h+='<span class="ctx-group-label">Element</span>';
         h+=ctxItem(single.locked?'🔓 Odblokuj':'🔒 Zablokuj','togglelock');
         h+=ctxItem(single.visible===false?'👁 Pokaż':'👁‍🗨 Ukryj','togglevis');
         if(single.type==='path') h+=ctxItem('✏️ Edytuj węzły','editnodes');
@@ -5839,6 +5953,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
         else h+=ctxItem('🔗 Grupuj <span class="ctx-key">Ctrl+G</span>','group');
       }
     } else {
+      h+='<span class="ctx-group-label">Płótno</span>';
       h+=ctxItem('📋 Wklej <span class="ctx-key">Ctrl+V</span>','paste',{disabled:!clipboard.length});
       h+=ctxItem('▦ Zaznacz wszystko <span class="ctx-key">Ctrl+A</span>','selectall',{disabled:!state.objects.length});
       h+='<hr>';
@@ -6464,6 +6579,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
   function renderDepthLegend(){
     const dlEl=document.getElementById('depthLegend'); if(!dlEl) return;
     const depths=[...new Set(state.objects.map(o=>o.depth||1))].sort((a,b)=>a-b);
+    const dcBadge=document.getElementById('depthCountBadge');
+    if(dcBadge) dcBadge.textContent=depths.length;
     if(!depths.length){ dlEl.innerHTML='<div class="dl-empty">Brak elementów. Dodaj kształt lub bazę — przypiszesz mu warstwę poniżej.</div>'; return; }
     const totalMM=depths.reduce((sum,dep)=>sum+layerMM(dep),0);
     const selDepths=new Set(getSelected().map(o=>o.depth||1));
@@ -6674,7 +6791,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<br><span style="font-size:.65rem;margin-top:4px;display:block">Narzędzia rysowania: <kbd style="font-size:.58rem;padding:1px 3px">R</kbd> <kbd style="font-size:.58rem;padding:1px 3px">O</kbd> <kbd style="font-size:.58rem;padding:1px 3px">P</kbd> <kbd style="font-size:.58rem;padding:1px 3px">T</kbd> lub szablony z panelu</span></div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<span class="empty-hint">Narzędzia: <kbd style="font-size:.58rem;padding:1px 3px">R</kbd> prostokąt · <kbd style="font-size:.58rem;padding:1px 3px">O</kbd> elipsa · <kbd style="font-size:.58rem;padding:1px 3px">T</kbd> tekst · <kbd style="font-size:.58rem;padding:1px 3px">P</kbd> ścieżka<br>lub wybierz szablon z panelu po lewej</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -6685,7 +6802,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
   function scheduleSvgSplit(){ clearTimeout(svgSplitTimer); svgSplitTimer=setTimeout(updateSvgSplit, 280); }
   function updateSvgSplit(){
     let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
-    bbSvgEl.innerHTML = r ? r.svg : '<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się plik z rozdzielonymi warstwami<br><span style="font-size:.62rem;color:var(--muted-2);margin-top:4px;display:block">Automatyczny podgląd SVG produkcyjnego</span></div>';
+    bbSvgEl.innerHTML = r ? r.svg : '<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się podgląd pliku SVG z rozdzielonymi warstwami<span style="font-size:.6rem;color:var(--muted-2);margin-top:6px;display:block">Kolory warstw: <span style="color:var(--cut)">■</span> cięcie · <span style="color:var(--engrave)">■</span> grawer · <span style="color:var(--score)">■</span> nacięcie</span></div>';
   }
 
   live3dStage.addEventListener('contextmenu',e=>e.preventDefault());
@@ -9205,21 +9322,39 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
   const _splashBar=document.getElementById('splashBar');
   const _splashOv=document.getElementById('splashOv');
   const _splashHint=document.getElementById('splashHint');
-  function splashProgress(pct,msg){ if(_splashBar) _splashBar.style.width=Math.min(100,pct)+'%'; if(msg&&_splashHint) _splashHint.textContent=msg; }
-  splashProgress(10,'Budowanie płótna…');
+  const _splashStages=document.getElementById('splashStages');
+  let _splashCurrentStage=null;
+  function splashProgress(pct,msg,stageKey){
+    if(_splashBar) _splashBar.style.width=Math.min(100,pct)+'%';
+    if(msg&&_splashHint) _splashHint.textContent=msg;
+    if(stageKey&&_splashStages){
+      if(_splashCurrentStage){
+        const prev=_splashStages.querySelector(`[data-stage="${_splashCurrentStage}"]`);
+        if(prev){ prev.classList.remove('stage-active'); prev.classList.add('stage-done'); prev.querySelector('.stage-check').textContent='✓'; }
+      }
+      const cur=_splashStages.querySelector(`[data-stage="${stageKey}"]`);
+      if(cur) cur.classList.add('stage-active');
+      _splashCurrentStage=stageKey;
+    }
+  }
+  splashProgress(10,'Budowanie płótna…','canvas');
   buildCanvasSkeleton();
-  splashProgress(25,'Konfiguracja arkusza…');
+  splashProgress(25,'Konfiguracja arkusza…','sheet');
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
-  splashProgress(40,'Renderowanie sceny…');
+  splashProgress(40,'Renderowanie sceny…','render');
   zoomFit(); renderGrid(); renderAll(); renderProps(); renderParams();
-  splashProgress(60,'Ładowanie galerii…');
+  splashProgress(60,'Ładowanie galerii…','gallery');
   renderGallery(); renderMotifs();
-  splashProgress(80,'Inicjalizacja widoku 3D…');
+  splashProgress(80,'Inicjalizacja widoku 3D…','3d');
   updateCanvasCursor();
   updateLive3D();
   pushHistory();
   splashProgress(100,'Gotowe!');
+  if(_splashStages&&_splashCurrentStage){
+    const last=_splashStages.querySelector(`[data-stage="${_splashCurrentStage}"]`);
+    if(last){ last.classList.remove('stage-active'); last.classList.add('stage-done'); last.querySelector('.stage-check').textContent='✓'; }
+  }
   requestAnimationFrame(()=>{ _splashOv.classList.add('hide'); setTimeout(()=>_splashOv.remove(),500); });
   (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   // Podpowiedzi „?" dostępne z klawiatury: fokusowalne + nazwa dla czytnika ekranu
@@ -9320,45 +9455,45 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
   const qsResults=document.getElementById('quickSearchResults');
   let _qsIdx=-1;
   const QS_COMMANDS=[
-    {ico:'↖',label:'Zaznaczanie',hint:'V',action:()=>{state.tool='select';syncToolButtons();}},
-    {ico:'▭',label:'Prostokąt',hint:'R',action:()=>{state.tool='rect';syncToolButtons();}},
-    {ico:'◯',label:'Elipsa',hint:'O',action:()=>{state.tool='ellipse';syncToolButtons();}},
-    {ico:'⬡',label:'Wielokąt',hint:'P',action:()=>{state.tool='polygon';syncToolButtons();}},
-    {ico:'★',label:'Gwiazda',hint:'S',action:()=>{state.tool='star';syncToolButtons();}},
-    {ico:'╱',label:'Linia',hint:'L',action:()=>{state.tool='line';syncToolButtons();}},
-    {ico:'✎',label:'Pióro',hint:'N',action:()=>{state.tool='pen';syncToolButtons();}},
-    {ico:'T',label:'Tekst',hint:'T',action:()=>{state.tool='text';syncToolButtons();}},
-    {ico:'✋',label:'Przesuwanie',hint:'H',action:()=>{state.tool='pan';syncToolButtons();}},
-    {ico:'↶',label:'Cofnij',hint:'Ctrl+Z',action:undo},
-    {ico:'↷',label:'Ponów',hint:'Ctrl+Y',action:redo},
-    {ico:'⎘',label:'Kopiuj zaznaczone',hint:'Ctrl+C',action:copySel},
-    {ico:'📋',label:'Wklej',hint:'Ctrl+V',action:pasteClipboard},
-    {ico:'⧉',label:'Duplikuj zaznaczone',hint:'Ctrl+D',action:duplicateSel},
-    {ico:'🗑',label:'Usuń zaznaczone',hint:'Delete',action:deleteSel},
-    {ico:'📐',label:'Rozmieść automatycznie',hint:'',action:autoArrange},
-    {ico:'⊞',label:'Siatka wł/wył',hint:'G',action:()=>setSnap(!state.snap,true)},
-    {ico:'🔎',label:'Dopasuj widok',hint:'1 / F',action:zoomFit},
-    {ico:'⌖',label:'Przybliż do zaznaczenia',hint:'2',action:zoomToSelection},
-    {ico:'📊',label:'Podsumowanie projektu',hint:'',action:()=>document.getElementById('summaryBtn')?.click()},
-    {ico:'⌨',label:'Skróty klawiszowe',hint:'?',action:()=>document.getElementById('helpBtn')?.click()},
-    {ico:'💾',label:'Zapisz projekt',hint:'Ctrl+S',action:()=>document.getElementById('saveProjectBtn')?.click()},
-    {ico:'📂',label:'Otwórz projekt',hint:'Ctrl+O',action:()=>document.getElementById('loadProjectBtn')?.click()},
-    {ico:'🎯',label:'Podgląd 3D',hint:'',action:()=>document.getElementById('preview3dBtn')?.click()},
-    {ico:'🆕',label:'Nowy projekt',hint:'',action:()=>document.getElementById('newProjectBtn')?.click()},
-    {ico:'💰',label:'Wycena',hint:'',action:()=>activatePricingTab(false)},
-    {ico:'🪗',label:'Generator zawiasu',hint:'',action:()=>document.getElementById('hingeGenBtn')?.click()},
-    {ico:'⚙',label:'Koło zębate',hint:'',action:()=>document.getElementById('gearGenBtn')?.click()},
-    {ico:'🖼',label:'Importuj obraz',hint:'',action:()=>document.getElementById('importImageBtn')?.click()},
-    {ico:'📐',label:'Importuj SVG',hint:'',action:()=>document.getElementById('importSvgBtn')?.click()},
-    {ico:'⬇',label:'Eksport DXF',hint:'',action:()=>document.getElementById('exportDxfBtn')?.click()},
-    {ico:'🧊',label:'Eksport 3D',hint:'',action:()=>document.getElementById('export3dBtn')?.click()},
-    {ico:'🎨',label:'Tryb warstw 3D',hint:'',action:()=>document.getElementById('depthViewBtn')?.click()},
-    {ico:'📨',label:'Wyślij do wyceny',hint:'',action:()=>document.getElementById('lqSend')?.click()},
-    {ico:'✏',label:'Edytuj punkty ścieżki',hint:'E',action:()=>{const o=getSel();if(o&&o.type==='path') toggleNodeEdit(o);}},
-    {ico:'🔒',label:'Zablokuj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.locked=true);pushHistory();renderAll();}},
-    {ico:'🔓',label:'Odblokuj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.locked=false);pushHistory();renderAll();}},
-    {ico:'👁',label:'Ukryj zaznaczone',hint:'',action:()=>{const s=getSelected();s.forEach(o=>o.visible=false);pushHistory();renderAll();}},
-    {ico:'👁',label:'Pokaż wszystkie',hint:'',action:()=>{state.objects.forEach(o=>o.visible=true);pushHistory();renderAll();}},
+    {ico:'↖',label:'Zaznaczanie',hint:'V',cat:'narzędzie',action:()=>{state.tool='select';syncToolButtons();}},
+    {ico:'▭',label:'Prostokąt',hint:'R',cat:'narzędzie',action:()=>{state.tool='rect';syncToolButtons();}},
+    {ico:'◯',label:'Elipsa',hint:'O',cat:'narzędzie',action:()=>{state.tool='ellipse';syncToolButtons();}},
+    {ico:'⬡',label:'Wielokąt',hint:'P',cat:'narzędzie',action:()=>{state.tool='polygon';syncToolButtons();}},
+    {ico:'★',label:'Gwiazda',hint:'S',cat:'narzędzie',action:()=>{state.tool='star';syncToolButtons();}},
+    {ico:'╱',label:'Linia',hint:'L',cat:'narzędzie',action:()=>{state.tool='line';syncToolButtons();}},
+    {ico:'✎',label:'Pióro',hint:'N',cat:'narzędzie',action:()=>{state.tool='pen';syncToolButtons();}},
+    {ico:'T',label:'Tekst',hint:'T',cat:'narzędzie',action:()=>{state.tool='text';syncToolButtons();}},
+    {ico:'✋',label:'Przesuwanie',hint:'H',cat:'narzędzie',action:()=>{state.tool='pan';syncToolButtons();}},
+    {ico:'↶',label:'Cofnij',hint:'Ctrl+Z',cat:'edycja',action:undo},
+    {ico:'↷',label:'Ponów',hint:'Ctrl+Y',cat:'edycja',action:redo},
+    {ico:'⎘',label:'Kopiuj zaznaczone',hint:'Ctrl+C',cat:'edycja',action:copySel},
+    {ico:'📋',label:'Wklej',hint:'Ctrl+V',cat:'edycja',action:pasteClipboard},
+    {ico:'⧉',label:'Duplikuj zaznaczone',hint:'Ctrl+D',cat:'edycja',action:duplicateSel},
+    {ico:'🗑',label:'Usuń zaznaczone',hint:'Delete',cat:'edycja',action:deleteSel},
+    {ico:'📐',label:'Rozmieść automatycznie',hint:'',cat:'widok',action:autoArrange},
+    {ico:'⊞',label:'Siatka wł/wył',hint:'G',cat:'widok',action:()=>setSnap(!state.snap,true)},
+    {ico:'🔎',label:'Dopasuj widok',hint:'1 / F',cat:'widok',action:zoomFit},
+    {ico:'⌖',label:'Przybliż do zaznaczenia',hint:'2',cat:'widok',action:zoomToSelection},
+    {ico:'📊',label:'Podsumowanie projektu',hint:'',cat:'projekt',action:()=>document.getElementById('summaryBtn')?.click()},
+    {ico:'⌨',label:'Skróty klawiszowe',hint:'?',cat:'pomoc',action:()=>document.getElementById('helpBtn')?.click()},
+    {ico:'💾',label:'Zapisz projekt',hint:'Ctrl+S',cat:'plik',action:()=>document.getElementById('saveProjectBtn')?.click()},
+    {ico:'📂',label:'Otwórz projekt',hint:'Ctrl+O',cat:'plik',action:()=>document.getElementById('loadProjectBtn')?.click()},
+    {ico:'🎯',label:'Podgląd 3D',hint:'',cat:'widok',action:()=>document.getElementById('preview3dBtn')?.click()},
+    {ico:'🆕',label:'Nowy projekt',hint:'',cat:'plik',action:()=>document.getElementById('newProjectBtn')?.click()},
+    {ico:'💰',label:'Wycena',hint:'',cat:'projekt',action:()=>activatePricingTab(false)},
+    {ico:'🪗',label:'Generator zawiasu',hint:'',cat:'generator',action:()=>document.getElementById('hingeGenBtn')?.click()},
+    {ico:'⚙',label:'Koło zębate',hint:'',cat:'generator',action:()=>document.getElementById('gearGenBtn')?.click()},
+    {ico:'🖼',label:'Importuj obraz',hint:'',cat:'plik',action:()=>document.getElementById('importImageBtn')?.click()},
+    {ico:'📐',label:'Importuj SVG',hint:'',cat:'plik',action:()=>document.getElementById('importSvgBtn')?.click()},
+    {ico:'⬇',label:'Eksport DXF',hint:'',cat:'eksport',action:()=>document.getElementById('exportDxfBtn')?.click()},
+    {ico:'🧊',label:'Eksport 3D',hint:'',cat:'eksport',action:()=>document.getElementById('export3dBtn')?.click()},
+    {ico:'🎨',label:'Tryb warstw 3D',hint:'',cat:'widok',action:()=>document.getElementById('depthViewBtn')?.click()},
+    {ico:'📨',label:'Wyślij do wyceny',hint:'',cat:'eksport',action:()=>document.getElementById('lqSend')?.click()},
+    {ico:'✏',label:'Edytuj punkty ścieżki',hint:'E',cat:'edycja',action:()=>{const o=getSel();if(o&&o.type==='path') toggleNodeEdit(o);}},
+    {ico:'🔒',label:'Zablokuj zaznaczone',hint:'',cat:'edycja',action:()=>{const s=getSelected();s.forEach(o=>o.locked=true);pushHistory();renderAll();}},
+    {ico:'🔓',label:'Odblokuj zaznaczone',hint:'',cat:'edycja',action:()=>{const s=getSelected();s.forEach(o=>o.locked=false);pushHistory();renderAll();}},
+    {ico:'👁',label:'Ukryj zaznaczone',hint:'',cat:'edycja',action:()=>{const s=getSelected();s.forEach(o=>o.visible=false);pushHistory();renderAll();}},
+    {ico:'👁',label:'Pokaż wszystkie',hint:'',cat:'edycja',action:()=>{state.objects.forEach(o=>o.visible=true);pushHistory();renderAll();}},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
@@ -9376,7 +9511,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
   function renderQsResults(q){
     const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)):QS_COMMANDS;
     if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników dla „'+q+'"</div>'; return; }
-    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}" role="option" aria-selected="${i===_qsIdx}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${highlightMatch(c.label,q)}</span>${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
+    qsResults.innerHTML=filtered.map((c,i)=>`<div class="quick-search-item${i===_qsIdx?' qs-active':''}" data-idx="${i}" role="option" aria-selected="${i===_qsIdx}"><span class="qs-ico">${c.ico}</span><span class="qs-label">${highlightMatch(c.label,q)}</span>${c.cat?`<span class="qs-badge">${c.cat}</span>`:''}${c.hint?`<span class="qs-hint">${c.hint}</span>`:''}</div>`).join('');
     qsResults.querySelectorAll('.quick-search-item').forEach((el,i)=>{
       el.addEventListener('click',()=>{ const ci=filtered[i]; if(ci){ closeQuickSearch(); ci.action(); } });
     });
