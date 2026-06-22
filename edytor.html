@@ -2955,6 +2955,36 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 
 /* === v80: Confirm dialog — ikona z gradient === */
 .confirm-box .confirm-icon{background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),transparent);border-radius:var(--r);padding:8px;display:inline-block}
+
+/* === v81: Scroll-to-view — smooth scroll w panelu warstw === */
+.layers{scroll-behavior:smooth;overflow-y:auto;max-height:calc(100vh - 300px)}
+
+/* === v81: Lepszy focus na warstwie po scrollu === */
+.layer.sel{scroll-margin:8px}
+
+/* === v81: Lepsza wizualizacja kopiowania/wklejania z type info === */
+.toast .toast-detail{display:block;font-size:.7rem;color:var(--muted);margin-top:2px;font-weight:400}
+
+/* === v81: Ulepszone pasek zoomu — animacja zmiany === */
+@keyframes zoomPulse{0%{color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.4)}100%{color:inherit;text-shadow:none}}
+.sb-zoom.zoom-changed{animation:zoomPulse .4s ease-out}
+
+/* === v81: Lepsze tło na canvas hint-empty z subtleniejszym ruchem === */
+.stage .hint-empty{text-align:center;line-height:1.5}
+
+/* === v81: Poprawa widoczności confirm actions === */
+.confirm-box .confirm-actions .tbtn{min-width:100px;font-weight:700}
+.confirm-box .confirm-actions .tbtn-danger{box-shadow:0 2px 10px rgba(255,59,59,.25)}
+
+/* === v81: Modal close — lepszy hover z kolorowym tłem === */
+.modal-close{transition:background .14s,color .14s,border-color .14s,transform .1s,box-shadow .14s,rotate .2s}
+
+/* === v81: Lepsza wizualizacja splasha z progress === */
+.splash-bar-fill{background:var(--grad-accent);box-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
+
+/* === v81: Poprawiony dropdown kbd na hover === */
+.dd-kbd{transition:color .12s,background .12s}
+.dd-menu .tbtn:hover .dd-kbd{color:var(--accent-text);background:rgba(255,255,255,.15)}
 </style>
 </head>
 <body>
@@ -4297,7 +4327,14 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     const next = id? expandGroupSelection([id]) : [];
     const same = next.length===state.selectedIds.length && next.every(x=>state.selectedIds.includes(x));
     state.selectedIds = next; renderOverlay(); renderProps();
-    if(!same) renderLayers(); // przy tej samej selekcji nie przebudowuj listy warstw — umożliwia dwuklik na nazwie
+    if(!same){ renderLayers(); scrollLayerIntoView(id); }
+  }
+  function scrollLayerIntoView(id){
+    if(!id) return;
+    requestAnimationFrame(()=>{
+      const row=layersEl.querySelector('[data-id="'+id+'"]');
+      if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
+    });
   }
   function toggleSelection(id){
     const i=state.selectedIds.indexOf(id);
@@ -6973,9 +7010,11 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     const copies=clipboard.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
-    clipboard=copies.map(c=>JSON.parse(JSON.stringify(c))); // kolejne Ctrl+V odsuwa dalej, jak w Illustratorze/Cuttle
+    clipboard=copies.map(c=>JSON.parse(JSON.stringify(c)));
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
-    showToast('Wklejono '+copies.length+' elem.','info',1000); }
+    const types={}; copies.forEach(o=>{types[o.type]=(types[o.type]||0)+1;});
+    const typeStr=Object.entries(types).map(([t,c])=>c+'× '+t).join(', ');
+    showToast('Wklejono '+copies.length+' elem. ('+typeStr+')','info',1200); }
   function zoomBy(f){ const v=state.view; const cx=v.x+v.w/2, cy=v.y+v.h/2;
     v.w*=f; v.h*=f; v.x=cx-v.w/2; v.y=cy-v.h/2; applyView(); renderOverlay(); }
   // Domyślny widok: arkusz wypełnia pole edycji maksymalnie, wycentrowany,
@@ -6986,6 +7025,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     const m=4;
     state.view={ x:-m, y:-m, w:state.docW+2*m, h:state.docH+2*m };
     applyView(); renderOverlay();
+    const z=Math.round(state.docW/state.view.w*100);
+    if(_sbZoom){ _sbZoom.classList.add('zoom-changed'); setTimeout(()=>_sbZoom.classList.remove('zoom-changed'),300); }
   }
   // przybliż widok tak, by mieściło całe zaznaczenie (z marginesem); brak zaznaczenia -> jak "Dopasuj"
   function zoomToSelection(){
