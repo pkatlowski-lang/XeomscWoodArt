@@ -61,6 +61,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .tbtn.active{background:var(--grad-accent);border-color:transparent;color:var(--accent-text);box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}
 .tbtn-primary{background:var(--grad-accent);border-color:transparent;color:var(--accent-text);font-weight:800;box-shadow:0 4px 16px -3px rgba(var(--accent-rgb),.55),0 0 0 1px rgba(255,255,255,.12) inset}
 .tbtn-primary:hover{filter:brightness(1.08);box-shadow:0 6px 22px -3px rgba(var(--accent-rgb),.6);color:var(--accent-text)}
+.tbtn-danger{background:linear-gradient(135deg,var(--cut),#cc2222);border-color:transparent;color:#fff;font-weight:800;box-shadow:0 4px 16px -3px rgba(255,59,59,.5)}
+.tbtn-danger:hover{filter:brightness(1.1);box-shadow:0 6px 22px -3px rgba(255,59,59,.55);color:#fff}
 .tbtn:focus-visible{outline:none;box-shadow:var(--glow)}
 .tbtn:active:not(:disabled){transform:translateY(1px) scale(.985)}
 .tbtn:disabled{opacity:.4;cursor:not-allowed}
@@ -118,6 +120,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-grid input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 7px;font-size:.76rem;outline:none;width:100%;box-sizing:border-box;transition:border-color .14s,box-shadow .14s}
 .pq-grid input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.18)}
 .pq-actions{display:flex;gap:6px;padding:8px 14px 14px}
+.pq-actions .tbtn{font-size:.72rem;flex:1}
 .pq-status{font-size:.72rem;min-height:16px;padding:0 14px 8px;font-weight:600}
 .pq-help{font-size:.7rem;color:var(--muted);line-height:1.5;margin:0 0 9px}
 /* --- Wycena: profile, karta ceny, pozycje dodatkowe, zwijana konfiguracja --- */
@@ -206,7 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd-btn:hover{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.12)}
 .font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:280px;overflow-y:auto;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.1);padding:4px 0}
 .font-dd.open .font-dd-list{display:block}
-.font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:6px;margin:0 4px;transition:background .1s,color .1s}
+.font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:6px;margin:0 4px;transition:background .12s,color .12s}
 .font-dd-item:hover{background:var(--grad-accent);color:var(--accent-text);box-shadow:0 2px 6px rgba(var(--accent-rgb),.3)}
 .font-dd-item.cur{background:rgba(var(--accent-rgb),.18)}
 .font-dd-item .pc{font-family:var(--font-b);font-size:.68rem;color:var(--muted)}
@@ -352,7 +355,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Menu kontekstowe (PPM na płótnie) ---- */
 .ctx-menu{position:fixed;z-index:3000;background:linear-gradient(180deg,rgba(26,34,51,.96),rgba(12,16,25,.96));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:10px;padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.12);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.96) translateY(-6px);transition:opacity .12s ease,transform .12s ease}
 .ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0)}
-.ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:6px;cursor:pointer;font:inherit;transition:background .1s,color .1s}
+.ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:6px;cursor:pointer;font:inherit;transition:background .12s,color .12s}
 .ctx-menu button:hover:not(:disabled){background:var(--grad-accent);color:var(--accent-text)}
 .ctx-menu button:hover:not(:disabled) .ctx-key{color:var(--accent-text);opacity:.7}
 .ctx-menu button:disabled{opacity:.4;cursor:not-allowed}
@@ -383,7 +386,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .mat-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.8rem;transition:border-color .12s,background .12s,transform .08s}
 .mat-row:hover{border-color:var(--border-strong);background:var(--surface3);transform:translateX(2px)}
 .mat-row .mat-label{flex:1}
-.mat-row .mat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:3px 5px;line-height:1;border-radius:4px;transition:background .1s,color .1s}
+.mat-row .mat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:3px 5px;line-height:1;border-radius:4px;transition:background .12s,color .12s}
 .mat-row .mat-del:hover{color:var(--cut);background:rgba(255,60,60,.1)}
 .mat-empty{font-size:.74rem;color:var(--muted);line-height:1.5}
 
@@ -600,7 +603,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .dd.open .dd-caret{transform:rotate(180deg);opacity:.8}
 .dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:210px;background:linear-gradient(180deg,rgba(26,34,51,.96),rgba(12,16,25,.96));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r);padding:5px;box-shadow:var(--sh),0 0 0 1px rgba(0,0,0,.12);z-index:900;flex-direction:column}
 .dd.open .dd-menu{display:flex}
-.dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:7px;padding:8px 12px;font-size:.82rem;background:transparent;color:var(--text);transition:background .1s,color .1s}
+.dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:7px;padding:8px 12px;font-size:.82rem;background:transparent;color:var(--text);transition:background .12s,color .12s}
 .dd-menu .tbtn:hover{background:rgba(var(--accent-rgb),.12);color:#fff}
 .dd-menu .tbtn.cfgbtn{background:linear-gradient(135deg,rgba(247,183,51,.12),rgba(247,183,51,.06));color:var(--operator)}
 .dd-menu .tbtn.cfgbtn:hover{background:linear-gradient(135deg,rgba(247,183,51,.22),rgba(247,183,51,.12))}
@@ -719,6 +722,39 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Loading state — skeleton pulse do ponownego użycia === */
 @keyframes skeletonPulse{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:skeletonPulse 1.5s ease-in-out infinite;border-radius:var(--r-sm)}
+
+/* === Modal confirm — zastępuje natywne confirm() === */
+.confirm-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9500;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .18s ease,visibility 0s linear .18s}
+.confirm-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .18s ease,visibility 0s}
+.confirm-box{background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform .2s cubic-bezier(.4,0,.2,1),opacity .18s ease;opacity:0}
+.confirm-ov.open .confirm-box{transform:scale(1) translateY(0);opacity:1}
+.confirm-box .confirm-icon{font-size:1.6rem;margin-bottom:6px}
+.confirm-box .confirm-msg{font-size:.86rem;line-height:1.55;color:var(--text);margin-bottom:18px}
+.confirm-box .confirm-actions{display:flex;justify-content:flex-end;gap:8px}
+.confirm-box .confirm-actions .tbtn{min-width:90px;justify-content:center}
+
+/* === Klasy utility dla modali i formularzy === */
+.modal-box.modal-sm{max-width:420px}
+.modal-box.modal-md{max-width:480px}
+.modal-box.modal-lg{max-width:680px}
+.modal-box.modal-xl{max-width:860px}
+.modal-box.modal-xxl{max-width:1100px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.flex-row{display:flex;align-items:center;gap:8px}
+.flex-wrap-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem}
+.field-actions{padding:6px 0 0;display:flex;justify-content:flex-end;gap:8px}
+.modal-hint{font-size:.8rem;color:var(--muted);margin:0;line-height:1.5}
+.modal-hint-sm{font-size:.74rem;color:var(--muted);line-height:1.5}
+.modal-hint-center{font-size:.72rem;color:var(--muted);text-align:center;margin-top:8px}
+.modal-sec-title{margin:14px 0 8px;font-size:.8rem;color:var(--muted)}
+.tbtn-full{width:100%;justify-content:center}
+.input-flex-2{flex:2}
+.input-flex-fixed{flex:0 0 70px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gear-preview-row{display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px}
+.gear-preview-box{flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
+.gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -880,22 +916,22 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         <!-- TWOJA WYCENA: materiał, ilość, cena na żywo -->
         <div class="pq-sec">
           <div class="pq-h">🧮 Twoja wycena</div>
-          <div class="q-field"><span class="lbl">Materiał</span><select id="quoteMat"></select></div>
-          <div class="q-field"><span class="lbl">Ilość sztuk</span><input type="number" id="qQty" min="1" step="1" value="1"></div>
+          <div class="q-field"><span class="lbl">Materiał</span><select id="quoteMat" aria-label="Materiał do wyceny"></select></div>
+          <div class="q-field"><span class="lbl">Ilość sztuk</span><input type="number" id="qQty" min="1" step="1" value="1" aria-label="Ilość sztuk"></div>
           <div class="q-price-card empty" id="qPriceCard">
             <div class="q-pp"><span class="q-pp-lbl">Cena / szt.</span><span class="q-pp-val" id="qPerPiece">–</span></div>
             <div class="q-total"><span class="q-total-lbl">Razem (× <span id="qQtyEcho">1</span>)</span><span class="q-total-val" id="qTotal">–</span></div>
             <div class="q-empty-msg" id="qEmptyMsg">Narysuj projekt na płycie, aby zobaczyć cenę.</div>
             <div class="q-break" id="qBreak"></div>
           </div>
-          <button type="button" class="tbtn tbtn-primary" id="sendQuoteOpenBtn" style="width:100%">📨 Wyślij projekt do wyceny</button>
+          <button type="button" class="tbtn tbtn-primary tbtn-full" id="sendQuoteOpenBtn">📨 Wyślij projekt do wyceny</button>
         </div>
         <!-- POZYCJE DODATKOWE: ręczne dopłaty per sztuka -->
         <div class="pq-sec">
           <div class="pq-h">➕ Pozycje dodatkowe</div>
           <p class="pq-help">Ręczne dopłaty doliczane do ceny każdej sztuki (np. „Malowanie", „Personalizacja"). Doliczane po marży.</p>
           <div id="qExtras"></div>
-          <button type="button" class="tbtn add-action" style="width:100%;font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
+          <button type="button" class="tbtn add-action tbtn-full" style="font-size:.72rem" id="qAddExtra">＋ Dodaj pozycję</button>
         </div>
         <!-- KONFIGURACJA CENNIKA: edycja materiałów i parametrów aktywnego profilu (zwijana) -->
         <button type="button" class="q-cfg-toggle" id="qCfgToggle"><span class="chev">▸</span> ⚙ Cennik i parametry (edycja profilu)</button>
@@ -904,7 +940,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
             <div class="pq-h">📦 Materiały</div>
             <p class="pq-help">Dla każdego materiału: nazwa, grubość (mm), koszt za 1&nbsp;cm² oraz prędkość cięcia (mm/min).</p>
             <div id="pqMaterials"></div>
-            <button type="button" class="tbtn add-action" style="width:100%;margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
+            <button type="button" class="tbtn add-action tbtn-full" style="margin-top:6px;font-size:.74rem" id="pqAddMat">＋ Dodaj materiał</button>
           </div>
           <div class="pq-sec">
             <div class="pq-h">⚙ Parametry</div>
@@ -919,8 +955,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
             </div>
           </div>
           <div class="pq-actions">
-            <button type="button" class="tbtn" id="pqRestore" style="font-size:.72rem;flex:1" title="Przywróć wartości fabryczne w tym profilu">↺ Domyślne</button>
-            <button type="button" class="tbtn tbtn-primary" id="pqSave" style="font-size:.72rem;flex:1">💾 Zapisz profil</button>
+            <button type="button" class="tbtn" id="pqRestore" title="Przywróć wartości fabryczne w tym profilu">↺ Domyślne</button>
+            <button type="button" class="tbtn tbtn-primary" id="pqSave">💾 Zapisz profil</button>
           </div>
           <div id="pqStatus" class="pq-status"></div>
         </div>
@@ -983,10 +1019,10 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 <div class="ctx-menu" id="ctxMenu"></div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wizualizacja 3D projektu" id="modal3dPrev">
-  <div class="modal-box" style="max-width:860px">
+  <div class="modal-box modal-xl">
     <button class="modal-close" aria-label="Zamknij" id="modal3dPrevClose" title="Zamknij">✕</button>
     <h3>🎯 Wizualizacja 3D projektu</h3>
-    <div class="p3d-controls"><span id="p3dHint">Grubości warstw ustawiasz w mm w panelu „Warstwy 3D” po lewej — model 3D odwzorowuje je proporcjonalnie.</span>
+    <div class="p3d-controls"><span id="p3dHint">Grubości warstw ustawiasz w mm w panelu „Warstwy 3D" po lewej — model 3D odwzorowuje je proporcjonalnie.</span>
       <span class="bb-spacer"></span>
 
       <span class="zoom-badge" id="p3dZoomLabel" title="Przybliżenie — kółko myszy = zoom w miejscu kursora, przeciągnij = obróć, Shift+przeciągnij lub prawy przycisk = przesuń widok">100%</span>
@@ -995,17 +1031,17 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     <div class="preview3d-wrap" id="p3dWrap">
       <div class="preview3d-scene" id="p3dScene"></div>
     </div>
-    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:8px">Przeciągnij aby obrócić · Shift+przeciągnij lub prawy przycisk = przesuń widok · kółko myszy = przybliż / oddal w miejscu kursora · podwójne kliknięcie = reset widoku · każdy kolor = osobna warstwa materiału</p>
+    <p class="modal-hint-center">Przeciągnij aby obrócić · Shift+przeciągnij lub prawy przycisk = przesuń widok · kółko myszy = przybliż / oddal w miejscu kursora · podwójne kliknięcie = reset widoku · każdy kolor = osobna warstwa materiału</p>
   </div>
 </div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Podgląd SVG — warstwy rozdzielone" id="modalSvgPrev">
-  <div class="modal-box" style="max-width:1100px">
+  <div class="modal-box modal-xxl">
     <button class="modal-close" aria-label="Zamknij" id="modalSvgPrevClose" title="Zamknij">✕</button>
     <h3>📄 Podgląd SVG — warstwy rozdzielone (1 plik)</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0">Każda warstwa ma osobną kolumnę — wspólne elementy są scalone w jeden obrys gotowy do wycięcia.</p>
+    <p class="modal-hint">Każda warstwa ma osobną kolumnę — wspólne elementy są scalone w jeden obrys gotowy do wycięcia.</p>
     <div class="svgprev-wrap" id="svgPrevWrap"></div>
-    <div class="field" style="padding:14px 0 0;display:flex;justify-content:flex-end">
+    <div class="field-actions">
       <button type="button" class="tbtn tbtn-primary" id="svgPrevDownload">⬇ Pobierz SVG warstw</button>
     </div>
   </div>
@@ -1015,7 +1051,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   <div class="modal-box">
     <button class="modal-close" aria-label="Zamknij" id="modal3dClose" title="Zamknij">✕</button>
     <h3>🧊 Eksport 3D — warstwy do sklejenia</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0">Każda warstwa to osobny plik SVG. Wytnij je z osobnych arkuszy materiału i sklejaj od dołu (Warstwa 1) do góry — uzyskasz efekt głębi 3D.</p>
+    <p class="modal-hint">Każda warstwa to osobny plik SVG. Wytnij je z osobnych arkuszy materiału i sklejaj od dołu (Warstwa 1) do góry — uzyskasz efekt głębi 3D.</p>
     <div class="layers3d-grid" id="layers3dGrid"></div>
     <div class="modal-note" id="modal3dNote"></div>
   </div>
@@ -1024,36 +1060,36 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Generator zawiasu (living hinge)" id="modalHinge">
-  <div class="modal-box" style="max-width:420px">
+  <div class="modal-box modal-sm">
     <button class="modal-close" aria-label="Zamknij" id="modalHingeClose" title="Zamknij">✕</button>
     <h3>🪗 Generator zawiasu (living hinge) z polami i zaczepami</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec” (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
+    <p class="modal-hint" style="margin-bottom:8px">Panel = <strong>pole lewe</strong> + <strong>strefa zawiasu</strong> (nacięcia, które się wyginają) + <strong>pole prawe</strong>. Pola boczne to lite powierzchnie do przyczepienia/wklejenia, a zaczepy „na palec" (jak w pudełku) pozwalają połączyć panel z innymi elementami. Nacięcia stykają się z górną i dolną krawędzią strefy zawiasu.</p>
     <div class="field"><label for="hingeH">Wysokość panelu — H (mm)</label><input type="number" id="hingeH" min="10" max="760" step="1" value="60"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div class="grid-3">
       <div class="field"><label for="hingeLeft">Pole lewe (mm)</label><input type="number" id="hingeLeft" min="0" max="700" step="1" value="70"></div>
       <div class="field"><label for="hingeZone">Strefa zawiasu (mm)</label><input type="number" id="hingeZone" min="5" max="700" step="1" value="60"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" id="hingeRight" min="0" max="700" step="1" value="90"></div>
     </div>
     <div class="form-sec">Nacięcia</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="grid-2">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" id="hingeLen" min="5" max="200" step="1" value="20"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" id="hingeKerf" min="0.2" max="5" step="0.1" value="0.5"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" id="hingePitchX" min="1" max="100" step="0.5" value="3"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" id="hingePitchY" min="1" max="100" step="0.5" value="3"></div>
     </div>
-    <div class="form-sec">Łączenie — zaczepy „na palec”</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="form-sec">Łączenie — zaczepy „na palec"</div>
+    <div class="grid-2">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" id="hingeT" min="0.5" max="20" step="0.5" value="3"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" id="hingeF" min="2" max="100" step="1" value="12"></div>
     </div>
     <div class="field"><label>Kierunek zaczepów</label>
-      <select id="hingeTabDir">
+      <select id="hingeTabDir" aria-label="Kierunek zaczepów">
         <option value="out">Na zewnątrz — wystają poza obrys panelu</option>
         <option value="in">Do wewnątrz — wycięcia w obrysie panelu</option>
       </select>
     </div>
-    <label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
+    <label class="modal-hint-sm" style="display:block;margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
+    <div class="flex-wrap-row">
       <label class="flex-label"><input type="checkbox" id="hingeTabLeft"> Lewa</label>
       <label class="flex-label"><input type="checkbox" id="hingeTabRight"> Prawa</label>
       <label class="flex-label"><input type="checkbox" id="hingeTabTop"> Górna</label>
@@ -1064,26 +1100,26 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 </div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Generator koła zębatego" id="modalGear">
-  <div class="modal-box" style="max-width:420px">
+  <div class="modal-box modal-sm">
     <button class="modal-close" aria-label="Zamknij" id="modalGearClose" title="Zamknij">✕</button>
     <h3>⚙ Generator koła zębatego</h3>
-    <p style="font-size:.8rem;color:var(--muted);margin:0 0 8px">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <p class="modal-hint" style="margin-bottom:8px">Wygeneruj parametryczne koło zębate (zarys ewolwentowy) z opcjonalnym otworem na oś — gotowe do wycięcia laserem.</p>
+    <div class="grid-2">
       <div class="field"><label>Liczba zębów</label><input type="number" id="gearTeeth" min="6" max="200" step="1" value="20"></div>
       <div class="field"><label>Moduł (mm)</label><input type="number" id="gearModule" min="0.2" max="20" step="0.1" value="2"></div>
       <div class="field"><label>Kąt przyporu (°)</label><input type="number" id="gearPressure" min="10" max="30" step="1" value="20"></div>
       <div class="field"><label>Otwór osi (mm, 0 = brak)</label><input type="number" id="gearBore" min="0" max="200" step="0.5" value="6"></div>
     </div>
-    <div style="display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px">
-      <div id="gearPreview" style="flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)"></div>
-      <p id="gearInfo" style="flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7"></p>
+    <div class="gear-preview-row">
+      <div id="gearPreview" class="gear-preview-box"></div>
+      <p id="gearInfo" class="gear-preview-info"></p>
     </div>
     <button type="button" class="tbtn tbtn-primary tbtn-block" id="gearGenerateBtn">⚙ Generuj koło zębate</button>
   </div>
 </div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Skróty klawiszowe" id="modalHelp">
-  <div class="modal-box" style="max-width:680px">
+  <div class="modal-box modal-lg">
     <button class="modal-close" aria-label="Zamknij" id="modalHelpClose" title="Zamknij">✕</button>
     <h3>⌨ Skróty klawiszowe</h3>
     <div class="shortcuts-grid">
@@ -1151,27 +1187,27 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 </div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Biblioteka materiałów" id="modalMaterials">
-  <div class="modal-box" style="max-width:480px">
+  <div class="modal-box modal-md">
     <button class="modal-close" aria-label="Zamknij" id="modalMaterialsClose" title="Zamknij">✕</button>
     <h3>📦 Biblioteka materiałów</h3>
-    <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px;line-height:1.5">Dodaj własne materiały (nazwa + grubość w mm), aby szybko ustawiać grubość warstw 3D z listy „Materiał…” przy warstwie.</p>
+    <p class="modal-hint" style="margin-bottom:10px">Dodaj własne materiały (nazwa + grubość w mm), aby szybko ustawiać grubość warstw 3D z listy „Materiał…" przy warstwie.</p>
     <div class="field"><label>Nowy materiał</label>
       <div class="row2">
-        <input type="text" id="matName" placeholder="np. Sklejka topolowa" style="flex:2">
-        <input type="number" id="matMM" placeholder="mm" min="0.1" max="60" step="0.5" style="flex:0 0 70px">
+        <input type="text" id="matName" placeholder="np. Sklejka topolowa" class="input-flex-2" aria-label="Nazwa materiału">
+        <input type="number" id="matMM" placeholder="mm" min="0.1" max="60" step="0.5" class="input-flex-fixed" aria-label="Grubość materiału (mm)">
       </div>
     </div>
-    <button type="button" class="tbtn" id="matAddBtn" style="width:100%;justify-content:center;margin-top:4px">+ Dodaj materiał</button>
+    <button type="button" class="tbtn tbtn-full" id="matAddBtn" style="margin-top:4px">+ Dodaj materiał</button>
     <div class="mat-list" id="matList"></div>
   </div>
 </div>
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Podsumowanie projektu" id="modalSummary">
-  <div class="modal-box" style="max-width:480px">
+  <div class="modal-box modal-md">
     <button class="modal-close" aria-label="Zamknij" id="modalSummaryClose" title="Zamknij">✕</button>
     <h3>📊 Podsumowanie projektu</h3>
     <div class="sum-stats" id="summaryStats"></div>
-    <h4 style="margin:14px 0 8px;font-size:.8rem;color:var(--muted)">Szacowany czas pracy lasera</h4>
+    <h4 class="modal-sec-title">Szacowany czas pracy lasera</h4>
     <div class="fields2">
       <div class="field"><label>Prędkość cięcia (mm/min)</label><input type="number" id="sumCutSpeed" min="1" step="10"></div>
       <div class="field"><label>Prędkość nacinania (mm/min)</label><input type="number" id="sumScoreSpeed" min="1" step="10"></div>
@@ -1181,7 +1217,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       <div class="field"><label>Odstęp linii graweru (mm)</label><input type="number" id="sumEngraveSpacing" min="0.01" step="0.01"></div>
     </div>
     <div class="sum-time" id="summaryTime"></div>
-    <p style="font-size:.74rem;color:var(--muted);margin:10px 0 0;line-height:1.5">Szacunek orientacyjny — nie uwzględnia czasu przejazdów między elementami, przyspieszeń ani liczby przejść.</p>
+    <p class="modal-hint-sm" style="margin-top:10px">Szacunek orientacyjny — nie uwzględnia czasu przejazdów między elementami, przyspieszeń ani liczby przejść.</p>
   </div>
 </div>
 
@@ -1190,15 +1226,15 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
      ilość, cena na żywo, wysyłka). -->
 
 <div class="modal-ov" role="dialog" aria-modal="true" aria-label="Wyślij projekt do pracowni" id="modalSendQuote">
-  <div class="modal-box" style="max-width:440px">
+  <div class="modal-box modal-sm" style="max-width:440px">
     <button class="modal-close" aria-label="Zamknij" id="modalSendQuoteClose" title="Zamknij">✕</button>
     <h3>📨 Wyślij projekt do pracowni</h3>
-    <p style="font-size:.78rem;color:var(--muted);margin:0 0 6px;line-height:1.5">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
+    <p class="modal-hint" style="margin-bottom:6px">Otrzymamy Twój projekt (grafikę, wizualizację i plik produkcyjny SVG) wraz z wyceną i odpowiemy na podany e-mail.</p>
     <div class="field"><label>Imię (opcjonalnie)</label><input type="text" id="sendQuoteName" maxlength="60" placeholder="np. Anna"></div>
     <div class="field"><label>Twój e-mail *</label><input type="email" id="sendQuoteEmail" maxlength="120" placeholder="adres@email.pl" required></div>
     <div class="field"><label>Wiadomość (opcjonalnie)</label><textarea id="sendQuoteMsg" rows="3" maxlength="1500" placeholder="Uwagi do projektu, termin, ilość sztuk…"></textarea></div>
-    <div id="sendQuoteStatus" style="font-size:.78rem;min-height:18px;margin:2px 0 6px;color:var(--muted)"></div>
-    <div class="field" style="padding:6px 0 0;display:flex;justify-content:flex-end;gap:8px">
+    <div id="sendQuoteStatus" class="modal-hint-sm" style="min-height:18px;margin:2px 0 6px"></div>
+    <div class="field-actions">
       <button type="button" class="tbtn" id="sendQuoteCancel">Anuluj</button>
       <button type="button" class="tbtn tbtn-primary" id="sendQuoteSubmit">Wyślij projekt</button>
     </div>
@@ -1206,6 +1242,16 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
+<div class="confirm-ov" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-actions">
+      <button type="button" class="tbtn" id="confirmCancel">Anuluj</button>
+      <button type="button" class="tbtn tbtn-primary" id="confirmOk">OK</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -1219,6 +1265,37 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     el.textContent=msg; _toastC.appendChild(el);
     setTimeout(()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); },duration||3500);
   }
+  const _confirmOv=document.getElementById('confirmOverlay');
+  const _confirmMsg=document.getElementById('confirmMsg');
+  const _confirmIcon=document.getElementById('confirmIcon');
+  const _confirmOk=document.getElementById('confirmOk');
+  const _confirmCancel=document.getElementById('confirmCancel');
+  let _confirmResolve=null;
+  function showConfirm(msg,opts){
+    opts=opts||{};
+    _confirmMsg.textContent=msg;
+    _confirmIcon.textContent=opts.icon||'⚠️';
+    _confirmOk.textContent=opts.ok||'OK';
+    _confirmCancel.textContent=opts.cancel||'Anuluj';
+    if(opts.danger){ _confirmOk.className='tbtn tbtn-danger'; } else { _confirmOk.className='tbtn tbtn-primary'; }
+    _confirmOv.classList.add('open');
+    _confirmOk.focus();
+    return new Promise(resolve=>{
+      _confirmResolve=resolve;
+    });
+  }
+  function _closeConfirm(val){
+    _confirmOv.classList.remove('open');
+    if(_confirmResolve){ _confirmResolve(val); _confirmResolve=null; }
+  }
+  _confirmOk.addEventListener('click',()=>_closeConfirm(true));
+  _confirmCancel.addEventListener('click',()=>_closeConfirm(false));
+  _confirmOv.addEventListener('click',e=>{ if(e.target===_confirmOv) _closeConfirm(false); });
+  document.addEventListener('keydown',e=>{
+    if(!_confirmOv.classList.contains('open')) return;
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(false); }
+    if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
+  });
   const FONTS=[
     // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
     // bez instalowania czegokolwiek; wyglądają identycznie na PC, telefonie i Macu.
@@ -3434,30 +3511,30 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     const m=outline.hinge;
     let h=`<div class="empty-note" style="padding-bottom:4px">🪗 Zawias (living hinge) — zmiany od razu przeliczają obrys i nacięcia, bez tworzenia nowej kopii.</div>`;
     h+=`<div class="field"><label>Wysokość panelu — H (mm)</label><input type="number" data-hinge="H" value="${fmt(m.H)}" min="10" max="760" step="1" title="${WHEEL_HINT}"></div>`;
-    h+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    h+=`<div class="grid-3">
       <div class="field"><label>Pole lewe (mm)</label><input type="number" data-hinge="leftW" value="${fmt(m.leftW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Strefa zawiasu (mm)</label><input type="number" data-hinge="zoneW" value="${fmt(m.zoneW)}" min="5" max="700" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Pole prawe (mm)</label><input type="number" data-hinge="rightW" value="${fmt(m.rightW)}" min="0" max="700" step="1" title="${WHEEL_HINT}"></div>
     </div>`;
     h+=`<div class="form-sec">Nacięcia</div>`;
-    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    h+=`<div class="grid-2">
       <div class="field"><label>Długość nacięcia (mm)</label><input type="number" data-hinge="slitLen" value="${fmt(m.slitLen)}" min="5" max="200" step="1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Kerf — szer. cięcia (mm)</label><input type="number" data-hinge="kerf" value="${fmt(m.kerf)}" min="0.2" max="5" step="0.1" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Odstęp kolumn (mm)</label><input type="number" data-hinge="pitchX" value="${fmt(m.pitchX)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Mostek (mm)</label><input type="number" data-hinge="bridge" value="${fmt(m.bridge)}" min="1" max="100" step="0.5" title="${WHEEL_HINT}"></div>
     </div>`;
-    h+=`<div class="form-sec">Łączenie — zaczepy „na palec”</div>`;
-    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    h+=`<div class="form-sec">Łączenie — zaczepy „na palec"</div>`;
+    h+=`<div class="grid-2">
       <div class="field"><label>Grubość sklejki — T (mm)</label><input type="number" data-hinge="T" value="${fmt(m.T)}" min="0.5" max="20" step="0.5" title="${WHEEL_HINT}"></div>
       <div class="field"><label>Rozmiar palca (mm)</label><input type="number" data-hinge="F" value="${fmt(m.F)}" min="2" max="100" step="1" title="${WHEEL_HINT}"></div>
     </div>`;
     h+=`<div class="field"><label>Kierunek zaczepów</label>
-      <select data-hinge="tabDir">
+      <select data-hinge="tabDir" aria-label="Kierunek zaczepów">
         <option value="out" ${(m.tabDir||'out')==='out'?'selected':''}>Na zewnątrz — wystają poza obrys panelu</option>
         <option value="in" ${m.tabDir==='in'?'selected':''}>Do wewnątrz — wycięcia w obrysie panelu</option>
       </select></div>`;
-    h+=`<label style="display:block;font-size:.78rem;color:var(--muted);margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem">
+    h+=`<label class="modal-hint-sm" style="display:block;margin:2px 0 4px">Zaczepy na krawędziach pól bocznych (NIE wchodzą na strefę zawiasu — góra/dół strefy zostają proste):</label>
+      <div class="flex-wrap-row">
         <label class="flex-label"><input type="checkbox" data-hinge-tab="left" ${m.tabs.left?'checked':''}> Lewa</label>
         <label class="flex-label"><input type="checkbox" data-hinge-tab="right" ${m.tabs.right?'checked':''}> Prawa</label>
         <label class="flex-label"><input type="checkbox" data-hinge-tab="top" ${m.tabs.top?'checked':''}> Górna</label>
@@ -3542,7 +3619,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         const bb=objBBox(o);
         h+=`<div class="field"><label>Szerokość (mm)</label><input type="number" id="pathW" value="${fmt(bb.w)}" min="1" step="1"></div>`;
         h+=`<div class="field"><label>Wysokość (mm)</label><input type="number" id="pathH" value="${fmt(bb.h)}" min="1" step="1"></div>`;
-        h+=`<div class="field"><button type="button" id="pathReset" class="tbtn" style="width:100%;justify-content:center" title="Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości ścieżki">↺ Przywróć proporcje 1:1</button></div>`;
+        h+=`<div class="field"><button type="button" id="pathReset" class="tbtn tbtn-full" title="Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości ścieżki">↺ Przywróć proporcje 1:1</button></div>`;
       }
     } else {
       h+=numField('Pozycja X (mm)','x',o,{step:1});
@@ -3583,7 +3660,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       const tbb=objBBox(o);
       h+=`<div class="field"><label>Szerokość napisu (mm)</label><input type="number" id="textW" value="${fmt(tbb.w)}" min="1" step="1"></div>`;
       h+=`<div class="field"><label>Wysokość napisu (mm)</label><input type="number" id="textH" value="${fmt(tbb.h)}" min="1" step="1"></div>`;
-      h+=`<div class="field"><button type="button" id="textReset" class="tbtn" style="width:100%;justify-content:center" title="Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości napisu">↺ Przywróć proporcje 1:1</button></div>`;
+      h+=`<div class="field"><button type="button" id="textReset" class="tbtn tbtn-full" title="Usuwa rozciągnięcie — przywraca oryginalny stosunek szerokości do wysokości napisu">↺ Przywróć proporcje 1:1</button></div>`;
     }
     // ---- sekcja: powielanie ----
     h+=`<div class="form-sec">Powielanie</div>`;
@@ -3619,10 +3696,10 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           <button type="button" id="frameAddBtn" class="tbtn" style="flex:1;justify-content:center;min-width:0">✂ Dodaj</button>
         </div>
         <p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
-      h+=`<div class="field"><button type="button" id="convertTextPathBtn" class="tbtn" style="width:100%;justify-content:center" title="Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi">✏ Konwertuj na ścieżkę (kontury liter)</button></div>`;
+      h+=`<div class="field"><button type="button" id="convertTextPathBtn" class="tbtn tbtn-full" title="Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi">✏ Konwertuj na ścieżkę (kontury liter)</button></div>`;
     }
     if(['rect','ellipse','polygon','star'].includes(o.type)){
-      h+=`<div class="field"><button type="button" id="convertPathBtn" class="tbtn" style="width:100%;justify-content:center" title="Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać">✏ Konwertuj na ścieżkę</button></div>`;
+      h+=`<div class="field"><button type="button" id="convertPathBtn" class="tbtn tbtn-full" title="Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać">✏ Konwertuj na ścieżkę</button></div>`;
       h+=`<div class="field"><label>Obwódka (mm)</label><div class="row2">
         <input type="number" id="offsetVal" value="5" step="1" style="flex:0 0 90px" title="Odległość obwódki od krawędzi kształtu (mm)">
         <button type="button" id="offsetBtn" class="tbtn" style="flex:1;justify-content:center">+ Utwórz obwódkę</button></div></div>`;
@@ -3639,10 +3716,10 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       </div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length===1){
-      h+=`<div class="field"><button type="button" id="smoothBtn" class="tbtn" style="width:100%;justify-content:center" title="Zamienia prostoliniowe krawędzie ścieżki na gładkie krzywe Béziera — efekt miękkiego, organicznego kształtu zamiast kanciastego wielokąta">〰 Wygładź w krzywe Béziera</button></div>`;
+      h+=`<div class="field"><button type="button" id="smoothBtn" class="tbtn tbtn-full" title="Zamienia prostoliniowe krawędzie ścieżki na gładkie krzywe Béziera — efekt miękkiego, organicznego kształtu zamiast kanciastego wielokąta">〰 Wygładź w krzywe Béziera</button></div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length>1){
-      h+=`<div class="field"><button type="button" id="breakApartBtn" class="tbtn" style="width:100%;justify-content:center" title="Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie">✂ Rozdziel na podścieżki <span class="ctx-key">Ctrl+Shift+B</span></button></div>`;
+      h+=`<div class="field"><button type="button" id="breakApartBtn" class="tbtn tbtn-full" title="Rozdziela ścieżkę z wieloma podścieżkami (np. zwektoryzowany tekst) na osobne obiekty - każdy edytowalny niezależnie">✂ Rozdziel na podścieżki <span class="ctx-key">Ctrl+Shift+B</span></button></div>`;
     }
     // ---- sekcja: warstwa 3D ----
     h+=`<div class="form-sec">Warstwa 3D</div>`;
@@ -3667,7 +3744,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   /* ---- Właściwości obrazu pomocniczego (kalka do przerysowania) ---- */
   function renderImageProps(o){
     let h='';
-    h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz”, aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
+    h+=`<div class="empty-note" style="padding-bottom:4px">🖼 Obraz pomocniczy — sam NIE jest cięty ani uwzględniany w eksporcie SVG / podglądzie 3D. Użyj „Obrysuj obraz", aby zamienić go na wektorowy kontur (ścieżkę), który już MOŻNA wycinać lub grawerować.</div>`;
     h+=`<div class="field"><label>Nazwa</label><input type="text" data-prop="name" value="${escapeXml(o.name||'')}" placeholder="${escapeXml(autoName(o))}"></div>`;
     h+=`<div class="field"><label>Pozycja X (mm)</label><input type="number" data-prop="x" value="${fmt(o.x)}" step="1" title="${WHEEL_HINT}"></div>`;
     h+=`<div class="field"><label>Pozycja Y (mm)</label><input type="number" data-prop="y" value="${fmt(o.y)}" step="1" title="${WHEEL_HINT}"></div>`;
@@ -3676,8 +3753,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     h+=`<div class="field"><label class="check-label"><input type="checkbox" id="imgLockRatio" ${o.lockAspect?'checked':''}> Zachowaj proporcje przy zmianie rozmiaru</label></div>`;
     h+=rangeField('Obrót (°)','rotation',o.rotation||0,0,360,1,o);
     h+=rangeField('Krycie (%)','opacity',o.opacity??100,0,100,1);
-    h+=`<div class="field"><button type="button" id="imgReplaceBtn" class="tbtn" style="width:100%;justify-content:center">🔄 Zamień obraz</button></div>`;
-    h+=`<div class="field"><button type="button" id="imgTraceBtn" class="tbtn" style="width:100%;justify-content:center" title="Tworzy nowy element 'ścieżka' z konturu obrazu — do cięcia lub grawerowania. Najlepiej działa dla prostych, kontrastowych grafik (logo, sylwetka), najlepiej z przezroczystym tłem.">🪄 Obrysuj obraz → ścieżka do cięcia</button></div>`;
+    h+=`<div class="field"><button type="button" id="imgReplaceBtn" class="tbtn tbtn-full">🔄 Zamień obraz</button></div>`;
+    h+=`<div class="field"><button type="button" id="imgTraceBtn" class="tbtn tbtn-full" title="Tworzy nowy element 'ścieżka' z konturu obrazu — do cięcia lub grawerowania. Najlepiej działa dla prostych, kontrastowych grafik (logo, sylwetka), najlepiej z przezroczystym tłem.">🪄 Obrysuj obraz → ścieżka do cięcia</button></div>`;
     propsEl.innerHTML=lockedWrap(h,o);
     bindProps();
     bindImageProps(o);
@@ -3790,7 +3867,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   // a baner na górze tłumaczy, dlaczego nie reagują na kliknięcia.
   function lockedWrap(h,o){
     if(!o.locked) return h;
-    return `<div class="empty-note" style="background:rgba(255,170,60,.12);border:1px solid rgba(255,170,60,.35);border-radius:8px;padding:8px 10px;margin:0 0 4px">🔒 Element zablokowany — odblokuj go w panelu „Warstwy” (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled style="border:0;padding:0;margin:0">${h}</fieldset>`;
+    return `<div class="empty-note" style="background:rgba(255,170,60,.12);border:1px solid rgba(255,170,60,.35);border-radius:8px;padding:8px 10px;margin:0 0 4px">🔒 Element zablokowany — odblokuj go w panelu „Warstwy" (ikona 🔒/🔓), aby edytować właściwości.</div><fieldset disabled style="border:0;padding:0;margin:0">${h}</fieldset>`;
   }
   function bindProps(){
     const o=getSel(); if(!o) return;
@@ -3977,7 +4054,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   const paramsEl=document.getElementById('params');
   function renderParams(){
     if(!state.params.length){
-      paramsEl.innerHTML=`<div class="params-empty">Brak parametrów. Dodaj parametr (np. „grubość materiału” albo „rozmiar”), a potem w panelu właściwości elementu wybierz 🔗 powiązanie z nim — jeden suwak będzie sterował całym projektem naraz.</div>`;
+      paramsEl.innerHTML=`<div class="params-empty">Brak parametrów. Dodaj parametr (np. „grubość materiału" albo „rozmiar"), a potem w panelu właściwości elementu wybierz 🔗 powiązanie z nim — jeden suwak będzie sterował całym projektem naraz.</div>`;
       return;
     }
     paramsEl.innerHTML=state.params.map(p=>`
@@ -4271,8 +4348,11 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     reader.readAsText(f);
     e.target.value='';
   });
-  document.getElementById('newProjectBtn').addEventListener('click',()=>{
-    if(state.objects.length && !confirm('Wyczyścić bieżący projekt i zacząć od nowa? Niezapisane zmiany zostaną utracone.')) return;
+  document.getElementById('newProjectBtn').addEventListener('click',async()=>{
+    if(state.objects.length){
+      const ok=await showConfirm('Wyczyścić bieżący projekt i zacząć od nowa? Niezapisane zmiany zostaną utracone.',{icon:'🗑️',ok:'Wyczyść',danger:true});
+      if(!ok) return;
+    }
     applyProjectData({docW:760,docH:760,objects:[],params:[{id:'p_grubosc',name:'grubość_materiału',value:3,min:1,max:12,step:0.5}],layerMM:{},hiddenDepths:[],depthView:true});
   });
 
@@ -4977,8 +5057,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     document.getElementById('pqMaterials').appendChild(pqMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
   });
   document.getElementById('pqSave').addEventListener('click',collectPqAndSave);
-  document.getElementById('pqRestore').addEventListener('click',()=>{
-    if(!confirm('Przywrócić domyślny cennik i parametry w tym profilu?')) return;
+  document.getElementById('pqRestore').addEventListener('click',async()=>{
+    const ok=await showConfirm('Przywrócić domyślny cennik i parametry w tym profilu?',{icon:'↺',ok:'Przywróć domyślne'});
+    if(!ok) return;
     PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
     fillPqPanel(); refreshPricingUI();
     const st=document.getElementById('pqStatus'); st.style.color='var(--success)'; st.textContent='↺ Przywrócono domyślne.';
@@ -5023,10 +5104,11 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     cur.name=name; saveProfiles(); renderProfileSelect();
   });
   const _pDel=document.getElementById('qProfDel');
-  if(_pDel) _pDel.addEventListener('click',()=>{
+  if(_pDel) _pDel.addEventListener('click',async()=>{
     if(PROFILES.profiles.length<=1){ showToast('To jedyny profil — nie można go usunąć.','error'); return; }
     const cur=activeProfile(); if(!cur) return;
-    if(!confirm('Usunąć profil „'+cur.name+'"?')) return;
+    const ok=await showConfirm('Usunąć profil „'+cur.name+'"?',{icon:'🗑️',ok:'Usuń',danger:true});
+    if(!ok) return;
     PROFILES.profiles=PROFILES.profiles.filter(p=>p.id!==cur.id);
     PROFILES.activeId=PROFILES.profiles[0].id; PRICING=activeProfile().config; saveProfiles();
     renderProfileSelect(); syncMatSelectors(); fillPqPanel(); renderQuoteAll();
@@ -5103,7 +5185,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   function renderMaterialsList(){
     const listEl=document.getElementById('matList');
     const customs=loadCustomMaterials();
-    if(!customs.length){ listEl.innerHTML='<p class="mat-empty">Brak własnych materiałów. Dodaj pierwszy powyżej — pojawi się na liście „Materiał…” przy każdej warstwie.</p>'; return; }
+    if(!customs.length){ listEl.innerHTML='<p class="mat-empty">Brak własnych materiałów. Dodaj pierwszy powyżej — pojawi się na liście „Materiał…" przy każdej warstwie.</p>'; return; }
     listEl.innerHTML=customs.map((m,i)=>`<div class="mat-row" data-i="${i}"><span class="mat-label">${escapeXml(m.label)}</span><span class="lyr-unit">${fmt(m.mm)} mm</span><button type="button" class="mat-del" title="Usuń">🗑</button></div>`).join('');
     listEl.querySelectorAll('.mat-del').forEach(btn=>btn.addEventListener('click',()=>{
       const i=Number(btn.closest('.mat-row').dataset.i);
@@ -5297,7 +5379,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   const p3dZoomLabel=document.getElementById('p3dZoomLabel');
   const p3dHint=document.getElementById('p3dHint');
   const p3dWrap0=document.getElementById('p3dWrap');
-  const P3D_HINT_NET='Grubości warstw ustawiasz w mm w panelu „Warstwy 3D” po lewej — model 3D odwzorowuje je proporcjonalnie.';
+  const P3D_HINT_NET='Grubości warstw ustawiasz w mm w panelu „Warstwy 3D" po lewej — model 3D odwzorowuje je proporcjonalnie.';
   function applyP3DTransform(){
     p3dScene.style.transform=`translate(${fmt(p3dZoom.x)}px,${fmt(p3dZoom.y)}px) scale(${fmt(p3dZoom.scale)}) rotateX(${p3dRot.x}deg) rotateZ(${p3dRot.z}deg)`;
     p3dZoomLabel.textContent=Math.round(p3dZoom.scale*100)+'%';
@@ -5756,7 +5838,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     tplEl.appendChild(b);
   });
 
-  /* ---------------- Punkty krawędzi „na palec” (używane przez generator zawiasu) ---------------- */
+  /* ---------------- Punkty krawędzi „na palec" (używane przez generator zawiasu) ---------------- */
   function fingerEdgePoints(L,t,f,tabsFirst){
     let n=Math.max(1,Math.round(L/f));
     if(n%2===0) n+=1;
