@@ -2811,6 +2811,63 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 /* === v77: Toolbar — group separator pulse na hover === */
 .tgroup::after{transition:opacity .2s}
 .tgroup:hover::after{opacity:1;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.25),transparent)}
+
+/* === v78: Breakdown wyceny — animacja wejścia wierszy === */
+@keyframes brRowIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.q-break .br-row{animation:brRowIn .15s ease-out backwards}
+.q-break .br-row:nth-child(2){animation-delay:30ms}
+.q-break .br-row:nth-child(3){animation-delay:60ms}
+.q-break .br-row:nth-child(4){animation-delay:90ms}
+.q-break .br-row:nth-child(5){animation-delay:120ms}
+
+/* === v78: Lepszy widoczny focus na warstwie z klawiaturą === */
+.layer[tabindex]:focus-visible{box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4),0 0 12px rgba(var(--accent-rgb),.15);border-color:var(--accent);z-index:2}
+.layer[tabindex]:focus-visible .drag-grip{opacity:1;color:var(--accent)}
+
+/* === v78: Performance warning — wyróżniony toast === */
+.toast.toast-warning{border-left:3px solid var(--operator)}
+
+/* === v78: Lepszy styl legendy w dolnym pasku === */
+.legend span{letter-spacing:.01em}
+.legend span:first-child{margin-left:2px}
+
+/* === v78: Karta wyceny — lepsza animacja ceny === */
+@keyframes priceUpdate{from{transform:scale(1.05);opacity:.8}to{transform:scale(1);opacity:1}}
+.q-pp-val.price-flash{animation:priceUpdate .3s ease-out}
+
+/* === v78: Ulepszone multi-select chipy — hover === */
+.multi-sel-chip{transition:background .12s,border-color .12s,transform .08s;cursor:default}
+.multi-sel-chip:hover{background:rgba(var(--accent-rgb),.15);border-color:rgba(var(--accent-rgb),.3);transform:scale(1.04)}
+
+/* === v78: Lepszy empty state 3D z gradient === */
+.live3d-empty{background:radial-gradient(ellipse at 50% 60%,rgba(var(--accent-rgb),.03),transparent 70%)}
+.live3d-empty::before{transition:filter .2s,opacity .2s}
+.live3d-empty:hover::before{filter:grayscale(0);opacity:.7}
+
+/* === v78: Lepsza wizualizacja depth-legend z gradient === */
+.depth-legend{border-top:1px solid rgba(var(--accent-rgb),.06);padding-top:6px}
+.depth-legend .lyr-row:first-child{margin-top:2px}
+
+/* === v78: Kontekstowe menu — animacja wejścia pozycji === */
+.ctx-menu.open button{animation:ctxItemIn .1s ease-out backwards}
+.ctx-menu.open button:nth-child(2){animation-delay:15ms}
+.ctx-menu.open button:nth-child(3){animation-delay:30ms}
+.ctx-menu.open button:nth-child(4){animation-delay:45ms}
+.ctx-menu.open button:nth-child(5){animation-delay:60ms}
+.ctx-menu.open button:nth-child(n+6){animation-delay:75ms}
+@keyframes ctxItemIn{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
+
+/* === v78: Lepszy hover na seg buttons z depth-color === */
+.seg button.cut:hover:not(.on){color:var(--cut);border-color:rgba(255,59,59,.3)}
+.seg button.engrave:hover:not(.on){color:var(--muted);border-color:var(--border-strong)}
+.seg button.score:hover:not(.on){color:var(--score);border-color:rgba(47,123,216,.3)}
+
+/* === v78: Poprawa live-quote na mobile === */
+@media(max-width:480px){
+  .live-quote{min-width:auto}
+  .live-quote .lq-head{font-size:.62rem}
+  .live-quote .lq-price{font-size:1.05rem}
+}
 </style>
 </head>
 <body>
@@ -4120,7 +4177,10 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     gOverlay.innerHTML=s;
   }
 
-  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').style.display=state.objects.length?'none':''; if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar(); }
+  let _perfWarnShown=false;
+  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').style.display=state.objects.length?'none':''; if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
+    if(!_perfWarnShown && state.objects.length>=150){ _perfWarnShown=true; showToast('Dużo elementów ('+state.objects.length+') — edytor może działać wolniej. Rozważ grupowanie lub usunięcie zbędnych obiektów.','warning',5000); }
+  }
 
   /* ---------------- Pomocniki zaznaczenia ---------------- */
   function getSelected(){ return state.objects.filter(o=>state.selectedIds.includes(o.id)); }
@@ -5668,7 +5728,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     if(lockedInSel) selInfoExtra+=' · '+lockedInSel+' 🔒';
     if(hiddenInSel) selInfoExtra+=' · '+hiddenInSel+' ukr.';
     if(depthsInSel.length>1) selInfoExtra+=' · '+depthsInSel.length+' warstw';
-    let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}${selInfoExtra}<br><span class="muted-sm">${typeInfo}</span></div>`;
+    const chipHtml=Object.entries(typeCounts).map(([t,c])=>`<span class="multi-sel-chip">${c}× ${t}</span>`).join('');
+    let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}${selInfoExtra}</div><div class="multi-sel-info">${chipHtml}</div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
     // proporcjonalnie (Sz./Wys., zakotwiczone w lewym górnym rogu) całe zaznaczenie naraz
     const mb=selBBox(sel);
