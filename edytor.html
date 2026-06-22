@@ -76,7 +76,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Pionowy pasek narzędzi rysowania (lewa krawędź) ---- */
 .toolrail{flex:0 0 60px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh-sm);z-index:5}
 .toolrail .tool-list{display:flex;flex-direction:column;gap:4px;align-items:center}
-.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.55rem;font-weight:700;border-radius:10px;padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted);transition:all .14s;position:relative}
+.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.55rem;font-weight:700;border-radius:10px;padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted);transition:background .14s,color .14s,transform .14s,box-shadow .14s;position:relative}
 .toolrail .tbtn .ico{font-size:1.24rem;line-height:1}
 .toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}
@@ -196,7 +196,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .text-toolbar select{max-width:150px}
 .text-toolbar input[type=number]{width:58px}
 .text-toolbar label{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.text-toolbar .tbtn{height:30px;min-width:30px;padding:0 9px;transition:all .12s}
+.text-toolbar .tbtn{height:30px;min-width:30px;padding:0 9px;transition:background .12s,color .12s,border-color .12s,box-shadow .12s,transform .08s}
 .text-toolbar .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 2px 8px rgba(var(--accent-rgb),.4)}
 .tt-sep{width:1px;height:22px;background:var(--border);opacity:.5}
 
@@ -336,7 +336,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .gallery-upload-btn{margin:0 14px 16px;width:calc(100% - 28px);justify-content:center;cursor:pointer;font-size:.76rem}
 
 /* ---- Głębokość / warstwy 3D ---- */
-.d-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:17px;padding:0 5px;border-radius:5px;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.d-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:17px;padding:0 5px;border-radius:5px;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .08s,box-shadow .08s}
+.d-badge:hover{transform:scale(1.1);box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .d1{background:#2a9d8f}.d2{background:#e76f51}.d3{background:#9b5de5}.d4{background:#f4a261}.d5{background:#06d6a0}.d6{background:#e63946}.dN{background:#888}
 .depth-ctrl{display:flex;align-items:center;gap:6px}
 .depth-ctrl .dbtn{width:26px;height:26px;border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));border-radius:6px;cursor:pointer;font-size:.9rem;color:var(--text);display:flex;align-items:center;justify-content:center;padding:0;transition:border-color .12s,color .12s,background .12s,transform .08s}
@@ -370,8 +371,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .modal-close:hover{background:rgba(255,90,90,.2);border-color:var(--danger);color:var(--danger);transform:scale(1.08);box-shadow:0 0 12px rgba(255,90,90,.2)}
 .modal-close:active{transform:scale(.92)}
 .layers3d-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
-.layer3d-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px;transition:border-color .14s,box-shadow .14s,transform .1s}
-.layer3d-card:hover{border-color:var(--accent);box-shadow:0 4px 14px rgba(var(--accent-rgb),.15);transform:translateY(-2px)}
+.layer3d-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px;transition:border-color .14s,box-shadow .14s,transform .12s}
+.layer3d-card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(var(--accent-rgb),.18);transform:translateY(-3px) scale(1.01)}
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700}
 .layer3d-card .lcount{font-size:.71rem;color:var(--muted)}
 .layer3d-card svg{width:120px;height:76px;overflow:visible;background:var(--bg);border-radius:6px;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.3)}
@@ -379,8 +380,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Biblioteka materiałów (modal) ---- */
 .mat-list{display:flex;flex-direction:column;gap:6px;margin-top:14px}
-.mat-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.8rem;transition:border-color .12s,background .12s}
-.mat-row:hover{border-color:var(--border-strong);background:var(--surface3)}
+.mat-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.8rem;transition:border-color .12s,background .12s,transform .08s}
+.mat-row:hover{border-color:var(--border-strong);background:var(--surface3);transform:translateX(2px)}
 .mat-row .mat-label{flex:1}
 .mat-row .mat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:3px 5px;line-height:1;border-radius:4px;transition:background .1s,color .1s}
 .mat-row .mat-del:hover{color:var(--cut);background:rgba(255,60,60,.1)}
@@ -392,8 +393,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Podsumowanie projektu (modal) ---- */
 .sum-stats{display:flex;flex-direction:column;gap:5px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background .12s}
-.sum-row:hover{background:var(--surface3)}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background .12s,box-shadow .14s,transform .08s}
+.sum-row:hover{background:var(--surface3);box-shadow:var(--sh-sm);transform:translateX(2px)}
 .sum-row.sum-cut{border-left-color:var(--cut-light)}
 .sum-row.sum-score{border-left-color:var(--score-light)}
 .sum-row.sum-engrave{border-left-color:var(--hole)}
@@ -429,10 +430,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Skróty klawiszowe (modal) ---- */
 .shortcuts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 28px;margin-top:16px}
 .sc-group h4{margin:0 0 8px;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);padding:6px 8px;border-bottom:none;background:rgba(var(--accent-rgb),.06);border-radius:6px;border:1px solid rgba(var(--accent-rgb),.12)}
-.sc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px;font-size:.84rem;border-radius:5px;transition:background .12s}
-.sc-row:hover{background:var(--surface2)}
+.sc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px;font-size:.84rem;border-radius:5px;transition:background .12s,padding-left .12s}
+.sc-row:hover{background:var(--surface2);padding-left:10px}
 .sc-row .sc-keys{display:flex;gap:3px;flex-shrink:0;align-items:center}
-kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:linear-gradient(180deg,var(--surface3),var(--surface2));border:1px solid var(--border);border-bottom-width:2px;border-bottom-color:var(--border-strong);border-radius:5px;font:600 .76rem var(--font-b);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25)}
+kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:linear-gradient(180deg,var(--surface3),var(--surface2));border:1px solid var(--border);border-bottom-width:2px;border-bottom-color:var(--border-strong);border-radius:5px;font:600 .76rem var(--font-b);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .08s,box-shadow .08s}
+kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 /* sekcja nagłówka w formularzu (zawias, inne modala) */
 .form-sec{margin:16px 16px 9px;padding:7px 11px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.18);border-radius:8px;transition:background .14s}
 .form-sec:hover{background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent2-rgb),.06))}
@@ -490,8 +492,8 @@ kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;backgr
 /* ---- Manager warstw 3D ---- */
 .depth-legend{display:flex;flex-direction:column;gap:4px;padding:4px 14px 8px}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
-.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background .12s,border-color .12s,box-shadow .12s}
-.lyr-row:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm)}
+.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:8px;background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background .12s,border-color .12s,box-shadow .12s,transform .08s}
+.lyr-row:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateX(2px)}
 .lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15)}
 .lyr-row.lyr-hidden{opacity:.45}
 .lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;flex:0 0 auto;transition:filter .12s,transform .08s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -702,6 +704,17 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   font-size:.9rem;font-weight:700;color:var(--accent);background:rgba(8,11,18,.85);
   padding:12px 24px;border-radius:12px;border:1.5px solid rgba(var(--accent-rgb),.4);
   box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:5;pointer-events:none}
+
+/* === Toast / notyfikacja === */
+.toast-container{position:fixed;top:16px;right:16px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;max-width:380px;padding:12px 16px;border-radius:10px;font-size:.82rem;font-weight:500;line-height:1.5;
+  background:linear-gradient(180deg,rgba(26,34,51,.96),rgba(12,16,25,.96));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--border-strong);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.55);
+  animation:toastIn .25s ease-out;transition:opacity .2s,transform .2s}
+.toast.toast-error{border-color:rgba(255,90,90,.45);background:linear-gradient(180deg,rgba(40,20,20,.96),rgba(20,10,10,.96))}
+.toast.toast-success{border-color:rgba(84,214,153,.4)}
+.toast.toast-out{opacity:0;transform:translateX(20px)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 
 /* === Loading state — skeleton pulse do ponownego użycia === */
 @keyframes skeletonPulse{0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -1192,14 +1205,20 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   </div>
 </div>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
 (function(){
   const SVG_NS='http://www.w3.org/2000/svg';
-  // Wizualizacja 3D: zakładka (overlap) ścianek bocznych w px scalonego widoku 3D - eliminuje
-  // ułamkowe prześwity tła na stykach sąsiednich ścianek/płyt (patrz buildLayerScene)
   const WALL_OVERLAP=0.75;
   const COLORS={cut:'#ff2d2d',engrave:'#1c1c1c',score:'#2f7bd8',hole:'#9b5de5'};
   const ACCENT='#3fc7ff';
+  const _toastC=document.getElementById('toastContainer');
+  function showToast(msg,type,duration){
+    const el=document.createElement('div'); el.className='toast'+(type?' toast-'+type:'');
+    el.textContent=msg; _toastC.appendChild(el);
+    setTimeout(()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); },duration||3500);
+  }
   const FONTS=[
     // 47 czcionek webowych (Google Fonts) — zawsze dostępne dla KAŻDEGO klienta,
     // bez instalowania czegokolwiek; wyglądają identycznie na PC, telefonie i Macu.
@@ -1281,7 +1300,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   let localFonts=[];                       // czcionki zainstalowane na komputerze
   function availableFonts(){ return FONTS.concat(localFonts); }
   async function loadLocalFonts(){
-    if(!window.queryLocalFonts){ alert('Ta przeglądarka nie udostępnia czcionek z komputera.\nUżyj Chrome lub Edge (i otwórz edytor przez https albo lokalnie z uprawnieniami).'); return; }
+    if(!window.queryLocalFonts){ showToast('Ta przeglądarka nie udostępnia czcionek z komputera. Użyj Chrome lub Edge.','error',5000); return; }
     try{
       const fonts=await window.queryLocalFonts();
       const fams=[...new Set(fonts.map(f=>f.family))].sort((a,b)=>a.localeCompare(b));
@@ -1310,8 +1329,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       renderProps(); renderAll();
       const note=embeddedFamilies.size<fams.length?` (zarejestrowano do wektoryzacji ${embeddedFamilies.size}/${fams.length})`:'';
       const fcnt=fams.length, fpl=fcnt===1?'czcionkę':fcnt<=4?'czcionki':'czcionek';
-      alert('Wczytano '+fcnt+' '+fpl+' z komputera'+note+'. Znajdziesz je na liście „Czcionka” (oznaczone • PC).');
-    }catch(e){ alert('Nie udało się wczytać czcionek z komputera: '+e.message); }
+      showToast('Wczytano '+fcnt+' '+fpl+' z komputera'+note+'. Znajdziesz je na liście czcionek.','success',4000);
+    }catch(e){ showToast('Nie udało się wczytać czcionek: '+e.message,'error',4000); }
   }
 
   /* ---- Rozwijana lista czcionek z PODGLĄDEM NA ŻYWO: najechanie na nazwę od razu
@@ -2073,7 +2092,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       const cnv=document.createElement('canvas'); cnv.width=W; cnv.height=H;
       const ctx=cnv.getContext('2d');
       ctx.drawImage(img,0,0,W,H);
-      let data; try{ data=ctx.getImageData(0,0,W,H).data; }catch(e){ alert('Nie udało się przetworzyć tego obrazu.'); return; }
+      let data; try{ data=ctx.getImageData(0,0,W,H).data; }catch(e){ showToast('Nie udało się przetworzyć tego obrazu.','error'); return; }
       let hasAlpha=false;
       for(let p=3;p<data.length;p+=4){ if(data[p]<250){ hasAlpha=true; break; } }
       const mask=new Uint8Array(W*H);
@@ -2089,7 +2108,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         }
       }
       const rawPolys=traceMaskPolys(mask,W,H).map(p=>simplifyRing(p,1.2)).filter(r=>r.length>=3);
-      if(!rawPolys.length){ alert('Nie udało się znaleźć konturu na tym obrazie.\nNajlepiej działa to dla prostych, kontrastowych grafik (logo, sylwetka) — najlepiej z przezroczystym tłem.'); return; }
+      if(!rawPolys.length){ showToast('Nie udało się znaleźć konturu. Najlepiej działają proste, kontrastowe grafiki z przezroczystym tłem.','error',5000); return; }
       const sx=(o.w||1)/W, sy=(o.h||1)/H;
       const localPolys=rawPolys.map(poly=>smoothRingToPolyline(poly,50).map(([px,py])=>[px*sx, py*sy]));
       // Grupujemy pierścienie w ODDZIELNE kształty: każdy kontur najwyższego poziomu (nie
@@ -2129,7 +2148,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       state.selectedIds=newObjs.map(c=>c.id);
       pushHistory(); renderAll(); renderProps(); scheduleLive3D();
     };
-    img.onerror=()=>alert('Nie udało się wczytać obrazu do obrysowania.');
+    img.onerror=()=>showToast('Nie udało się wczytać obrazu do obrysowania.','error');
     img.src=o.src;
   }
 
@@ -2624,8 +2643,8 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   }
   function booleanOp(kind){
     const sel=getSelected().filter(o=>BOOL_TYPES.includes(o.type));
-    if(sel.length<2){ alert('Zaznacz co najmniej 2 kształty (prostokąt, elipsa, wielokąt, gwiazda lub wynik operacji).'); return; }
-    if(kind==='xor' && sel.length!==2){ alert('Wyklucz (XOR) działa tylko dla dokładnie 2 zaznaczonych kształtów.'); return; }
+    if(sel.length<2){ showToast('Zaznacz co najmniej 2 kształty do operacji logicznej.','error'); return; }
+    if(kind==='xor' && sel.length!==2){ showToast('XOR działa tylko dla 2 zaznaczonych kształtów.','error'); return; }
     // kolejność dla różnicy: od spodu (pierwszy = baza, kolejne odejmowane)
     const polys=sel.map(flattenToPoly).filter(Boolean);
     if(polys.length<2) return;
@@ -2636,7 +2655,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     } else {
       rings = polys.length===2 ? clipGH(polys[0],polys[1],kind) : clipMany(polys,kind);
     }
-    if(!rings.length){ alert(kind==='intersection'?'Zaznaczone kształty nie mają części wspólnej.':kind==='difference'?'Po odjęciu nie zostało nic.':kind==='xor'?'Kształty pokrywają się całkowicie — wynik operacji byłby pusty.':'Operacja nie dała wyniku.'); return; }
+    if(!rings.length){ showToast(kind==='intersection'?'Kształty nie mają części wspólnej.':kind==='difference'?'Po odjęciu nie zostało nic.':kind==='xor'?'Kształty pokrywają się całkowicie.':'Operacja nie dała wyniku.','error'); return; }
     finalizeBoolean(sel, rings.map(polyToPathD).join(' '), polysBBoxMulti(rings), sel[0].mode);
   }
 
@@ -3468,7 +3487,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       m.T=clamp(m.T,0.5,20); m.F=clamp(m.F,2,100);
       const ok=regenerateHingeGroup(outline,slits,m);
       if(!ok){
-        if(commit) alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość, zmniejsz długość nacięcia albo odstępy.');
+        if(commit) showToast('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość lub zmniejsz odstępy.','error',4000);
         return false;
       }
       renderAll();
@@ -3689,7 +3708,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
      historii cofania / autozapisu (które trzymają pełny JSON projektu). */
   let pendingImageReplaceId=null;
   function importImageFile(file){
-    if(!file || !/^image\//.test(file.type)){ alert('Wybierz plik obrazu (PNG, JPG, itp.).'); return; }
+    if(!file || !/^image\//.test(file.type)){ showToast('Wybierz plik obrazu (PNG, JPG, itp.).','error'); return; }
     const replaceId=pendingImageReplaceId; pendingImageReplaceId=null;
     const reader=new FileReader();
     reader.onload=()=>{
@@ -3714,7 +3733,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           addObject(o);
         }
       };
-      img.onerror=()=>alert('Nie udało się wczytać obrazu.');
+      img.onerror=()=>showToast('Nie udało się wczytać obrazu.','error');
       img.src=reader.result;
     };
     reader.readAsDataURL(file);
@@ -4130,7 +4149,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   TOOLS.forEach(t=>{
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
     b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
-    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`;
+    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`);
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
@@ -4247,7 +4266,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         const d=JSON.parse(reader.result);
         if(!Array.isArray(d.objects)) throw new Error('zły format pliku');
         applyProjectData(d);
-      }catch(err){ alert('Nie udało się wczytać projektu: '+err.message); }
+      }catch(err){ showToast('Nie udało się wczytać projektu: '+err.message,'error',5000); }
     };
     reader.readAsText(f);
     e.target.value='';
@@ -4546,7 +4565,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   function showExport3D(){
     const W=state.docW, H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image');
-    if(!vis.length){ alert('Projekt jest pusty — nie ma czego eksportować.'); return; }
+    if(!vis.length){ showToast('Projekt jest pusty — nie ma czego eksportować.','error'); return; }
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     const grid=document.getElementById('layers3dGrid');
     const note=document.getElementById('modal3dNote');
@@ -5005,7 +5024,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   });
   const _pDel=document.getElementById('qProfDel');
   if(_pDel) _pDel.addEventListener('click',()=>{
-    if(PROFILES.profiles.length<=1){ alert('To jedyny profil — nie można go usunąć.'); return; }
+    if(PROFILES.profiles.length<=1){ showToast('To jedyny profil — nie można go usunąć.','error'); return; }
     const cur=activeProfile(); if(!cur) return;
     if(!confirm('Usunąć profil „'+cur.name+'"?')) return;
     PROFILES.profiles=PROFILES.profiles.filter(p=>p.id!==cur.id);
@@ -5293,7 +5312,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   function showPreview3D(){
     const W=state.docW, H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
-    if(!vis.length){ alert('Brak widocznych elementów do wizualizacji 3D.'); return; }
+    if(!vis.length){ showToast('Brak widocznych elementów do wizualizacji 3D.','error'); return; }
     document.getElementById('modal3dPrev').classList.add('open');
     renderP3D();
     p3dRot={x:54,z:-24}; p3dZoom={scale:1,x:0,y:0};
@@ -5524,7 +5543,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     return {svg, w:totalW, h:H+labelH};
   }
   function downloadSeparatedSVG(){
-    const r=buildSeparatedSVG(); if(!r){ alert('Brak elementów do eksportu.'); return; }
+    const r=buildSeparatedSVG(); if(!r){ showToast('Brak elementów do eksportu.','error'); return; }
     const full=`<?xml version="1.0" encoding="UTF-8"?>\n${r.svg}`;
     const blob=new Blob([full],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-warstwy-${Date.now()}.svg`;
@@ -5657,7 +5676,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
   function exportDXF(){
     const H=state.docH;
     const objs=state.objects.filter(o=>o.visible && o.type!=='image');
-    if(!objs.length){ alert('Brak obiektów do eksportu.'); return; }
+    if(!objs.length){ showToast('Brak obiektów do eksportu.','error'); return; }
     const depths=[...new Set(objs.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let layerDefs='';
     depths.forEach(dep=>{
@@ -5926,7 +5945,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     const gid=uid();
     const meta={gid,leftW,zoneW,rightW,H,T,F,tabs:{...tabs},tabDir,slitLen,kerf,pitchX,bridge};
     const geo=buildHingeGeometry(meta);
-    if(!geo){ alert('Strefa zawiasu jest za mała na nacięcia — zwiększ jej szerokość albo zmniejsz długość nacięcia/odstępy.'); return; }
+    if(!geo){ showToast('Strefa zawiasu jest za mała na nacięcia.','error'); return; }
     const {outlinePts,slitD,obb}=geo;
     const px=20, py=20;
     const outline={id:uid(),type:'path',name:'Panel zawiasu (obrys)',d:polyToPathD(outlinePts),fillRule:'nonzero',
@@ -6019,7 +6038,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     const alpha=clamp(Number(document.getElementById('gearPressure').value)||20,10,30);
     const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
     const {pts,ra,rf}=buildGearPoints(z,m,alpha);
-    if(bore>0 && bore>=2*rf-0.5){ alert('Otwór osi jest za duży względem podstaw zębów — zmniejsz średnicę otworu lub zwiększ moduł/liczbę zębów.'); return; }
+    if(bore>0 && bore>=2*rf-0.5){ showToast('Otwór osi jest za duży — zmniejsz średnicę lub zwiększ moduł.','error'); return; }
     const px=20, py=20, cx=px+ra, cy=py+ra, W=2*ra, H=2*ra;
     const gear={id:uid(),type:'path',name:'Koło zębate',d:polyToPathD(pts),fillRule:'nonzero',
       bx:-ra,by:-ra,bw:W,bh:H,x:cx,y:cy,rotation:0,sx:1,sy:1,mode:'cut',
@@ -6327,7 +6346,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     reader.onload = e => {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(e.target.result, 'image/svg+xml');
-      if(svgDoc.querySelector('parsererror')){ alert('Nieprawidłowy plik SVG'); return; }
+      if(svgDoc.querySelector('parsererror')){ showToast('Nieprawidłowy plik SVG','error'); return; }
       const SHAPE_TAGS = new Set(['path','rect','circle','ellipse','polygon','polyline','line']);
       const SKIP = new Set(['defs','symbol','clipPath','mask','filter','pattern']);
       const parts = [];
@@ -6340,9 +6359,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
         }
       }
       const svgRoot = svgDoc.querySelector('svg');
-      if(!svgRoot){ alert('Brak elementu SVG'); return; }
+      if(!svgRoot){ showToast('Brak elementu SVG','error'); return; }
       collect(svgRoot);
-      if(!parts.length){ alert('Brak rozpoznanych kształtów w pliku SVG'); return; }
+      if(!parts.length){ showToast('Brak rozpoznanych kształtów w pliku SVG','error'); return; }
       const combinedD = parts.join(' ');
       const tmpSvg = document.createElementNS(SVG_NS,'svg');
       tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
@@ -6375,9 +6394,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     reader.onload=e=>{
       const parser=new DOMParser();
       const svgDoc=parser.parseFromString(e.target.result,'image/svg+xml');
-      if(svgDoc.querySelector('parsererror')){ alert('Nieprawidłowy plik SVG'); return; }
+      if(svgDoc.querySelector('parsererror')){ showToast('Nieprawidłowy plik SVG','error'); return; }
       const svgRoot=svgDoc.querySelector('svg');
-      if(!svgRoot){ alert('Brak elementu SVG'); return; }
+      if(!svgRoot){ showToast('Brak elementu SVG','error'); return; }
       const SHAPE_TAGS=new Set(['path','rect','circle','ellipse','polygon','polyline','line']);
       const SKIP=new Set(['defs','symbol','clipPath','mask','filter','pattern','metadata','title','desc']);
       const items=[];
@@ -6404,7 +6423,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           if(child.children.length) walk(child, cumMat);
         }
       })(svgRoot, matIdentity());
-      if(!items.length){ alert('Brak rozpoznanych kształtów w pliku SVG'); return; }
+      if(!items.length){ showToast('Brak rozpoznanych kształtów w pliku SVG','error'); return; }
 
       const tmpSvg=document.createElementNS(SVG_NS,'svg');
       tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
@@ -6429,7 +6448,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           prepared.push(it);
         }
       });
-      if(!prepared.length){ document.body.removeChild(tmpSvg); alert('Brak rozpoznanych kształtów w pliku SVG'); return; }
+      if(!prepared.length){ document.body.removeChild(tmpSvg); showToast('Brak rozpoznanych kształtów w pliku SVG','error'); return; }
 
       // Etap 2: skalowanie do rozmiaru arkusza (tylko zmniejszanie, jeśli rysunek jest większy
       // niż dokument) + wycentrowanie. Dla kształtów bez obrotu/skosu (najczęstszy przypadek)
