@@ -5243,6 +5243,7 @@ input[type=number]{position:relative}
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
     downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`);
     markSaved();
+    try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
     showToast('Projekt zapisany ('+state.objects.length+' elem.)','success');
   });
   document.getElementById('loadProjectBtn').addEventListener('click',()=>{
@@ -5269,6 +5270,7 @@ input[type=number]{position:relative}
       if(!ok) return;
     }
     applyProjectData({docW:760,docH:760,objects:[],params:[{id:'p_grubosc',name:'grubość_materiału',value:3,min:1,max:12,step:0.5}],layerMM:{},hiddenDepths:[],depthView:true});
+    try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){}
     showToast('Nowy projekt — czyste płótno','success');
   });
 
@@ -8861,7 +8863,6 @@ input[type=number]{position:relative}
   splashProgress(10);
   buildCanvasSkeleton();
   splashProgress(25);
-  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
   docWInput.value=state.docW; docHInput.value=state.docH;
   depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
   splashProgress(40);
@@ -8980,6 +8981,14 @@ input[type=number]{position:relative}
     {ico:'🎯',label:'Podgląd 3D',hint:'',action:()=>document.getElementById('preview3dBtn')?.click()},
     {ico:'🆕',label:'Nowy projekt',hint:'',action:()=>document.getElementById('newProjectBtn')?.click()},
     {ico:'💰',label:'Wycena',hint:'',action:()=>activatePricingTab(false)},
+    {ico:'🪗',label:'Generator zawiasu',hint:'',action:()=>document.getElementById('hingeGenBtn')?.click()},
+    {ico:'⚙',label:'Koło zębate',hint:'',action:()=>document.getElementById('gearGenBtn')?.click()},
+    {ico:'🖼',label:'Importuj obraz',hint:'',action:()=>document.getElementById('importImageBtn')?.click()},
+    {ico:'📐',label:'Importuj SVG',hint:'',action:()=>document.getElementById('importSvgBtn')?.click()},
+    {ico:'⬇',label:'Eksport DXF',hint:'',action:()=>document.getElementById('exportDxfBtn')?.click()},
+    {ico:'🧊',label:'Eksport 3D',hint:'',action:()=>document.getElementById('export3dBtn')?.click()},
+    {ico:'🎨',label:'Tryb warstw 3D',hint:'',action:()=>document.getElementById('depthViewBtn')?.click()},
+    {ico:'📨',label:'Wyślij do wyceny',hint:'',action:()=>document.getElementById('lqSend')?.click()},
   ];
   function openQuickSearch(){
     qsOv.classList.add('open');
