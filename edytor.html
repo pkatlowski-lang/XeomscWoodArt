@@ -2525,6 +2525,72 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v72: Splash hint — animowana zmiana tekstu === */
 .splash-hint{transition:opacity .2s}
+
+/* === v73: Lepsza wizualizacja quote break rows === */
+.q-break .br-row{padding:5px 8px;border-radius:var(--r-xs);transition:color .12s,background .12s,padding-left .1s}
+.q-break .br-row:hover{color:var(--text);background:rgba(var(--accent-rgb),.04);padding-left:12px}
+
+/* === v73: Eksport button z animacją na hover === */
+#exportBtn:not(:disabled){position:relative;overflow:hidden}
+#exportBtn:not(:disabled)::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.08);transform:translate(-50%,-50%);transition:width .3s,height .3s}
+#exportBtn:not(:disabled):hover::after{width:200%;height:200%}
+
+/* === v73: Q-field select — lepszy styl z gradient === */
+.q-field select{background:linear-gradient(180deg,var(--surface2),rgba(var(--accent-rgb),.03));transition:border-color .14s,box-shadow .14s,background .14s}
+.q-field select:hover{background:linear-gradient(180deg,var(--surface3),rgba(var(--accent-rgb),.06))}
+
+/* === v73: Extra row w wycenie — lepsza wizualizacja === */
+.q-extra-row{padding:4px 6px;border-radius:var(--r-xs);transition:background .12s}
+.q-extra-row:hover{background:rgba(var(--accent-rgb),.03)}
+
+/* === v73: Lepsza wizualizacja pq-sec hover === */
+.pq-sec{transition:border-color .14s,box-shadow .14s,border-left-color .12s}
+.pq-sec:hover{border-left-color:var(--accent)}
+
+/* === v73: Live quote — lepsza animacja flash na zmianie ceny === */
+@keyframes lqFlash{0%{transform:scale(1.08);text-shadow:0 0 16px rgba(var(--accent-rgb),.5)}100%{transform:scale(1);text-shadow:none}}
+
+/* === v73: Lepszy styl na disabled export button === */
+#exportBtn:disabled{position:relative;overflow:hidden}
+#exportBtn:disabled::after{content:'wersja online';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:.5rem;color:var(--muted-2);white-space:nowrap}
+
+/* === v73: Lepsza wizualizacja input z jednostką === */
+.unit-label{font-size:.68rem;color:var(--muted);font-weight:500;white-space:nowrap}
+
+/* === v73: Toolbar tgroup — lepsza wizualizacja separatora === */
+.tgroup{border-right-color:rgba(var(--accent-rgb),.06)}
+
+/* === v73: Animate canvas objects fade-in on load === */
+@keyframes objectFadeIn{from{opacity:0}to{opacity:1}}
+
+/* === v73: Improved responsive modal na tablecie === */
+@media(min-width:640px) and (max-width:1040px){
+  .modal-box{max-width:90vw}
+  .shortcuts-grid{grid-template-columns:1fr 1fr}
+}
+
+/* === v73: Lepsza karta parametru z tooltip === */
+.param-card input[type=text]:hover{border-color:var(--border-strong)}
+.param-card input[type=number]:hover{border-color:var(--border-strong)}
+
+/* === v73: Gallery upload button — lepsza wizualizacja === */
+.gallery-upload-btn{transition:border-color .14s,color .14s,background .14s,transform .08s}
+.gallery-upload-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.12)}
+
+/* === v73: Lepsza wizualizacja konfiguratora wyceny toggle === */
+.q-cfg-toggle::before{content:'⚙';margin-right:4px;font-size:.7rem;transition:transform .2s}
+.q-cfg-toggle.open::before{transform:rotate(90deg)}
+
+/* === v73: Improved dd-kbd styling na większych ekranach === */
+@media(min-width:1200px){
+  .dd-kbd{font-size:.62rem;padding:2px 6px}
+}
+
+/* === v73: Better error toast styling === */
+.toast.toast-error{border-left:3px solid var(--danger)}
+.toast.toast-success{border-left:3px solid var(--success)}
+.toast.toast-info{border-left:3px solid var(--accent)}
+.toast.toast-warning{border-left:3px solid var(--operator)}
 </style>
 </head>
 <body>
@@ -6592,7 +6658,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     if(e.code==='Space' && !typing){ spaceDown=true; if(!drag) canvas.style.cursor='grab'; e.preventDefault(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){ e.preventDefault(); redo(); return; }
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); downloadJSON(serializeProject(), `projekt-laser-${Date.now()}.json`); markSaved(); showToast('Projekt zapisany do pliku','success'); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); const proj=serializeProject(); const projStr=JSON.stringify(proj,null,1); const sizeKB=(new Blob([projStr]).size/1024).toFixed(1); downloadJSON(proj, `projekt-laser-${Date.now()}.json`); markSaved(); const depths=[...new Set(state.objects.map(o=>o.depth||1))].length; showToast('Zapisano ('+state.objects.length+' elem., '+depths+' warstw, '+sizeKB+' KB)','success'); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='o'){ e.preventDefault(); document.getElementById('loadProjectInput').click(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){ e.preventDefault(); duplicateSel(); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='g'){ e.preventDefault(); e.shiftKey?ungroupSel():groupSel(); return; }
