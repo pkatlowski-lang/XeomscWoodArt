@@ -473,7 +473,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .p3d-edge-b,.p3d-edge-r{position:absolute;transform-style:preserve-3d}
 .p3d-edge-b{bottom:0;left:0;width:100%;transform-origin:bottom center}
 .p3d-edge-r{top:0;right:0;height:100%;transform-origin:right center}
-.p3d-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:6px;padding:6px 8px;background:rgba(var(--accent-rgb),.03);border-radius:var(--r-sm);border:1px solid rgba(var(--accent-rgb),.08)}
+.p3d-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:6px;padding:6px 8px;background:rgba(var(--accent-rgb),.03);border-radius:var(--r-sm);border:1px solid rgba(var(--accent-rgb),.08);transition:border-color .14s}
+.p3d-controls:hover{border-color:rgba(var(--accent-rgb),.18)}
 .p3d-controls input[type=range]{width:120px;accent-color:var(--accent)}
 .p3d-controls b{color:var(--text);min-width:22px;display:inline-block}
 
@@ -497,7 +498,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .bb-btn:active{transform:translateY(1px) scale(.98)}
 .bb-btn.active{background:var(--grad-accent);border-color:transparent;color:var(--accent-text);box-shadow:0 2px 8px rgba(var(--accent-rgb),.4)}
 .bb-btn:focus-visible{outline:none;box-shadow:var(--glow)}
-.zoom-badge{font-size:.7rem;font-weight:700;color:var(--accent);background:rgba(var(--accent-rgb),.08);border:1.5px solid rgba(var(--accent-rgb),.25);border-radius:var(--r-xs);padding:4px 8px;min-width:42px;text-align:center;font-variant-numeric:tabular-nums;transition:background .14s,border-color .14s}
+.zoom-badge{font-size:.7rem;font-weight:700;color:var(--accent);background:rgba(var(--accent-rgb),.08);border:1.5px solid rgba(var(--accent-rgb),.25);border-radius:var(--r-xs);padding:4px 8px;min-width:42px;text-align:center;font-variant-numeric:tabular-nums;transition:background .14s,border-color .14s,transform .1s}
 .zoom-badge:hover{background:rgba(var(--accent-rgb),.14);border-color:rgba(var(--accent-rgb),.4);transform:scale(1.04)}
 .live3d-stage{flex:1;perspective:1100px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 68% 62% at 50% 62%,#1c1508 0%,#060402 100%);cursor:grab;box-shadow:inset 0 3px 12px rgba(0,0,0,.35);transition:box-shadow .2s}
 .live3d-stage:hover{box-shadow:inset 0 3px 12px rgba(0,0,0,.35),inset 0 0 40px rgba(var(--accent-rgb),.03)}
@@ -1032,7 +1033,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .mb-10{margin-bottom:10px}
 .modal-hint-block{display:block;margin:2px 0 4px}
 .status-msg{min-height:18px;margin:2px 0 6px}
-.modal-box.modal-send{max-width:440px}
+.modal-box.modal-send{max-width:440px;border-top:2px solid var(--accent);background:linear-gradient(180deg,rgba(var(--accent-rgb),.03),var(--bg-2) 40%)}
 .btn-sm-font{font-size:.72rem}
 .btn-sm-font-2{font-size:.74rem;margin-top:6px}
 .note-compact{padding-bottom:4px}
@@ -1547,6 +1548,13 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
         <h4>Pole liczbowe / suwak</h4>
         <div class="sc-row"><span>Zmień wartość o krok</span><span class="sc-keys"><kbd>Scroll</kbd></span></div>
         <div class="sc-row"><span>Zmień wartość o krok ×10</span><span class="sc-keys"><kbd>Shift</kbd>+<kbd>Scroll</kbd></span></div>
+      </div>
+      <div class="sc-group">
+        <h4>Podgląd 3D</h4>
+        <div class="sc-row"><span>Obróć model (oś Z)</span><span class="sc-keys"><kbd>←</kbd><kbd>→</kbd></span></div>
+        <div class="sc-row"><span>Obróć model (oś X)</span><span class="sc-keys"><kbd>↑</kbd><kbd>↓</kbd></span></div>
+        <div class="sc-row"><span>Szybszy obrót</span><span class="sc-keys"><kbd>Shift</kbd>+strzałki</span></div>
+        <div class="sc-row"><span>Resetuj widok</span><span class="sc-keys"><kbd>0</kbd></span></div>
       </div>
       <div class="sc-group">
         <h4>Zaznaczenie i ruch</h4>
@@ -8379,7 +8387,7 @@ submitBtn.addEventListener('click', async ()=>{
   const name=document.getElementById('sendQuoteName').value.trim();
   const userMsg=document.getElementById('sendQuoteMsg').value.trim();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ setStatus('Podaj poprawny adres e-mail.',true); return; }
-  submitBtn.disabled=true; setStatus('Przygotowuję projekt…');
+  submitBtn.disabled=true; submitBtn.textContent='⏳ Przygotowuję…'; setStatus('Przygotowuję projekt…');
   try{
     const payload=await window.XEO_BUILD_QUOTE_PAYLOAD();
     if(!payload){ setStatus('Projekt jest pusty — narysuj coś na płycie.',true); submitBtn.disabled=false; return; }
@@ -8387,7 +8395,7 @@ submitBtn.addEventListener('click', async ()=>{
     const exTxt=(q.extras&&q.extras.length)?'\nPozycje dodatkowe: '+q.extras.map(e=>`${e.label} ${e.amount.toFixed(2).replace('.',',')} zł`).join(', '):'';
     const qtyTxt=(q.qty&&q.qty>1)?`\nIlość: ${q.qty} szt. (cena/szt.: ${(q.perPiece||0).toFixed(2).replace('.',',')} zł)`:'';
     const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}${qtyTxt}\nCena${q.qty>1?' razem':''}: ${q.price.toFixed(2).replace('.',',')} zł${exTxt}\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
-    setStatus('Wysyłam do pracowni…');
+    submitBtn.textContent='📡 Wysyłam…'; setStatus('Wysyłam do pracowni…');
     const db=await ensureDb();
     await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
       name: name||'Klient edytora wyceny',
