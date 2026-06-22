@@ -2868,6 +2868,57 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   .live-quote .lq-head{font-size:.62rem}
   .live-quote .lq-price{font-size:1.05rem}
 }
+
+/* === v79: Grupowe obwódki w warstwie === */
+.layer.layer-grouped{border-left-color:rgba(var(--accent2-rgb),.4)!important;padding-left:14px}
+.layer.layer-grouped:hover{border-left-color:rgba(var(--accent2-rgb),.7)!important}
+.layer-group-ico{font-size:.6rem;opacity:.4;flex-shrink:0;transition:opacity .12s}
+.layer:hover .layer-group-ico{opacity:.7}
+
+/* === v79: Swatch koloru — lepsze kolory z tooltipem === */
+.sw-cut{background:var(--cut);box-shadow:0 0 4px rgba(255,59,59,.3)}
+.sw-engrave{background:var(--engrave);border:1px solid var(--muted-2);box-shadow:0 0 4px rgba(0,0,0,.2)}
+.sw-score{background:var(--score);box-shadow:0 0 4px rgba(47,123,216,.3)}
+
+/* === v79: Statusbar klikalne elementy === */
+.sb-item.sb-clickable{cursor:pointer;transition:color .12s,background .12s}
+.sb-item.sb-clickable:hover{color:var(--accent);background:rgba(var(--accent-rgb),.1)}
+.sb-item.sb-clickable:active{transform:scale(.96)}
+
+/* === v79: Poprawiona paleta kolorów w warstwie 3D === */
+.d1{background:linear-gradient(135deg,#2a9d8f,#21867a)}
+.d2{background:linear-gradient(135deg,#e76f51,#d15c3f)}
+.d3{background:linear-gradient(135deg,#9b5de5,#8347cc)}
+.d4{background:linear-gradient(135deg,#f4a261,#e5914e)}
+.d5{background:linear-gradient(135deg,#06d6a0,#05b888)}
+.d6{background:linear-gradient(135deg,#e63946,#d02a37)}
+
+/* === v79: Lepszy border na active seg button === */
+.seg button.on{position:relative}
+.seg button.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(255,255,255,.3);border-radius:2px}
+
+/* === v79: Ulepszony scroll na polach numerycznych === */
+.field input[type=number]{scroll-behavior:smooth}
+.field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field input[type=number]:hover::-webkit-inner-spin-button{-webkit-appearance:inner-spin-button}
+
+/* === v79: Pq-sec header — animacja z gradient sweep === */
+.pq-h{position:relative;overflow:hidden}
+.pq-h::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.2),transparent);transition:opacity .2s}
+.pq-sec:hover .pq-h::after{opacity:1}
+
+/* === v79: Toolbar — responsywne zachowanie na tablecie === */
+@media(min-width:821px) and (max-width:1200px){
+  .toolbar{padding:7px 10px;gap:5px}
+  .tgroup{gap:3px;padding-right:7px;margin-right:2px}
+}
+
+/* === v79: Gallery — lepsze hover z depth shadow === */
+.gallery-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.25),0 0 0 1px rgba(var(--accent-rgb),.2),inset 0 -2px 12px rgba(var(--accent-rgb),.06)}
+
+/* === v79: Lepszy contrast na ciemnym tle panelu === */
+.panel h2{color:var(--muted);transition:color .15s,letter-spacing .15s}
+.panel h2:hover{letter-spacing:.12em}
 </style>
 </head>
 <body>
@@ -3141,11 +3192,11 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     </aside>
   </div>
   <div class="statusbar" id="statusbar">
-    <span class="sb-item" id="sbTool">Zaznaczanie</span>
+    <span class="sb-item sb-clickable" id="sbTool" title="Kliknij, aby przełączyć narzędzie">Zaznaczanie</span>
     <span class="sb-sep">·</span>
-    <span class="sb-item" id="sbObjects">0 elementów</span>
+    <span class="sb-item sb-clickable" id="sbObjects" title="Kliknij, aby zaznaczć wszystkie elementy">0 elementów</span>
     <span class="sb-sep">·</span>
-    <span class="sb-item" id="sbDoc">300×200 mm</span>
+    <span class="sb-item sb-clickable" id="sbDoc" title="Kliknij, aby zmienić rozmiar płyty">300×200 mm</span>
     <span class="sb-sep">·</span>
     <span class="sb-item sb-history" id="sbHistory" title="Pozycja w historii cofania">↶ 0/0</span>
     <span class="sb-item sb-save" id="sbSave"></span>
@@ -6483,10 +6534,12 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       const dbadge=`<span class="d-badge ${dc}" title="Warstwa 3D ${d}">${d}</span>`;
       const visIco=o.visible?'◉':'◎'; const lockIco=o.locked?'🔒':'🔓';
       const visCls=o.visible?'lico-vis':'lico-vis hidden-ico';
-      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'}" data-id="${o.id}" draggable="true" tabindex="0">
+      const grpCls=o.groupId?'layer-grouped':'';
+      return `<div class="layer ${state.selectedIds.includes(o.id)?'sel':''} ${modeCls} ${o.visible?'':'layer-hidden'} ${grpCls}" data-id="${o.id}" data-gid="${o.groupId||''}" draggable="true" tabindex="0">
         <span class="drag-grip" title="Przeciągnij, aby zmienić kolejność">⠿</span>
         <span class="swatch ${sw}" title="${o.mode==='engrave'?'Grawer':o.mode==='score'?'Nacięcie':o.mode==='reference'?'Referencja':'Cięcie'}"></span>
         ${dbadge}
+        ${o.groupId?'<span class="layer-group-ico" title="Element grupy">🔗</span>':''}
         <span class="lname" title="Kliknij dwukrotnie, aby zmienić nazwę">${escapeXml(autoName(o))}</span>
         <button class="lico ${visCls}" data-act="vis" title="${o.visible?'Ukryj':'Pokaż'}">${visIco}</button>
         <button class="lico lico-lock${o.locked?' lico-locked':''}" data-act="lock" title="${o.locked?'Odblokuj':'Zablokuj'}">${lockIco}</button>
@@ -6647,6 +6700,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   function updateCanvasCursor(){ const c = state.tool==='pan'?'grab' : state.tool==='select'?'default' : state.tool==='text'?'text' : 'crosshair'; canvas.style.cursor=c; }
   const _sbTool=document.getElementById('sbTool'), _sbObj=document.getElementById('sbObjects'), _sbDoc=document.getElementById('sbDoc'), _sbZoom=document.getElementById('sbZoom'), _sbHistory=document.getElementById('sbHistory');
   if(_sbZoom){ _sbZoom.style.cursor='pointer'; _sbZoom.title='Podwójne kliknięcie = dopasuj widok'; _sbZoom.addEventListener('dblclick',zoomFit); }
+  if(_sbTool){ _sbTool.addEventListener('click',()=>{ openQuickSearch(); }); }
+  if(_sbObj){ _sbObj.addEventListener('click',()=>{ if(state.objects.length){ state.selectedIds=state.objects.filter(o=>!o.locked).map(o=>o.id); renderAll(); renderProps(); showToast('Zaznaczono '+state.selectedIds.length+' elem.','info',1000); } }); }
+  if(_sbDoc){ _sbDoc.addEventListener('click',()=>{ const el=document.getElementById('docWInput'); if(el){el.focus();el.select();} }); }
   const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
   function updateStatusBar(){
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
