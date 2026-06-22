@@ -4077,12 +4077,12 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
       h+=`<div class="field"><button type="button" id="convertPathBtn" class="tbtn tbtn-full" title="Zamienia kształt na ścieżkę z punktami, które można dowolnie przeciągać">✏ Konwertuj na ścieżkę</button></div>`;
       h+=`<div class="field"><label>Obwódka (mm)</label><div class="row2">
         <input type="number" id="offsetVal" value="5" step="1" class="input-offset" title="Odległość obwódki od krawędzi kształtu (mm)">
-        <button type="button" id="offsetBtn" class="tbtn btn-flex-center">+ Utwórz obwódkę</button></div></div>`;
+        <button type="button" id="offsetBtn" class="tbtn btn-flex-center" title="Utwórz nowy kształt odsunięty od krawędzi o podaną odległość">+ Utwórz obwódkę</button></div></div>`;
     }
     if(o.type==='path'){
       h+=`<div class="field"><label>Obwódka (mm)</label><div class="row2">
         <input type="number" id="offsetVal" value="5" step="1" class="input-offset" title="Odległość obwódki od krawędzi kształtu (mm)">
-        <button type="button" id="offsetBtn" class="tbtn btn-flex-center">+ Utwórz obwódkę</button></div></div>`;
+        <button type="button" id="offsetBtn" class="tbtn btn-flex-center" title="Utwórz nowy kształt odsunięty od krawędzi o podaną odległość">+ Utwórz obwódkę</button></div></div>`;
     }
     if(o.type==='path' && isEditablePolygonPath(o)){
       const editing=state.editingPathId===o.id;
@@ -6049,6 +6049,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Plik SVG wyeksportowany','success');
   }
 
   /* ---------------- Wysyłka projektu do wyceny (panel administratora) ---------------- */
@@ -6166,6 +6167,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
     const blob=new Blob([dxf],{type:'application/dxf'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.dxf`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Plik DXF wyeksportowany','success');
   }
 
   /* ---------------- Szablony ---------------- */
