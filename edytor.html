@@ -1889,6 +1889,63 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 /* === v62: Lepszy hover na warstwie w panelu === */
 .layer{transition:background .12s,border-color .12s,box-shadow .12s,transform .08s,padding-left .1s}
 .layer:hover{padding-left:12px}
+
+/* === v63: Gradient shimmer na przyciskach primary === */
+@keyframes primaryShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.tbtn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2),var(--accent));background-size:200% 100%}
+.tbtn-primary:hover{animation:primaryShimmer 2s linear infinite}
+
+/* === v63: Field label — lepsze wyrównanie z ikoną === */
+.field label .unit{font-weight:400;color:var(--muted);font-size:.65rem;margin-left:4px}
+
+/* === v63: Lepsza wizualizacja karty ceny z gradient na hover === */
+.q-price-card:not(.empty):hover .q-pp-val{text-shadow:0 0 24px rgba(var(--accent-rgb),.4)}
+
+/* === v63: Swatch w warstwie — tooltip z nazwą operacji === */
+.layer .swatch{cursor:help}
+
+/* === v63: Quick search — empty state z ilustracją === */
+.quick-search-empty::before{content:'🔍';display:block;font-size:1.4rem;margin-bottom:6px;opacity:.3}
+
+/* === v63: DD menu — lepsza wizualizacja disabled === */
+.dd-menu .tbtn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.3)}
+
+/* === v63: Seg button — hover z subtelnym glow === */
+.seg button:hover:not(.on){box-shadow:0 2px 8px rgba(0,0,0,.15)}
+
+/* === v63: Modal box — zamykanie kliknięciem w tło lepiej wizualizowane === */
+.modal-ov{cursor:pointer}
+.modal-ov .modal-box{cursor:default}
+
+/* === v63: Ulepszona legenda głębokości — pulsujący wskaźnik aktywnej warstwy === */
+.lyr-row.on .lyr-pick{animation:lyrPickPulse 1.5s ease-in-out infinite}
+@keyframes lyrPickPulse{0%,100%{box-shadow:0 1px 3px rgba(0,0,0,.3)}50%{box-shadow:0 1px 6px rgba(0,0,0,.4),0 0 8px currentColor}}
+
+/* === v63: Toolbar — hover z subtelnym glow na brand === */
+.toolbar .brand{transition:filter .2s}
+.toolbar .brand:hover{filter:drop-shadow(0 0 8px rgba(var(--accent-rgb),.2))}
+
+/* === v63: Input focus — subtelna animacja ring === */
+@keyframes focusRingIn{from{box-shadow:0 0 0 0 rgba(var(--accent-rgb),0)}to{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25)}}
+.field input:focus,.field select:focus,.field textarea:focus{animation:focusRingIn .15s ease-out forwards}
+
+/* === v63: Depth ctrl — animacja wartości na zmianę === */
+.depth-ctrl .dval.depth-changed{animation:depthValPulse .3s ease-out}
+@keyframes depthValPulse{0%{transform:scale(1.15);color:var(--accent)}100%{transform:scale(1)}}
+
+/* === v63: Tabbed panel — hover indicator pod zakładką === */
+.ptab:hover:not(.active)::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(var(--accent-rgb),.2);border-radius:2px;animation:ptabHoverIn .15s ease-out}
+@keyframes ptabHoverIn{from{width:0;left:50%;right:50%}to{left:20%;right:20%}}
+
+/* === v63: Lepsze miniaturki szablonów — border na hover === */
+.tpl button:hover .tpl-ico{border-color:var(--accent);box-shadow:0 0 12px rgba(var(--accent-rgb),.3)}
+
+/* === v63: Toolbar button — subtelna animacja tekstu === */
+.tbtn{letter-spacing:.01em;transition:border-color .14s,color .14s,background .14s,filter .15s,box-shadow .15s,transform .08s,letter-spacing .15s}
+.tbtn:hover{letter-spacing:.02em}
+
+/* === v63: Ogólne ulepszenie — gradient na hover select === */
+select:hover{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233fc7ff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 </style>
 </head>
 <body>
