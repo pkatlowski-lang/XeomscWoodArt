@@ -96,11 +96,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
 .ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6)}
-.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0}
+.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:relative}
 .ptab-body.active{display:flex}
+.ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
 /* Wycena inline — każda sekcja jako wyraźna karta */
 .pq-sec{padding:12px 13px;margin:10px 14px;background:linear-gradient(180deg,var(--surface2),rgba(18,24,38,.8));border:1px solid var(--border);border-left:3px solid rgba(var(--accent-rgb),.3);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:border-color .14s}
-.pq-sec:hover{border-left-color:rgba(var(--accent-rgb),.55)}
+.pq-sec:hover{border-left-color:rgba(var(--accent-rgb),.55);box-shadow:0 3px 10px rgba(0,0,0,.16)}
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
 .pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border)}
 .pq-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.6);flex:none}
@@ -287,6 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layers{display:flex;flex-direction:column;gap:2px;padding:0 10px 14px}
 .layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:8px;border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background .12s,border-color .12s,box-shadow .12s}
 .layer:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm)}
+.layer:active{transform:scale(.98)}
 .layer.sel{border-color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12)}
 .layer.lyr-cut{border-left-color:var(--cut-light)}
 .layer.lyr-cut.sel{border-color:var(--accent);border-left-color:var(--cut-light)}
@@ -322,7 +324,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Szablony (karty z odznaką ikony) ---- */
 .tpl{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 16px}
 .tpl button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 8px 11px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);font-size:.73rem;font-weight:600;cursor:pointer;line-height:1.3;text-align:center;transition:border-color .14s,color .14s,background .14s,transform .08s,box-shadow .14s}
-.tpl button:hover{border-color:var(--accent);color:#fff;background:var(--surface3);transform:translateY(-2px);box-shadow:var(--sh)}
+.tpl button:hover{border-color:var(--accent);color:#fff;background:var(--surface3);transform:translateY(-3px) scale(1.02);box-shadow:var(--sh),0 0 12px rgba(var(--accent-rgb),.08)}
 .tpl .tpl-ico{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;font-size:1.25rem;flex:none;background:radial-gradient(120% 120% at 30% 20%,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.06));border:1px solid rgba(var(--accent-rgb),.32);box-shadow:0 2px 10px -4px rgba(var(--accent-rgb),.5)}
 .tpl button:hover .tpl-ico{background:radial-gradient(120% 120% at 30% 20%,rgba(var(--accent-rgb),.34),rgba(var(--accent-rgb),.12));border-color:rgba(var(--accent-rgb),.5)}
 .tpl .tpl-txt{display:block}
@@ -330,7 +332,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Galeria podkładów / motywów ---- */
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px}
 .gallery-card{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:12px;padding:0 6px 9px;cursor:pointer;text-align:center;font-size:.7rem;color:var(--text);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px;overflow:hidden;transition:border-color .15s,color .15s,background .15s,transform .08s,box-shadow .14s}
-.gallery-card:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3);transform:translateY(-2px);box-shadow:var(--sh)}
+.gallery-card:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3);transform:translateY(-3px) scale(1.02);box-shadow:var(--sh),0 0 12px rgba(var(--accent-rgb),.08)}
 /* miniatura na własnym „kafelku" — czytelniejsza prezentacja kształtu */
 .gallery-card svg{width:100%;height:62px;margin-top:8px;pointer-events:none;overflow:visible;padding:6px;border-radius:9px;background:radial-gradient(120% 120% at 50% 30%,rgba(var(--accent-rgb),.07),transparent 70%)}
 .gallery-card:hover svg{background:radial-gradient(120% 120% at 50% 30%,rgba(var(--accent-rgb),.14),transparent 70%)}
@@ -358,9 +360,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ctx-menu{position:fixed;z-index:3000;background:linear-gradient(180deg,rgba(26,34,51,.96),rgba(12,16,25,.96));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:10px;padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.12);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.96) translateY(-6px);transition:opacity .12s ease,transform .12s ease}
 .ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0)}
 .ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:6px;cursor:pointer;font:inherit;transition:background .12s,color .12s}
-.ctx-menu button:hover:not(:disabled){background:var(--grad-accent);color:var(--accent-text)}
+.ctx-menu button:hover:not(:disabled){background:var(--grad-accent);color:var(--accent-text);padding-left:14px}
 .ctx-menu button:hover:not(:disabled) .ctx-key{color:var(--accent-text);opacity:.7}
 .ctx-menu button:disabled{opacity:.4;cursor:not-allowed}
+.ctx-menu button:active:not(:disabled){transform:scale(.97)}
 .ctx-key{font-size:.7rem;color:var(--muted)}
 .ctx-menu hr{border:none;border-top:1px solid var(--border);margin:6px 8px;opacity:.6}
 
@@ -511,7 +514,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .lyr-eye{background:none;border:none;cursor:pointer;font-size:.75rem;padding:2px 5px;line-height:1;color:var(--muted);border-radius:5px;transition:background .12s,color .12s}
 .lyr-eye:hover{background:rgba(255,255,255,.1);color:var(--text)}
 .lyr-row.lyr-hidden .lyr-eye{color:var(--accent);opacity:1}
-.dl-note{padding:4px 14px 8px;font-size:.73rem;color:var(--muted);line-height:1.55}
+.dl-note{padding:6px 14px 10px;font-size:.73rem;color:var(--muted);line-height:1.55;background:linear-gradient(135deg,rgba(var(--accent-rgb),.03),transparent);border-radius:8px;margin:0 10px 6px}
 .dl-note strong{color:var(--text);font-weight:600}
 .layer-assign{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .la-btn{border:1.5px solid var(--border);border-radius:6px;padding:4px 9px;font-size:.72rem;font-weight:700;color:#fff;cursor:pointer;line-height:1;transition:transform .08s,box-shadow .12s,outline-color .12s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
@@ -758,6 +761,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .input-flex-2{flex:2}
 .input-flex-fixed{flex:0 0 70px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.field-hint{font-size:.72rem;color:var(--muted);line-height:1.5;margin-top:4px}
 .gear-preview-row{display:flex;gap:10px;align-items:flex-start;margin:6px 0 8px}
 .gear-preview-box{flex:0 0 120px;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
 .gear-preview-info{flex:1;font-size:.78rem;color:var(--muted);margin:0;padding-top:4px;line-height:1.7}
@@ -3490,7 +3494,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       h+=`<div class="form-sec">Operacje na kształtach</div>`;
       h+=`<div class="field"><div class="seg">
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
-        <p style="font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.5">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
+        <p class="field-hint" style="margin-top:7px">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
     h+=`<div class="empty-note">Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę. Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
@@ -3637,7 +3641,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
       h+=`<div class="field"><label>Rola w warstwie</label><div class="seg" data-seg="role">
         <button class="${o.role==='hole'?'':'on'}" data-role="fill" title="Element jest pełnym, wypełnionym kształtem warstwy">${_isTxt?'⬛ Pełny napis':'⬛ Pełny kształt'}</button>
         <button class="${o.role==='hole'?'on':''}" data-role="hole" title="Kontur tego elementu zostanie wycięty (odjęty) z sylwetki warstwy 3D">◯ Otwór (wycięcie)</button></div>
-        ${o.role==='hole'?`<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
+        ${o.role==='hole'?`<p class="field-hint">${_isTxt?'Kształt liter zostanie wycięty na wylot z płyty tej samej warstwy 3D (efekt szablonu / ażuru) — napis nie jest osobnym elementem, lecz dziurą w materiale.':'Ten element wycina dziurę w pełnych kształtach tej samej warstwy 3D (np. otwór na śrubę) — sam nie jest wyświetlany jako odrębny element.'}</p>`:''}</div>`;
     }
     // ---- sekcja: pozycja i rozmiar ----
     h+=`<div class="form-sec">Pozycja i rozmiar</div>`;
@@ -3724,7 +3728,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
           <span style="font-size:.75rem;color:var(--muted)">mm odstępu</span>
           <button type="button" id="frameAddBtn" class="tbtn" style="flex:1;justify-content:center;min-width:0">✂ Dodaj</button>
         </div>
-        <p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
+        <p class="field-hint">Tworzy prostokąt cięcia wokół tekstu. Tekst przełącza się na grawer, ramka jest cięciem.</p></div>`;
       h+=`<div class="field"><button type="button" id="convertTextPathBtn" class="tbtn tbtn-full" title="Zamienia napis na zwektoryzowane kontury liter (ścieżkę), które można dowolnie edytować i łączyć operacjami logicznymi">✏ Konwertuj na ścieżkę (kontury liter)</button></div>`;
     }
     if(['rect','ellipse','polygon','star'].includes(o.type)){
@@ -3741,7 +3745,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
     if(o.type==='path' && isEditablePolygonPath(o)){
       const editing=state.editingPathId===o.id;
       h+=`<div class="field"><button type="button" id="nodeEditBtn" class="tbtn ${editing?'active':''}" style="width:100%;justify-content:center">${editing?'✓ Zakończ edycję punktów':'✏ Edytuj punkty ścieżki'}</button>
-        ${editing?`<p style="font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5">Przeciągnij punkt, aby zmienić kształt. Dwuklik na punkcie usuwa go (min. 3). Dwuklik na krawędzi dodaje nowy punkt. <kbd>Esc</kbd> kończy edycję.</p>`:''}
+        ${editing?`<p class="field-hint">Przeciągnij punkt, aby zmienić kształt. Dwuklik na punkcie usuwa go (min. 3). Dwuklik na krawędzi dodaje nowy punkt. <kbd>Esc</kbd> kończy edycję.</p>`:''}
       </div>`;
     }
     if(o.type==='path' && (o.d.match(/M/g)||[]).length===1){
