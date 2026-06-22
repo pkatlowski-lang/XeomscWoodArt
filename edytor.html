@@ -694,6 +694,81 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Podgląd SVG — czytelniejsze tło === */
 .bb-svg{background:radial-gradient(ellipse at center,var(--bg-2),var(--bg))}
 
+/* === Dropdown menu — hover efekt z płynnym paddingiem === */
+.dd-menu .tbtn{position:relative;overflow:hidden}
+.dd-menu .tbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform .12s ease}
+.dd-menu .tbtn:hover::before{transform:scaleY(1)}
+
+/* === Przycisk eksportu — premium pulsujący efekt === */
+.tbtn-primary.dd-toggle{position:relative;overflow:hidden}
+.tbtn-primary.dd-toggle::after{content:'';position:absolute;top:50%;left:50%;width:120%;height:120%;transform:translate(-50%,-50%) scale(0);background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);border-radius:50%;opacity:0;transition:transform .5s,opacity .3s}
+.tbtn-primary.dd-toggle:hover::after{transform:translate(-50%,-50%) scale(1);opacity:1}
+
+/* === Shortcuts grid — lepszy hover === */
+.sc-row{position:relative}
+.sc-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);opacity:0;border-radius:2px;transition:opacity .12s}
+.sc-row:hover::before{opacity:1}
+
+/* === Karta ceny w panelu wyceny — lepsza animacja === */
+.q-pp-val{transition:transform .15s,color .15s,text-shadow .15s}
+.q-price-card:not(.empty) .q-pp-val{text-shadow:0 0 20px rgba(var(--accent-rgb),.3)}
+
+/* === Przycisk wysyłki — akcent wizualny === */
+#sendQuoteOpenBtn{position:relative;overflow:hidden}
+#sendQuoteOpenBtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left .6s}
+#sendQuoteOpenBtn:hover::after{left:100%}
+
+/* === Info-box — lepsza interakcja === */
+.info-box{cursor:default}
+.info-box .info-box-size{transition:color .12s}
+.info-box:hover .info-box-size{color:var(--accent)}
+
+/* === Ptab — aktywna zakładka lepsza wizualizacja === */
+.ptab.active{position:relative;overflow:hidden}
+.ptab.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:rgba(255,255,255,.2);border-radius:2px}
+
+/* === Empty note — ładniejszy styl z ikoną === */
+.empty-note::after{content:'';position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(var(--accent-rgb),.04),transparent 70%);border-radius:50%;pointer-events:none}
+
+/* === Q-break row — tabular nums dla czytelności === */
+.q-break .br-row b{font-variant-numeric:tabular-nums}
+
+/* === Confirm overlay — lepszy backdrop === */
+.confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(var(--accent-rgb),.04),transparent 70%)}
+
+/* === Confirm box — lepsza animacja wejścia === */
+.confirm-ov.open .confirm-box{transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s ease}
+
+/* === Panel right (właściwości) — sekcja h2 separator === */
+.panel.right h2{margin-top:4px}
+
+/* === Form-sec — lepsza interakcja i hierarchia === */
+.form-sec{cursor:default;user-select:none}
+
+/* === Field label — lepsze wyrównanie i czytelność === */
+.field label{user-select:none}
+
+/* === Seg buttons — lepsza separacja === */
+.seg{background:rgba(0,0,0,.08);border-radius:var(--r-sm);padding:3px;border:1px solid rgba(var(--accent-rgb),.04)}
+
+/* === Layer search — ikona z animacją === */
+.layer-search:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+
+/* === Gallery card — aktywna/focus karta === */
+.gallery-card.active-base{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.2)}
+
+/* === Klaw shortcuts kbd — lepsze 3D === */
+kbd{letter-spacing:.02em}
+
+/* === Ruler — subtelny gradient na hover === */
+.ruler-h:hover,.ruler-v:hover{background:linear-gradient(180deg,rgba(var(--accent-rgb),.04),var(--surface2))}
+
+/* === Stage background — subtelna siatka punktowa === */
+.stage::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+/* === Zoom val — tabular nums === */
+.zoomval{font-variant-numeric:tabular-nums}
+
 /* === Karta ceny — puls animacja akcentu kiedy jest aktywna === */
 @keyframes priceGlow{0%,100%{box-shadow:0 2px 12px rgba(var(--accent-rgb),.12)}50%{box-shadow:0 2px 16px rgba(var(--accent-rgb),.25)}}
 .q-price-card:not(.empty){animation:priceGlow 3s ease-in-out infinite}
