@@ -2413,6 +2413,63 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v70: Improved selection hint na canvas === */
 .stage .hint-empty span{font-weight:600;color:var(--accent)}
+
+/* === v71: Lepsze micro-interactions na kształtach === */
+#canvas [data-id]{transition:opacity .08s}
+#canvas [data-id]:hover{opacity:.92}
+
+/* === v71: Ulepszone drag label — tooltip na canvasie === */
+.drag-label{position:absolute;pointer-events:none;z-index:100;background:linear-gradient(180deg,rgba(26,34,51,.94),rgba(12,16,25,.94));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--text);font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:var(--r-xs);border:1px solid rgba(var(--accent-rgb),.3);box-shadow:0 4px 12px rgba(0,0,0,.4);white-space:nowrap}
+
+/* === v71: Lepsza wizualizacja warstwy referencyjna (obraz) === */
+.layer.lyr-ref{border-left-color:var(--muted-2)}
+.sw-reference{position:relative}
+
+/* === v71: Pulsujący dot na niezapisanym stanie === */
+.sb-save:not(:empty)::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--operator);margin-right:4px;animation:saveDotPulse 1.5s ease-in-out infinite}
+@keyframes saveDotPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+
+/* === v71: Improved keyboard shortcut row highlight === */
+.sc-row{transition:background .12s,padding-left .12s}
+.sc-row:hover{background:rgba(var(--accent-rgb),.04);padding-left:12px}
+.sc-row:hover kbd{border-color:rgba(var(--accent-rgb),.3)}
+
+/* === v71: Layer counter — lepsze wyrównanie === */
+.layers-counter{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* === v71: Better multi-select note — info cards === */
+.note-compact{border-left-width:3px;border-left-style:solid}
+
+/* === v71: Improved form field hint text === */
+.field-hint{font-size:.68rem;color:var(--muted-2);line-height:1.5;margin-top:4px;padding:4px 8px;background:rgba(var(--accent-rgb),.03);border-radius:var(--r-xs);border-left:2px solid rgba(var(--accent-rgb),.15)}
+
+/* === v71: Lepsza wizualizacja na operator buttons === */
+.tbtn-operator{background:linear-gradient(135deg,var(--operator),var(--operator-dark));border-color:transparent;color:var(--operator-text);font-weight:800}
+.tbtn-operator:hover{filter:brightness(1.1);box-shadow:0 4px 16px -3px rgba(247,183,51,.45)}
+
+/* === v71: Zoom controls — grouped styling === */
+#zoomIn,#zoomOut{font-size:.85rem}
+#zoomIn:hover,#zoomOut:hover{color:var(--accent)}
+
+/* === v71: Tooltip delayed hide — less flickering === */
+[data-tooltip]::after{transition:opacity .15s ease,transform .15s ease,visibility 0s linear .15s}
+
+/* === v71: Multi-selection bbox — gradient dashed border === */
+.sel-box{stroke-dasharray:6 4}
+
+/* === v71: Better legend layout wrap === */
+.legend{row-gap:4px}
+.legend span{font-size:.7rem}
+
+/* === v71: Lepsza wizualizacja field z row2 (dual input) === */
+.field .row2{gap:8px;align-items:center}
+.field .row2>input,.field .row2>select{min-width:0}
+
+/* === v71: Floating action button style na canvas === */
+.live-quote .lq-price{font-variant-numeric:tabular-nums;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* === v71: Lepszy styl na depth-ctrl minus/plus hover === */
+.depth-ctrl .dbtn:hover{background:rgba(var(--accent-rgb),.12);transform:scale(1.06)}
 </style>
 </head>
 <body>
@@ -4571,6 +4628,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
         bx:bb.minx,by:bb.miny,bw:Math.max(1,bb.maxx-bb.minx),bh:Math.max(1,bb.maxy-bb.miny),
         x:0,y:0,rotation:0,mode:'cut',visible:true,locked:false,depth:1,repeat:{type:'none'}};
       state.objects.push(o); state.selectedIds=[o.id]; pushHistory();
+      showToast('Ścieżka utworzona ('+pts.length+' punktów)','success',1500);
     }
     state.tool='select'; syncToolButtons(); renderAll(); renderProps();
   }
@@ -5077,13 +5135,13 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
       if(drag.moved){ recalcPathBBox(o); nodeClickInfo=null; pushHistory(); renderAll(); renderProps(); scheduleLive3D(); }
       else { nodeClickInfo={id:o.id, idx:drag.idx, time:Date.now()}; }
     } else if(m==='guideNewH'){
-      if(pointInCanvas(e)) state.guides.h.push(drag.y);
+      if(pointInCanvas(e)){ state.guides.h.push(drag.y); showToast('Prowadnica pozioma: '+fmt(drag.y)+' mm','info',1000); }
       renderGuides();
     } else if(m==='guideNewV'){
-      if(pointInCanvas(e)) state.guides.v.push(drag.x);
+      if(pointInCanvas(e)){ state.guides.v.push(drag.x); showToast('Prowadnica pionowa: '+fmt(drag.x)+' mm','info',1000); }
       renderGuides();
     } else if(m==='guideMove'){
-      if(!pointInCanvas(e)){ state.guides[drag.gtype].splice(drag.idx,1); guideClickInfo=null; }
+      if(!pointInCanvas(e)){ state.guides[drag.gtype].splice(drag.idx,1); guideClickInfo=null; showToast('Prowadnica usunięta','warning',1000); }
       else if(state.guides[drag.gtype][drag.idx]===drag.orig){ guideClickInfo={gtype:drag.gtype, idx:drag.idx, time:Date.now()}; }
       else { guideClickInfo=null; }
       renderGuides();
