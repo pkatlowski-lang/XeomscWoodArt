@@ -10179,7 +10179,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   let _autosaveCount=0;
   setInterval(()=>{
     if(state.objects.length && state.hIndex!==_savedAtIndex){
-      try{ localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(serializeProject())); }catch(ex){}
+      const json=JSON.stringify(serializeProject());
+      try{ localStorage.setItem(AUTOSAVE_KEY, json); }catch(ex){}
       _autosaveCount++;
       const sbSave=document.getElementById('sbSave');
       if(sbSave){
@@ -10190,7 +10191,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         setTimeout(()=>dot.remove(),2000);
       }
       if(_autosaveCount%4===0){
-        const sizeKB=(JSON.stringify(serializeProject()).length/1024).toFixed(0);
+        const sizeKB=(json.length/1024).toFixed(0);
         showToast('Autozapis ('+state.objects.length+' elem., '+sizeKB+' KB)','info',1200);
       }
     }
