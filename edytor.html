@@ -19,9 +19,9 @@
   --accent-rgb:63,199,255; --accent2-rgb:138,160,255;
   --text:#f1f5fc; --muted:#94a3bd; --muted-2:#5f6c85;
   /* Kolory operacji lasera (funkcjonalne — niezmienione semantycznie) */
-  --cut:#ff3b3b; --cut-light:#ff5a5a; --cut-light-rgb:255,90,90; --engrave:#161616; --score:#2f7bd8; --score-light:#3b9eff;
-  --hole:#a86bf0; --success:#54d699; --success-rgb:84,214,153; --danger:#ff8a8a; --danger-rgb:255,138,138; --cut-rgb:255,59,59;
-  --operator:#f7b733; --operator-dark:#e0892a; --operator-text:#1a1206;
+  --cut:#ff3b3b; --cut-light:#ff5a5a; --cut-light-rgb:255,90,90; --engrave:#161616; --score:#2f7bd8; --score-rgb:47,123,216; --score-light:#3b9eff;
+  --hole:#a86bf0; --hole-rgb:155,93,229; --success:#54d699; --success-rgb:84,214,153; --danger:#ff8a8a; --danger-rgb:255,138,138; --cut-rgb:255,59,59;
+  --operator:#f7b733; --operator-rgb:247,183,51; --operator-dark:#e0892a; --operator-text:#1a1206;
   --warning:#ffaa3c; --warning-rgb:255,170,60;
   /* Badge warstw 3D */
   --depth-1:#2a9d8f; --depth-2:#e76f51; --depth-3:#9b5de5; --depth-4:#f4a261; --depth-5:#06d6a0; --depth-6:#e63946; --depth-n:#888;
@@ -240,8 +240,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .geo-engrave-txt{fill:var(--engrave);stroke:none}
 .geo-cut-txt{fill:transparent;stroke:var(--cut);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-score-txt{fill:transparent;stroke:var(--score);stroke-width:1.4px;vector-effect:non-scaling-stroke}
-.geo-hole{fill:rgba(155,93,229,.22);stroke:var(--hole);stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
-.geo-hole-txt{fill:rgba(155,93,229,.30);stroke:var(--hole);stroke-width:0.8px;vector-effect:non-scaling-stroke}
+.geo-hole{fill:rgba(var(--hole-rgb),.22);stroke:var(--hole);stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
+.geo-hole-txt{fill:rgba(var(--hole-rgb),.30);stroke:var(--hole);stroke-width:0.8px;vector-effect:non-scaling-stroke}
 .sel-box{fill:none;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:5 3;animation:marchingAnts 0.6s linear infinite}
 @keyframes marchingAnts{to{stroke-dashoffset:-8}}
 .sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.4))}
@@ -286,7 +286,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .seg button.on{border-color:transparent;color:var(--accent-text);background:var(--grad-accent);box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6)}
 .seg button.cut.on{background:var(--cut);border-color:var(--cut);color:#fff;box-shadow:0 3px 12px -3px rgba(var(--cut-rgb),.55)}
 .seg button.engrave.on{background:var(--engrave);border-color:var(--engrave);color:#fff;box-shadow:0 3px 12px -3px rgba(0,0,0,.6)}
-.seg button.score.on{background:var(--score);border-color:var(--score);color:#fff;box-shadow:0 3px 12px -3px rgba(47,123,216,.55)}
+.seg button.score.on{background:var(--score);border-color:var(--score);color:#fff;box-shadow:0 3px 12px -3px rgba(var(--score-rgb),.55)}
 .empty-note{margin:14px 16px;padding:16px 15px;font-size:.8rem;color:var(--muted);line-height:1.7;background:linear-gradient(180deg,rgba(var(--accent-rgb),.05),var(--surface2));border:1px dashed var(--border-strong);border-radius:var(--r);box-shadow:0 2px 8px rgba(0,0,0,.12);position:relative;overflow:hidden}
 .empty-note::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-accent);opacity:.3}
 .empty-note strong{color:var(--text)}
@@ -623,7 +623,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .brand-name{font-weight:800;letter-spacing:.3px;margin-left:9px;color:var(--text);white-space:nowrap}
 .brand-name span{color:var(--accent)}
 /* === Wyróżniony przycisk operatora (Cennik i materiały) === */
-.tbtn.cfgbtn{background:linear-gradient(135deg,var(--operator),var(--operator-dark));border-color:var(--operator);color:var(--operator-text);font-weight:800;box-shadow:0 0 0 1px rgba(247,183,51,.45),0 4px 14px rgba(247,183,51,.28)}
+.tbtn.cfgbtn{background:linear-gradient(135deg,var(--operator),var(--operator-dark));border-color:var(--operator);color:var(--operator-text);font-weight:800;box-shadow:0 0 0 1px rgba(var(--operator-rgb),.45),0 4px 14px rgba(var(--operator-rgb),.28)}
 .tbtn.cfgbtn:hover{filter:brightness(1.07)}
 /* === Podpowiedzi „?" przy polach === */
 .hint{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--grad-accent);color:var(--accent-text);font-size:11px;font-weight:800;cursor:help;position:relative;vertical-align:middle;margin-left:5px;flex:0 0 auto;transition:transform .1s,box-shadow .14s;box-shadow:0 1px 4px rgba(var(--accent-rgb),.3)}
@@ -661,8 +661,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:var(--r-sm);padding:8px 12px;font-size:.82rem;background:transparent;color:var(--text);transition:background .12s,color .12s,padding-left .12s}
 .dd-menu .tbtn:hover{background:rgba(var(--accent-rgb),.12);color:#fff;padding-left:16px}
 .dd-menu .tbtn:focus-visible{outline:none;box-shadow:var(--glow);background:rgba(var(--accent-rgb),.08)}
-.dd-menu .tbtn.cfgbtn{background:linear-gradient(135deg,rgba(247,183,51,.12),rgba(247,183,51,.06));color:var(--operator)}
-.dd-menu .tbtn.cfgbtn:hover{background:linear-gradient(135deg,rgba(247,183,51,.22),rgba(247,183,51,.12))}
+.dd-menu .tbtn.cfgbtn{background:linear-gradient(135deg,rgba(var(--operator-rgb),.12),rgba(var(--operator-rgb),.06));color:var(--operator)}
+.dd-menu .tbtn.cfgbtn:hover{background:linear-gradient(135deg,rgba(var(--operator-rgb),.22),rgba(var(--operator-rgb),.12))}
 .dd-sep{border:none;height:1px;margin:4px 8px;background:linear-gradient(90deg,transparent,var(--border-strong),transparent)}
 .dd-menu input[type=file]{display:none}
 
@@ -1237,7 +1237,7 @@ input[type=number]{position:relative}
 
 /* === Context menu — danger items === */
 .ctx-menu button.ctx-danger:hover:not(:disabled){background:linear-gradient(135deg,rgba(var(--cut-rgb),.2),rgba(var(--cut-rgb),.1));color:var(--danger)}
-.ctx-menu button.ctx-danger:hover:not(:disabled) .ctx-key{color:rgba(255,138,138,.7)}
+.ctx-menu button.ctx-danger:hover:not(:disabled) .ctx-key{color:rgba(var(--danger-rgb),.7)}
 
 /* === Modal send — step indicator === */
 .send-steps{display:flex;align-items:center;gap:0;margin:0 0 18px;padding:0}
@@ -1367,7 +1367,7 @@ input[type=number]{position:relative}
 .sb-item:hover{color:var(--text);background:rgba(var(--accent-rgb),.06)}
 .sb-zoom{transition:color .14s,transform .1s}
 .statusbar .sb-save{padding:2px 8px;border-radius:var(--r-xs);transition:color .2s,background .2s}
-.statusbar .sb-save:not(:empty){background:rgba(247,183,51,.08);animation:saveIndicatorPulse 2s ease-in-out infinite}
+.statusbar .sb-save:not(:empty){background:rgba(var(--operator-rgb),.08);animation:saveIndicatorPulse 2s ease-in-out infinite}
 @keyframes saveIndicatorPulse{0%,100%{opacity:.7}50%{opacity:1}}
 
 /* === Ptab-body — animacja wyjścia/wejścia z fade === */
@@ -2471,7 +2471,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v71: Lepsza wizualizacja na operator buttons === */
 .tbtn-operator{background:linear-gradient(135deg,var(--operator),var(--operator-dark));border-color:transparent;color:var(--operator-text);font-weight:800}
-.tbtn-operator:hover{filter:brightness(1.1);box-shadow:0 4px 16px -3px rgba(247,183,51,.45)}
+.tbtn-operator:hover{filter:brightness(1.1);box-shadow:0 4px 16px -3px rgba(var(--operator-rgb),.45)}
 
 /* === v71: Zoom controls — grouped styling === */
 #zoomIn,#zoomOut{font-size:.85rem}
@@ -2886,7 +2886,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 /* === v78: Lepszy hover na seg buttons z depth-color === */
 .seg button.cut:hover:not(.on){color:var(--cut);border-color:rgba(var(--cut-rgb),.3)}
 .seg button.engrave:hover:not(.on){color:var(--muted);border-color:var(--border-strong)}
-.seg button.score:hover:not(.on){color:var(--score);border-color:rgba(47,123,216,.3)}
+.seg button.score:hover:not(.on){color:var(--score);border-color:rgba(var(--score-rgb),.3)}
 
 /* === v78: Poprawa live-quote na mobile === */
 @media(max-width:480px){
@@ -2904,7 +2904,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 /* === v79: Swatch koloru — lepsze kolory z tooltipem === */
 .sw-cut{background:var(--cut);box-shadow:0 0 4px rgba(var(--cut-rgb),.3)}
 .sw-engrave{background:var(--engrave);border:1px solid var(--muted-2);box-shadow:0 0 4px rgba(0,0,0,.2)}
-.sw-score{background:var(--score);box-shadow:0 0 4px rgba(47,123,216,.3)}
+.sw-score{background:var(--score);box-shadow:0 0 4px rgba(var(--score-rgb),.3)}
 
 /* === v79: Statusbar klikalne elementy === */
 .sb-item.sb-clickable{cursor:pointer;transition:color .12s,background .12s}
