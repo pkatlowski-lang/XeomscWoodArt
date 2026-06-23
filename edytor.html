@@ -401,7 +401,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
    formularzy) z kolejności Tab; przy otwarciu staje się widoczny natychmiast */
 .modal-ov{display:flex;position:fixed;inset:0;background:var(--overlay-dark);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow)}
 .modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) ease,visibility 0s}
-.modal-box{background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform var(--tr-slow) cubic-bezier(.4,0,.2,1),opacity var(--tr-slow) ease;opacity:0}
+.modal-box{background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0}
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
 .modal-box h3{margin:0 0 14px;font-size:1.1rem;font-weight:800;padding-bottom:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--text),rgba(var(--accent-rgb),.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:background var(--tr-base),color var(--tr-base),border-color var(--tr-base),transform var(--tr-base),box-shadow var(--tr-base)}
@@ -799,7 +799,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(var(--accent-rgb),.04),transparent 70%)}
 
 /* === Confirm box — lepsza animacja wejścia === */
-.confirm-ov.open .confirm-box{transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity var(--tr-slow) ease}
+.confirm-ov.open .confirm-box{transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
 
 /* === Panel right (właściwości) — sekcja h2 separator === */
 .panel.right h2{margin-top:4px}
@@ -1053,8 +1053,8 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 /* === Modal confirm — zastępuje natywne confirm() === */
 .confirm-ov{display:flex;position:fixed;inset:0;background:var(--overlay-strong);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:7500;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow)}
 .confirm-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) ease,visibility 0s}
-.confirm-box{background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) cubic-bezier(.4,0,.2,1),opacity var(--tr-slow) ease;opacity:0}
-.confirm-ov.open .confirm-box{transform:scale(1) translateY(0);opacity:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity var(--tr-slow) ease}
+.confirm-box{background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0}
+.confirm-ov.open .confirm-box{transform:scale(1) translateY(0);opacity:1;transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
 .confirm-box .confirm-icon{font-size:1.6rem;margin-bottom:6px}
 .confirm-box .confirm-msg{font-size:.86rem;line-height:1.55;color:var(--text);margin-bottom:18px}
 .confirm-box .confirm-actions{display:flex;justify-content:flex-end;gap:8px}
@@ -1141,7 +1141,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .form-sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--accent-rgb),.2),transparent)}
 
 /* === Animacja wejścia modalu — lepsza sprężystość === */
-.modal-ov.open .modal-box{transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity var(--tr-slow) ease}
+.modal-ov.open .modal-box{transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
 
 /* === Toolbar brand — subtelna animacja === */
 .toolbar .brand::before{transition:transform var(--tr-slow),box-shadow var(--tr-slow)}
@@ -3585,7 +3585,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         <div class="sc-row"><span>Poprzednia warstwa</span><span class="sc-keys"><kbd>↑</kbd></span></div>
         <div class="sc-row"><span>Zaznacz warstwę</span><span class="sc-keys"><kbd>Enter</kbd> / <kbd>Spacja</kbd></span></div>
         <div class="sc-row"><span>Usuń warstwę</span><span class="sc-keys"><kbd>Del</kbd></span></div>
-        <div class="sc-row"><span>Multi-select</span><span class="sc-keys"><kbd>Shift</kbd>+<kbd>Enter</kbd></span></div>
+        <div class="sc-row"><span>Zaznacz wiele</span><span class="sc-keys"><kbd>Shift</kbd>+<kbd>Enter</kbd></span></div>
       </div>
       <div class="sc-group">
         <h4>Widok</h4>
@@ -3593,7 +3593,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         <div class="sc-row"><span>Przybliż</span><span class="sc-keys"><kbd>Ctrl+=</kbd></span></div>
         <div class="sc-row"><span>Oddal</span><span class="sc-keys"><kbd>Ctrl+-</kbd></span></div>
         <div class="sc-row"><span>Przybliż do zaznaczenia</span><span class="sc-keys"><kbd>2</kbd></span></div>
-        <div class="sc-row"><span>Zoom +/-</span><span class="sc-keys"><kbd>Scroll</kbd> na płótnie</span></div>
+        <div class="sc-row"><span>Powiększ / pomniejsz</span><span class="sc-keys"><kbd>Kółko myszy</kbd> na płótnie</span></div>
         <div class="sc-row"><span>Przesuwanie</span><span class="sc-keys"><kbd>Spacja</kbd>+przeciągnij</span></div>
       </div>
       <div class="sc-group">
