@@ -6879,6 +6879,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   if(_sbObj){ _sbObj.addEventListener('click',()=>{ if(state.objects.length){ state.selectedIds=state.objects.filter(o=>!o.locked).map(o=>o.id); renderAll(); renderProps(); showToast('Zaznaczono '+state.selectedIds.length+' elem.','info',1000); } }); }
   if(_sbDoc){ _sbDoc.addEventListener('click',()=>{ const el=document.getElementById('docWInput'); if(el){el.focus();el.select();} }); }
   const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
+  let _lastSizeHIndex=-1;
+  const _sbSize=document.getElementById('sbSize');
   function updateStatusBar(){
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
     if(_sbObj){
@@ -6910,8 +6912,6 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       const redoCount=hl-hi;
       _sbHistory.title='Historia: pozycja '+hi+' z '+hl+(redoCount>0?' — '+redoCount+' krok'+(redoCount===1?'':'ów')+' do ponowienia':'');
     }
-    // v82: lekki wskaźnik rozmiaru projektu — przeliczany tylko gdy zmieni się historia (nie na każdym renderze)
-    const _sbSize=document.getElementById('sbSize');
     if(_sbSize && state.hIndex!==_lastSizeHIndex){
       _lastSizeHIndex=state.hIndex;
       if(state.objects.length){
@@ -6924,8 +6924,6 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       } else { _sbSize.textContent=''; _sbSize.classList.remove('sb-size-warn'); }
     }
   }
-  let _lastSizeHIndex=-1;
-
   const _sbCoords=document.getElementById('sbCoords');
   const _sbSession=document.getElementById('sbSession');
   const _sessionStart=Date.now();
