@@ -3652,8 +3652,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     <div class="field"><label>Wiadomość (opcjonalnie)</label><textarea id="sendQuoteMsg" rows="3" maxlength="1500" placeholder="Uwagi do projektu, termin, ilość sztuk…"></textarea></div>
     <div id="sendQuoteStatus" class="modal-hint-sm status-msg"></div>
     <div class="field-actions">
-      <button type="button" class="tbtn" id="sendQuoteCancel">Anuluj</button>
-      <button type="button" class="tbtn tbtn-primary" id="sendQuoteSubmit">Wyślij projekt</button>
+      <button type="button" class="tbtn" id="sendQuoteCancel" title="Anuluj (Esc)">Anuluj</button>
+      <button type="button" class="tbtn tbtn-primary" id="sendQuoteSubmit" title="Wyślij projekt do wyceny">Wyślij projekt</button>
     </div>
   </div>
 </div>
@@ -3666,8 +3666,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     <label for="confirmInput" class="sr-only" id="confirmInputLabel">Wartość</label>
     <input type="text" class="confirm-input" id="confirmInput" style="display:none" aria-labelledby="confirmInputLabel">
     <div class="confirm-actions">
-      <button type="button" class="tbtn" id="confirmCancel">Anuluj</button>
-      <button type="button" class="tbtn tbtn-primary" id="confirmOk">OK</button>
+      <button type="button" class="tbtn" id="confirmCancel" title="Anuluj (Esc)">Anuluj</button>
+      <button type="button" class="tbtn tbtn-primary" id="confirmOk" title="Potwierdź">OK</button>
     </div>
   </div>
 </div>
@@ -6783,7 +6783,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     const ri=_layerRowId(e); if(!ri) return;
     ri.row.classList.remove('drop-target-above','drop-target-below');
     if(!_layerDragId||_layerDragId===ri.id) return;
-    const dropAbove=e.clientY<ri.row.getBoundingClientRect().top+ri.row.getBoundingClientRect().height/2;
+    const _dr=ri.row.getBoundingClientRect();
+    const dropAbove=e.clientY<_dr.top+_dr.height/2;
     const fromIdx=state.objects.findIndex(o=>o.id===_layerDragId);
     const toIdx=state.objects.findIndex(o=>o.id===ri.id);
     if(fromIdx<0||toIdx<0||fromIdx===toIdx) return;
@@ -9954,19 +9955,19 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
       {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:3,tol:0.8,minArea:100,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:3,tol:0.8,minArea:100,smoothIter:3,close:3})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:3,tol:0.8,minArea:40,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:3,tol:0.8,minArea:40,smoothIter:3,close:2})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),800,800,{ss:3,tol:0.8,minArea:50,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),800,800,{ss:3,tol:0.8,minArea:50,smoothIter:3,close:2})},
       {id:'mo_tree_family', label:'Drzewo z rodziną', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeFamilyCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:40,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeFamilyCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:40,smoothIter:3,close:2})},
       {id:'mo_mtn_circle', label:'Góry w okręgu', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:50,smoothIter:3})},
       {id:'mo_forest_circle', label:'Las w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:50,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:50,smoothIter:3,close:2})},
       {id:'mo_deer_circle', label:'Jeleń w lesie', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawDeerCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:30,smoothIter:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawDeerCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.8,minArea:30,smoothIter:3,close:2})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
         d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:7,trunk:0.22,width:0.055,spread:0.72,up:0.18,curve:0.42,foliage:false,minW:3.8}),520,600,{ss:3,tol:0.8,minArea:60,smoothIter:3})},
       {id:'mo_family', label:'Rodzina', fillRule:'evenodd',
