@@ -7441,7 +7441,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 
   function showExport3D(){
     const W=state.docW, H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image');
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference');
     if(!vis.length){ showToast('Projekt jest pusty — nie ma czego eksportować.','error'); return; }
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     const grid=document.getElementById('layers3dGrid');
@@ -7553,7 +7553,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   function renderSummary(){
     const s=computeProjectStats();
     const totalElements=s.cutCount+s.scoreCount+s.engraveCount;
-    const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))].sort((a,b)=>a-b);
+    const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference').map(o=>o.depth||1))].sort((a,b)=>a-b);
     const depthInfo=depths.length>1?' · '+depths.length+' warstw 3D':'';
     const totalLen=s.cutLen+s.scoreLen;
     const cutPct=totalLen>0?Math.round(s.cutLen/totalLen*100):0;
@@ -8111,7 +8111,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   // dzięki czemu grubsza warstwa jest realnie wyższa w wizualizacji.
   function buildLayerScene(sceneEl, sw, pxPerMM){
     const W=state.docW, H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     if(!vis.length||!depths.length){ sceneEl.innerHTML=''; sceneEl.dataset.empty='1'; return 0; }
     sceneEl.dataset.empty='';
@@ -8183,7 +8183,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 
   // łączna grubość stosu w mm (do auto-skalowania wizualizacji)
   function totalStackMM(){
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))];
     return depths.reduce((s,d)=>s+layerMM(d),0)||3;
   }
@@ -8294,7 +8294,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   }
   function showPreview3D(){
     const W=state.docW, H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     if(!vis.length){ showToast('Brak widocznych elementów do wizualizacji 3D.','error'); return; }
     document.getElementById('modal3dPrev').classList.add('open');
     renderP3D();
@@ -8498,7 +8498,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   }
   function buildSeparatedSVG(){
     const W=state.docW,H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && !state.hiddenDepths.includes(o.depth||1));
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     if(!depths.length) return null;
     const gap=14, labelH=11;
@@ -8542,7 +8542,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   // obrysu tam, gdzie elementy się stykają lub nakładają.
   function buildExportSvgString(){
     const W=state.docW,H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image');
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference');
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let body='';
     depths.forEach(dep=>{
@@ -8683,7 +8683,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   }
   function exportDXF(){
     const H=state.docH;
-    const objs=state.objects.filter(o=>o.visible && o.type!=='image');
+    const objs=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference');
     if(!objs.length){ showToast('Brak obiektów do eksportu.','error'); return; }
     const depths=[...new Set(objs.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let layerDefs='';
