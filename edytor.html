@@ -3114,10 +3114,10 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       <button class="tbtn" id="delBtn" title="Usuń (Delete)" aria-label="Usuń"><span class="ico">🗑</span></button>
     </div>
     <div class="tgroup">
-      <button class="tbtn" id="zoomOut" title="Pomniejsz" aria-label="Pomniejsz"><span class="ico">−</span></button>
+      <button class="tbtn" id="zoomOut" title="Pomniejsz (Ctrl+-)" aria-label="Pomniejsz"><span class="ico">−</span></button>
       <span class="zoomval" id="zoomVal">100%</span>
-      <button class="tbtn" id="zoomIn" title="Powiększ" aria-label="Powiększ"><span class="ico">+</span></button>
-      <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku">Dopasuj</button>
+      <button class="tbtn" id="zoomIn" title="Powiększ (Ctrl+=)" aria-label="Powiększ"><span class="ico">+</span></button>
+      <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku (Ctrl+0)">Dopasuj</button>
       <button class="tbtn" id="zoomSelBtn" title="Przybliż do zaznaczenia (klawisz 2)">⌖ Zaznaczenie</button>
     </div>
     <div class="tgroup">
@@ -3534,8 +3534,10 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       <div class="sc-group">
         <h4>Widok</h4>
         <div class="sc-row"><span>Powiększ / pomniejsz</span><span class="sc-keys"><kbd>Scroll</kbd></span></div>
+        <div class="sc-row"><span>Przybliż</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>=</kbd></span></div>
+        <div class="sc-row"><span>Oddal</span><span class="sc-keys"><kbd>Ctrl</kbd>+<kbd>-</kbd></span></div>
         <div class="sc-row"><span>Przesuń widok (tymczasowo)</span><span class="sc-keys"><kbd>Spacja</kbd>+przeciągnij</span></div>
-        <div class="sc-row"><span>Dopasuj cały arkusz</span><span class="sc-keys"><kbd>1</kbd> / <kbd>F</kbd></span></div>
+        <div class="sc-row"><span>Dopasuj cały arkusz</span><span class="sc-keys"><kbd>1</kbd> / <kbd>F</kbd> / <kbd>Ctrl</kbd>+<kbd>0</kbd></span></div>
         <div class="sc-row"><span>Przybliż do zaznaczenia</span><span class="sc-keys"><kbd>2</kbd></span></div>
         <div class="sc-row"><span>Siatka wł/wył</span><span class="sc-keys"><kbd>G</kbd></span></div>
         <div class="sc-row"><span>Pokaż tę pomoc</span><span class="sc-keys"><kbd>?</kbd></span></div>
@@ -3558,7 +3560,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       </div>
       <div class="sc-group">
         <h4>Widok</h4>
-        <div class="sc-row"><span>Dopasuj widok</span><span class="sc-keys"><kbd>1</kbd></span></div>
+        <div class="sc-row"><span>Dopasuj widok</span><span class="sc-keys"><kbd>1</kbd> / <kbd>F</kbd> / <kbd>Ctrl+0</kbd></span></div>
+        <div class="sc-row"><span>Przybliż</span><span class="sc-keys"><kbd>Ctrl+=</kbd></span></div>
+        <div class="sc-row"><span>Oddal</span><span class="sc-keys"><kbd>Ctrl+-</kbd></span></div>
         <div class="sc-row"><span>Przybliż do zaznaczenia</span><span class="sc-keys"><kbd>2</kbd></span></div>
         <div class="sc-row"><span>Zoom +/-</span><span class="sc-keys"><kbd>Scroll</kbd> na płótnie</span></div>
         <div class="sc-row"><span>Przesuwanie</span><span class="sc-keys"><kbd>Spacja</kbd>+przeciągnij</span></div>
@@ -7227,6 +7231,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       if(e.key===']') e.shiftKey?bringToFront():bringForward();
       else e.shiftKey?sendToBack():sendBackward();
     } return; }
+    if((e.ctrlKey||e.metaKey)&&(e.key==='='||e.key==='+')){ e.preventDefault(); zoomBy(0.83); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key==='-'){ e.preventDefault(); zoomBy(1.2); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key==='0'){ e.preventDefault(); zoomFit(); return; }
     if(typing) return;
     if(e.key==='1'){ e.preventDefault(); zoomFit(); return; }
     if(e.key==='2'){ e.preventDefault(); zoomToSelection(); return; }
@@ -9684,7 +9691,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       let s=iters>0?chaikinClosed(p,iters):p;
       s=s.map(pt=>[pt[0]/ss, pt[1]/ss]);
       s=simplifyRing(s, 0.35);
-      return polyToPathD(s);
+      return polyToSmoothPathD(s, 18);
     }).join(' ');
   }
   // Rekurencyjne drzewo (gałęzie zwężające się + opcjonalna korona z kęp liści).
@@ -10277,7 +10284,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     {ico:'🗑',label:'Usuń zaznaczone',hint:'Delete',cat:'edycja',action:deleteSel},
     {ico:'📐',label:'Rozmieść automatycznie',hint:'',cat:'widok',action:autoArrange},
     {ico:'⊞',label:'Siatka wł/wył',hint:'G',cat:'widok',action:()=>setSnap(!state.snap,true)},
-    {ico:'🔎',label:'Dopasuj widok',hint:'1 / F',cat:'widok',action:zoomFit},
+    {ico:'🔎',label:'Dopasuj widok',hint:'Ctrl+0 / 1 / F',cat:'widok',action:zoomFit},
+    {ico:'🔍',label:'Przybliż',hint:'Ctrl+=',cat:'widok',action:()=>zoomBy(0.83)},
+    {ico:'🔍',label:'Oddal',hint:'Ctrl+-',cat:'widok',action:()=>zoomBy(1.2)},
     {ico:'⌖',label:'Przybliż do zaznaczenia',hint:'2',cat:'widok',action:zoomToSelection},
     {ico:'📊',label:'Podsumowanie projektu',hint:'',cat:'projekt',action:()=>document.getElementById('summaryBtn')?.click()},
     {ico:'⌨',label:'Skróty klawiszowe',hint:'?',cat:'pomoc',action:()=>document.getElementById('helpBtn')?.click()},
