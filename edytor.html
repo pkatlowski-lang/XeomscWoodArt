@@ -82,7 +82,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Pionowy pasek narzędzi rysowania (lewa krawędź) ---- */
 .toolrail{flex:0 0 60px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh-sm);z-index:5}
 .toolrail .tool-list{display:flex;flex-direction:column;gap:4px;align-items:center}
-.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.55rem;font-weight:700;border-radius:var(--r-md);padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted);transition:background .14s,color .14s,transform .14s,box-shadow .14s;position:relative}
+.toolrail .tbtn{flex-direction:column;width:50px;height:48px;min-width:0;gap:3px;font-size:.6rem;font-weight:700;border-radius:var(--r-md);padding:2px 0;line-height:1;white-space:normal;text-align:center;border-color:transparent;background:transparent;color:var(--muted);transition:background .14s,color .14s,transform .14s,box-shadow .14s;position:relative}
 .toolrail .tbtn .ico{font-size:1.24rem;line-height:1}
 .toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}
@@ -264,7 +264,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field input[type=number],.field input[type=text],.field select,.field textarea{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;transition:border-color .14s,box-shadow .14s,background .14s}
 .field input:hover,.field select:hover,.field textarea:hover{border-color:var(--border-strong)}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25),inset 0 0 0 1px rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.03)}
-#props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:var(--border);margin-top:2px;opacity:.55;transition:opacity .15s,border-color .12s,color .12s}
+#props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:var(--border);margin-top:2px;opacity:.68;transition:opacity .15s,border-color .12s,color .12s}
 #props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
 #props fieldset:disabled{opacity:.5}
 #props fieldset:disabled,#props fieldset:disabled *{cursor:not-allowed}
@@ -892,7 +892,7 @@ input[type=range]:focus-visible{outline:none}
 .node-handle-vis{filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 
 /* === Inline text editor — lepsza dostępność === */
-.inline-text-editor::placeholder{color:rgba(255,255,255,.3)}
+.inline-text-editor::placeholder{color:rgba(255,255,255,.38)}
 
 /* === Op-box — lepsza organizacja formularza operatora === */
 .op-h::before{content:'';display:inline-block;width:4px;height:16px;border-radius:2px;background:var(--accent);margin-right:8px;flex-shrink:0}
@@ -1737,8 +1737,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 .ctx-menu button:hover:not(:disabled) .ctx-ico{opacity:1}
 
 /* === v60: Toolrail — sekcje z mini-nagłówkami === */
-.toolrail .tool-section-label{font-size:.45rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);text-align:center;padding:2px 4px;margin-top:6px;user-select:none;opacity:.6;transition:opacity .2s}
-.toolrail:hover .tool-section-label{opacity:.9}
+.toolrail .tool-section-label{font-size:.52rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);text-align:center;padding:2px 4px;margin-top:6px;user-select:none;opacity:.7;transition:opacity .2s}
+.toolrail:hover .tool-section-label{opacity:1}
 
 /* === v60: Panel properties — ulepszona pusta strona === */
 .empty-note .empty-shortcuts{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
