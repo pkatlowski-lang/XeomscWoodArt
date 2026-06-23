@@ -3195,8 +3195,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
           📤 Wrzuć własną bazę (SVG)
           <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
         </label>
-        <h2>Galeria motywów</h2>
+        <h2>Galeria motywów <span class="h2-badge" id="motifCountBadge">0</span></h2>
         <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
+        <div class="gallery-search-wrap"><input type="text" class="gallery-search" id="motifSearchInput" placeholder="Szukaj motywu…" autocomplete="off" spellcheck="false" aria-label="Filtruj motywy"></div>
         <div class="gallery" id="motifs"></div>
       </div><!-- /ptab-body add -->
 
@@ -10064,9 +10065,15 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     const bar=document.getElementById('motifs-progress');
     if(bar){ if(done>=total) bar.remove(); else bar.textContent=`Generowanie: ${done}/${total}…`; }
   }
-  function renderMotifs(){
+  const motifSearchInput=document.getElementById('motifSearchInput');
+  const motifCountBadge=document.getElementById('motifCountBadge');
+  function renderMotifs(query){
     if(!MOTIFS.length){ motifsEl.innerHTML='<div class="dl-note" style="grid-column:1/-1;text-align:center">⏳ Generowanie motywów…</div>'; return; }
-    motifsEl.innerHTML=MOTIFS.map(m=>{
+    const q=(query||'').trim().toLowerCase();
+    const filtered=q?MOTIFS.filter(m=>m.label.toLowerCase().includes(q)||m.id.toLowerCase().includes(q)):MOTIFS;
+    if(motifCountBadge) motifCountBadge.textContent=filtered.length+(q?'/'+MOTIFS.length:'');
+    if(!filtered.length){ motifsEl.innerHTML='<div class="dl-note" style="grid-column:1/-1;text-align:center">Brak motywów pasujących do „'+escapeXml(q)+'"</div>'; return; }
+    motifsEl.innerHTML=filtered.map(m=>{
       const fr=m.fillRule==='evenodd'?' fill-rule="evenodd"':'';
       return `<div class="gallery-card" data-motif-id="${m.id}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
     }).join('');
@@ -10074,6 +10081,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       card.addEventListener('click',()=>{ const m=MOTIFS.find(x=>x.id===card.getAttribute('data-motif-id')); if(m) addBaseToCanvas(m); });
     });
   }
+  if(motifSearchInput) motifSearchInput.addEventListener('input',()=>renderMotifs(motifSearchInput.value));
 
   document.getElementById('galleryUpload').addEventListener('change', e => {
     const f=e.target.files[0]; if(f) importSvgFile(f); e.target.value='';
