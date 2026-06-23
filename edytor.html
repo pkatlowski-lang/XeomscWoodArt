@@ -396,7 +396,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1}
 .modal-box h3{margin:0 0 14px;font-size:1.1rem;font-weight:800;padding-bottom:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--text),rgba(var(--accent-rgb),.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:background .14s,color .14s,border-color .14s,transform .1s,box-shadow .14s}
-.modal-close:hover{background:rgba(255,90,90,.2);border-color:var(--danger);color:var(--danger);transform:scale(1.08);box-shadow:0 0 12px rgba(255,90,90,.2)}
+.modal-close:hover{background:rgba(255,90,90,.28);border-color:var(--danger);color:var(--danger);transform:scale(1.08);box-shadow:0 0 12px rgba(255,90,90,.25)}
 .modal-close:active{transform:scale(.92)}
 .layers3d-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
 .layer3d-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1.5px solid var(--border);border-radius:var(--r-md);padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px;transition:border-color .14s,box-shadow .14s,transform .12s}
@@ -1824,8 +1824,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 .tgroup:has(.tbtn.active){border-color:rgba(var(--accent-rgb),.12)}
 
 /* === v60: Panel ptab — ikona przejścia z lewej === */
-.ptab{position:relative;transition:color .15s,background .15s,box-shadow .15s,border-color .15s,transform .08s,padding-left .12s}
-.ptab:hover{padding-left:2px}
+.ptab{position:relative;transition:color .15s,background .15s,box-shadow .15s,border-color .15s,transform .12s}
+.ptab:hover{transform:translateX(1px)}
 
 /* === v60: Lepsza wizualizacja depth badge z tooltip === */
 .d-badge[data-tooltip]::after{font-size:.65rem;padding:4px 8px;white-space:nowrap}
@@ -6726,93 +6726,90 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         <button class="lico lico-del" data-act="del" title="Usuń">✕</button>
       </div>`;
     }).join('');
-    layersEl.querySelectorAll('.layer').forEach(row=>{
-      const id=row.getAttribute('data-id');
-      row.addEventListener('click',e=>{ if(e.target.closest('[data-act]')||e.target.closest('.lname')) return; (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(id):select(id); });
-      row.querySelectorAll('[data-act]').forEach(btn=>btn.addEventListener('click',e=>{
-        e.stopPropagation(); layerAction(id,btn.getAttribute('data-act'));
-      }));
-      const lname=row.querySelector('.lname');
-      lname.addEventListener('click',e=>{ (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(id):select(id); });
-      lname.addEventListener('dblclick',e=>{
-        e.stopPropagation();
-        const o=state.objects.find(x=>x.id===id); if(!o) return;
-        const cur=autoName(o);
-        lname.innerHTML=`<input type="text" value="${escapeXml(cur)}" maxlength="40">`;
-        const inp=lname.querySelector('input');
-        inp.focus(); inp.select();
-        let done=false;
-        const finish=(save)=>{
-          if(done) return; done=true;
-          if(save){ const v=inp.value.trim(); o.name=v; pushHistory(); }
-          renderLayers();
-        };
-        inp.addEventListener('keydown',ke=>{
-          ke.stopPropagation();
-          if(ke.key==='Enter'){ finish(true); }
-          else if(ke.key==='Escape'){ finish(false); }
-        });
-        inp.addEventListener('blur',()=>finish(true));
-      });
-      row.addEventListener('dragstart',e=>{
-        _layerDragId=id;
-        row.classList.add('dragging');
-        e.dataTransfer.effectAllowed='move';
-        e.dataTransfer.setData('text/plain',id);
-      });
-      row.addEventListener('dragend',()=>{
-        row.classList.remove('dragging');
-        _layerDragId=null;
-        layersEl.querySelectorAll('.drop-target-above,.drop-target-below').forEach(el=>el.classList.remove('drop-target-above','drop-target-below'));
-      });
-      row.addEventListener('dragover',e=>{
-        if(!_layerDragId || _layerDragId===id) return;
-        e.preventDefault(); e.dataTransfer.dropEffect='move';
-        const rect=row.getBoundingClientRect();
-        const mid=rect.top+rect.height/2;
-        const above=e.clientY<mid;
-        row.classList.toggle('drop-target-above',above);
-        row.classList.toggle('drop-target-below',!above);
-      });
-      row.addEventListener('dragleave',()=>{
-        row.classList.remove('drop-target-above','drop-target-below');
-      });
-      row.addEventListener('drop',e=>{
-        e.preventDefault();
-        row.classList.remove('drop-target-above','drop-target-below');
-        if(!_layerDragId || _layerDragId===id) return;
-        const rect=row.getBoundingClientRect();
-        const dropAbove=e.clientY<rect.top+rect.height/2;
-        const fromIdx=state.objects.findIndex(o=>o.id===_layerDragId);
-        const toIdx=state.objects.findIndex(o=>o.id===id);
-        if(fromIdx<0||toIdx<0||fromIdx===toIdx) return;
-        const [moved]=state.objects.splice(fromIdx,1);
-        let insertAt=toIdx>fromIdx?toIdx:toIdx;
-        if(dropAbove) insertAt=Math.min(insertAt+1,state.objects.length);
-        else insertAt=Math.max(0,insertAt);
-        state.objects.splice(insertAt,0,moved);
-        pushHistory(); renderAll(); renderProps();
-        showToast('Kolejność warstw zmieniona','info',1500);
-      });
-      row.addEventListener('keydown',e=>{
-        const layers=Array.from(layersEl.querySelectorAll('.layer'));
-        const idx=layers.indexOf(row);
-        if(e.key==='ArrowDown'||e.key==='ArrowUp'){
-          e.preventDefault();
-          const next=e.key==='ArrowDown'?idx+1:idx-1;
-          if(next>=0&&next<layers.length) layers[next].focus();
-        }
-        if(e.key==='Enter'||e.key===' '){
-          e.preventDefault();
-          (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(id):select(id);
-        }
-        if(e.key==='Delete'){
-          e.preventDefault();
-          layerAction(id,'del');
-        }
-      });
-    });
   }
+  // delegacja zdarzeń — jeden zestaw listenerów na kontenerze zamiast per-row
+  function _layerRowId(e){ const r=e.target.closest('.layer[data-id]'); return r?{row:r,id:r.getAttribute('data-id')}:null; }
+  layersEl.addEventListener('click',e=>{
+    const act=e.target.closest('[data-act]');
+    if(act){ const ri=_layerRowId(e); if(ri){ e.stopPropagation(); layerAction(ri.id,act.getAttribute('data-act')); } return; }
+    const ri=_layerRowId(e); if(!ri) return;
+    (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(ri.id):select(ri.id);
+  });
+  layersEl.addEventListener('dblclick',e=>{
+    const lname=e.target.closest('.lname'); if(!lname) return;
+    const ri=_layerRowId(e); if(!ri) return;
+    e.stopPropagation();
+    const o=state.objects.find(x=>x.id===ri.id); if(!o) return;
+    const cur=autoName(o);
+    lname.innerHTML=`<input type="text" value="${escapeXml(cur)}" maxlength="40">`;
+    const inp=lname.querySelector('input');
+    inp.focus(); inp.select();
+    let done=false;
+    const finish=(save)=>{
+      if(done) return; done=true;
+      if(save){ const v=inp.value.trim(); o.name=v; pushHistory(); }
+      renderLayers();
+    };
+    inp.addEventListener('keydown',ke=>{
+      ke.stopPropagation();
+      if(ke.key==='Enter') finish(true);
+      else if(ke.key==='Escape') finish(false);
+    });
+    inp.addEventListener('blur',()=>finish(true));
+  });
+  layersEl.addEventListener('dragstart',e=>{
+    const ri=_layerRowId(e); if(!ri) return;
+    _layerDragId=ri.id; ri.row.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',ri.id);
+  });
+  layersEl.addEventListener('dragend',e=>{
+    const ri=_layerRowId(e); if(ri) ri.row.classList.remove('dragging');
+    _layerDragId=null;
+    layersEl.querySelectorAll('.drop-target-above,.drop-target-below').forEach(el=>el.classList.remove('drop-target-above','drop-target-below'));
+  });
+  layersEl.addEventListener('dragover',e=>{
+    const ri=_layerRowId(e); if(!ri||!_layerDragId||_layerDragId===ri.id) return;
+    e.preventDefault(); e.dataTransfer.dropEffect='move';
+    const rect=ri.row.getBoundingClientRect();
+    const above=e.clientY<rect.top+rect.height/2;
+    ri.row.classList.toggle('drop-target-above',above);
+    ri.row.classList.toggle('drop-target-below',!above);
+  });
+  layersEl.addEventListener('dragleave',e=>{
+    const ri=_layerRowId(e); if(ri){ ri.row.classList.remove('drop-target-above','drop-target-below'); }
+  });
+  layersEl.addEventListener('drop',e=>{
+    e.preventDefault();
+    const ri=_layerRowId(e); if(!ri) return;
+    ri.row.classList.remove('drop-target-above','drop-target-below');
+    if(!_layerDragId||_layerDragId===ri.id) return;
+    const dropAbove=e.clientY<ri.row.getBoundingClientRect().top+ri.row.getBoundingClientRect().height/2;
+    const fromIdx=state.objects.findIndex(o=>o.id===_layerDragId);
+    const toIdx=state.objects.findIndex(o=>o.id===ri.id);
+    if(fromIdx<0||toIdx<0||fromIdx===toIdx) return;
+    const [moved]=state.objects.splice(fromIdx,1);
+    let insertAt=toIdx>fromIdx?toIdx:toIdx;
+    if(dropAbove) insertAt=Math.min(insertAt+1,state.objects.length);
+    else insertAt=Math.max(0,insertAt);
+    state.objects.splice(insertAt,0,moved);
+    pushHistory(); renderAll(); renderProps();
+    showToast('Kolejność warstw zmieniona','info',1500);
+  });
+  layersEl.addEventListener('keydown',e=>{
+    const ri=_layerRowId(e); if(!ri) return;
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      const layers=Array.from(layersEl.querySelectorAll('.layer'));
+      const idx=layers.indexOf(ri.row);
+      const next=e.key==='ArrowDown'?idx+1:idx-1;
+      if(next>=0&&next<layers.length) layers[next].focus();
+    }
+    if(e.key==='Enter'||e.key===' '){
+      e.preventDefault();
+      (e.shiftKey||e.ctrlKey||e.metaKey)?toggleSelection(ri.id):select(ri.id);
+    }
+    if(e.key==='Delete'){ e.preventDefault(); layerAction(ri.id,'del'); }
+  });
   let _layerDragId=null;
   function layerAction(id,act){
     const i=state.objects.findIndex(o=>o.id===id); if(i<0) return; const o=state.objects[i];
