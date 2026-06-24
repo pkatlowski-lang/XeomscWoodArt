@@ -564,19 +564,30 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   body{overflow:auto}
   .app{height:auto;min-height:100vh}
   .workspace{flex-direction:column;overflow:visible}
-  .toolrail{display:none}
-  .bottombar{flex:0 0 auto;border-left:none;border-right:none;border-top:2px solid var(--accent-dark)}
+  .toolrail{display:flex;flex-direction:row;flex:0 0 auto;border-right:none;border-bottom:1px solid var(--border);padding:6px 10px;overflow-x:auto;gap:4px}
+  .bottombar{flex:0 0 auto;border-left:none;border-right:none;border-top:2px solid var(--accent-dark);order:3;flex-direction:column}
   .bottombar>.bb-sec:first-child{flex:0 0 auto;min-height:300px}
   .bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:260px}
   .panel{flex:0 0 auto;max-height:none;width:100%;border:none;border-top:1px solid var(--border)}
   .stage{order:1;min-height:62vh;flex:0 0 auto}
-  .panel.right{order:2} .bottombar{order:3} .panel.left{order:4}
+  .panel.right{order:2}
+  .panel.left{order:4}
   .toolbar{position:sticky;top:0;z-index:5}
   .dd-menu{right:auto;left:0;min-width:180px}
-  .live-quote{position:static;max-width:none;margin:8px 10px;border-radius:var(--r-sm)}
+  .live-quote{position:static;max-width:none;margin:6px 8px;border-radius:var(--r-sm)}
+  .ptabs{gap:2px;padding:6px}
+  .ptab{font-size:.62rem;padding:8px 3px}
+  .tgroup{border-right:none;padding-right:0;margin-right:0}
+  .tgroup+.tgroup{border-left:1px solid rgba(var(--accent-rgb),.06);padding-left:8px;margin-left:4px}
+  .bottombar::before{display:none}
+  .bottombar>.bb-sec:first-child,.bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:200px}
+  .toolrail .tool-list{flex-direction:row}
+  .toolrail .tbtn{flex-direction:row;width:auto;height:36px;min-width:36px;gap:4px;font-size:.5rem}
+  .toolrail .tbtn.active::before{display:none}
+  .tool-sep{width:2px;height:20px;margin:0 4px}
 }
 @media(max-width:640px){
-  .text-toolbar{max-width:98%;padding:5px 8px;gap:4px}
+.text-toolbar{max-width:98%;padding:5px 8px;gap:4px}
   .text-toolbar select{max-width:120px}
   .modal-box{width:97vw;padding:16px 14px 18px}
   .shortcuts-grid{grid-template-columns:1fr}
@@ -588,6 +599,8 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .live-quote .lq-head{flex-wrap:wrap}
   .dd-kbd{display:none}
   .sc-search{font-size:.78rem}
+.toolbar{gap:3px}
+.info-box{flex-direction:column;text-align:center;gap:4px}
 }
 @media(max-width:480px){
   .toolbar{padding:6px 8px;gap:4px}
@@ -603,10 +616,15 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
   .gallery-card{font-size:.65rem;border-radius:var(--r-md)}
   .gallery-card svg{height:50px}
   .pq-sec{margin:8px 10px;padding:10px 11px}
-  .live-quote{padding:8px 10px}
+  .live-quote{padding:8px 10px;min-width:auto}
   .hint-empty{font-size:.72rem;padding:6px 12px}
   .statusbar{padding:2px 8px;font-size:.6rem}
   .statusbar .sb-sep:nth-child(4),.statusbar .sb-item:nth-child(5){display:none}
+  .statusbar .sb-sep:nth-child(2),.statusbar .sb-item:nth-child(3){display:none}
+  .gallery-card span{font-size:.62rem;line-height:1.2}
+  .tpl button{font-size:.68rem;padding:10px 6px 8px}
+  .live-quote .lq-head{font-size:.62rem}
+  .live-quote .lq-price{font-size:1.05rem}
 }
 @media(max-width:360px){
   .toolbar .brand .brand-name{display:none}
@@ -806,7 +824,7 @@ input[type=range]:focus-visible{outline:none}
 .pq-del:hover::after{opacity:1}
 
 /* === Toolbar — responsywny gap na mały ekran === */
-@media(max-width:640px){.toolbar{gap:3px}}
+
 
 /* === Animacja aktywności zakładki === */
 @keyframes ptabActivate{from{transform:scale(.95);opacity:.7}to{transform:scale(1);opacity:1}}
@@ -825,10 +843,7 @@ input[type=range]:focus-visible{outline:none}
 .op-h::before{content:'';display:inline-block;width:4px;height:16px;border-radius:2px;background:var(--accent);margin-right:8px;flex-shrink:0}
 
 /* === Responsywność — tablet improvements === */
-@media(max-width:820px){
-  .ptabs{gap:2px;padding:6px}
-  .ptab{font-size:.62rem;padding:8px 3px}
-}
+
 
 /* === Reduced motion — respektuj preferencje użytkownika === */
 @media(prefers-reduced-motion:reduce){
@@ -846,10 +861,11 @@ input[type=range]:focus-visible{outline:none}
 /* === Print — ukryj UI przy drukowaniu === */
 @media print{
   .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov,.statusbar,.splash-ov{display:none!important}
-  .app{height:auto;overflow:visible}
+  .app{height:auto!important;overflow:visible}
   .workspace{flex-direction:column}
-  .stage{flex:none;min-height:auto;background:#fff}
-  #canvas{position:static;width:100%;height:auto}
+  .stage{flex:none;min-height:auto;background:#fff;position:static!important;width:100%!important;height:auto!important}
+  #canvas{position:static!important;width:100%!important;height:auto!important}
+  body{overflow:visible!important}
 }
 
 /* === Polerka: panel h2 — hover akcent === */
@@ -869,9 +885,7 @@ input[type=range]:focus-visible{outline:none}
 .check-label:hover{color:#fff}
 
 /* === Polerka: info-box responsywność === */
-@media(max-width:640px){
-  .info-box{flex-direction:column;text-align:center;gap:4px}
-}
+
 
 /* === Polerka: lepsza hierarchia numerów w polach === */
 .field input[type=number]{font-variant-numeric:tabular-nums;cursor:ns-resize;scroll-behavior:smooth}
@@ -1269,9 +1283,7 @@ input[type=number]{position:relative}
 .tbtn-primary.dd-toggle:hover .ico{transform:translateY(2px)}
 
 /* === Lepsza responsywność statusbar === */
-@media(max-width:480px){
-  .statusbar .sb-sep:nth-child(2),.statusbar .sb-item:nth-child(3){display:none}
-}
+
 
 /* === Przycisk w panelu wyceny — hover efekt === */
 .qbar-btns .tbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--accent-rgb),.05),transparent);opacity:0;transition:opacity var(--tr-base)}
@@ -1427,10 +1439,7 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
 kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bottom-width:1px;margin-top:1px}
 
 /* === v59: Toolbar — lepsza separacja grup na mobile === */
-@media(max-width:820px){
-  .tgroup{border-right:none;padding-right:0;margin-right:0}
-  .tgroup+.tgroup{border-left:1px solid rgba(var(--accent-rgb),.06);padding-left:8px;margin-left:4px}
-}
+
 
 /* === v59: Lepsza wizualizacja czekania — skeleton dla kart === */
 .gallery-card.loading{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:skeletonPulse 1.5s ease-in-out infinite}
@@ -1489,12 +1498,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 .panel h2 .h2-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.1);color:var(--accent);font-size:.58rem;font-weight:700;margin-left:auto;font-variant-numeric:tabular-nums}
 
 /* === v60: Lepszy responsywny bottom bar === */
-@media(max-width:820px){
-  .bottombar{flex-direction:column;border-left:none;border-top:2px solid var(--accent-dark)}
-  .bottombar::before{display:none}
-  .bottombar>.bb-sec:first-child,.bottombar>.bb-sec:last-child{flex:0 0 auto;min-height:200px}
-  .live-quote{border-radius:var(--r-sm);margin:6px 8px}
-}
+
 
 /* === v60: Context menu — subtelna animacja === */
 @keyframes ctxMenuIn{from{opacity:0;transform:scale(.94) translateY(-4px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -1648,10 +1652,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .lq-send.tbtn-primary:hover::before{width:200%;height:200%}
 
 /* === v64: Gallery card — czytelniejsze fonty na mobile === */
-@media(max-width:480px){
-  .gallery-card span{font-size:.62rem;line-height:1.2}
-  .tpl button{font-size:.68rem;padding:10px 6px 8px}
-}
+
 
 /* === v64: Toolrail — micro-separator z gradientem === */
 .toolrail .tool-sep::after{content:'';position:absolute;left:50%;top:-2px;width:4px;height:4px;border-radius:50%;background:rgba(var(--accent-rgb),.12);transform:translateX(-50%)}
@@ -1814,13 +1815,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .toolrail .tbtn:focus-visible .ico{transform:scale(1.1)}
 
 /* === v70: Improved responsywność — scroll na toolrail mobilnie === */
-@media(max-width:820px){
-  .toolrail{display:flex;flex-direction:row;flex:0 0 auto;border-right:none;border-bottom:1px solid var(--border);padding:6px 10px;overflow-x:auto;gap:4px}
-  .toolrail .tool-list{flex-direction:row}
-  .toolrail .tbtn{flex-direction:row;width:auto;height:36px;min-width:36px;gap:4px;font-size:.5rem}
-  .toolrail .tbtn.active::before{display:none}
-  .tool-sep{width:2px;height:20px;margin:0 4px}
-}
+
 
 /* === v70: Skip-to-content link (accessibility) === */
 .skip-link{position:absolute;top:-40px;left:0;background:var(--accent);color:var(--accent-text);padding:8px 16px;z-index:10000;font-weight:700;font-size:.8rem;border-radius:0 0 var(--r-sm) 0;transition:top var(--tr-slow)}
@@ -1836,13 +1831,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 }
 
 /* === v70: Better print styles === */
-@media print{
-  .toolbar,.toolrail,.panel,.bottombar,.text-toolbar,.live-quote,.ctx-menu,.toast-container,.confirm-ov,.modal-ov,.statusbar,.splash-ov{display:none!important}
-  .stage{position:static!important;width:100%!important;height:auto!important}
-  #canvas{position:static!important;width:100%!important;height:auto!important}
-  body{overflow:visible!important}
-  .app{height:auto!important}
-}
+
 
 /* === v70: Panel transition na scroll-shadow === */
 .panel.left,.panel.right{position:relative}
@@ -1970,6 +1959,10 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
   .tpl{grid-template-columns:1fr 1fr 1fr}
   .layer{padding:6px 8px 6px 12px}
   .layer .lname{font-size:.84rem}
+  .panel h2{font-size:.72rem;padding:18px 20px 10px}
+  .field{padding:0 20px 12px}
+  .field label{font-size:.72rem;margin-bottom:6px}
+  .field input,.field select,.field textarea{font-size:.88rem;padding:9px 12px}
 }
 
 /* === v74: Poprawiony styl summary total row === */
@@ -2061,15 +2054,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .qs-category::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:var(--accent);margin-right:6px;vertical-align:middle;opacity:.5}
 
 /* === v77: Responsywność — bardzo duże ekrany (2K+) panele === */
-@media(min-width:2000px){
-  .panel{flex-basis:300px}
-  .panel h2{font-size:.72rem;padding:18px 20px 10px}
-  .field{padding:0 20px 12px}
-  .field label{font-size:.72rem;margin-bottom:6px}
-  .field input,.field select,.field textarea{font-size:.88rem;padding:9px 12px}
-  .layer{padding:6px 8px 6px 12px}
-  .layer .lname{font-size:.84rem}
-}
+
 
 /* === v77: Toolbar — group separator pulse na hover === */
 .tgroup:hover::after{opacity:1;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.25),transparent)}
@@ -2116,11 +2101,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .seg button.score:hover:not(.on){color:var(--score);border-color:rgba(var(--score-rgb),.3)}
 
 /* === v78: Poprawa live-quote na mobile === */
-@media(max-width:480px){
-  .live-quote{min-width:auto}
-  .live-quote .lq-head{font-size:.62rem}
-  .live-quote .lq-price{font-size:1.05rem}
-}
+
 
 /* === v79: Grupowe obwódki w warstwie === */
 .layer.layer-grouped{border-left-color:rgba(var(--accent2-rgb),.4)!important;padding-left:14px}
@@ -2244,11 +2225,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 @media(max-width:1400px){
   .panel{flex-basis:230px}
 }
-@media(min-width:1800px){
-  .toolrail{flex:0 0 70px}
-  .toolrail .tbtn{width:56px;height:52px;font-size:.6rem}
-  .toolrail .tbtn .ico{font-size:1.35rem}
-}
+
 
 /* === v82: Input group — sąsiadujące inputy z lepszym łączeniem === */
 .input-group{display:flex;gap:0}
@@ -4135,6 +4112,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const lineStep=fs*1.2*SCALE;
     const fontStr=`${o.italic?'italic ':''}${o.bold?'bold ':''}${(fs*SCALE).toFixed(2)}px ${o.font}`;
     const mctx=document.createElement('canvas').getContext('2d');
+    if(!mctx) return null;
     mctx.font=fontStr;
     const linesChars=lines.map(line=>[...line]);
     const linesWidths=linesChars.map(chars=>chars.map(ch=>mctx.measureText(ch).width));
@@ -4147,6 +4125,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const gw_max=Math.max(1,Math.ceil(maxAdvance))+PAD*2;
     const cnv=document.createElement('canvas'); cnv.width=gw_max; cnv.height=gh;
     const ctx=cnv.getContext('2d');
+    if(!ctx) return null;
     ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillStyle='#000';
     ctx.font=fontStr;
@@ -8170,7 +8149,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const ra=rp+m*addF;
     let rf=rp-m*dedF;
     if(rf<1) rf=1;
-    const invo=r=>{ const c=Math.min(1,rb/r); return Math.sqrt(Math.max(0,1/(c*c)-1)) - Math.acos(c); };
+    const invo=r=>{ if(r<1e-9) return 0; const c=Math.min(1,rb/Math.max(r,1e-9)); const v=Math.sqrt(Math.max(0,1/(c*c)-1)) - Math.acos(c); return isFinite(v)?v:0; };
     const invoP=invo(rp);
     const half=Math.PI/(2*z);
     const rStart=Math.max(rb,rf);
@@ -9327,7 +9306,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(last){ last.classList.remove('stage-active'); last.classList.add('stage-done'); last.querySelector('.stage-check').textContent='✓'; }
   }
   if(_splashHint) _splashHint.textContent='Edytor gotowy — powodzenia!';
-  requestAnimationFrame(()=>{ _splashOv.classList.add('hide'); setTimeout(()=>_splashOv.remove(),500); });
+  requestAnimationFrame(()=>{ if(_splashOv){ _splashOv.classList.add('hide'); setTimeout(()=>{try{_splashOv.remove();}catch(e){}},500); }});
   (window.requestIdleCallback||(cb=>setTimeout(cb,80)))(buildMotifsDeferred);
   // Podpowiedzi „?" dostępne z klawiatury: fokusowalne + nazwa dla czytnika ekranu
   // (tooltip pokazuje się też na :focus — patrz CSS .hint:focus::after).
