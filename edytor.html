@@ -6017,7 +6017,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
   }
   function restore(s){
-    const d=JSON.parse(s);
+    let d; try{ d=JSON.parse(s); }catch(e){ console.warn('Historia: uszkodzone dane',e.message); return; }
     state.objects=d.objects; state.selectedIds=d.selectedIds||(d.selectedId?[d.selectedId]:[]);
     // jeśli edytowaliśmy węzły ścieżki, cofnięcie/ponowienie nie powinno wyrzucać nas z trybu edycji punktów
     if(state.editingPathId && !state.selectedIds.includes(state.editingPathId) && state.objects.some(o=>o.id===state.editingPathId)){
@@ -6118,7 +6118,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     },1000);
   }
   if(_sbCoords){
-    canvas.addEventListener('mousemove',e=>{
+    canvas.addEventListener('pointermove',e=>{
       const rect=canvas.getBoundingClientRect();
       const scaleX=state.view.w/rect.width, scaleY=state.view.h/rect.height;
       const mx=state.view.x+(e.clientX-rect.left)*scaleX;
@@ -6129,7 +6129,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         _sbCoords.textContent='⊞ ---';
       }
     });
-    canvas.addEventListener('mouseleave',()=>{ _sbCoords.textContent=''; });
+    canvas.addEventListener('pointerleave',()=>{ _sbCoords.textContent=''; });
   }
 
   document.getElementById('undoBtn').addEventListener('click',undo);
@@ -9387,10 +9387,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         showConfirm('Znaleziono autozapis z '+data.objects.length+' elementami ('+sizeKB+' KB, '+depthCount+' warstw). Przywrócić?',{icon:'💾',ok:'Przywróć'}).then(ok=>{
           if(ok){ applyProjectData(data); showToast('Przywrócono autozapis ('+data.objects.length+' elem., '+depthCount+' warstw)','success'); }
           else { try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(ex){} }
-        });
+        }).catch(e=>{ console.warn('Autozapis dialog:',e); });
       }
     }
-  }catch(ex){}
+  }catch(ex){ console.warn('Odtwarzanie autozapisu:',ex.message); }
 
   // Czcionki z Google Fonts wczytują się asynchronicznie - jeśli wektoryzacja tekstu
   // (rasteryzacja na <canvas>, patrz rasterizeTextOutlines) zdarzy się WCZEŚNIEJ,
