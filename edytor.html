@@ -3563,7 +3563,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   }
 
   let _perfWarnShown=false;
-  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').style.display=state.objects.length?'none':''; if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
+  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').classList.toggle('u-hidden',state.objects.length>0); if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
     if(!_perfWarnShown && state.objects.length>=150){ _perfWarnShown=true; showToast('Dużo elementów ('+state.objects.length+') — edytor może działać wolniej. Rozważ grupowanie lub usunięcie zbędnych obiektów.','warning',5000); }
   }
 
@@ -6001,7 +6001,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const el=document.getElementById('sbSave');
     if(el){
       el.textContent=unsaved?'● niezapisany':'';
-      el.style.color=unsaved?'var(--operator)':'';
       if(unsaved) el.classList.add('sb-unsaved'); else el.classList.remove('sb-unsaved');
     }
   }
