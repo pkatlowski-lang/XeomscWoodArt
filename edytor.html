@@ -459,7 +459,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:36px;font-size:.76rem;margin-top:4px;position:relative;overflow:hidden}
-.live-quote .lq-send::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .4s}
+.live-quote .lq-send::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform var(--an-slow)}
 .live-quote .lq-send:hover::after{transform:translateX(100%)}
 
 /* ---- Skróty klawiszowe (modal) ---- */
@@ -764,7 +764,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Przycisk eksportu — premium pulsujący efekt === */
 .tbtn-primary.dd-toggle{position:relative;overflow:hidden}
-.tbtn-primary.dd-toggle::after{content:'';position:absolute;top:50%;left:50%;width:120%;height:120%;transform:translate(-50%,-50%) scale(0);background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);border-radius:50%;opacity:0;transition:transform .5s,opacity .3s}
+.tbtn-primary.dd-toggle::after{content:'';position:absolute;top:50%;left:50%;width:120%;height:120%;transform:translate(-50%,-50%) scale(0);background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);border-radius:50%;opacity:0;transition:transform var(--an-slow),opacity var(--an-med)}
 .tbtn-primary.dd-toggle:hover::after{transform:translate(-50%,-50%) scale(1);opacity:1}
 
 /* === Shortcuts grid — lepszy hover === */
@@ -777,7 +777,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Przycisk wysyłki — akcent wizualny === */
 #sendQuoteOpenBtn{position:relative;overflow:hidden;font-weight:800;letter-spacing:.03em;text-transform:uppercase;font-size:.72rem}
-#sendQuoteOpenBtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left .6s}
+#sendQuoteOpenBtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left var(--an-slower)}
 #sendQuoteOpenBtn:hover::after{left:100%}
 
 /* === Info-box — lepsza interakcja === */
@@ -1108,7 +1108,7 @@ input[type=range]:focus-visible{outline:none}
 
 /* === Splash screen / loading overlay === */
 .splash-ov{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
-  background:radial-gradient(ellipse 800px 500px at 50% 45%,rgba(var(--accent-rgb),.06),var(--bg));transition:opacity .4s ease,visibility 0s linear .4s}
+  background:radial-gradient(ellipse 800px 500px at 50% 45%,rgba(var(--accent-rgb),.06),var(--bg));transition:opacity var(--an-slow) ease,visibility 0s linear var(--an-slow)}
 .splash-ov.hide{opacity:0;visibility:hidden;pointer-events:none}
 .splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px;animation:splashBrandIn var(--an-slow) ease-out}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
@@ -1667,7 +1667,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 
 /* === v64: Live quote — lepsza animacja wysyłki === */
 .lq-send.tbtn-primary{position:relative;overflow:hidden}
-.lq-send.tbtn-primary::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.1);border-radius:50%;transform:translate(-50%,-50%);transition:width .4s,height .4s}
+.lq-send.tbtn-primary::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.1);border-radius:50%;transform:translate(-50%,-50%);transition:width var(--an-slow),height var(--an-slow)}
 .lq-send.tbtn-primary:hover::before{width:200%;height:200%}
 
 /* === v64: Gallery card — czytelniejsze fonty na mobile === */
@@ -2041,7 +2041,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .sb-autosave{color:var(--success);font-weight:600;font-size:.6rem;animation:autosavePulse 1.8s ease-out forwards;pointer-events:none}
 
 /* === v77: Karta szablonu — shimmer na hover === */
-.tpl button::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transition:left .5s}
+.tpl button::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transition:left var(--an-slow)}
 .tpl button:hover::after{left:110%}
 
 /* === v77: Lepsze wyróżnienie aktywnego narzędzia toolrail === */
