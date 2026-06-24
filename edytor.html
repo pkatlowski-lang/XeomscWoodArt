@@ -22,14 +22,13 @@
   --cut:#ff3b3b; --cut-dark:#cc2222; --cut-light:#ff5a5a; --cut-light-rgb:255,90,90; --engrave:#161616; --score:#2f7bd8; --score-rgb:47,123,216; --score-light:#3b9eff;
   --hole:#a86bf0; --hole-rgb:155,93,229; --success:#54d699; --success-rgb:84,214,153; --danger:#ff8a8a; --danger-rgb:255,138,138; --cut-rgb:255,59,59;
   --operator:#f7b733; --operator-rgb:247,183,51; --operator-dark:#e0892a; --operator-text:#1a1206;
-  --warning:#ffaa3c; --warning-rgb:255,170,60;
+  --warning-rgb:255,170,60;
   --guide:#ff4fa6;
   --board:#f6ecd9; --board-border:#c9b48a;
   /* Badge warstw 3D */
   --depth-1:#2a9d8f; --depth-2:#e76f51; --depth-3:#9b5de5; --depth-4:#f4a261; --depth-5:#06d6a0; --depth-6:#e63946; --depth-n:#888;
   /* Powierzchnie glassmorficzne */
   --glass:rgba(26,34,51,.96); --glass-2:rgba(12,16,25,.96);
-  --overlay-dark:rgba(0,0,0,.72); --overlay-strong:rgba(0,0,0,.78);
   /* Promienie, cienie, typografia */
   --r:12px; --r-hair:2px; --r-xxs:3px; --r-xs:6px; --r-sm:8px; --r-md:10px; --r-lg:18px;
   --sh-sm:0 1px 2px rgba(0,0,0,.35); --sh:0 8px 24px -8px rgba(0,0,0,.55);
@@ -2176,7 +2175,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .gallery-search-wrap{position:relative;margin:8px 14px}
 .gallery-search{width:100%;padding:7px 10px 7px 30px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.78rem;box-sizing:border-box;transition:border-color var(--tr-base),box-shadow var(--tr-base);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
 .gallery-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
-.gallery-count{font-size:.6rem;color:var(--muted-2);text-align:right;padding:2px 14px;font-variant-numeric:tabular-nums}
+
 
 /* === v82: Ulepszony empty state — ikony kształtów z animacją === */
 .empty-note .empty-shapes{display:flex;gap:12px;justify-content:center;margin:12px 0 4px;opacity:.4}
@@ -5014,6 +5013,16 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
   /* ---------------- Panel właściwości ---------------- */
   const propsEl=document.getElementById('props');
+  propsEl.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    if(b.dataset.align){ alignSel(b.dataset.align); return; }
+    if(b.dataset.dist){ distributeSel(b.dataset.dist); return; }
+    if(b.dataset.bool){ booleanOp(b.dataset.bool); return; }
+    if(b.dataset.group){ b.dataset.group==='group'?groupSel():ungroupSel(); return; }
+    if(b.dataset.rot90!==undefined){ rotate90(Number(b.dataset.rot90)); return; }
+    if(b.dataset.setdepth!==undefined){ const dd=Number(b.dataset.setdepth); getSelected().forEach(ob=>ob.depth=dd); renderAll(); renderProps(); pushHistory(); return; }
+    if(b.closest('[data-seg="mmode"]')&&b.dataset.mode){ const m=b.dataset.mode; getSelected().forEach(o=>o.mode=m); renderObjects(); renderLayers(); pushHistory(); return; }
+  });
   function field(label, inner){ return `<div class="field"><label>${label}</label>${inner}</div>`; }
   /* ---- Wyrównywanie / rozkładanie (działa na zaznaczonej grupie) ---- */
   function alignSel(mode){
@@ -5129,12 +5138,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
     h+=`<div class="empty-note group-hint">💡 Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę.<br>Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
-    propsEl.querySelectorAll('[data-align]').forEach(b=>b.addEventListener('click',()=>alignSel(b.dataset.align)));
-    propsEl.querySelectorAll('[data-dist]').forEach(b=>b.addEventListener('click',()=>distributeSel(b.dataset.dist)));
-    propsEl.querySelectorAll('[data-bool]').forEach(b=>b.addEventListener('click',()=>booleanOp(b.dataset.bool)));
-    propsEl.querySelectorAll('[data-group]').forEach(b=>b.addEventListener('click',()=>{ b.dataset.group==='group'?groupSel():ungroupSel(); }));
-    propsEl.querySelectorAll('[data-seg="mmode"] button').forEach(b=>b.addEventListener('click',()=>{ const m=b.dataset.mode; getSelected().forEach(o=>o.mode=m); renderObjects(); renderLayers(); pushHistory(); }));
-    propsEl.querySelectorAll('[data-rot90]').forEach(b=>b.addEventListener('click',()=>rotate90(Number(b.dataset.rot90))));
     // numeryczna pozycja/rozmiar całego zaznaczenia (X/Y przesuwa, Sz./Wys. skaluje
     // proporcjonalnie wszystkie zaznaczone elementy względem lewego górnego rogu)
     const mbX=propsEl.querySelector('#mbX'), mbY=propsEl.querySelector('#mbY'), mbW=propsEl.querySelector('#mbW'), mbH=propsEl.querySelector('#mbH');
@@ -5606,7 +5609,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     });
     const shapeLockRatio=propsEl.querySelector('#shapeLockRatio');
     if(shapeLockRatio) shapeLockRatio.addEventListener('change',()=>{ o.lockRatio=shapeLockRatio.checked; pushHistory(); });
-    propsEl.querySelectorAll('[data-rot90]').forEach(b=>b.addEventListener('click',()=>rotate90(Number(b.getAttribute('data-rot90')))));
     propsEl.querySelectorAll('[data-seg="mode"] button').forEach(b=>b.addEventListener('click',()=>{ o.mode=b.getAttribute('data-mode'); renderProps(); renderObjects(); scheduleLive3D(); pushHistory(); }));
     propsEl.querySelectorAll('[data-seg="role"] button').forEach(b=>b.addEventListener('click',()=>{ const r=b.getAttribute('data-role'); o.role=r==='hole'?'hole':undefined; renderProps(); renderAll(); scheduleLive3D(); pushHistory(); }));
     propsEl.querySelectorAll('[data-seg="flip"] button').forEach(b=>b.addEventListener('click',()=>{ o.flip=b.getAttribute('data-flip')==='1'; renderProps(); renderObjects(); scheduleLive3D(); pushHistory(); }));
@@ -5658,10 +5660,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       ddBtn.addEventListener('click',()=>{ obj.depth=Math.max(1,(obj.depth||1)-1); renderAll(); renderProps(); pushHistory(); });
       duBtn.addEventListener('click',()=>{ obj.depth=(obj.depth||1)+1; renderAll(); renderProps(); pushHistory(); });
     }
-    propsEl.querySelectorAll('[data-setdepth]').forEach(b=>b.addEventListener('click',()=>{
-      const dd=Number(b.dataset.setdepth); getSelected().forEach(ob=>ob.depth=dd);
-      renderAll(); renderProps(); pushHistory();
-    }));
   }
   /* ---- Pełna edycja napisów: rozciąganie (tsx/tsy) + pasek u góry obszaru roboczego ---- */
   function applyTextSize(wInp,hInp){
