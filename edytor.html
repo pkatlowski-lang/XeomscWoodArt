@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,7 +99,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55);animation:toolGlow 2s ease-in-out infinite}
 .toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 var(--r-xxs) var(--r-xxs) 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn var(--an-base) ease-out}
 @keyframes toolIndicatorIn{from{transform:translateY(-50%) scaleY(0);opacity:0}to{transform:translateY(-50%) scaleY(1);opacity:1}}
-.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative}
+.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative;overscroll-behavior:contain}
 .panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
 .panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
 .panel h2{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:16px 16px 8px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0;transition:color var(--tr-base),letter-spacing var(--tr-base)}
@@ -112,7 +112,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab:hover{color:var(--text);background:rgba(255,255,255,.04);opacity:1;transform:translateX(1px)}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
 .ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);opacity:1;position:relative;overflow:hidden;animation:ptabActivate var(--an-fast) ease-out;text-shadow:0 1px 4px rgba(0,0,0,.3)}
-.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:absolute;scroll-behavior:smooth;scrollbar-gutter:stable;transition:opacity var(--tr-base) ease;opacity:0;pointer-events:none;top:0;left:0;right:0;bottom:0}
+.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:absolute;scroll-behavior:smooth;scrollbar-gutter:stable;overscroll-behavior:contain;transition:opacity var(--tr-base) ease;opacity:0;pointer-events:none;top:0;left:0;right:0;bottom:0}
 .ptab-body.active{display:flex;animation:ptabBodyIn var(--an-base) ease-out;box-shadow:inset 0 4px 8px -4px rgba(0,0,0,.15);opacity:1;pointer-events:auto;position:relative}
 .ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
 /* Wycena inline — każda sekcja jako wyraźna karta */
@@ -234,7 +234,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd-item:hover .pc{color:var(--accent-text)}
 
 /* canvas geometry styling */
-.doc-bg{fill:#f5eede;filter:drop-shadow(0 2px 6px rgba(0,0,0,.12))}
+.doc-bg{fill:var(--board);filter:drop-shadow(0 2px 6px rgba(0,0,0,.12))}
 .grid-line{stroke:rgba(0,0,0,.06);stroke-width:1px;vector-effect:non-scaling-stroke;transition:stroke var(--tr-slow);stroke-linecap:round}
 .grid-line.major{stroke:rgba(0,0,0,.14);stroke-linecap:butt}
 .doc-border{fill:none;stroke:var(--accent-dark);stroke-width:1.8px;vector-effect:non-scaling-stroke;stroke-dasharray:none;transition:stroke var(--tr-slow),stroke-width var(--tr-slow)}
@@ -305,7 +305,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Warstwy ---- */
 .layer-search{width:calc(100% - 20px);margin:0 10px 8px;padding:7px 10px 7px 32px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.8rem;box-sizing:border-box;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:9px center;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 .layer-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
-.layers{display:flex;flex-direction:column;gap:2px;padding:0 10px 14px;scroll-behavior:smooth;overflow-y:auto;max-height:calc(100vh - 300px)}
+.layers{display:flex;flex-direction:column;gap:2px;padding:0 10px 14px;scroll-behavior:smooth;overflow-y:auto;overscroll-behavior:contain;max-height:calc(100vh - 300px)}
 .layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:var(--r-sm);border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),padding-left var(--tr-base);position:relative}
 .layer:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm);padding-left:12px;border-left-color:var(--accent)!important}
 .layer:active{transform:scale(.98)}
@@ -2829,7 +2829,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
 <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false" role="status"></div>
 <div class="confirm-ov" id="confirmOverlay">
-  <div class="confirm-box">
+  <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirmMsg">
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
     <div class="confirm-msg" id="confirmMsg"></div>
     <label for="confirmInput" class="sr-only" id="confirmInputLabel">Wartość</label>
@@ -6912,19 +6912,27 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     quoteMatSel.value=val; lqMat.value=val;
   }
   // Pozycje dodatkowe — render edytowalnej listy
+  const _qExtrasBox=document.getElementById('qExtras');
   function renderExtras(){
-    const box=document.getElementById('qExtras'); if(!box) return;
-    box.innerHTML='';
-    quoteExtras.forEach((ex,i)=>{
-      const row=document.createElement('div'); row.className='q-extra-row';
-      row.innerHTML=`<input type="text" class="ex-name" placeholder="np. Malowanie" value="${String(ex.label||'').replace(/"/g,'&quot;')}">`
-        +`<input type="number" class="ex-amt" step="0.5" min="0" placeholder="zł" value="${ex.amount!=null?ex.amount:''}">`
-        +`<button type="button" class="pq-del" title="Usuń pozycję" aria-label="Usuń pozycję">✕</button>`;
-      const ins=row.querySelectorAll('input');
-      ins[0].addEventListener('input',()=>{ quoteExtras[i].label=ins[0].value; });
-      ins[1].addEventListener('input',()=>{ quoteExtras[i].amount=ins[1].value; scheduleLiveQuote(); });
-      row.querySelector('.pq-del').addEventListener('click',()=>{ quoteExtras.splice(i,1); renderExtras(); renderQuoteAll(); });
-      box.appendChild(row);
+    if(!_qExtrasBox) return;
+    _qExtrasBox.innerHTML=quoteExtras.map((ex,i)=>
+      `<div class="q-extra-row" data-exi="${i}">`
+      +`<input type="text" class="ex-name" placeholder="np. Malowanie" value="${String(ex.label||'').replace(/"/g,'&quot;')}">`
+      +`<input type="number" class="ex-amt" step="0.5" min="0" placeholder="zł" value="${ex.amount!=null?ex.amount:''}">`
+      +`<button type="button" class="pq-del" title="Usuń pozycję" aria-label="Usuń pozycję">✕</button></div>`
+    ).join('');
+  }
+  if(_qExtrasBox){
+    _qExtrasBox.addEventListener('input',e=>{
+      const row=e.target.closest('[data-exi]'); if(!row) return;
+      const i=+row.getAttribute('data-exi');
+      if(e.target.classList.contains('ex-name')) quoteExtras[i].label=e.target.value;
+      else if(e.target.classList.contains('ex-amt')){ quoteExtras[i].amount=e.target.value; scheduleLiveQuote(); }
+    });
+    _qExtrasBox.addEventListener('click',e=>{
+      if(!e.target.closest('.pq-del')) return;
+      const row=e.target.closest('[data-exi]'); if(!row) return;
+      quoteExtras.splice(+row.getAttribute('data-exi'),1); renderExtras(); renderQuoteAll();
     });
   }
   // Główny render ceny: karta w zakładce (cena/szt + razem + rozbicie) ORAZ widget na żywo
@@ -7937,19 +7945,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }}
   ];
   const tplEl=document.getElementById('templates');
-  TEMPLATES.forEach(t=>{
-    const b=document.createElement('button');
-    // rozdziel wiodącą ikonę (emoji) od podpisu, aby pokazać ją w odznace
+  tplEl.innerHTML=TEMPLATES.map((t,i)=>{
     const m=t.label.match(/^(\S+)\s+(.*)$/);
     const icon=m?m[1]:'◆', txt=m?m[2]:t.label;
-    b.innerHTML=`<span class="tpl-ico">${icon}</span><span class="tpl-txt">${escapeXml(txt)}</span>`;
-    b.title=txt;
-    b.addEventListener('click',()=>{
-      const objs=t.build(); objs.forEach(o=>{o.id=uid();}); state.objects.push(...objs); state.selectedIds=[objs[objs.length-1].id];
-      pushHistory(); renderAll(); renderProps(); zoomFit();
-      showToast('Szablon: '+txt+' ('+objs.length+' elem.)','success',1500);
-    });
-    tplEl.appendChild(b);
+    return `<button data-tpl="${i}" aria-label="Szablon: ${escapeXml(txt)}"><span class="tpl-ico">${icon}</span><span class="tpl-txt">${escapeXml(txt)}</span></button>`;
+  }).join('');
+  tplEl.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-tpl]'); if(!btn) return;
+    const t=TEMPLATES[+btn.getAttribute('data-tpl')]; if(!t) return;
+    const m=t.label.match(/^(\S+)\s+(.*)$/);
+    const txt=m?m[2]:t.label;
+    const objs=t.build(); objs.forEach(o=>{o.id=uid();}); state.objects.push(...objs); state.selectedIds=[objs[objs.length-1].id];
+    pushHistory(); renderAll(); renderProps(); zoomFit();
+    showToast('Szablon: '+txt+' ('+objs.length+' elem.)','success',1500);
   });
 
   /* ---------------- Punkty krawędzi „na palec" (używane przez generator zawiasu) ---------------- */
@@ -8795,19 +8803,24 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const vx=fmt(base.bx), vy=fmt(base.by), vw=fmt(base.bw), vh=fmt(base.bh);
       const del = base.custom ? `<button class="del-base" data-del="${base.id}" title="Usuń tę bazę" aria-label="Usuń tę bazę">✕</button>` : '';
       const fr = base.fillRule==='evenodd' ? ' fill-rule="evenodd"' : '';
-      return `<div class="gallery-card" data-base-id="${base.id}">${del}<svg viewBox="${vx} ${vy} ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(base.d)}" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(base.label)}</span></div>`;
+      return `<div class="gallery-card" data-base-id="${base.id}" tabindex="0" role="button" aria-label="${escapeXml(base.label)}">${del}<svg viewBox="${vx} ${vy} ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(base.d)}" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(base.label)}</span></div>`;
     }).join('');
-    galleryEl.querySelectorAll('.gallery-card').forEach(card => {
-      const id = card.getAttribute('data-base-id');
-      card.addEventListener('click', ev => {
-        if(ev.target.classList.contains('del-base')) return;
-        const base = all.find(b=>b.id===id); if(base) addBaseToCanvas(base);
-      });
-    });
-    galleryEl.querySelectorAll('.del-base').forEach(btn => {
-      btn.addEventListener('click', ev => { ev.stopPropagation(); removeCustomBase(btn.getAttribute('data-del')); });
-    });
   }
+  function _galleryActivate(e){
+    if(e.target.closest('.del-base')) return;
+    const card=e.target.closest('.gallery-card[data-base-id]'); if(!card) return;
+    const id=card.getAttribute('data-base-id');
+    const base=[...BUILT_IN_BASES,...loadCustomBases()].find(b=>b.id===id);
+    if(base) addBaseToCanvas(base);
+  }
+  galleryEl.addEventListener('click',_galleryActivate);
+  galleryEl.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); _galleryActivate(e); }
+  });
+  galleryEl.addEventListener('click',e=>{
+    const del=e.target.closest('.del-base'); if(!del) return;
+    e.stopPropagation(); removeCustomBase(del.getAttribute('data-del'));
+  });
 
   /* ---------------- Generator sylwetek organicznych (rasteryzacja → kontur) ----------------
      Rysuje kształt WYPEŁNIONY na ukrytym <canvas> (dowolnie nakładające się elementy —
@@ -9260,12 +9273,17 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!filtered.length){ motifsEl.innerHTML='<div class="dl-note dl-note-grid">Brak motywów pasujących do „'+escapeXml(q)+'"</div>'; return; }
     motifsEl.innerHTML=filtered.map(m=>{
       const fr=m.fillRule==='evenodd'?' fill-rule="evenodd"':'';
-      return `<div class="gallery-card" data-motif-id="${m.id}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
+      return `<div class="gallery-card" data-motif-id="${m.id}" tabindex="0" role="button" aria-label="${escapeXml(m.label)}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
     }).join('');
-    motifsEl.querySelectorAll('.gallery-card').forEach(card=>{
-      card.addEventListener('click',()=>{ const m=MOTIFS.find(x=>x.id===card.getAttribute('data-motif-id')); if(m) addBaseToCanvas(m); });
-    });
   }
+  function _motifActivate(e){
+    const card=e.target.closest('.gallery-card'); if(!card) return;
+    const m=MOTIFS.find(x=>x.id===card.getAttribute('data-motif-id')); if(m) addBaseToCanvas(m);
+  }
+  motifsEl.addEventListener('click',_motifActivate);
+  motifsEl.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); _motifActivate(e); }
+  });
   if(motifSearchInput) motifSearchInput.addEventListener('input',()=>renderMotifs(motifSearchInput.value));
 
   document.getElementById('galleryUpload').addEventListener('change', e => {
