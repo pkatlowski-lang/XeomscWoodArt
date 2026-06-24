@@ -2801,6 +2801,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const ACCENT=_cs.getPropertyValue('--accent').trim()||'#3fc7ff';
   const BOARD=_cs.getPropertyValue('--board').trim()||'#f6ecd9';
   const BOARD_BORDER=_cs.getPropertyValue('--board-border').trim()||'#c9b48a';
+  function openModal(el){ el._prevFocus=document.activeElement; el.classList.add('open'); const f=el.querySelector('button,input,select,[tabindex]'); if(f) requestAnimationFrame(()=>f.focus()); }
+  function closeModal(el){ el.classList.remove('open'); if(el._prevFocus) try{el._prevFocus.focus();}catch(ex){} }
   const _toastC=document.getElementById('toastContainer');
   function showToast(msg,type,duration){
     const icons={success:'✓',error:'✗',info:'ℹ',warning:'⚠'};
@@ -6334,8 +6336,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const typing=/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
     if(e.key==='Escape'){
       if(document.getElementById('quickSearchOv').classList.contains('open')){ e.preventDefault(); closeQuickSearch(); return; }
-      const openModal=document.querySelector('.modal-ov.open');
-      if(openModal){ e.preventDefault(); openModal.classList.remove('open'); return; }
+      const activeModal=document.querySelector('.modal-ov.open');
+      if(activeModal){ e.preventDefault(); closeModal(activeModal); return; }
       if(state.editingPathId && !typing){ e.preventDefault(); state.editingPathId=null; renderOverlay(); renderProps(); return; }
     }
     if(e.key==='?' && !typing){ e.preventDefault(); showHelp(); return; }
@@ -6610,17 +6612,17 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     • Sklejaj warstwy od dołu do góry: 1 → 2 → 3 … Uzyskasz efekt 3D w zależności od liczby warstw.<br>
     • Łączna głębokość = suma grubości wszystkich warstw materiału.`;
 
-    document.getElementById('modal3d').classList.add('open');
+    openModal(document.getElementById('modal3d'));
   }
 
   document.getElementById('export3dBtn').addEventListener('click', showExport3D);
-  document.getElementById('modal3dClose').addEventListener('click', ()=>document.getElementById('modal3d').classList.remove('open'));
-  document.getElementById('modal3d').addEventListener('click', e=>{ if(e.target===document.getElementById('modal3d')) document.getElementById('modal3d').classList.remove('open'); });
+  document.getElementById('modal3dClose').addEventListener('click', ()=>closeModal(document.getElementById('modal3d')));
+  document.getElementById('modal3d').addEventListener('click', e=>{ if(e.target===document.getElementById('modal3d')) closeModal(document.getElementById('modal3d')); });
 
   /* ---------------- Pomoc — skróty klawiszowe ---------------- */
   const modalHelp=document.getElementById('modalHelp');
-  function showHelp(){ modalHelp.classList.add('open'); }
-  function hideHelp(){ modalHelp.classList.remove('open'); }
+  function showHelp(){ openModal(modalHelp); }
+  function hideHelp(){ closeModal(modalHelp); }
   document.getElementById('helpBtn').addEventListener('click', showHelp);
   document.getElementById('modalHelpClose').addEventListener('click', hideHelp);
   modalHelp.addEventListener('click', e=>{ if(e.target===modalHelp) hideHelp(); });
@@ -6710,9 +6712,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       +`<div class="sum-time-row"><span>Grawer</span><span>${formatTime(engraveTime)}</span></div>`
       +`<div class="sum-time-row total"><span>Razem (szacunkowo)</span><span>${formatTime(cutTime+scoreTime+engraveTime)}</span></div>`;
   }
-  document.getElementById('summaryBtn').addEventListener('click',()=>{ renderSummary(); modalSummary.classList.add('open'); });
-  document.getElementById('modalSummaryClose').addEventListener('click',()=>modalSummary.classList.remove('open'));
-  modalSummary.addEventListener('click',e=>{ if(e.target===modalSummary) modalSummary.classList.remove('open'); });
+  document.getElementById('summaryBtn').addEventListener('click',()=>{ renderSummary(); openModal(modalSummary); });
+  document.getElementById('modalSummaryClose').addEventListener('click',()=>closeModal(modalSummary));
+  modalSummary.addEventListener('click',e=>{ if(e.target===modalSummary) closeModal(modalSummary); });
   let _sumTimer;
   function debouncedSummary(){ clearTimeout(_sumTimer); _sumTimer=setTimeout(renderSummary,120); }
   [sumCutSpeed,sumScoreSpeed,sumEngraveSpeed,sumEngraveSpacing].forEach(inp=>inp.addEventListener('input',debouncedSummary));
@@ -7234,7 +7236,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const list=loadCustomMaterials(); list.splice(+row.dataset.i,1); saveCustomMaterials(list);
     renderMaterialsList(); renderDepthLegend();
   });
-  function openMaterialsModal(){ renderMaterialsList(); modalMaterials.classList.add('open'); }
+  function openMaterialsModal(){ renderMaterialsList(); openModal(modalMaterials); }
   document.getElementById('matAddBtn').addEventListener('click',()=>{
     const nameEl=document.getElementById('matName'), mmEl=document.getElementById('matMM');
     const name=nameEl.value.trim(), mm=Number(mmEl.value);
@@ -7244,8 +7246,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     nameEl.value=''; mmEl.value='';
     renderMaterialsList(); renderDepthLegend();
   });
-  document.getElementById('modalMaterialsClose').addEventListener('click',()=>modalMaterials.classList.remove('open'));
-  modalMaterials.addEventListener('click',e=>{ if(e.target===modalMaterials) modalMaterials.classList.remove('open'); });
+  document.getElementById('modalMaterialsClose').addEventListener('click',()=>closeModal(modalMaterials));
+  modalMaterials.addEventListener('click',e=>{ if(e.target===modalMaterials) closeModal(modalMaterials); });
 
   const depthViewBtn=document.getElementById('depthViewBtn');
   depthViewBtn.classList.toggle('active',state.depthView); depthViewBtn.setAttribute('aria-pressed',state.depthView?'true':'false');
@@ -7457,7 +7459,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const W=state.docW, H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     if(!vis.length){ showToast('Brak widocznych elementów do wizualizacji 3D.','error'); return; }
-    document.getElementById('modal3dPrev').classList.add('open');
+    openModal(document.getElementById('modal3dPrev'));
     renderP3D();
     p3dRot={x:54,z:-24}; p3dZoom={scale:1,x:0,y:0};
     applyP3DTransform();
@@ -7481,19 +7483,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   document.getElementById('p3dZoomReset').addEventListener('click',()=>{ p3dRot={x:54,z:-24}; p3dZoom={scale:1,x:0,y:0}; applyP3DTransform(); });
   document.getElementById('preview3dBtn').addEventListener('click',showPreview3D);
   document.getElementById('loadFontsBtn').addEventListener('click',loadLocalFonts);
-  document.getElementById('modal3dPrevClose').addEventListener('click',()=>document.getElementById('modal3dPrev').classList.remove('open'));
-  document.getElementById('modal3dPrev').addEventListener('click',e=>{ if(e.target===document.getElementById('modal3dPrev')) document.getElementById('modal3dPrev').classList.remove('open'); });
+  document.getElementById('modal3dPrevClose').addEventListener('click',()=>closeModal(document.getElementById('modal3dPrev')));
+  document.getElementById('modal3dPrev').addEventListener('click',e=>{ if(e.target===document.getElementById('modal3dPrev')) closeModal(document.getElementById('modal3dPrev')); });
 
   /* ----- Powiększony podgląd rozdzielonego SVG ----- */
   function showSvgPreview(){
     let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
     document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.<br><span class="bb-hint-sub">Narysuj elementy na płycie, aby wygenerować plik SVG</span></div>';
-    document.getElementById('modalSvgPrev').classList.add('open');
+    openModal(document.getElementById('modalSvgPrev'));
     if(r){ const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))]; showToast('Podgląd SVG — '+depths.length+' warstw','info',1500); }
   }
   document.getElementById('svgPrevDownload').addEventListener('click',downloadSeparatedSVG);
-  document.getElementById('modalSvgPrevClose').addEventListener('click',()=>document.getElementById('modalSvgPrev').classList.remove('open'));
-  document.getElementById('modalSvgPrev').addEventListener('click',e=>{ if(e.target===document.getElementById('modalSvgPrev')) document.getElementById('modalSvgPrev').classList.remove('open'); });
+  document.getElementById('modalSvgPrevClose').addEventListener('click',()=>closeModal(document.getElementById('modalSvgPrev')));
+  document.getElementById('modalSvgPrev').addEventListener('click',e=>{ if(e.target===document.getElementById('modalSvgPrev')) closeModal(document.getElementById('modalSvgPrev')); });
 
   /* ---------------- Łączenie warstw (union) + rozdzielony plik SVG ----------------
      Dla każdej warstwy bierzemy wszystkie kształty CIĘCIA na warstwach >= dep
@@ -8094,9 +8096,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     return true;
   }
   const modalHinge=document.getElementById('modalHinge');
-  document.getElementById('hingeGenBtn').addEventListener('click',()=>modalHinge.classList.add('open'));
-  document.getElementById('modalHingeClose').addEventListener('click',()=>modalHinge.classList.remove('open'));
-  modalHinge.addEventListener('click',e=>{ if(e.target===modalHinge) modalHinge.classList.remove('open'); });
+  document.getElementById('hingeGenBtn').addEventListener('click',()=>openModal(modalHinge));
+  document.getElementById('modalHingeClose').addEventListener('click',()=>closeModal(modalHinge));
+  modalHinge.addEventListener('click',e=>{ if(e.target===modalHinge) closeModal(modalHinge); });
   document.getElementById('hingeGenerateBtn').addEventListener('click',()=>{
     const num=(id,def)=>Number(document.getElementById(id).value)||def;
     const H=clamp(num('hingeH',60),10,760);
@@ -8136,7 +8138,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
     state.objects.push(outline,slits); state.selectedIds=[outline.id,slits.id];
     pushHistory(); renderAll(); renderProps(); zoomFit();
-    modalHinge.classList.remove('open');
+    closeModal(modalHinge);
     showToast('Zawias wstawiony na arkusz','success');
   });
 
@@ -8203,9 +8205,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       prevEl.innerHTML=`<svg viewBox="${vb}" width="120" height="120"><path d="${d}" fill="${ACCENT}33" stroke="${ACCENT}" stroke-width="${fmt(ra*0.025)}"/>${boreEl}${pd}</svg>`;
     }
   }
-  document.getElementById('gearGenBtn').addEventListener('click',()=>{ updateGearInfo(); modalGear.classList.add('open'); });
-  document.getElementById('modalGearClose').addEventListener('click',()=>modalGear.classList.remove('open'));
-  modalGear.addEventListener('click',e=>{ if(e.target===modalGear) modalGear.classList.remove('open'); });
+  document.getElementById('gearGenBtn').addEventListener('click',()=>{ updateGearInfo(); openModal(modalGear); });
+  document.getElementById('modalGearClose').addEventListener('click',()=>closeModal(modalGear));
+  modalGear.addEventListener('click',e=>{ if(e.target===modalGear) closeModal(modalGear); });
   ['gearTeeth','gearModule','gearPressure','gearBore'].forEach(id=>document.getElementById(id).addEventListener('input',updateGearInfo));
   document.getElementById('gearGenerateBtn').addEventListener('click',()=>{
     const z=clamp(Number(document.getElementById('gearTeeth').value)||20,6,200);
@@ -8227,7 +8229,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
     state.objects.push(...newObjs); state.selectedIds=newObjs.map(o=>o.id);
     pushHistory(); renderAll(); renderProps(); zoomFit();
-    modalGear.classList.remove('open');
+    closeModal(modalGear);
     showToast('Koło zębate wstawione na arkusz','success');
   });
 
