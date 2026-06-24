@@ -207,9 +207,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border:1.5px solid var(--border-strong);border-radius:var(--r);
   padding:7px 12px;box-shadow:0 8px 28px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04) inset;max-width:96%;flex-wrap:wrap;
-  animation:ttSlideIn .18s ease-out}
+  animation:ttSlideIn var(--an-base) ease-out}
 @keyframes ttSlideIn{from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.text-toolbar.show{display:flex;animation:ttSlideIn .18s ease-out}
+.text-toolbar.show{display:flex;animation:ttSlideIn var(--an-base) ease-out}
 .text-toolbar select,.text-toolbar input[type=number]{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);font-family:inherit;font-size:.78rem;padding:5px 6px;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 .text-toolbar select:focus,.text-toolbar input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.2)}
 .text-toolbar select{max-width:150px}
@@ -226,7 +226,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .font-dd-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:1200;max-height:320px;overflow-y:auto;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.1);padding:4px 0;scroll-behavior:smooth;scrollbar-gutter:stable}
 .font-dd-search{position:sticky;top:0;width:calc(100% - 8px);margin:4px;padding:6px 10px 6px 28px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);font-family:inherit;font-size:.78rem;z-index:1;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 .font-dd-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15)}
-.font-dd.open .font-dd-list{display:block;animation:ddSlideIn .14s ease-out}
+.font-dd.open .font-dd-list{display:block;animation:ddSlideIn var(--an-fast) ease-out}
 .font-dd-item{padding:7px 10px;cursor:pointer;font-size:1.02rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:var(--r-xs);margin:0 4px;transition:background var(--tr-base),color var(--tr-base);position:relative}
 .font-dd-item:hover{background:var(--grad-accent);color:var(--accent-text);box-shadow:0 2px 6px rgba(var(--accent-rgb),.3)}
 .font-dd-item.cur{background:rgba(var(--accent-rgb),.18)}
@@ -471,7 +471,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:linear-gradient(180deg,var(--surface3),var(--surface2));border:1px solid var(--border);border-bottom-width:2px;border-bottom-color:var(--border-strong);border-radius:var(--r-xs);font:600 .76rem var(--font-b);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform var(--tr-fast),box-shadow var(--tr-fast);letter-spacing:.02em;border-bottom:2px solid rgba(0,0,0,.35);text-shadow:0 1px 0 rgba(255,255,255,.06)}
 kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 /* sekcja nagłówka w formularzu (zawias, inne modala) */
-.form-sec{margin:12px 16px 6px;padding:7px 11px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--r-sm);transition:background var(--tr-base),border-color var(--tr-base),padding-left var(--tr-base);cursor:default;user-select:none;position:relative;overflow:hidden;line-height:1.1;animation:formSecIn .15s ease-out}
+.form-sec{margin:12px 16px 6px;padding:7px 11px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--r-sm);transition:background var(--tr-base),border-color var(--tr-base),padding-left var(--tr-base);cursor:default;user-select:none;position:relative;overflow:hidden;line-height:1.1;animation:formSecIn var(--an-fast) ease-out}
 .form-sec:hover{background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent2-rgb),.06));border-color:rgba(var(--accent-rgb),.25)}
 .form-sec::before{content:'';width:0;height:5px;border-radius:50%;flex:none;background:rgba(var(--accent-rgb),.08);box-shadow:0 0 8px rgba(var(--accent-rgb),.7);position:absolute;left:0;top:0;bottom:0;transition:width var(--tr-slow)}
 
@@ -538,7 +538,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 /* ---- Manager warstw 3D ---- */
 .depth-legend{display:flex;flex-direction:column;gap:4px;padding:4px 14px 8px;border-top:1px solid rgba(var(--accent-rgb),.06);padding-top:6px}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
-.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:depthLegendIn .15s ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
+.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:depthLegendIn var(--an-fast) ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
 .lyr-row:hover{background:linear-gradient(90deg,var(--surface3),rgba(var(--accent-rgb),.04));border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateX(2px);backdrop-filter:blur(2px)}
 .lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:lyrRowActivate var(--an-base) ease-out;position:relative}
 .lyr-row.lyr-hidden{opacity:.45}
@@ -683,7 +683,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .dd-caret{font-size:.65rem;opacity:.5;transition:transform var(--tr-slow),opacity var(--tr-slow)}
 .dd.open .dd-caret{transform:rotate(180deg);opacity:.8}
 .dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:210px;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border-strong);border-radius:var(--r);padding:5px;box-shadow:var(--sh),0 0 0 1px rgba(0,0,0,.12);z-index:900;flex-direction:column}
-.dd.open .dd-menu{display:flex;animation:ddSlideIn .14s ease-out}
+.dd.open .dd-menu{display:flex;animation:ddSlideIn var(--tr-base) ease-out}
 .dd-menu .tbtn{width:100%;justify-content:flex-start;border:none;border-radius:var(--r-sm);padding:8px 12px;font-size:.82rem;background:transparent;color:var(--text);transition:background var(--tr-base),color var(--tr-base),padding-left var(--tr-base);position:relative;overflow:hidden}
 .dd-menu .tbtn:hover{background:rgba(var(--accent-rgb),.12);color:#fff;padding-left:16px}
 .dd-menu .tbtn:focus-visible{outline:none;box-shadow:var(--glow);background:rgba(var(--accent-rgb),.08)}
@@ -901,7 +901,7 @@ input[type=range]:focus-visible{outline:none}
 @keyframes layerSelPulse{from{background:rgba(var(--accent-rgb),.2)}to{background:rgba(var(--accent-rgb),.08)}}
 
 /* === Empty state — lepszy styl === */
-.hint-empty{animation:hintFadeIn .5s ease-out;pointer-events:auto;cursor:default;transition:opacity var(--tr-slow),border-color var(--tr-slow);background:linear-gradient(180deg,rgba(18,24,38,.82),rgba(8,11,18,.82))}
+.hint-empty{animation:hintFadeIn var(--an-slow) ease-out;pointer-events:auto;cursor:default;transition:opacity var(--tr-slow),border-color var(--tr-slow);background:linear-gradient(180deg,rgba(18,24,38,.82),rgba(8,11,18,.82))}
 @keyframes hintFadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* === v86: Input number — wizualny feedback przy scrollwheel === */
@@ -1110,7 +1110,7 @@ input[type=range]:focus-visible{outline:none}
 .splash-ov{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
   background:radial-gradient(ellipse 800px 500px at 50% 45%,rgba(var(--accent-rgb),.06),var(--bg));transition:opacity .4s ease,visibility 0s linear .4s}
 .splash-ov.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px;animation:splashBrandIn .5s ease-out}
+.splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px;animation:splashBrandIn var(--an-slow) ease-out}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
 .splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;animation:splashBarIn var(--an-med) ease-out .1s backwards}
@@ -1280,7 +1280,7 @@ input[type=number]{position:relative}
 .quick-search-input:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");border-bottom-color:var(--accent);box-shadow:0 1px 0 var(--accent)}
 .quick-search-input::placeholder{color:var(--muted-2)}
 .quick-search-results{max-height:320px;overflow-y:auto;padding:4px 0;scroll-behavior:smooth}
-.quick-search-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;color:var(--text);transition:background var(--tr-base),padding-left var(--tr-base);position:relative;animation:qsItemIn .12s ease-out backwards}
+.quick-search-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;color:var(--text);transition:background var(--tr-base),padding-left var(--tr-base);position:relative;animation:qsItemIn var(--an-micro) ease-out backwards}
 .quick-search-item:hover,.quick-search-item.qs-active{background:rgba(var(--accent-rgb),.1);padding-left:20px}
 .quick-search-item .qs-ico{font-size:1rem;opacity:.6;flex-shrink:0}
 .quick-search-item .qs-label{flex:1}
@@ -1437,7 +1437,7 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
 
 /* === v58: Modal send — lepsza wizualizacja kroków === */
 .send-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);font-size:.6rem;font-weight:800;transition:border-color var(--tr-slow),background var(--tr-slow),color var(--tr-slow)}
-.send-step.active .step-num{border-color:var(--accent);background:rgba(var(--accent-rgb),.15);color:var(--accent);animation:stepNumPulse .5s ease-out}
+.send-step.active .step-num{border-color:var(--accent);background:rgba(var(--accent-rgb),.15);color:var(--accent);animation:stepNumPulse var(--an-slow) ease-out}
 .send-step.done .step-num{border-color:var(--success);background:rgba(var(--success-rgb),.15);color:var(--success)}
 
 /* === v59: Wycena panel — lepsza wizualizacja profilu === */
@@ -1742,7 +1742,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 @keyframes toolGlow{0%,100%{box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}50%{box-shadow:0 4px 18px -2px rgba(var(--accent-rgb),.75),0 0 6px rgba(var(--accent-rgb),.2)}}
 
 /* === v67: Confirm dialog — backdrop blur i scale animation === */
-.confirm-ov .confirm-box{animation:confirmScaleIn .18s cubic-bezier(.2,.9,.3,1.1)}
+.confirm-ov .confirm-box{animation:confirmScaleIn var(--an-base) cubic-bezier(.2,.9,.3,1.1)}
 @keyframes confirmScaleIn{from{opacity:0;transform:scale(.92) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
 /* === v67: Panel h2 — animowany separator z gradient sweep === */
@@ -2215,7 +2215,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .collapsible-header:hover{color:var(--text);background:rgba(var(--accent-rgb),.03)}
 .collapsible-header .coll-chev{transition:transform var(--tr-base);font-size:.5rem;opacity:.5}
 .collapsible-header.open .coll-chev{transform:rotate(90deg)}
-.collapsible-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity var(--tr-slow) ease,padding var(--tr-slow) ease}
+.collapsible-body{overflow:hidden;max-height:0;opacity:0;transition:max-height var(--tr-modal) ease,opacity var(--tr-slow) ease,padding var(--tr-slow) ease}
 .collapsible-body.open{max-height:2000px;opacity:1}
 
 /* === v82: Lepszy styl pola z podpowiedzią — interaktywne === */
@@ -2503,47 +2503,47 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <span class="bb-spacer"></span>
 
         <span class="zoom-badge" id="live3dZoomLabel" title="Przybliżenie — kółko myszy = zoom w miejscu kursora, przeciągnij = obróć, Shift+przeciągnij lub prawy przycisk = przesuń widok">100%</span>
-        <button class="bb-btn" id="live3dZoomReset" title="Zresetuj przybliżenie">⟲ 100%</button>
-        <button class="bb-btn" id="live3dExpand" title="Powiększ na cały ekran">⛶ Powiększ</button>
+        <button class="bb-btn" id="live3dZoomReset" title="Zresetuj przybliżenie" aria-label="Reset widoku 3D">⟲ 100%</button>
+        <button class="bb-btn" id="live3dExpand" title="Powiększ na cały ekran" aria-label="Powiększ widok 3D">⛶ Powiększ</button>
       </div>
       <div class="live3d-stage" id="live3dStage"><div class="live3d-scene" id="live3dScene"></div></div>
     </div>
     <div class="bb-sec">
       <div class="bb-head"><span>📄 Plik SVG — warstwy rozdzielone (1 plik)</span>
         <button class="bb-btn" id="bbSvgExpand" aria-label="Powiększ podgląd SVG" title="Powiększ podgląd SVG">⛶</button>
-        <button class="bb-btn" id="bbDownload" title="Pobierz rozdzielony plik SVG">⬇ Pobierz SVG</button>
+        <button class="bb-btn" id="bbDownload" title="Pobierz rozdzielony plik SVG" aria-label="Pobierz SVG">⬇ Pobierz SVG</button>
       </div>
       <div class="bb-svg" id="bbSvg"></div>
       <div class="live-quote" id="liveQuote">
-        <div class="lq-head"><span>💰 Wycena</span><select id="lqMat" title="Materiał"></select></div>
+        <div class="lq-head"><span>💰 Wycena</span><select id="lqMat" title="Materiał" aria-label="Materiał wyceny"></select></div>
         <div class="lq-price lq-empty" id="lqPrice">narysuj projekt…</div>
         <div class="lq-time" id="lqTime"></div>
-        <button type="button" class="tbtn tbtn-primary lq-send" id="lqSend">📨 Wyślij do wyceny</button>
+        <button type="button" class="tbtn tbtn-primary lq-send" id="lqSend" aria-label="Wyślij projekt do wyceny">📨 Wyślij do wyceny</button>
       </div>
     </div>
   </div>
 
-    <aside class="panel right">
+    <aside class="panel right" aria-label="Panel właściwości">
       <h2>Właściwości</h2>
       <div id="props"></div>
     </aside>
   </div>
-  <div class="statusbar" id="statusbar">
-    <span class="sb-item sb-clickable" id="sbTool" title="Kliknij, aby przełączyć narzędzie">Zaznaczanie</span>
-    <span class="sb-sep">·</span>
-    <span class="sb-item sb-clickable" id="sbObjects" title="Kliknij, aby zaznaczyć wszystkie elementy">0 elementów</span>
-    <span class="sb-sep">·</span>
-    <span class="sb-item sb-clickable" id="sbDoc" title="Kliknij, aby zmienić rozmiar płyty">300×200 mm</span>
-    <span class="sb-sep">·</span>
-    <span class="sb-item sb-history" id="sbHistory" title="Pozycja w historii cofania">↶ 0/0</span>
-    <span class="sb-item sb-save" id="sbSave"></span>
-    <span class="sb-item sb-size" id="sbSize" title="Rozmiar projektu w pamięci"></span>
+  <div class="statusbar" id="statusbar" role="status" aria-label="Pasek stanu">
+    <span class="sb-item sb-clickable" id="sbTool" title="Kliknij, aby przełączyć narzędzie" role="button" aria-label="Aktualne narzędzie">Zaznaczanie</span>
+    <span class="sb-sep" aria-hidden="true">·</span>
+    <span class="sb-item sb-clickable" id="sbObjects" title="Kliknij, aby zaznaczyć wszystkie elementy" role="button" aria-label="Liczba elementów">0 elementów</span>
+    <span class="sb-sep" aria-hidden="true">·</span>
+    <span class="sb-item sb-clickable" id="sbDoc" title="Kliknij, aby zmienić rozmiar płyty" role="button" aria-label="Rozmiar arkusza">300×200 mm</span>
+    <span class="sb-sep" aria-hidden="true">·</span>
+    <span class="sb-item sb-history" id="sbHistory" title="Pozycja w historii cofania" aria-label="Historia cofania">↶ 0/0</span>
+    <span class="sb-item sb-save" id="sbSave" aria-label="Stan zapisu"></span>
+    <span class="sb-item sb-size" id="sbSize" title="Rozmiar projektu w pamięci" aria-label="Rozmiar projektu"></span>
     <span class="sb-spacer"></span>
-    <span class="sb-item sb-coords" id="sbCoords" title="Pozycja kursora na płótnie (mm)"></span>
-    <span class="sb-sep">·</span>
-    <span class="sb-item sb-session" id="sbSession" title="Czas trwania sesji edycji"></span>
-    <span class="sb-sep">·</span>
-    <span class="sb-item sb-zoom" id="sbZoom">100%</span>
+    <span class="sb-item sb-coords" id="sbCoords" title="Pozycja kursora na płótnie (mm)" aria-label="Współrzędne kursora"></span>
+    <span class="sb-sep" aria-hidden="true">·</span>
+    <span class="sb-item sb-session" id="sbSession" title="Czas trwania sesji edycji" aria-label="Czas sesji"></span>
+    <span class="sb-sep" aria-hidden="true">·</span>
+    <span class="sb-item sb-zoom" id="sbZoom" aria-label="Poziom powiększenia">100%</span>
   </div>
 </div>
 
@@ -2565,7 +2565,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       <span class="bb-spacer"></span>
 
       <span class="zoom-badge" id="p3dZoomLabel" title="Przybliżenie — kółko myszy = zoom w miejscu kursora, przeciągnij = obróć, Shift+przeciągnij lub prawy przycisk = przesuń widok">100%</span>
-      <button class="bb-btn" id="p3dZoomReset" title="Zresetuj przybliżenie i obrót">⟲ Reset widoku</button>
+      <button class="bb-btn" id="p3dZoomReset" title="Zresetuj przybliżenie i obrót" aria-label="Reset widoku 3D">⟲ Reset widoku</button>
     </div>
     <div class="preview3d-wrap" id="p3dWrap">
       <div class="preview3d-scene" id="p3dScene"></div>
