@@ -745,7 +745,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === 3D preview — ulepszone tło i ramka === */
 .live3d-stage{background:radial-gradient(ellipse 72% 65% at 50% 60%,#201a0c 0%,#0a0804 50%,#050302 100%);
-  border-top:1px solid rgba(var(--accent-rgb),.08);transition:background .3s}
+  border-top:1px solid rgba(var(--accent-rgb),.08);transition:background var(--tr-slow)}
 .preview3d-wrap{background:radial-gradient(ellipse 72% 60% at 50% 60%,#221c0e 0%,#0a0804 50%,#050302 100%);
   border:1px solid rgba(var(--accent-rgb),.1);box-shadow:inset 0 4px 20px rgba(0,0,0,.5),0 0 0 1px var(--border)}
 
@@ -1200,7 +1200,7 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
 .splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden}
-.splash-bar-fill{width:0%;height:100%;border-radius:2px;background:var(--grad-accent);transition:width .3s ease}
+.splash-bar-fill{width:0%;height:100%;border-radius:2px;background:var(--grad-accent);transition:width var(--tr-slow) ease}
 .splash-hint{font-size:.75rem;color:var(--muted-2);letter-spacing:.03em}
 
 /* === Layers panel — number badge + drag grip === */
@@ -1263,7 +1263,7 @@ input[type=number]{position:relative}
 .ruler-corner:active{transform:scale(.95)}
 
 /* === Stage hint — lepsza widoczność i interakcja === */
-.hint-empty{pointer-events:auto;cursor:default;transition:opacity .3s,border-color var(--tr-slow)}
+.hint-empty{pointer-events:auto;cursor:default;transition:opacity var(--tr-slow),border-color var(--tr-slow)}
 .hint-empty:hover{border-color:rgba(var(--accent-rgb),.4);box-shadow:0 6px 18px rgba(0,0,0,.4)}
 
 /* === Lepsza wizualna kart parametrów — gradient header === */
@@ -1440,8 +1440,8 @@ input[type=number]{position:relative}
 .tbtn-primary.dd-toggle:hover .ico{transform:translateY(2px)}
 
 /* === Modal — skala wejścia jeszcze gładniejsza === */
-.modal-ov{transition:opacity .25s ease,visibility 0s linear .25s}
-.modal-ov.open{transition:opacity .25s ease,visibility 0s}
+.modal-ov{transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow)}
+.modal-ov.open{transition:opacity var(--tr-slow) ease,visibility 0s}
 
 /* === Lepsza responsywność statusbar === */
 @media(max-width:480px){
@@ -1582,7 +1582,7 @@ input[type=number]{position:relative}
 .bb-svg:hover .bb-empty{opacity:1}
 
 /* === v58: Toolrail separator — pulsujący akcent === */
-.toolrail .tool-sep{transition:opacity .3s}
+.toolrail .tool-sep{transition:opacity var(--tr-slow)}
 .toolrail:hover .tool-sep{opacity:.9}
 
 /* === v58: Quick search — lepszy focus i animacja === */
@@ -1863,7 +1863,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 .grid-line.major{stroke:rgba(0,0,0,.14)}
 
 /* === v62: Lepsza wizualizacja ramki dokumentu === */
-.doc-border{stroke:var(--accent-dark);stroke-dasharray:none;transition:stroke .3s}
+.doc-border{stroke:var(--accent-dark);stroke-dasharray:none;transition:stroke var(--tr-slow)}
 
 /* === v62: Ulepszone karty parametrów globalnych === */
 .param-card .prow{transition:padding-left var(--tr-base)}
@@ -2115,7 +2115,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 .modal-box>*{position:relative;z-index:1}
 
 /* === v66: Toolbar brand — subtelna animacja na hover === */
-.toolbar .brand:hover .brand-name{transition:letter-spacing .3s;letter-spacing:.5px}
+.toolbar .brand:hover .brand-name{transition:letter-spacing var(--tr-slow);letter-spacing:.5px}
 
 /* === v66: Dropdown menu — staggered animation === */
 .dd.open .dd-menu .tbtn{animation:ddItemIn .12s ease-out backwards}
@@ -2170,7 +2170,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 .zoom-changed{color:var(--accent)!important;transform:scale(1.08)}
 
 /* === v67: Context menu — badge z liczbą zaznaczonych === */
-.ctx-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:10px;background:rgba(var(--accent-rgb),.15);color:var(--accent);font-size:.62rem;font-weight:800;margin-left:6px;font-variant-numeric:tabular-nums}
+.ctx-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-md);background:rgba(var(--accent-rgb),.15);color:var(--accent);font-size:.62rem;font-weight:800;margin-left:6px;font-variant-numeric:tabular-nums}
 
 /* === v67: Toolrail — active tool glow pulse === */
 .toolrail .tbtn.active{animation:toolGlow 2s ease-in-out infinite}
@@ -2415,7 +2415,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .toolbar .brand:hover::before{transform:rotate(15deg) scale(1.06);box-shadow:0 4px 18px rgba(var(--accent-rgb),.65)}
 
 /* === v70: Layers counter badge — lepsza wizualizacja === */
-.lc-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;padding:0 5px;border-radius:10px;background:rgba(var(--accent-rgb),.12);color:var(--accent);font-weight:800;font-size:.68rem;font-variant-numeric:tabular-nums}
+.lc-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;padding:0 5px;border-radius:var(--r-md);background:rgba(var(--accent-rgb),.12);color:var(--accent);font-weight:800;font-size:.68rem;font-variant-numeric:tabular-nums}
 
 /* === v70: Depth view toggle — lepsza wizualizacja stanu === */
 #depthViewBtn.active{background:linear-gradient(135deg,rgba(var(--accent-rgb),.15),rgba(var(--accent2-rgb),.1));border-color:var(--accent);color:var(--accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.2)}
@@ -2541,7 +2541,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v73: Eksport button z animacją na hover === */
 #exportBtn:not(:disabled){position:relative;overflow:hidden}
-#exportBtn:not(:disabled)::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.08);transform:translate(-50%,-50%);transition:width .3s,height .3s}
+#exportBtn:not(:disabled)::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.08);transform:translate(-50%,-50%);transition:width var(--tr-slow),height var(--tr-slow)}
 #exportBtn:not(:disabled):hover::after{width:200%;height:200%}
 
 /* === v73: Q-field select — lepszy styl z gradient === */
