@@ -121,7 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
 .pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border);transition:color var(--tr-base);position:relative;overflow:hidden}
 .pq-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.6);flex:none}
-.pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg-2);position:relative;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast);animation:matRowIn var(--an-base) ease-out}
+.pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg-2);position:relative;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast);animation:cfgBodyIn var(--an-base) ease-out}
 .pq-mat-row:hover{border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateY(-1px)}
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(var(--accent-rgb),.04)}
 .pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
@@ -161,7 +161,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-total .q-total-val{font-size:1.05rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .q-empty-msg{font-size:.78rem;color:var(--muted);font-weight:500;line-height:1.5}
 .q-break{display:flex;flex-direction:column;gap:4px;margin-top:8px;border-top:1px solid rgba(var(--accent-rgb),.06);padding-top:8px}
-.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);padding:5px 8px;border-bottom:1px solid rgba(var(--accent-rgb),.04);transition:color var(--tr-base),background var(--tr-base),padding-left var(--tr-base);border-radius:var(--r-xs);animation:brRowIn var(--an-fast) ease-out backwards}
+.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);padding:5px 8px;border-bottom:1px solid rgba(var(--accent-rgb),.04);transition:color var(--tr-base),background var(--tr-base),padding-left var(--tr-base);border-radius:var(--r-xs);animation:slideInX var(--an-fast) ease-out backwards}
 .q-break .br-row:last-child{border-bottom:none}
 .q-break .br-row:hover{color:var(--text);background:rgba(var(--accent-rgb),.04);padding-left:12px}
 .q-break .br-row b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
@@ -430,7 +430,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Podsumowanie projektu (modal) ---- */
 .sum-stats{display:flex;flex-direction:column;gap:5px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),border-left-color var(--tr-base);cursor:default;animation:sumRowIn var(--an-fast) ease-out backwards}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),border-left-color var(--tr-base);cursor:default;animation:layerSlideIn var(--an-fast) ease-out backwards}
 .sum-row:hover{background:var(--surface3);box-shadow:var(--sh-sm);transform:translateX(3px);border-left-color:var(--accent)}
 .sum-row.sum-cut{border-left-color:var(--cut-light)}
 .sum-row.sum-score{border-left-color:var(--score-light)}
@@ -470,7 +470,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 kbd{display:inline-block;min-width:20px;text-align:center;padding:2px 6px;background:linear-gradient(180deg,var(--surface3),var(--surface2));border:1px solid var(--border);border-bottom-width:2px;border-bottom-color:var(--border-strong);border-radius:var(--r-xs);font:600 .76rem var(--font-b);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform var(--tr-fast),box-shadow var(--tr-fast);letter-spacing:.02em;border-bottom:2px solid rgba(0,0,0,.35);text-shadow:0 1px 0 rgba(255,255,255,.06)}
 kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 /* sekcja nagłówka w formularzu (zawias, inne modala) */
-.form-sec{margin:12px 16px 6px;padding:7px 11px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--r-sm);transition:background var(--tr-base),border-color var(--tr-base),padding-left var(--tr-base);cursor:default;user-select:none;position:relative;overflow:hidden;line-height:1.1;animation:formSecIn var(--an-fast) ease-out}
+.form-sec{margin:12px 16px 6px;padding:7px 11px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--r-sm);transition:background var(--tr-base),border-color var(--tr-base),padding-left var(--tr-base);cursor:default;user-select:none;position:relative;overflow:hidden;line-height:1.1;animation:slideInX var(--an-fast) ease-out}
 .form-sec:hover{background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent2-rgb),.06));border-color:rgba(var(--accent-rgb),.25)}
 .form-sec::before{content:'';width:0;height:5px;border-radius:50%;flex:none;background:rgba(var(--accent-rgb),.08);box-shadow:0 0 8px rgba(var(--accent-rgb),.7);position:absolute;left:0;top:0;bottom:0;transition:width var(--tr-slow)}
 
@@ -537,7 +537,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 /* ---- Manager warstw 3D ---- */
 .depth-legend{display:flex;flex-direction:column;gap:4px;padding:4px 14px 8px;border-top:1px solid rgba(var(--accent-rgb),.06);padding-top:6px}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
-.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:depthLegendIn var(--an-fast) ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
+.lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:slideInX var(--an-fast) ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
 .lyr-row:hover{background:linear-gradient(90deg,var(--surface3),rgba(var(--accent-rgb),.04));border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateX(2px);backdrop-filter:blur(2px)}
 .lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:lyrRowActivate var(--an-base) ease-out;position:relative}
 .lyr-row.lyr-hidden{opacity:.45}
@@ -737,6 +737,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .layer[draggable]:active{cursor:grabbing}
 .layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 2px;font-variant-numeric:tabular-nums;letter-spacing:.02em;animation:fadeInShort var(--an-fast) ease-out;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 @keyframes fadeInShort{from{opacity:0}to{opacity:1}}
+@keyframes slideInX{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 
 /* === Dropdown menu — hover efekt z płynnym paddingiem === */
 .dd-menu .tbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform var(--tr-base) var(--ease-out)}
@@ -1088,7 +1089,7 @@ input[type=range]:focus-visible{outline:none}
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
 .splash-bar{width:200px;height:3px;border-radius:var(--r-hair);background:var(--surface3);overflow:hidden;animation:splashBarIn var(--an-med) ease-out .1s backwards}
 .splash-bar-fill{width:0%;height:100%;border-radius:var(--r-hair);background:var(--grad-accent);transition:width var(--tr-slow) var(--ease-out);box-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
-.splash-hint{font-size:.78rem;color:var(--muted);letter-spacing:.04em;animation:splashHintIn var(--an-slow) ease-out var(--an-base) backwards;transition:opacity var(--tr-slow);margin-top:8px}
+.splash-hint{font-size:.78rem;color:var(--muted);letter-spacing:.04em;animation:fadeInShort var(--an-slow) ease-out var(--an-base) backwards;transition:opacity var(--tr-slow);margin-top:8px}
 
 /* === Layers panel — number badge + drag grip === */
 .layer .drag-grip{flex:0 0 auto;cursor:grab;color:var(--muted-2);font-size:.55rem;padding:0 2px;opacity:0;transition:color var(--tr-base);user-select:none;line-height:1}
@@ -1097,8 +1098,7 @@ input[type=range]:focus-visible{outline:none}
 
 /* === Przycisk wysyłki — stany ładowania z CSS spinner === */
 .tbtn.btn-loading{pointer-events:none;position:relative;color:transparent!important}
-.tbtn.btn-loading::after{content:'';position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:btnSpin var(--an-slower) linear infinite}
-@keyframes btnSpin{to{transform:rotate(360deg)}}
+.tbtn.btn-loading::after{content:'';position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin var(--an-slower) linear infinite}
 .tbtn.btn-success{background:linear-gradient(135deg,var(--success),#3abf80)!important;border-color:var(--success)!important;color:var(--accent-text)!important;pointer-events:none}
 
 /* === Input number — precyzyjny scroll hint === */
@@ -1174,7 +1174,6 @@ input[type=number]{position:relative}
 
 /* === Splash screen — lepsza animacja === */
 @keyframes splashBrandIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes splashHintIn{from{opacity:0}to{opacity:1}}
 @keyframes splashBarIn{from{opacity:0;transform:scaleX(.6)}to{opacity:1;transform:scaleX(1)}}
 
 /* === Zoom badge — pulsujący akcent przy zmianie === */
@@ -1253,7 +1252,7 @@ input[type=number]{position:relative}
 .quick-search-input:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");border-bottom-color:var(--accent);box-shadow:0 1px 0 var(--accent)}
 .quick-search-input::placeholder{color:var(--muted-2)}
 .quick-search-results{max-height:320px;overflow-y:auto;padding:4px 0;scroll-behavior:smooth}
-.quick-search-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;color:var(--text);transition:background var(--tr-base),padding-left var(--tr-base);position:relative;animation:qsItemIn var(--an-micro) ease-out backwards}
+.quick-search-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;color:var(--text);transition:background var(--tr-base),padding-left var(--tr-base);position:relative;animation:slideInX var(--an-micro) ease-out backwards}
 .quick-search-item:hover,.quick-search-item.qs-active{background:rgba(var(--accent-rgb),.1);padding-left:20px}
 .quick-search-item .qs-ico{font-size:1rem;opacity:.6;flex-shrink:0}
 .quick-search-item .qs-label{flex:1}
@@ -1281,8 +1280,6 @@ input[type=number]{position:relative}
 .qbar-btns .tbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--accent-rgb),.05),transparent);opacity:0;transition:opacity var(--tr-base)}
 .qbar-btns .tbtn:hover::after{opacity:1}
 
-/* === Animation for new depth layers appearing === */
-@keyframes depthLegendIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 /* === Karta warstwy 3D w modalu — animowane wejście === */
 @keyframes layer3dCardIn{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 .layer3d-card:nth-child(2){animation-delay:40ms}
@@ -1292,7 +1289,6 @@ input[type=number]{position:relative}
 .layer3d-card:nth-child(n+6){animation-delay:200ms}
 
 /* === Sum-row — animacja wejścia === */
-@keyframes sumRowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 .sum-row:nth-child(2){animation-delay:30ms}
 .sum-row:nth-child(3){animation-delay:60ms}
 
@@ -1593,7 +1589,6 @@ select:hover{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 .sb-session:hover{color:var(--text)}
 
 /* === v64: Lepsza wizualizacja suwaka range — tooltip wartości === */
-@keyframes formSecIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 
 /* === v64: Lepsza wizualizacja select option === */
 select option{background:var(--surface);color:var(--text)}
@@ -1692,8 +1687,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 @keyframes lyrPickChange{0%{transform:scale(1.2);box-shadow:0 0 12px currentColor}100%{transform:scale(1);box-shadow:0 1px 3px rgba(0,0,0,.3)}}
 
 /* === v66: Lepsza wizualizacja zaznaczenia — multi-sel info === */
-.empty-note.note-compact{border-left:3px solid var(--accent);animation:noteCompactIn var(--an-base) ease-out}
-@keyframes noteCompactIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.empty-note.note-compact{border-left:3px solid var(--accent);animation:slideInX var(--an-base) ease-out}
 
 /* === v67: Undo/redo — subtelny flash na statusbar history === */
 .sb-history-flash{animation:sbHistFlash var(--an-slow) ease-out}
@@ -2020,8 +2014,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.08),transparent);z-index:3;pointer-events:none;opacity:0;transition:opacity var(--tr-slow)}
 .panel:hover::before{opacity:1}
 
-/* === v77: Pq-mat-row — animacja przy dodawaniu === */
-@keyframes matRowIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .gallery-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(var(--accent-rgb),.08));opacity:0;transition:opacity var(--tr-slow);pointer-events:none;z-index:0;border-radius:var(--r)}
 .gallery-card:hover::before{opacity:1}
 
@@ -2035,7 +2027,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .tgroup:hover::after{opacity:1;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),.25),transparent)}
 
 /* === v78: Breakdown wyceny — animacja wejścia wierszy === */
-@keyframes brRowIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 .q-break .br-row:nth-child(2){animation-delay:30ms}
 .q-break .br-row:nth-child(3){animation-delay:60ms}
 .q-break .br-row:nth-child(4){animation-delay:90ms}
@@ -2135,7 +2126,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .qs-category::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 .qs-cat-count{font-size:.5rem;font-weight:600;padding:1px 5px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.06);color:var(--accent);margin-left:auto}
 /* === v82: Quick Search — lepsza animacja wyników z stagger === */
-@keyframes qsItemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 .quick-search-item:nth-child(2){animation-delay:15ms}
 .quick-search-item:nth-child(3){animation-delay:30ms}
 .quick-search-item:nth-child(n+4){animation-delay:45ms}
