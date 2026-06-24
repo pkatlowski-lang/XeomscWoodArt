@@ -2788,7 +2788,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   function showToast(msg,type,duration){
     const icons={success:'✓',error:'✗',info:'ℹ',warning:'⚠'};
     const dur=duration||3500;
-    const el=document.createElement('div'); el.className='toast'+(type?' toast-'+type:'');
+    const el=document.createElement('div'); el.className=`toast${type?` toast-${type}`:''}`;
     el.setAttribute('role','alert');
     el.style.setProperty('--toast-dur',(dur/1000)+'s');
     if(icons[type]){
@@ -3547,7 +3547,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   function scrollLayerIntoView(id){
     if(!id) return;
     requestAnimationFrame(()=>{
-      const row=layersEl.querySelector('[data-id="'+id+'"]');
+      const row=layersEl.querySelector(`[data-id="${id}"]`);
       if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
     });
   }
@@ -3570,7 +3570,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     state.selectedIds=sel.map(o=>o.id);
     pushHistory(); renderAll(); renderProps();
     const grpTypes={}; sel.forEach(o=>{grpTypes[o.type]=(grpTypes[o.type]||0)+1;});
-    const grpInfo=Object.entries(grpTypes).map(([t,n])=>n+'× '+t).join(', ');
+    const grpInfo=Object.entries(grpTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
     showToast(`Zgrupowano ${sel.length} elementów (${grpInfo})`,'success');
   }
   function ungroupSel(){
@@ -5072,14 +5072,14 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   function renderMultiProps(sel){
     const typeCounts={};
     sel.forEach(o=>{ const t=o.type==='path'?'ścieżka':o.type==='rect'?'prostokąt':o.type==='ellipse'?'elipsa':o.type==='text'?'tekst':o.type==='polygon'?'wielokąt':o.type==='star'?'gwiazda':o.type==='line'?'linia':o.type==='image'?'obraz':o.type; typeCounts[t]=(typeCounts[t]||0)+1; });
-    const typeInfo=Object.entries(typeCounts).map(([t,c])=>c+'× '+t).join(', ');
+    const typeInfo=Object.entries(typeCounts).map(([t,c])=>`${c}× ${t}`).join(', ');
     const lockedInSel=sel.filter(o=>o.locked).length;
     const hiddenInSel=sel.filter(o=>!o.visible).length;
     const depthsInSel=[...new Set(sel.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let selInfoExtra='';
-    if(lockedInSel) selInfoExtra+=' · '+lockedInSel+' 🔒';
-    if(hiddenInSel) selInfoExtra+=' · '+hiddenInSel+' ukr.';
-    if(depthsInSel.length>1) selInfoExtra+=' · '+depthsInSel.length+' warstw';
+    if(lockedInSel) selInfoExtra+=` · ${lockedInSel} 🔒`;
+    if(hiddenInSel) selInfoExtra+=` · ${hiddenInSel} ukr.`;
+    if(depthsInSel.length>1) selInfoExtra+=` · ${depthsInSel.length} warstw`;
     const chipHtml=Object.entries(typeCounts).map(([t,c])=>`<span class="multi-sel-chip">${c}× ${t}</span>`).join('');
     let h=`<div class="empty-note note-compact">Zaznaczono <strong>${sel.length}</strong> ${sel.length===1?'element':sel.length<=4?'elementy':'elementów'}${selInfoExtra}</div><div class="multi-sel-info">${chipHtml}</div>`;
     // wspólny prostokąt zaznaczenia — pozwala numerycznie przesunąć (X/Y) i przeskalować
@@ -6191,7 +6191,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         markSaved();
         const depths=[...new Set(d.objects.map(o=>o.depth||1))];
         const types={}; d.objects.forEach(o=>{types[o.type]=(types[o.type]||0)+1;});
-        const typeStr=Object.entries(types).map(([t,c])=>c+'× '+t).join(', ');
+        const typeStr=Object.entries(types).map(([t,c])=>`${c}× ${t}`).join(', ');
         showToast(`Projekt wczytany — ${d.objects.length} obiektów (${typeStr}), ${depths.length} warst${depths.length===1?'wa':'w'}`,'success',4000);
       }catch(err){ showToast(`Nie udało się wczytać projektu: ${err.message}`,'error',5000); }
     };
@@ -6215,13 +6215,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       return c; });
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
     const dupTypes={};copies.forEach(c=>{const t=c.type;dupTypes[t]=(dupTypes[t]||0)+1;});
-    const dupInfo=Object.entries(dupTypes).map(([t,n])=>n+'× '+t).join(', ');
+    const dupInfo=Object.entries(dupTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
     const dupDepths=[...new Set(copies.map(c=>c.depth||1))].length;
     showToast(`Powielono ${copies.length} elem. (${dupInfo}, ${dupDepths} warst${dupDepths===1?'wa':'w'})`,'info',1500); }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
     const deleted=state.objects.filter(o=>ids.includes(o.id));
     const delTypes={}; deleted.forEach(o=>{delTypes[o.type]=(delTypes[o.type]||0)+1;});
-    const delInfo=Object.entries(delTypes).map(([t,n])=>n+'× '+t).join(', ');
+    const delInfo=Object.entries(delTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
     state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps();
     showToast(`Usunięto ${deleted.length} elem. (${delInfo})`,'warning',1800); }
 
@@ -6238,7 +6238,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     clipboard=copies.map(c=>structuredClone(c));
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
     const types={}; copies.forEach(o=>{types[o.type]=(types[o.type]||0)+1;});
-    const typeStr=Object.entries(types).map(([t,c])=>c+'× '+t).join(', ');
+    const typeStr=Object.entries(types).map(([t,c])=>`${c}× ${t}`).join(', ');
     showToast(`Wklejono ${copies.length} elem. (${typeStr})`,'info',1200); }
   function zoomBy(f){ const v=state.view; const cx=v.x+v.w/2, cy=v.y+v.h/2;
     v.w*=f; v.h*=f; v.x=cx-v.w/2; v.y=cy-v.h/2; applyView(); renderOverlay(); }
@@ -8667,7 +8667,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       pushHistory(); renderAll(); renderProps();
       const cnt=newObjs.length, pl=cnt===1?'obiekt':cnt<=4?'obiekty':'obiektów';
       const impTypes={}; newObjs.forEach(o=>{impTypes[o.type]=(impTypes[o.type]||0)+1;});
-      const impInfo=Object.entries(impTypes).map(([t,n])=>n+'× '+t).join(', ');
+      const impInfo=Object.entries(impTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
       const impDepths=[...new Set(newObjs.map(o=>o.depth||1))].length;
       showToast(`Zaimportowano ${cnt} ${pl} z SVG (${impInfo}, ${impDepths} warst${impDepths===1?'wa':'w'})`,'success');
     };
