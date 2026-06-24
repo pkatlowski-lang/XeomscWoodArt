@@ -7022,7 +7022,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       +`<label>zł/cm²<input type="number" data-f="pricePerCm2" step="0.0001" min="0" value="${m.pricePerCm2!=null?m.pricePerCm2:''}"></label>`
       +`<label>Cięcie mm/min<input type="number" data-f="speed" step="10" min="1" value="${m.speed!=null?m.speed:''}"></label>`
       +`</div>`;
-    row.querySelector('.pq-del').addEventListener('click',()=>row.remove());
     return row;
   }
   const _pqMats=document.getElementById('pqMaterials'),
@@ -7030,6 +7029,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         _pqPackTier=document.getElementById('pqPackTier'), _pqMargin=document.getElementById('pqMargin'),
         _pqBuffer=document.getElementById('pqBuffer'), _pqEngSpeed=document.getElementById('pqEngSpeed'),
         _pqEngSpacing=document.getElementById('pqEngSpacing'), _pqStatus=document.getElementById('pqStatus');
+  _pqMats.addEventListener('click',e=>{
+    const del=e.target.closest('.pq-del'); if(!del) return;
+    const row=del.closest('.pq-mat-row'); if(row) row.remove();
+  });
   function fillPqPanel(){
     _pqMats.innerHTML='';
     Object.entries(PRICING.materials).forEach(([k,m])=>_pqMats.appendChild(pqMatRow(k,m)));
@@ -9502,11 +9505,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!q) return text;
     const idx=text.toLowerCase().indexOf(q);
     if(idx<0) return text;
-    return text.slice(0,idx)+'<span class="qs-match">'+text.slice(idx,idx+q.length)+'</span>'+text.slice(idx+q.length);
+    return escapeXml(text.slice(0,idx))+'<span class="qs-match">'+escapeXml(text.slice(idx,idx+q.length))+'</span>'+escapeXml(text.slice(idx+q.length));
   }
   function renderQsResults(q){
     const filtered=q?QS_COMMANDS.filter(c=>c.label.toLowerCase().includes(q)||c.cat.toLowerCase().includes(q)):QS_COMMANDS;
-    if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników dla „'+q+'"</div>'; return; }
+    if(!filtered.length){ qsResults.innerHTML='<div class="quick-search-empty">Brak wyników dla „'+escapeXml(q)+'"</div>'; return; }
     const grouped=new Map();
     filtered.forEach(c=>{ const cat=c.cat||'inne'; if(!grouped.has(cat)) grouped.set(cat,[]); grouped.get(cat).push(c); });
     let html='';let globalIdx=0;
