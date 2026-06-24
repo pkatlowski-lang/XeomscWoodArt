@@ -5807,15 +5807,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const _lcBadgeEl=document.getElementById('layerCountBadge');
   function renderLayers(){
     const total=state.objects.length;
-    const locked=state.objects.filter(o=>o.locked).length;
-    const hidden=state.objects.filter(o=>!o.visible).length;
+    let locked=0,hidden=0,cuts=0,engr=0,scor=0;
+    for(const o of state.objects){ if(o.locked) locked++; if(!o.visible) hidden++; if(o.mode==='cut') cuts++; else if(o.mode==='engrave') engr++; else if(o.mode==='score') scor++; }
     if(_lcBadgeEl) _lcBadgeEl.textContent=total;
     let counter='';
     if(total){
       const sel=state.selectedIds.length;
-      const cuts=state.objects.filter(o=>o.mode==='cut').length;
-      const engr=state.objects.filter(o=>o.mode==='engrave').length;
-      const scor=state.objects.filter(o=>o.mode==='score').length;
       let parts=`<span class="lc-badge">${total}</span> elem.`;
       if(sel) parts+=` · <span class="c-accent">${sel} wyb.</span>`;
       if(locked) parts+=` · ${locked} 🔒`;
@@ -7155,17 +7152,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!depths.length){ _dlEl.innerHTML='<div class="dl-empty">Brak elementów. Dodaj kształt lub bazę — przypiszesz mu warstwę poniżej.</div>'; return; }
     const totalMM=depths.reduce((sum,dep)=>sum+layerMM(dep),0);
     const selDepths=new Set(getSelected().map(o=>o.depth||1));
+    const depthStats=new Map();
+    for(const o of state.objects){ const d=o.depth||1; let s=depthStats.get(d); if(!s){ s={cnt:0,cuts:0,engr:0}; depthStats.set(d,s); } s.cnt++; if(o.mode==='cut') s.cuts++; else if(o.mode==='engrave') s.engr++; }
+    const customMats=loadCustomMaterials();
+    const matOptions=`<option value="">Wybierz materiał…</option>`
+      +MATERIAL_PRESETS.map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')
+      +(customMats.length?`<optgroup label="Własne">${customMats.map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')}</optgroup>`:'')
+      +`<option value="__manage__">⚙ Zarządzaj materiałami…</option>`;
     _dlEl.innerHTML=depths.map(dep=>{
       const col=depthColor(dep);
       const hidden=state.hiddenDepths.includes(dep);
-      const cnt=state.objects.filter(o=>(o.depth||1)===dep).length;
+      const ds=depthStats.get(dep)||{cnt:0,cuts:0,engr:0};
+      const cnt=ds.cnt, cuts=ds.cuts, engr=ds.engr;
       const sel=selDepths.has(dep)?' on':'';
-      const matOptions=`<option value="">Wybierz materiał…</option>`
-        +MATERIAL_PRESETS.map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')
-        +(loadCustomMaterials().length?`<optgroup label="Własne">${loadCustomMaterials().map(m=>`<option value="${m.mm}">${escapeXml(m.label)}</option>`).join('')}</optgroup>`:'')
-        +`<option value="__manage__">⚙ Zarządzaj materiałami…</option>`;
-      const cuts=state.objects.filter(o=>(o.depth||1)===dep&&o.mode==='cut').length;
-      const engr=state.objects.filter(o=>(o.depth||1)===dep&&o.mode==='engrave').length;
       const cntTip=cnt+' elem. ('+cuts+' cięć, '+engr+' grawerów), '+fmt(layerMM(dep))+' mm';
       return `<div class="lyr-row${hidden?' lyr-hidden':''}${sel}" data-dep="${dep}">
         <button class="lyr-pick" data-pick="${dep}" style="background:${col}" title="${cntTip}" data-tooltip="Warstwa ${dep}: ${cntTip}">W${dep}</button>
