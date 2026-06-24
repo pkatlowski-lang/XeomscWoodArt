@@ -539,7 +539,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
 .lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:slideInX var(--an-fast) ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
 .lyr-row:hover{background:linear-gradient(90deg,var(--surface3),rgba(var(--accent-rgb),.04));border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateX(2px);backdrop-filter:blur(2px)}
-.lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:lyrRowActivate var(--an-base) ease-out;position:relative}
+.lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:layerSelPulse var(--an-base) ease-out;position:relative}
 .lyr-row.lyr-hidden{opacity:.45}
 .lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-xs);cursor:pointer;flex:0 0 auto;transition:filter var(--tr-base),transform var(--tr-fast);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .lyr-pick:hover{filter:brightness(1.25);transform:scale(1.04)}
@@ -1470,9 +1470,6 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 .q-field select{cursor:pointer;transition:border-color var(--tr-base),box-shadow var(--tr-base),background var(--tr-base);background:linear-gradient(180deg,var(--surface2),rgba(var(--accent-rgb),.03))}
 .q-field select:hover{background:linear-gradient(180deg,var(--surface3),rgba(var(--accent-rgb),.06))}
 
-/* === v60: Lyr-row — animacja selekcji === */
-@keyframes lyrRowActivate{from{background:rgba(var(--accent-rgb),.2)}to{background:rgba(var(--accent-rgb),.08)}}
-
 /* === v60: Quick search — grupowanie wyników z kategoriami === */
 .qs-category{display:flex;padding:8px 16px 4px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none;align-items:center;gap:6px}
 .quick-search-item .qs-badge{font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.08);color:var(--accent);margin-left:auto;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em;transition:background var(--tr-base)}
@@ -1667,13 +1664,12 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .modal-box>*{position:relative;z-index:1}
 
 /* === v66: Dropdown menu — staggered animation === */
-.dd.open .dd-menu .tbtn{animation:ddItemIn var(--an-micro) ease-out backwards}
+.dd.open .dd-menu .tbtn{animation:stageActivePulse var(--an-micro) ease-out backwards}
 .dd.open .dd-menu .tbtn:nth-child(2){animation-delay:20ms}
 .dd.open .dd-menu .tbtn:nth-child(3){animation-delay:40ms}
 .dd.open .dd-menu .tbtn:nth-child(4){animation-delay:60ms}
 .dd.open .dd-menu .tbtn:nth-child(5){animation-delay:80ms}
 .dd.open .dd-menu .tbtn:nth-child(n+6){animation-delay:100ms}
-@keyframes ddItemIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
 
 /* === v66: Responsywny toolrail na bardzo szerokich ekranach === */
 @media(min-width:1800px){
