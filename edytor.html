@@ -999,6 +999,7 @@ input[type=range]:focus-visible{outline:none}
 .bb-hint-sub{font-size:.68rem;color:var(--muted-2)}
 .group-hint{font-size:.74rem}
 .layers-hint{font-size:.7rem;color:var(--muted-2)}
+.layer-search-active{border-color:var(--accent)!important}
 .layers-shortcuts{font-size:.65rem;color:var(--muted-2);margin-top:4px;display:block}
 .kbd-xs{font-size:.6rem;padding:1px 4px}
 .kbd-xxs{font-size:.58rem;padding:1px 3px}
@@ -1030,6 +1031,8 @@ input[type=range]:focus-visible{outline:none}
 .dl-note:hover{border-color:rgba(var(--accent-rgb),.2)}
 .dl-note-grid{grid-column:1/-1;text-align:center}
 .u-hidden{display:none}
+.c-accent{color:var(--accent)}.c-cut{color:var(--cut)}.c-engrave{color:var(--engrave)}.c-score{color:var(--score)}.c-muted{color:var(--muted)}
+.c-success{color:var(--success)}.c-error{color:var(--cut-light)}
 
 /* === pq-sec — aktywna sekcja z lepszą wizualną === */
 .pq-sec:focus-within{border-left-color:var(--accent);box-shadow:0 3px 12px rgba(0,0,0,.18),0 0 0 1px rgba(var(--accent-rgb),.08)}
@@ -2266,7 +2269,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 <a class="skip-link" href="#canvas" tabindex="1">Przejdź do płótna</a>
 <div class="app">
   <div class="toolbar">
-    <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.style.display='none'"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
+    <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.classList.add('u-hidden')"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
     <div class="tgroup">
       <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)" aria-label="Cofnij"><span class="ico">↶</span></button>
       <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)" aria-label="Ponów"><span class="ico">↷</span></button>
@@ -3052,7 +3055,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const filterFonts=(q)=>{
       const items=dd.querySelectorAll('.font-dd-item');
       const lq=q.toLowerCase();
-      items.forEach(it=>{ it.style.display=it.textContent.toLowerCase().includes(lq)?'':'none'; });
+      items.forEach(it=>{ it.classList.toggle('u-hidden',!it.textContent.toLowerCase().includes(lq)); });
     };
     dd.addEventListener('click',e=>{
       if(e.target.closest('.font-dd-search')) return;
@@ -3491,8 +3494,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const w=dl.text.length*fs*0.58+padX*2, h=fs+padY*2;
     const x=dl.x+fs*0.7, y=dl.y+fs*0.7;
     return `<g class="drag-label">
-      <rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" rx="${fmt(fs*0.25)}" fill="#1c1c1cdd" stroke="${ACCENT}" stroke-width="${fmt(Math.max(fs*0.04,0.05))}"/>
-      <text x="${fmt(x+w/2)}" y="${fmt(y+h/2+fs*0.32)}" text-anchor="middle" font-size="${fmt(fs)}" font-family="sans-serif" fill="#fff">${escapeXml(dl.text)}</text>
+      <rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" rx="${fmt(fs*0.25)}" fill="var(--glass-2)" stroke="${ACCENT}" stroke-width="${fmt(Math.max(fs*0.04,0.05))}"/>
+      <text x="${fmt(x+w/2)}" y="${fmt(y+h/2+fs*0.32)}" text-anchor="middle" font-size="${fmt(fs)}" font-family="sans-serif" fill="var(--text)">${escapeXml(dl.text)}</text>
     </g>`;
   }
   function renderOverlay(){
@@ -5839,10 +5842,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const layerSearchEl=document.getElementById('layerSearch');
   layerSearchEl.addEventListener('input',()=>{
     renderLayers();
-    layerSearchEl.style.borderColor=layerSearchEl.value?'var(--accent)':'';
+    layerSearchEl.classList.toggle('layer-search-active',!!layerSearchEl.value);
   });
   layerSearchEl.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){ layerSearchEl.value=''; layerSearchEl.style.borderColor=''; renderLayers(); layerSearchEl.blur(); }
+    if(e.key==='Escape'){ layerSearchEl.value=''; layerSearchEl.classList.remove('layer-search-active'); renderLayers(); layerSearchEl.blur(); }
   });
   function renderLayers(){
     const total=state.objects.length;
@@ -5857,13 +5860,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const engr=state.objects.filter(o=>o.mode==='engrave').length;
       const scor=state.objects.filter(o=>o.mode==='score').length;
       let parts=`<span class="lc-badge">${total}</span> elem.`;
-      if(sel) parts+=` · <span style="color:var(--accent)">${sel} wyb.</span>`;
+      if(sel) parts+=` · <span class="c-accent">${sel} wyb.</span>`;
       if(locked) parts+=` · ${locked} 🔒`;
       if(hidden) parts+=` · ${hidden} ukr.`;
       let typeParts=[];
-      if(cuts) typeParts.push(`<span style="color:var(--cut)">${cuts}✂</span>`);
-      if(engr) typeParts.push(`<span style="color:var(--muted)">${engr}▦</span>`);
-      if(scor) typeParts.push(`<span style="color:var(--score)">${scor}〜</span>`);
+      if(cuts) typeParts.push(`<span class="c-cut">${cuts}✂</span>`);
+      if(engr) typeParts.push(`<span class="c-muted">${engr}▦</span>`);
+      if(scor) typeParts.push(`<span class="c-score">${scor}〜</span>`);
       if(typeParts.length) parts+=' · '+typeParts.join(' ');
       counter=`<div class="layers-counter">${parts}</div>`;
     }
@@ -6665,12 +6668,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     let totalVisible=0;
     modalHelp.querySelectorAll('.sc-row').forEach(row=>{
       const vis=!q||row.textContent.toLowerCase().includes(q);
-      row.style.display=vis?'':'none';
+      row.classList.toggle('u-hidden',!vis);
       if(vis) totalVisible++;
     });
     modalHelp.querySelectorAll('.sc-group').forEach(g=>{
-      const visible=g.querySelectorAll('.sc-row:not([style*="display: none"])').length;
-      g.style.display=visible?'':'none';
+      const visible=g.querySelectorAll('.sc-row:not(.u-hidden)').length;
+      g.classList.toggle('u-hidden',!visible);
     });
   }
   scSearchEl.addEventListener('input',filterShortcuts);
@@ -6925,7 +6928,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!hasWork){
       if(card) card.classList.add('empty');
       if(ppEl) ppEl.textContent='–'; if(totEl) totEl.textContent='–';
-      if(brk) brk.innerHTML=''; if(emptyMsg) emptyMsg.style.display='';
+      if(brk) brk.innerHTML=''; if(emptyMsg) emptyMsg.classList.remove('u-hidden');
       if(lqPrice){ lqPrice.textContent='narysuj projekt…'; lqPrice.classList.add('lq-empty'); }
       if(lqTime) lqTime.textContent='';
       return;
@@ -6933,7 +6936,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const q=computeQuoteFull(quoteMatSel.value);
     if(!q) return;
     if(card) card.classList.remove('empty');
-    if(emptyMsg) emptyMsg.style.display='none';
+    if(emptyMsg) emptyMsg.classList.add('u-hidden');
     if(ppEl){ const nv=zl(q.perPiece); if(ppEl.textContent!==nv){ppEl.classList.remove('price-flash');void ppEl.offsetWidth;ppEl.classList.add('price-flash');} ppEl.textContent=nv; }
     if(qtyEcho) qtyEcho.textContent=q.qty;
     if(totEl) totEl.textContent=zl(q.total);
@@ -7076,7 +7079,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       let key=r.dataset.key; if(!key||mats[key]) key='mat-'+Math.random().toString(36).slice(2,8);
       mats[key]={label, mm, speed:Math.max(1,speed), pricePerCm2:Math.max(0,price)};
     });
-    if(!Object.keys(mats).length){ st.style.color='var(--cut-light)'; st.textContent='Dodaj przynajmniej jeden materiał.'; return; }
+    if(!Object.keys(mats).length){ st.className='c-error'; st.textContent='Dodaj przynajmniej jeden materiał.'; return; }
     PRICING.materials=mats;
     PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('pqLaserMin').value)||0);
     PRICING.packagingUnit=Math.max(0,parseFloat(document.getElementById('pqPack').value)||0);
@@ -7086,8 +7089,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('pqEngSpeed').value)||8000);
     PRICING.engraveSpacing=Math.max(0.01,parseFloat(document.getElementById('pqEngSpacing').value)||0.1);
     savePricing(); refreshPricingUI();
-    st.style.color='var(--success)'; st.textContent='✅ Zapisano.';
-    setTimeout(()=>{ if(st.textContent==='✅ Zapisano.') st.textContent=''; },2500);
+    st.className='c-success'; st.textContent='✅ Zapisano.';
+    setTimeout(()=>{ if(st.textContent==='✅ Zapisano.'){ st.textContent=''; st.className=''; } },2500);
   }
   document.getElementById('pqAddMat').addEventListener('click',()=>{
     document.getElementById('pqMaterials').appendChild(pqMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
@@ -7098,7 +7101,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!ok) return;
     PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
     fillPqPanel(); refreshPricingUI();
-    const st=document.getElementById('pqStatus'); st.style.color='var(--success)'; st.textContent='↺ Przywrócono domyślne.';
+    const st=document.getElementById('pqStatus'); st.className='c-success'; st.textContent='↺ Przywrócono domyślne.';
   });
 
   /* ---------------- Profile wyceny: wybór, tworzenie, nazwa, powielanie, usuwanie ---------------- */
@@ -7412,7 +7415,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const svgHead=bbSvgEl.closest('.bb-sec')?.querySelector('.bb-head span');
       if(svgHead) svgHead.textContent='SVG podgląd ('+depths.length+' warst'+(depths.length===1?'wa':'w')+')';
     } else {
-      bbSvgEl.innerHTML='<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się podgląd pliku SVG z rozdzielonymi warstwami<span class="bb-legend">Kolory warstw: <span style="color:var(--cut)">■</span> cięcie · <span style="color:var(--engrave)">■</span> grawer · <span style="color:var(--score)">■</span> nacięcie</span></div>';
+      bbSvgEl.innerHTML='<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się podgląd pliku SVG z rozdzielonymi warstwami<span class="bb-legend">Kolory warstw: <span class="c-cut">■</span> cięcie · <span class="c-engrave">■</span> grawer · <span class="c-score">■</span> nacięcie</span></div>';
     }
   }
 
@@ -9583,7 +9586,7 @@ function setSendStep(n){
     s.classList.toggle('done',sn<n);
   });
 }
-const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.style.color=err?'var(--cut-light)':'var(--muted)'; };
+const setStatus=(t,err)=>{ statusEl.textContent=t; statusEl.className=err?'c-error':'c-muted'; };
 
 openBtn.addEventListener('click',()=>{ setStatus(''); setSendStep(1); ov.classList.add('open'); });
 document.getElementById('lqSend').addEventListener('click',()=>{ setStatus(''); setSendStep(1); ov.classList.add('open'); });
