@@ -992,6 +992,15 @@ input[type=range]:focus-visible{outline:none}
 .tbtn-link{font-size:.72rem;text-decoration:none}
 /* live3d-empty — zdefiniowany wyżej */
 .unit-label{font-size:.68rem;color:var(--muted);font-weight:500;white-space:nowrap}
+.sum-footer{font-size:.72rem;color:var(--muted);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums}
+.depth-footer{font-size:.65rem;color:var(--muted-2);text-align:right;padding:4px 6px;font-variant-numeric:tabular-nums}
+.bb-legend{font-size:.6rem;color:var(--muted-2);margin-top:6px;display:block}
+.bb-hint-sub{font-size:.68rem;color:var(--muted-2)}
+.group-hint{font-size:.74rem}
+.layers-hint{font-size:.7rem;color:var(--muted-2)}
+.layers-shortcuts{font-size:.65rem;color:var(--muted-2);margin-top:4px;display:block}
+.kbd-xs{font-size:.6rem;padding:1px 4px}
+.kbd-xxs{font-size:.58rem;padding:1px 3px}
 .depth-info{font-size:.7rem;color:var(--muted);margin-left:6px}
 .depth-ctrl-field{margin-top:7px}
 .d-badge-inline{margin-left:4px}
@@ -5149,7 +5158,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <button data-bool="union" title="Scal w jeden kształt">∪ Suma</button><button data-bool="difference" title="Wytnij dziurę (góra w dół)">∖ Różnica</button><button data-bool="intersection" title="Zostaw część wspólną">∩ Wspólne</button>${xorBtn}</div>
         <p class="field-hint mt-8">∪ Suma = scal w jeden kształt · ∖ Różnica = wytnij dziurę (góra w dół) · ∩ Wspólne = część wspólna${xorInfo}.</p></div>`;
     }
-    h+=`<div class="empty-note" style="font-size:.74rem">💡 Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę.<br>Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
+    h+=`<div class="empty-note group-hint">💡 Przeciągnij dowolny zaznaczony element, aby przesunąć całą grupę.<br>Shift+klik dodaje lub usuwa element z zaznaczenia.</div>`;
     propsEl.innerHTML=h;
     propsEl.querySelectorAll('[data-align]').forEach(b=>b.addEventListener('click',()=>alignSel(b.dataset.align)));
     propsEl.querySelectorAll('[data-dist]').forEach(b=>b.addEventListener('click',()=>distributeSel(b.dataset.dist)));
@@ -5856,7 +5865,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(typeParts.length) parts+=' · '+typeParts.join(' ');
       counter=`<div class="layers-counter">${parts}</div>`;
     }
-    if(!total){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów na płycie.<br><span style="font-size:.7rem;color:var(--muted-2)">Narysuj kształt lub wybierz szablon z galerii</span><br><span style="font-size:.65rem;color:var(--muted-2);margin-top:4px;display:block">Skrót: <kbd style="font-size:.6rem;padding:1px 4px">R</kbd> prostokąt · <kbd style="font-size:.6rem;padding:1px 4px">O</kbd> elipsa · <kbd style="font-size:.6rem;padding:1px 4px">T</kbd> tekst</span></div>`; return; }
+    if(!total){ layersEl.innerHTML=`<div class="layers-empty">Brak elementów na płycie.<br><span class="layers-hint">Narysuj kształt lub wybierz szablon z galerii</span><br><span class="layers-shortcuts">Skrót: <kbd class="kbd-xs">R</kbd> prostokąt · <kbd class="kbd-xs">O</kbd> elipsa · <kbd class="kbd-xs">T</kbd> tekst</span></div>`; return; }
     const q=(layerSearchEl.value||'').trim().toLowerCase();
     const list=q?state.objects.filter(o=>autoName(o).toLowerCase().includes(q)):state.objects;
     if(!list.length){ layersEl.innerHTML=counter+`<div class="layers-empty">Brak elementów spełniających wyszukiwanie.</div>`; return; }
@@ -6721,7 +6730,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm${totalLen>0?' ('+cutPct+'%)':''}</span></div>`
       +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm${totalLen>0?' ('+scorePct+'%)':''}</span></div>`
       +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`
-      +`<div style="font-size:.72rem;color:var(--muted);text-align:right;padding:6px 4px 0;font-variant-numeric:tabular-nums">Łącznie: ${totalElements} elementów · ${fmt(totalLen)} mm tras${depthInfo}</div>`;
+      +`<div class="sum-footer">Łącznie: ${totalElements} elementów · ${fmt(totalLen)} mm tras${depthInfo}</div>`;
     const cutSpeed=Math.max(1,Number(sumCutSpeed.value)||1);
     const scoreSpeed=Math.max(1,Number(sumScoreSpeed.value)||1);
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
@@ -7185,7 +7194,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <input class="lyr-mm" type="number" data-mm="${dep}" value="${fmt(layerMM(dep))}" min="0.5" step="0.5" title="Grubość materiału tej warstwy (mm)"><span class="lyr-unit">mm</span>
         <button class="lyr-eye" data-eye="${dep}" title="${hidden?'Pokaż warstwę':'Ukryj warstwę'}">${hidden?'◎':'◉'}</button>
       </div>`;
-    }).join('')+(depths.length>1?`<div style="font-size:.65rem;color:var(--muted-2);text-align:right;padding:4px 6px;font-variant-numeric:tabular-nums">Łączna głębokość: ${fmt(totalMM)} mm (${depths.length} warstw)</div>`:'');
+    }).join('')+(depths.length>1?`<div class="depth-footer">Łączna głębokość: ${fmt(totalMM)} mm (${depths.length} warstw)</div>`:'');
     dlEl.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{
       const dep=Number(b.dataset.pick);
       state.selectedIds=expandGroupSelection(state.objects.filter(o=>(o.depth||1)===dep).map(o=>o.id));
@@ -7383,7 +7392,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
     const n=buildLayerScene(live3dScene, sw, pxPerMM);
-    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<span class="empty-hint">Narzędzia: <kbd style="font-size:.58rem;padding:1px 3px">R</kbd> prostokąt · <kbd style="font-size:.58rem;padding:1px 3px">O</kbd> elipsa · <kbd style="font-size:.58rem;padding:1px 3px">T</kbd> tekst · <kbd style="font-size:.58rem;padding:1px 3px">P</kbd> ścieżka<br>lub wybierz szablon z panelu po lewej</span></div>'; }
+    if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<span class="empty-hint">Narzędzia: <kbd class="kbd-xxs">R</kbd> prostokąt · <kbd class="kbd-xxs">O</kbd> elipsa · <kbd class="kbd-xxs">T</kbd> tekst · <kbd class="kbd-xxs">P</kbd> ścieżka<br>lub wybierz szablon z panelu po lewej</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
   }
@@ -7400,7 +7409,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const svgHead=bbSvgEl.closest('.bb-sec')?.querySelector('.bb-head span');
       if(svgHead) svgHead.textContent='SVG podgląd ('+depths.length+' warst'+(depths.length===1?'wa':'w')+')';
     } else {
-      bbSvgEl.innerHTML='<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się podgląd pliku SVG z rozdzielonymi warstwami<span style="font-size:.6rem;color:var(--muted-2);margin-top:6px;display:block">Kolory warstw: <span style="color:var(--cut)">■</span> cięcie · <span style="color:var(--engrave)">■</span> grawer · <span style="color:var(--score)">■</span> nacięcie</span></div>';
+      bbSvgEl.innerHTML='<div class="bb-empty">Dodaj elementy na płytę —<br>tu pojawi się podgląd pliku SVG z rozdzielonymi warstwami<span class="bb-legend">Kolory warstw: <span style="color:var(--cut)">■</span> cięcie · <span style="color:var(--engrave)">■</span> grawer · <span style="color:var(--score)">■</span> nacięcie</span></div>';
     }
   }
 
@@ -7485,7 +7494,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   /* ----- Powiększony podgląd rozdzielonego SVG ----- */
   function showSvgPreview(){
     let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
-    document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.<br><span style="font-size:.68rem;color:var(--muted-2)">Narysuj elementy na płycie, aby wygenerować plik SVG</span></div>';
+    document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.<br><span class="bb-hint-sub">Narysuj elementy na płycie, aby wygenerować plik SVG</span></div>';
     document.getElementById('modalSvgPrev').classList.add('open');
     if(r){ const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))]; showToast('Podgląd SVG — '+depths.length+' warstw','info',1500); }
   }
