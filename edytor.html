@@ -460,7 +460,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote select:focus{border-color:var(--accent)}
 .live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.3px;line-height:1.1;transition:color var(--tr-slow),transform var(--tr-base);font-variant-numeric:tabular-nums}
 .live-quote .lq-price.lq-flash{animation:lqFlash .35s ease-out}
-@keyframes lqFlash{0%{transform:scale(1.08);color:#fff}40%{transform:scale(1.02);color:rgba(var(--accent-rgb),.8)}100%{transform:scale(1);color:var(--accent)}}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:36px;font-size:.76rem;margin-top:4px;position:relative;overflow:hidden}
@@ -927,8 +926,10 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
   .toolrail .tbtn:hover{transform:none}
   .layer:active,.tbtn:active:not(:disabled){transform:none}
   .modal-ov .modal-box,.confirm-box{transition:none}
-  .toast{animation:none}
-  .q-price-card:not(.empty){animation:none}
+  .toast{animation:none!important}
+  .q-price-card:not(.empty){animation:none!important}
+  .gallery-card,.tpl button{animation:none!important}
+  .toolrail .tbtn.active{animation:none!important}
 }
 
 /* === Print — ukryj UI przy drukowaniu === */
@@ -1672,7 +1673,6 @@ input[type=number]:hover::-webkit-outer-spin-button{opacity:1;height:auto}
 .param-card .ptag{background:rgba(var(--accent-rgb),.06);padding:2px 6px;border-radius:var(--r-xs)}
 
 /* === v58: Gallery motif card — lepsza animacja wejścia === */
-@keyframes galleryCardIn{from{opacity:0;transform:scale(.94) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .gallery-card{animation:galleryCardIn .2s ease-out backwards}
 .gallery-card:nth-child(2n){animation-delay:30ms}
 .gallery-card:nth-child(3n){animation-delay:60ms}
@@ -1861,9 +1861,6 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3)}
 /* === v62: Grid — subtelniejsze linie z lepszym kontrastem === */
 .grid-line{stroke:rgba(0,0,0,.06);transition:stroke var(--tr-slow)}
 .grid-line.major{stroke:rgba(0,0,0,.14)}
-
-/* === v62: Gallery card — efekt glassmorphism na hover === */
-.gallery-card:hover::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--accent-rgb),.06),transparent 50%);border-radius:var(--r);pointer-events:none;z-index:0}
 
 /* === v62: Lepsza wizualizacja ramki dokumentu === */
 .doc-border{stroke:var(--accent-dark);stroke-dasharray:none;transition:stroke .3s}
@@ -2713,13 +2710,6 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .q-total .q-total-val{background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
 
 /* === v76: Accessibility — reduced motion === */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
-  .gallery-card,.tpl button{animation:none!important}
-  .toolrail .tbtn.active{animation:none!important}
-  .toast{animation:none!important}
-}
-
 /* === v76: Lepsza wizualizacja focus na tablecie === */
 @media(hover:none){
   .layer .lico{opacity:.7}
@@ -4107,7 +4097,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       // text-anchor="middle" centruje KAŻDY wiersz niezależnie (jak w Cuttle/Illustrator)
       const content=lines.length<2 ? escapeXml(o.text||'') : lines.map((ln,i)=>
         `<tspan x="${fmt(o.x)}"${i>0?' dy="1.2em"':''}>${escapeXml(ln)}</tspan>`).join('');
-      let txt=`<text x="${fmt(o.x)}" y="${fmt(yBase)}" text-anchor="middle" font-family='${o.font}' font-size="${fmt(fs)}"${clsAttr}${styleAttr}>${content}</text>`;
+      let txt=`<text x="${fmt(o.x)}" y="${fmt(yBase)}" text-anchor="middle" font-family="${escapeXml(o.font)}" font-size="${fmt(fs)}"${clsAttr}${styleAttr}>${content}</text>`;
       const tsx=(o.tsx||1)*(o.flipX?-1:1), tsy=(o.tsy||1)*(o.flipY?-1:1);
       if(tsx!==1||tsy!==1) txt=`<g transform="translate(${fmt(o.x)} ${fmt(yBase)}) scale(${fmt(tsx)} ${fmt(tsy)}) translate(${fmt(-o.x)} ${fmt(-yBase)})">${txt}</g>`;
       geo=txt;
@@ -6336,6 +6326,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     if(!file || !/^image\//.test(file.type)){ showToast('Wybierz plik obrazu (PNG, JPG, itp.).','error'); return; }
     const replaceId=pendingImageReplaceId; pendingImageReplaceId=null;
     const reader=new FileReader();
+    reader.onerror=()=>showToast('Nie udało się odczytać pliku','error');
     reader.onload=()=>{
       const img=new Image();
       img.onload=()=>{
@@ -7087,6 +7078,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   document.getElementById('loadProjectInput').addEventListener('change',e=>{
     const f=e.target.files[0]; if(!f) return;
     const reader=new FileReader();
+    reader.onerror=()=>showToast('Nie udało się odczytać pliku','error');
     reader.onload=()=>{
       try{
         const d=JSON.parse(reader.result);
@@ -9375,6 +9367,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   function importSvgFile(file){
     if(!file) return;
     const reader = new FileReader();
+    reader.onerror = () => showToast('Nie udało się odczytać pliku','error');
     reader.onload = e => {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(e.target.result, 'image/svg+xml');
@@ -9423,6 +9416,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   function importSvgAsObjects(file){
     if(!file) return;
     const reader=new FileReader();
+    reader.onerror=()=>showToast('Nie udało się odczytać pliku','error');
     reader.onload=e=>{
       const parser=new DOMParser();
       const svgDoc=parser.parseFromString(e.target.result,'image/svg+xml');
@@ -10192,7 +10186,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   setInterval(()=>{
     if(state.objects.length && state.hIndex!==_savedAtIndex){
       const json=JSON.stringify(serializeProject());
-      try{ localStorage.setItem(AUTOSAVE_KEY, json); }catch(ex){}
+      try{ localStorage.setItem(AUTOSAVE_KEY, json); }catch(ex){ if(ex.name==='QuotaExceededError') showToast('Brak miejsca w localStorage — autozapis nie powiódł się','warning',4000); }
       _autosaveCount++;
       const sbSave=document.getElementById('sbSave');
       if(sbSave){
