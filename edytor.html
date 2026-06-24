@@ -36,10 +36,10 @@
   --grad-accent:linear-gradient(135deg,var(--accent),var(--accent-2));
   --font-d:'Poppins',system-ui,sans-serif; --font-b:'Inter','Poppins',system-ui,sans-serif;
   /* Standaryzacja przejść — spójny motion system */
-  --tr-fast:.08s; --tr-base:.14s; --tr-slow:.22s; --tr-modal:.28s;
+  --tr-fast:.08s; --tr-base:.14s; --tr-slow:.22s; --tr-modal:.28s; --tr-tooltip:.35s;
   /* Tokeny animacji — jednolite duracje dla @keyframes */
   --an-micro:.1s; --an-fast:.15s; --an-base:.2s; --an-med:.3s; --an-slow:.4s; --an-slower:.6s;
-  --ease-out:cubic-bezier(.4,0,.2,1); --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease-out:cubic-bezier(.4,0,.2,1); --ease-bounce:cubic-bezier(.34,1.56,.64,1); --ease-snappy:cubic-bezier(.2,.9,.3,1.1);
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-height:1.45;overflow:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04','ss01'}
@@ -706,9 +706,9 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Custom tooltip — premium zastępujący natywne title === */
 [data-tooltip]{position:relative}
 [data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);font-size:.72rem;font-weight:500;line-height:1.5;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;max-width:280px;border:1px solid var(--border-strong);box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.1);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) var(--ease-out),transform var(--tr-base) var(--ease-out),visibility 0s linear var(--tr-base);z-index:5000;letter-spacing:.01em}
-[data-tooltip]:hover::after,[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:opacity var(--tr-base) var(--ease-out) .35s,transform var(--tr-base) var(--ease-out) .35s,visibility 0s linear .35s}
+[data-tooltip]:hover::after,[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:opacity var(--tr-base) var(--ease-out) var(--tr-tooltip),transform var(--tr-base) var(--ease-out) var(--tr-tooltip),visibility 0s linear var(--tr-tooltip)}
 [data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border-strong);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) var(--ease-out),visibility 0s linear var(--tr-base);z-index:5001}
-[data-tooltip]:hover::before,[data-tooltip]:focus-visible::before{opacity:1;visibility:visible;transition:opacity var(--tr-base) var(--ease-out) .35s,visibility 0s linear .35s}
+[data-tooltip]:hover::before,[data-tooltip]:focus-visible::before{opacity:1;visibility:visible;transition:opacity var(--tr-base) var(--ease-out) var(--tr-tooltip),visibility 0s linear var(--tr-tooltip)}
 [data-tooltip].tip-down::before{bottom:auto;top:calc(100% + 3px);border-top-color:transparent;border-bottom-color:var(--border-strong)}
 [data-tooltip].tip-down::after{bottom:auto;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px)}
 [data-tooltip].tip-down:hover::after,[data-tooltip].tip-down:focus-visible::after{transform:translateX(-50%) translateY(0)}
@@ -752,7 +752,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .sc-row:hover::before{opacity:1}
 
 /* === Karta ceny w panelu wyceny — lepsza animacja === */
-.q-pp-val{transition:transform var(--tr-slow) cubic-bezier(.2,.9,.3,1.1),color var(--tr-base),text-shadow var(--tr-slow)}
+.q-pp-val{transition:transform var(--tr-slow) var(--ease-snappy),color var(--tr-base),text-shadow var(--tr-slow)}
 .q-price-card:not(.empty) .q-pp-val{text-shadow:0 0 20px rgba(var(--accent-rgb),.3)}
 
 /* === Przycisk wysyłki — akcent wizualny === */
@@ -1709,7 +1709,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 @keyframes toolGlow{0%,100%{box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55)}50%{box-shadow:0 4px 18px -2px rgba(var(--accent-rgb),.75),0 0 6px rgba(var(--accent-rgb),.2)}}
 
 /* === v67: Confirm dialog — backdrop blur i scale animation === */
-.confirm-ov .confirm-box{animation:confirmScaleIn var(--an-base) cubic-bezier(.2,.9,.3,1.1)}
+.confirm-ov .confirm-box{animation:confirmScaleIn var(--an-base) var(--ease-snappy)}
 @keyframes confirmScaleIn{from{opacity:0;transform:scale(.92) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
 /* === v67: Panel h2 — animowany separator z gradient sweep === */
@@ -3694,7 +3694,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   }
   /* ---- Offset / obwódka: tworzy nowy kształt powiększony (lub pomniejszony) o d mm ---- */
   function offsetShape(o, d){
-    const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.name=''; c.repeat={type:'none'}; c.mode='cut';
+    const c=structuredClone(o); c.id=uid(); c.name=''; c.repeat={type:'none'}; c.mode='cut';
     if(o.type==='rect'){
       c.x=o.x-d; c.y=o.y-d; c.w=Math.max(1,o.w+2*d); c.h=Math.max(1,o.h+2*d); c.rx=Math.max(0,(o.rx||0)+d);
     } else if(o.type==='ellipse'){
@@ -3739,7 +3739,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
      dzięki czemu pozycja, rozmiar i środek obrotu pozostają identyczne jak przed konwersją. */
   function convertToPath(o){
     if(!o || !['rect','ellipse','polygon','star'].includes(o.type)) return;
-    const conv=JSON.parse(JSON.stringify(o));
+    const conv=structuredClone(o);
     conv.d=shapeD(o); conv.fillRule='nonzero';
     conv.bx=o.x; conv.by=o.y; conv.bw=Math.max(0.01,o.w); conv.bh=Math.max(0.01,o.h);
     conv.x=0; conv.y=0; conv.sx=1; conv.sy=1; conv.flipX=false; conv.flipY=false;
@@ -3767,7 +3767,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(o.rotation){ const p=rotatePt(x,y,c.x,c.y,rot); return [p.x,p.y]; }
       return [x,y];
     }));
-    const conv=JSON.parse(JSON.stringify(o));
+    const conv=structuredClone(o);
     conv.d=localPolys.map(polyToPathD).join(' ');
     conv.fillRule='evenodd';
     conv.bx=b.x; conv.by=b.y; conv.bw=Math.max(0.01,b.w); conv.bh=Math.max(0.01,b.h);
@@ -3888,7 +3888,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const newCx=bx+bw/2, newCy=by+bh/2;
       const dx=oldCx-newCx, dy=oldCy-newCy;
       const ax=a00*dx+a01*dy, ay=a10*dx+a11*dy;
-      const conv=JSON.parse(JSON.stringify(o));
+      const conv=structuredClone(o);
       conv.id=uid();
       conv.name=(o.name||'Ścieżka')+' '+(idx+1);
       conv.d=d; conv.bx=bx; conv.by=by; conv.bw=bw; conv.bh=bh;
@@ -4607,7 +4607,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const sel=getSelected().filter(s=>!s.locked);
       const idx=sel.indexOf(o);
       const gidMap={};
-      const copies=sel.map(s=>{ const c=JSON.parse(JSON.stringify(s)); c.id=uid();
+      const copies=sel.map(s=>{ const c=structuredClone(s); c.id=uid();
         if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
         return c; });
       state.objects.push(...copies);
@@ -5978,7 +5978,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   }
   function undo(){ if(state.hIndex>0){ const prevCount=state.objects.length; state.hIndex--; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Cofnięto (krok '+state.hIndex+'/'+(state.history.length-1); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
   function redo(){ if(state.hIndex<state.history.length-1){ const prevCount=state.objects.length; state.hIndex++; restore(state.history[state.hIndex]); updateUndoButtons(); updateSaveIndicator(); const diff=state.objects.length-prevCount; let info='Ponowiono (krok '+state.hIndex+'/'+(state.history.length-1); if(diff>0) info+=', +'+diff+' elem.'; else if(diff<0) info+=', '+diff+' elem.'; info+=')'; showToast(info,'info',1200); if(_sbHistory) _sbHistory.classList.add('sb-history-flash'); setTimeout(()=>{if(_sbHistory) _sbHistory.classList.remove('sb-history-flash');},400); } }
-  function updateUndoButtons(){ document.getElementById('undoBtn').disabled=state.hIndex<=0; document.getElementById('redoBtn').disabled=state.hIndex>=state.history.length-1; }
+  const _undoBtnEl=document.getElementById('undoBtn'), _redoBtnEl=document.getElementById('redoBtn');
+  function updateUndoButtons(){ _undoBtnEl.disabled=state.hIndex<=0; _redoBtnEl.disabled=state.hIndex>=state.history.length-1; }
 
   /* ---------------- Podpięcie paska narzędzi ---------------- */
   const toolsEl=document.getElementById('tools');
@@ -6009,8 +6010,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
     if(_sbObj){
       const n=state.objects.length; const s=state.selectedIds.length;
-      const locked=state.objects.filter(o=>o.locked).length;
-      const hidden=state.objects.filter(o=>!o.visible).length;
+      let locked=0,hidden=0; for(const o of state.objects){ if(o.locked) locked++; if(!o.visible) hidden++; }
       _sbObj.textContent=n+' elem.'+(s?' ('+s+' wyb.)':'');
       let tip=n+' elementów na płótnie';
       if(s) tip+=', '+s+' zaznaczonych';
@@ -6077,8 +6077,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     canvas.addEventListener('pointerleave',()=>{ _sbCoords.textContent=''; });
   }
 
-  document.getElementById('undoBtn').addEventListener('click',undo);
-  document.getElementById('redoBtn').addEventListener('click',redo);
+  _undoBtnEl.addEventListener('click',undo);
+  _redoBtnEl.addEventListener('click',redo);
   document.getElementById('copyBtn').addEventListener('click',copySel);
   document.getElementById('pasteBtn').addEventListener('click',pasteClipboard);
   document.getElementById('dupBtn').addEventListener('click',duplicateSel);
@@ -6223,7 +6223,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
   function duplicateSel(){ const sel=getSelected(); if(!sel.length) return;
     const gidMap={};
-    const copies=sel.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
+    const copies=sel.map(o=>{ const c=structuredClone(o); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
@@ -6241,14 +6241,14 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   /* ---------------- Schowek: kopiuj / wklej (Ctrl+C / Ctrl+V) ---------------- */
   let clipboard=[];
   function copySel(){ const sel=getSelected(); if(!sel.length) return;
-    clipboard=sel.map(o=>JSON.parse(JSON.stringify(o)));
+    clipboard=sel.map(o=>structuredClone(o));
     showToast('Skopiowano '+clipboard.length+' elem.','info',1000); }
   function pasteClipboard(){ if(!clipboard.length) return;
     const gidMap={};
-    const copies=clipboard.map(o=>{ const c=JSON.parse(JSON.stringify(o)); c.id=uid(); c.x+=10; c.y+=10; c.name='';
+    const copies=clipboard.map(o=>{ const c=structuredClone(o); c.id=uid(); c.x+=10; c.y+=10; c.name='';
       if(c.groupId){ if(!gidMap[c.groupId]) gidMap[c.groupId]=uid(); c.groupId=gidMap[c.groupId]; }
       return c; });
-    clipboard=copies.map(c=>JSON.parse(JSON.stringify(c)));
+    clipboard=copies.map(c=>structuredClone(c));
     state.objects.push(...copies); state.selectedIds=copies.map(c=>c.id); pushHistory(); renderAll(); renderProps();
     const types={}; copies.forEach(o=>{types[o.type]=(types[o.type]||0)+1;});
     const typeStr=Object.entries(types).map(([t,c])=>c+'× '+t).join(', ');
@@ -6739,11 +6739,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const PROFILES_KEY='laser_edytor_profiles_v1'; // nowy magazyn: profile wyceny
   // Sprowadza dowolny zapisany obiekt cennika do pełnego, poprawnego kształtu (+ migracja pakowania).
   function normalizeConfig(s){
-    const base=JSON.parse(JSON.stringify(QUOTE_DEFAULTS));
+    const base=structuredClone(QUOTE_DEFAULTS);
     if(!s||typeof s!=='object') return base;
     const out={...base, ...s};
     out.materials=(s.materials && typeof s.materials==='object' && Object.keys(s.materials).length)
-      ? JSON.parse(JSON.stringify(s.materials)) : base.materials;
+      ? structuredClone(s.materials) : base.materials;
     if(s.packaging!=null && s.packagingUnit==null){ out.packagingUnit=0.25; out.packagingTier=5; }
     delete out.packaging;
     return out;
@@ -6761,7 +6761,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }catch(e){ console.warn('Wczytywanie profili wyceny:',e.message); }
     let cfg;
     try{ cfg=normalizeConfig(JSON.parse(localStorage.getItem(PRICING_KEY)||'null')); }
-    catch(e){ cfg=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); }
+    catch(e){ cfg=structuredClone(QUOTE_DEFAULTS); }
     const id=newProfId();
     return { profiles:[{id, name:'Domyślny', config:cfg}], activeId:id };
   }
@@ -7069,18 +7069,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   document.getElementById('pqRestore').addEventListener('click',async()=>{
     const ok=await showConfirm('Przywrócić domyślny cennik i parametry w tym profilu?',{icon:'↺',ok:'Przywróć domyślne'});
     if(!ok) return;
-    PRICING=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); savePricing();
+    PRICING=structuredClone(QUOTE_DEFAULTS); savePricing();
     fillPqPanel(); refreshPricingUI();
-    const st=document.getElementById('pqStatus'); st.className='c-success'; st.textContent='↺ Przywrócono domyślne.';
+    _pqStatus.className='c-success'; _pqStatus.textContent='↺ Przywrócono domyślne.';
   });
 
   /* ---------------- Profile wyceny: wybór, tworzenie, nazwa, powielanie, usuwanie ---------------- */
   const qProfileSel=document.getElementById('qProfile');
+  const _pDel=document.getElementById('qProfDel');
   function renderProfileSelect(){
     if(!qProfileSel) return;
     qProfileSel.innerHTML=PROFILES.profiles.map(p=>`<option value="${p.id}">${String(p.name||'Profil').replace(/</g,'&lt;')}</option>`).join('');
     qProfileSel.value=PROFILES.activeId;
-    const delBtn=document.getElementById('qProfDel'); if(delBtn) delBtn.disabled=PROFILES.profiles.length<=1;
+    if(_pDel) _pDel.disabled=PROFILES.profiles.length<=1;
   }
   // Przełącza aktywny profil i odświeża cały interfejs wyceny.
   function switchProfile(id){
@@ -7098,14 +7099,14 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const _pNew=document.getElementById('qProfNew');
   if(_pNew) _pNew.addEventListener('click',async()=>{
     const name=(await showPrompt('Nazwa nowego profilu:','Nowy profil')||'').trim(); if(!name) return;
-    addProfile(name, JSON.parse(JSON.stringify(QUOTE_DEFAULTS)));
+    addProfile(name, structuredClone(QUOTE_DEFAULTS));
     showToast('Utworzono profil „'+name+'"','success',2000);
   });
   const _pDup=document.getElementById('qProfDup');
   if(_pDup) _pDup.addEventListener('click',async()=>{
     const cur=activeProfile(); if(!cur) return;
     const name=(await showPrompt('Nazwa kopii profilu:',cur.name+' (kopia)')||'').trim(); if(!name) return;
-    addProfile(name, JSON.parse(JSON.stringify(cur.config)));
+    addProfile(name, structuredClone(cur.config));
     showToast('Powielono profil jako „'+name+'"','success',2000);
   });
   const _pRen=document.getElementById('qProfRename');
@@ -7115,7 +7116,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     cur.name=name; saveProfiles(); renderProfileSelect();
     showToast('Zmieniono nazwę profilu','info',1500);
   });
-  const _pDel=document.getElementById('qProfDel');
   if(_pDel) _pDel.addEventListener('click',async()=>{
     if(PROFILES.profiles.length<=1){ showToast('To jedyny profil — nie można go usunąć.','error'); return; }
     const cur=activeProfile(); if(!cur) return;
@@ -8177,17 +8177,18 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     return {pts, rp, rb, ra, rf};
   }
   const modalGear=document.getElementById('modalGear');
+  const _gearTeethEl=document.getElementById('gearTeeth'), _gearModuleEl=document.getElementById('gearModule'), _gearPressureEl=document.getElementById('gearPressure'), _gearBoreEl=document.getElementById('gearBore');
+  const _gearInfoEl=document.getElementById('gearInfo'), _gearPreviewEl=document.getElementById('gearPreview');
   function updateGearInfo(){
-    const z=clamp(Number(document.getElementById('gearTeeth').value)||20,6,200);
-    const m=clamp(Number(document.getElementById('gearModule').value)||2,0.2,20);
-    const alpha=clamp(Number(document.getElementById('gearPressure').value)||20,10,30);
-    const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
+    const z=clamp(Number(_gearTeethEl.value)||20,6,200);
+    const m=clamp(Number(_gearModuleEl.value)||2,0.2,20);
+    const alpha=clamp(Number(_gearPressureEl.value)||20,10,30);
+    const bore=clamp(Number(_gearBoreEl.value)||0,0,200);
     const {pts,rp,ra,rf}=buildGearPoints(z,m,alpha);
     let info=`Śr. podziałowa: <strong>${fmt(2*rp)} mm</strong><br>Śr. zewnętrzna: <strong>${fmt(2*ra)} mm</strong><br>Śr. podstaw: <strong>${fmt(2*rf)} mm</strong>`;
     if(bore>0 && bore>=2*rf-0.5) info+='<br><span class="gear-warn">⚠ otwór za duży!</span>';
-    document.getElementById('gearInfo').innerHTML=info;
-    // Mini-podgląd SVG koła
-    const prevEl=document.getElementById('gearPreview');
+    _gearInfoEl.innerHTML=info;
+    const prevEl=_gearPreviewEl;
     if(prevEl){
       const pad=ra*0.18, vb=`${-(ra+pad)} ${-(ra+pad)} ${2*(ra+pad)} ${2*(ra+pad)}`;
       const d=polyToPathD(pts);
@@ -8202,10 +8203,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   modalGear.addEventListener('click',e=>{ if(e.target===modalGear) closeModal(modalGear); });
   ['gearTeeth','gearModule','gearPressure','gearBore'].forEach(id=>document.getElementById(id).addEventListener('input',updateGearInfo));
   document.getElementById('gearGenerateBtn').addEventListener('click',()=>{
-    const z=clamp(Number(document.getElementById('gearTeeth').value)||20,6,200);
-    const m=clamp(Number(document.getElementById('gearModule').value)||2,0.2,20);
-    const alpha=clamp(Number(document.getElementById('gearPressure').value)||20,10,30);
-    const bore=clamp(Number(document.getElementById('gearBore').value)||0,0,200);
+    const z=clamp(Number(_gearTeethEl.value)||20,6,200);
+    const m=clamp(Number(_gearModuleEl.value)||2,0.2,20);
+    const alpha=clamp(Number(_gearPressureEl.value)||20,10,30);
+    const bore=clamp(Number(_gearBoreEl.value)||0,0,200);
     const {pts,ra,rf}=buildGearPoints(z,m,alpha);
     if(bore>0 && bore>=2*rf-0.5){ showToast('Otwór osi jest za duży — zmniejsz średnicę lub zwiększ moduł.','error'); return; }
     const px=20, py=20, cx=px+ra, cy=py+ra, W=2*ra, H=2*ra;
@@ -9223,9 +9224,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(MOTIFS.length) return;
     MOTIFS=buildMotifs(); renderMotifs(); renderMotifsProgress(MOTIFS.length,MOTIFS.length);
   }
+  let _motifsProgressEl=document.getElementById('motifs-progress');
   function renderMotifsProgress(done,total){
-    const bar=document.getElementById('motifs-progress');
-    if(bar){ if(done>=total) bar.remove(); else bar.textContent=`Generowanie: ${done}/${total}…`; }
+    if(!_motifsProgressEl) return;
+    if(done>=total){ _motifsProgressEl.remove(); _motifsProgressEl=null; }
+    else _motifsProgressEl.textContent=`Generowanie: ${done}/${total}…`;
   }
   const motifSearchInput=document.getElementById('motifSearchInput');
   const motifCountBadge=document.getElementById('motifCountBadge');
