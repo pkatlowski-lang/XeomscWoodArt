@@ -42,7 +42,7 @@
   --ease-out:cubic-bezier(.4,0,.2,1); --ease-bounce:cubic-bezier(.34,1.56,.64,1); --ease-snappy:cubic-bezier(.2,.9,.3,1.1);
 }
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-height:1.45;overflow:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04','ss01'}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-height:1.45;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:'cv02','cv03','cv04','ss01'}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:var(--r-sm);border:2px solid transparent;background-clip:padding-box;transition:background var(--tr-slow)}
@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px 14px;
   background:linear-gradient(180deg,rgba(26,34,51,.94),rgba(12,16,25,.94));
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 4px 12px rgba(0,0,0,.3);position:relative;z-index:20}
+  border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 4px 12px rgba(0,0,0,.3);position:relative;z-index:20;contain:layout style}
 .toolbar::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.2),transparent);pointer-events:none}
 .toolbar .brand{font-family:var(--font-d);font-weight:800;color:#fff;font-size:1.06rem;margin-right:12px;white-space:nowrap;letter-spacing:.2px;display:inline-flex;align-items:center;gap:10px;cursor:default;transition:filter var(--tr-slow)}
 /* miniaturka naklejki-logo nieczytelna w pasku — ukrywamy, używamy gradientowego znacznika */
@@ -99,7 +99,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55);animation:toolGlow 2s ease-in-out infinite}
 .toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 var(--r-xxs) var(--r-xxs) 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn var(--an-base) ease-out}
 @keyframes toolIndicatorIn{from{transform:translateY(-50%) scaleY(0);opacity:0}to{transform:translateY(-50%) scaleY(1);opacity:1}}
-.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative;overscroll-behavior:contain}
+.panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative;overscroll-behavior:contain;contain:layout style}
 .panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) var(--ease-out)}
 .panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) var(--ease-out)}
 .panel h2{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:16px 16px 8px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0;transition:color var(--tr-base),letter-spacing var(--tr-base)}
@@ -1064,7 +1064,7 @@ input[type=range]:focus-visible{outline:none}
 .gear-warn{color:var(--cut-light)}
 
 /* === Status bar — dolny pasek informacyjny === */
-.statusbar{display:flex;align-items:center;gap:4px;padding:3px 14px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-top:1px solid var(--border);font-size:.65rem;color:var(--muted-2);flex-shrink:0;min-height:22px;user-select:none;transition:background var(--tr-slow)}
+.statusbar{display:flex;align-items:center;gap:4px;padding:3px 14px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-top:1px solid var(--border);font-size:.65rem;color:var(--muted-2);flex-shrink:0;min-height:22px;user-select:none;transition:background var(--tr-slow);contain:layout style}
 .sb-item{font-variant-numeric:tabular-nums;letter-spacing:.02em;padding:2px 6px;border-radius:var(--r-xs);transition:color var(--tr-base),background var(--tr-base)}
 .sb-sep{opacity:.35;background:linear-gradient(180deg,var(--accent),var(--muted-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding:0 2px;color:rgba(var(--accent-rgb),.2);font-size:.5rem}
 .sb-spacer{flex:1}
@@ -9342,12 +9342,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   });
   /* Autosave do localStorage co 30 s (jeśli są niezapisane zmiany) */
   let _autosaveCount=0;
+  const _sbSaveEl=document.getElementById('sbSave');
   setInterval(()=>{
     if(state.objects.length && state.hIndex!==_savedAtIndex){
       const json=JSON.stringify(serializeProject());
       try{ localStorage.setItem(AUTOSAVE_KEY, json); }catch(ex){ if(ex.name==='QuotaExceededError') showToast('Brak miejsca w localStorage — autozapis nie powiódł się','warning',4000); }
       _autosaveCount++;
-      const sbSave=document.getElementById('sbSave');
+      const sbSave=_sbSaveEl;
       if(sbSave){
         const dot=document.createElement('span');
         dot.className='sb-autosave';
