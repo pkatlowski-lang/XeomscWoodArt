@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .panel h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.2),var(--border));background-size:200% 100%;animation:h2SweepGrad 4s linear infinite}
 /* ---- Zakładki panelu bocznego (segmentowane, premium) ---- */
 .ptabs{display:flex;gap:3px;padding:9px 9px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(180deg,var(--bg-2),rgba(8,11,18,.6));position:relative}
-.ptab{flex:1;padding:9px 4px;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:var(--text);background:transparent;border:1px solid transparent;border-radius:var(--r-sm);cursor:pointer;transition:color var(--tr-base),background var(--tr-base),box-shadow var(--tr-base),border-color var(--tr-base),transform var(--tr-base);text-align:center;position:relative;opacity:.7;gap:3px;overflow:hidden}
+.ptab{flex:1;padding:9px 4px;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:var(--text);background:transparent;border:1px solid transparent;border-radius:var(--r-sm);cursor:pointer;transition:color var(--tr-base),background var(--tr-base),box-shadow var(--tr-base),border-color var(--tr-base),transform var(--tr-base),opacity var(--tr-base);text-align:center;position:relative;opacity:.7;gap:3px;overflow:hidden}
 .ptab:active{transform:scale(.96)}
 .ptab:hover{color:var(--text);background:rgba(255,255,255,.04);opacity:1;transform:translateX(1px)}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
@@ -117,8 +117,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab-body.active{display:flex;animation:ptabBodyIn var(--an-base) ease-out;box-shadow:inset 0 4px 8px -4px rgba(0,0,0,.15);opacity:1;pointer-events:auto;position:relative}
 .ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
 /* Wycena inline — każda sekcja jako wyraźna karta */
-.pq-sec{padding:12px 13px;margin:10px 14px;background:linear-gradient(180deg,var(--surface2),rgba(18,24,38,.8));border:1px solid var(--border);border-left:3px solid rgba(var(--accent-rgb),.3);border-radius:var(--r);box-shadow:0 2px 6px rgba(0,0,0,.12);transition:border-color var(--tr-base),box-shadow var(--tr-base),border-left-color var(--tr-base)}
-.pq-sec:hover{border-left-color:var(--accent);box-shadow:0 3px 10px rgba(0,0,0,.16)}
+.pq-sec{padding:12px 13px;margin:10px 14px;background:linear-gradient(180deg,var(--surface2),rgba(18,24,38,.8));border:1px solid var(--border);border-left:3px solid rgba(var(--accent-rgb),.3);border-radius:var(--r);box-shadow:0 2px 6px rgba(0,0,0,.12);transition:border-color var(--tr-base),box-shadow var(--tr-base),border-left-color var(--tr-base),transform var(--tr-fast)}
+.pq-sec:hover{border-left-color:var(--accent);box-shadow:0 3px 10px rgba(0,0,0,.16);transform:translateY(-1px)}
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
 .pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border);transition:color var(--tr-base);position:relative;overflow:hidden}
 .pq-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.6);flex:none}
@@ -127,7 +127,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(var(--accent-rgb),.04)}
 .pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
 .pq-mat-row .pq-row-nums label{font-size:.58rem;color:var(--muted);display:flex;flex-direction:column;gap:2px}
-.pq-mat-row input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--r-xs);padding:6px;font-size:.74rem;outline:none;box-sizing:border-box;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
+.pq-mat-row input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--r-xs);padding:6px;font-size:.74rem;outline:none;box-sizing:border-box;transition:border-color var(--tr-base),box-shadow var(--tr-base),background var(--tr-base)}
 .pq-mat-row input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.18)}
 .pq-del{width:28px;height:28px;background:rgba(var(--cut-light-rgb),.12);border:1px solid rgba(var(--cut-light-rgb),.35);color:var(--danger);border-radius:var(--r-xs);cursor:pointer;font-size:.72rem;padding:0;display:flex;align-items:center;justify-content:center;transition:background var(--tr-base),border-color var(--tr-base),transform var(--tr-fast),box-shadow var(--tr-base);position:relative;overflow:hidden}
 .pq-del:hover{background:rgba(var(--cut-light-rgb),.28);border-color:rgba(var(--cut-light-rgb),.55);box-shadow:0 2px 8px rgba(var(--cut-light-rgb),.2)}
@@ -179,10 +179,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-cfg-body{display:none;padding:0 14px 14px}
 .q-cfg-body.open{display:block;animation:cfgBodyIn var(--an-base) ease-out}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;contain:layout style;background:radial-gradient(1000px 680px at 50% 38%, #131b2e, #080b12 82%);box-shadow:inset 0 0 30px rgba(0,0,0,.2);border-left:1px solid var(--border);border-right:1px solid var(--border)}
-#canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
+#canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;outline:none}
 /* blokada natywnego zaznaczania tekstu przeglądarki na płótnie — bez tego przeciąganie
    po napisie "podświetlało" litery na niebiesko i otwierało systemowe menu zaznaczenia */
-#canvas *{user-select:none;-webkit-user-select:none}
+#canvas *{user-select:none}
 #canvas text{pointer-events:bounding-box;cursor:move}
 .stage .hint-empty{position:absolute;left:calc(50% + 11px);top:34px;transform:translateX(-50%);font-size:.8rem;color:var(--text);background:linear-gradient(180deg,rgba(18,24,38,.75),rgba(8,11,18,.75));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:8px 16px;border-radius:100px;pointer-events:none;border:1px solid rgba(var(--accent-rgb),.22);box-shadow:0 4px 12px rgba(0,0,0,.3);font-weight:500;letter-spacing:.02em;text-align:center;line-height:1.5;animation:hintEmptyFloat 4s ease-in-out infinite}
 
@@ -343,6 +343,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .param-card .pdel:hover{color:var(--cut);background:rgba(255,255,255,.08)}
 .param-card .pdel:active{transform:scale(.85)}
 .addparam{margin:0 14px 16px;width:calc(100% - 28px);justify-content:center}
+.addparam:active{transform:scale(.97)}
 .params .bind-sel{margin-top:6px;width:100%;padding:6px 8px;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r-xs);color:var(--accent);font-size:.7rem;font-family:inherit;cursor:pointer;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base)}
 .params .bind-sel:focus{outline:none;border-color:var(--accent)}
 .params-empty{padding:2px 2px 6px;font-size:.78rem;color:var(--muted);line-height:1.55}
@@ -413,7 +414,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),transparent);border-radius:var(--r-xs);padding:6px 10px;margin:-4px -6px 0}
 .layer3d-card .lcount{font-size:.71rem;color:var(--muted)}
 .layer3d-card svg{width:120px;height:76px;overflow:visible;background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(135deg,var(--border),rgba(var(--accent-rgb),.2)) border-box;border-radius:var(--r-xs);border:1px solid transparent;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:box-shadow var(--tr-base)}
-.modal-note{margin-top:16px;font-size:.76rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:12px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.04),rgba(var(--accent2-rgb),.02));border-radius:0 0 var(--r-sm) var(--r-sm);padding:12px;margin-left:-12px;margin-right:-12px;margin-bottom:-12px}
+.modal-note{margin:16px -12px -12px;font-size:.76rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding:12px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.04),rgba(var(--accent2-rgb),.02));border-radius:0 0 var(--r-sm) var(--r-sm)}
 
 /* ---- Biblioteka materiałów (modal) ---- */
 .mat-list{display:flex;flex-direction:column;gap:6px;margin-top:14px}
@@ -678,10 +679,10 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
    (suwaki, checkboxy, pola) — dotyczy CAŁEJ aplikacji
    =================================================================== */
 /* --- Suwaki (range) — własny tor z wypełnieniem akcentem i wyrazistym uchwytem --- */
-input[type=range]{-webkit-appearance:none;appearance:none;height:6px;background:linear-gradient(90deg,rgba(var(--accent-rgb),.25),var(--border));cursor:pointer;position:relative;border-radius:var(--r-xxs)}
+input[type=range]{appearance:none;height:6px;background:linear-gradient(90deg,rgba(var(--accent-rgb),.25),var(--border));cursor:pointer;position:relative;border-radius:var(--r-xxs)}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--surface3),rgba(var(--accent-rgb),.12));border:1px solid var(--border)}
 input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:var(--surface3);border:1px solid var(--border)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(var(--accent-rgb),.4);transition:box-shadow var(--tr-base),transform var(--tr-fast),background var(--tr-base);cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(var(--accent-rgb),.4);transition:box-shadow var(--tr-base),transform var(--tr-fast),background var(--tr-base);cursor:pointer}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(var(--accent-rgb),.4);transition:box-shadow var(--tr-base),transform var(--tr-fast);cursor:pointer}
 input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 0 5px rgba(var(--accent-rgb),.18)}
 input[type=range]:active::-webkit-slider-thumb{transform:scale(1.08);background:var(--accent);box-shadow:0 0 0 6px rgba(var(--accent-rgb),.2)}
@@ -696,7 +697,7 @@ input:disabled,select:disabled,textarea:disabled{opacity:.5;cursor:not-allowed}
 /* --- Wspólny pierścień fokusu dla wszystkich pól tekstowych/liczbowych/list --- */
 input[type=text]:focus-visible,input[type=number]:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
 /* --- Custom dropdown arrow na select --- */
-select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3bd' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 8px) center;padding-right:26px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3bd' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 8px) center;padding-right:26px}
 /* --- Textarea — spójny wygląd premium --- */
 textarea{resize:vertical;min-height:56px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;padding:8px 11px;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.2),inset 0 0 0 1px rgba(var(--accent-rgb),.3);background:rgba(var(--accent-rgb),.02)}
@@ -1439,7 +1440,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 .toast.toast-warning .toast-ico{background:rgba(var(--warning-rgb),.15);color:var(--operator)}
 
 /* === v60: Context menu — lepsze grupowanie z nagłówkami sekcji === */
-.ctx-menu .ctx-group-label{display:block;padding:4px 10px 2px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none;pointer-events:none;margin-top:4px;padding-top:6px;border-top:1px solid var(--border)}
+.ctx-menu .ctx-group-label{display:block;padding:6px 10px 2px;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);user-select:none;pointer-events:none;margin-top:4px;border-top:1px solid var(--border)}
 .ctx-menu button .ctx-ico{width:18px;text-align:center;font-size:.82rem;flex-shrink:0;opacity:.7;transition:opacity var(--tr-base)}
 .ctx-menu button:hover:not(:disabled) .ctx-ico{opacity:1}
 
@@ -1900,6 +1901,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 
 /* === v73: Gallery upload button — lepsza wizualizacja === */
 .gallery-upload-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.12)}
+.gallery-upload-btn:active{transform:scale(.97)}
 
 /* === v73: Lepsza wizualizacja konfiguratora wyceny toggle === */
 .q-cfg-toggle::before{content:'⚙';margin-right:4px;font-size:.7rem;transition:transform var(--tr-slow)}
@@ -2202,22 +2204,22 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   </div>
   <div class="splash-hint" id="splashHint">Ładowanie edytora…</div>
 </div>
-<a class="skip-link" href="#canvas" tabindex="1">Przejdź do płótna</a>
+<a class="skip-link" href="#canvas">Przejdź do płótna</a>
 <div class="app">
   <div class="toolbar">
     <div class="brand"><img src="assets/logo.png" alt="Xeomsc-Laser" class="brand-logo" onerror="this.classList.add('u-hidden')"><span class="brand-name">Xeomsc<span>-Laser</span></span></div>
     <div class="tgroup">
-      <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)" aria-label="Cofnij"><span class="ico">↶</span></button>
-      <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)" aria-label="Ponów"><span class="ico">↷</span></button>
-      <button class="tbtn" id="copyBtn" title="Kopiuj (Ctrl+C)" aria-label="Kopiuj"><span class="ico">⎘</span></button>
-      <button class="tbtn" id="pasteBtn" title="Wklej (Ctrl+V)" aria-label="Wklej"><span class="ico">📋</span></button>
-      <button class="tbtn" id="dupBtn" title="Duplikuj (Ctrl+D)" aria-label="Duplikuj"><span class="ico">⧉</span></button>
-      <button class="tbtn" id="delBtn" title="Usuń (Delete)" aria-label="Usuń"><span class="ico">🗑</span></button>
+      <button class="tbtn" id="undoBtn" title="Cofnij (Ctrl+Z)" aria-label="Cofnij"><span class="ico" aria-hidden="true">↶</span></button>
+      <button class="tbtn" id="redoBtn" title="Ponów (Ctrl+Y)" aria-label="Ponów"><span class="ico" aria-hidden="true">↷</span></button>
+      <button class="tbtn" id="copyBtn" title="Kopiuj (Ctrl+C)" aria-label="Kopiuj"><span class="ico" aria-hidden="true">⎘</span></button>
+      <button class="tbtn" id="pasteBtn" title="Wklej (Ctrl+V)" aria-label="Wklej"><span class="ico" aria-hidden="true">📋</span></button>
+      <button class="tbtn" id="dupBtn" title="Duplikuj (Ctrl+D)" aria-label="Duplikuj"><span class="ico" aria-hidden="true">⧉</span></button>
+      <button class="tbtn" id="delBtn" title="Usuń (Delete)" aria-label="Usuń"><span class="ico" aria-hidden="true">🗑</span></button>
     </div>
     <div class="tgroup">
-      <button class="tbtn" id="zoomOut" title="Pomniejsz (Ctrl+-)" aria-label="Pomniejsz"><span class="ico">−</span></button>
+      <button class="tbtn" id="zoomOut" title="Pomniejsz (Ctrl+-)" aria-label="Pomniejsz"><span class="ico" aria-hidden="true">−</span></button>
       <span class="zoomval" id="zoomVal">100%</span>
-      <button class="tbtn" id="zoomIn" title="Powiększ (Ctrl+=)" aria-label="Powiększ"><span class="ico">+</span></button>
+      <button class="tbtn" id="zoomIn" title="Powiększ (Ctrl+=)" aria-label="Powiększ"><span class="ico" aria-hidden="true">+</span></button>
       <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku (Ctrl+0)" aria-label="Dopasuj do widoku">Dopasuj</button>
       <button class="tbtn" id="zoomSelBtn" title="Przybliż do zaznaczenia (klawisz 2)" aria-label="Przybliż do zaznaczenia">⌖ Zaznaczenie</button>
     </div>
@@ -2339,9 +2341,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <input type="text" id="layerSearch" class="layer-search" placeholder="Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
         <div class="layers" id="layers"></div>
         <div class="legend" id="legendBar">
-          <span data-filter="cut" title="Kliknij, aby podświetlić elementy cięcia" role="button" aria-label="Filtruj cięcie"><i class="li-cut"></i> cięcie</span>
-          <span data-filter="engrave" title="Kliknij, aby podświetlić elementy grawerowania" role="button" aria-label="Filtruj grawerowanie"><i class="li-eng"></i> grawer</span>
-          <span data-filter="score" title="Kliknij, aby podświetlić elementy nacięcia" role="button" aria-label="Filtruj nacięcie"><i class="li-sco"></i> nacięcie</span>
+          <span data-filter="cut" title="Kliknij, aby podświetlić elementy cięcia" role="button" tabindex="0" aria-label="Filtruj cięcie"><i class="li-cut" aria-hidden="true"></i> cięcie</span>
+          <span data-filter="engrave" title="Kliknij, aby podświetlić elementy grawerowania" role="button" tabindex="0" aria-label="Filtruj grawerowanie"><i class="li-eng" aria-hidden="true"></i> grawer</span>
+          <span data-filter="score" title="Kliknij, aby podświetlić elementy nacięcia" role="button" tabindex="0" aria-label="Filtruj nacięcie"><i class="li-sco" aria-hidden="true"></i> nacięcie</span>
         </div>
       </div><!-- /ptab-body layers -->
 
@@ -2484,7 +2486,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 <!-- Szybka wyszukiwarka Ctrl+K -->
 <div class="quick-search-ov" id="quickSearchOv">
   <div class="quick-search-box">
-    <input type="text" class="quick-search-input" id="quickSearchInput" placeholder="Szukaj narzędzia, akcji, elementu… (Esc aby zamknąć)" autocomplete="off" spellcheck="false" aria-label="Szybkie wyszukiwanie komend" role="combobox" aria-expanded="true" aria-controls="quickSearchResults">
+    <input type="text" class="quick-search-input" id="quickSearchInput" placeholder="Szukaj narzędzia, akcji, elementu… (Esc aby zamknąć)" autocomplete="off" spellcheck="false" aria-label="Szybkie wyszukiwanie komend" role="combobox" aria-expanded="true" aria-controls="quickSearchResults" aria-autocomplete="list">
     <div class="quick-search-results" id="quickSearchResults" role="listbox"></div>
   </div>
 </div>
@@ -2792,7 +2794,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     el.setAttribute('role','alert');
     el.style.setProperty('--toast-dur',(dur/1000)+'s');
     if(icons[type]){
-      el.innerHTML=`<span class="toast-ico">${icons[type]}</span><span class="toast-msg">${escapeXml(msg)}</span>`;
+      el.innerHTML=`<span class="toast-ico" aria-hidden="true">${icons[type]}</span><span class="toast-msg">${escapeXml(msg)}</span>`;
     } else {
       el.textContent=msg;
     }
@@ -5977,7 +5979,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
     const b=document.createElement('button'); b.className='tbtn'+(t.key==='select'?' active':''); b.dataset.tool=t.key;
     b.setAttribute('aria-pressed', t.key==='select'?'true':'false');
-    b.innerHTML=`<span class="ico">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`); b.setAttribute('data-tooltip',`${t.label} — ${t.hotkey}`);
+    b.innerHTML=`<span class="ico" aria-hidden="true">${t.ico}</span> ${t.label}`; b.title=`${t.label} (${t.hotkey})`; b.setAttribute('aria-label',`${t.label} (${t.hotkey})`); b.setAttribute('data-tooltip',`${t.label} — ${t.hotkey}`);
     b.addEventListener('click',()=>{ if(state.penDraft && t.key!=='pen') penCancel(); state.tool=t.key; syncToolButtons(); });
     toolsEl.appendChild(b);
   });
@@ -9379,7 +9381,14 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   });
 
   /* ---------------- Legenda — kliknięcie filtruje/podświetla po operacji ---------------- */
-  document.getElementById('legendBar')?.addEventListener('click',e=>{
+  const _legendBarEl=document.getElementById('legendBar');
+  _legendBarEl?.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){
+      const span=e.target.closest('[data-filter]');
+      if(span){ e.preventDefault(); span.click(); }
+    }
+  });
+  _legendBarEl?.addEventListener('click',e=>{
     const span=e.target.closest('[data-filter]');
     if(!span) return;
     const mode=span.dataset.filter;
