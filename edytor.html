@@ -2340,15 +2340,15 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       <div class="tool-list" id="tools"></div>
     </nav>
     <aside class="panel left">
-      <div class="ptabs">
-        <button class="ptab active" data-ptab="add" title="Dodaj kształty, szablony i motywy" aria-label="Zakładka Dodaj">➕ Dodaj</button>
-        <button class="ptab" data-ptab="sheet" title="Arkusz, siatka i parametry" aria-label="Zakładka Arkusz">📄 Arkusz</button>
-        <button class="ptab" data-ptab="layers" title="Warstwy i kolejność elementów" aria-label="Zakładka Warstwy">▦ Warstwy</button>
-        <button class="ptab" data-ptab="pricing" title="Wycena projektu" aria-label="Zakładka Wycena">💰 Wycena</button>
+      <div class="ptabs" role="tablist" aria-label="Panel boczny">
+        <button class="ptab active" data-ptab="add" role="tab" aria-selected="true" aria-controls="ptab-add" title="Dodaj kształty, szablony i motywy" aria-label="Zakładka Dodaj">➕ Dodaj</button>
+        <button class="ptab" data-ptab="sheet" role="tab" aria-selected="false" aria-controls="ptab-sheet" title="Arkusz, siatka i parametry" aria-label="Zakładka Arkusz">📄 Arkusz</button>
+        <button class="ptab" data-ptab="layers" role="tab" aria-selected="false" aria-controls="ptab-layers" title="Warstwy i kolejność elementów" aria-label="Zakładka Warstwy">▦ Warstwy</button>
+        <button class="ptab" data-ptab="pricing" role="tab" aria-selected="false" aria-controls="ptab-pricing" title="Wycena projektu" aria-label="Zakładka Wycena">💰 Wycena</button>
       </div>
 
       <!-- ZAKŁADKA: DODAJ — szablony, bazy, motywy -->
-      <div class="ptab-body active" data-ptab-body="add">
+      <div class="ptab-body active" data-ptab-body="add" id="ptab-add" role="tabpanel">
         <h2>Szablony startowe</h2>
         <div class="tpl" id="templates"></div>
         <h2>Galeria baz podstawowych</h2>
@@ -2364,7 +2364,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       </div><!-- /ptab-body add -->
 
       <!-- ZAKŁADKA: ARKUSZ — rozmiar, siatka, parametry globalne -->
-      <div class="ptab-body" data-ptab-body="sheet">
+      <div class="ptab-body" data-ptab-body="sheet" id="ptab-sheet" role="tabpanel">
         <h2>Arkusz roboczy</h2>
         <div class="field">
           <label>Arkusz roboczy (mm)</label>
@@ -2392,7 +2392,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       </div><!-- /ptab-body sheet -->
 
       <!-- ZAKŁADKA: WARSTWY — głębokość 3D i kolejność elementów -->
-      <div class="ptab-body" data-ptab-body="layers">
+      <div class="ptab-body" data-ptab-body="layers" id="ptab-layers" role="tabpanel">
         <h2>Warstwy 3D <span class="h2-badge" id="depthCountBadge">0</span></h2>
         <div class="depth-legend" id="depthLegend"></div>
         <p class="dl-note">Przycisk <strong>W1·W2…</strong> zaznacza wszystkie elementy danej warstwy. Pole <strong>mm</strong> = grubość materiału tej warstwy. Grubsza warstwa jest wyżej w wizualizacji 3D.</p>
@@ -2406,7 +2406,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         </div>
       </div><!-- /ptab-body layers -->
 
-      <div class="ptab-body" data-ptab-body="pricing">
+      <div class="ptab-body" data-ptab-body="pricing" id="ptab-pricing" role="tabpanel">
         <!-- PROFIL WYCENY: zapisane zestawy cennika do wyboru -->
         <div class="pq-sec">
           <div class="pq-h">💼 Profil wyceny</div>
@@ -2524,7 +2524,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   <div class="statusbar" id="statusbar">
     <span class="sb-item sb-clickable" id="sbTool" title="Kliknij, aby przełączyć narzędzie">Zaznaczanie</span>
     <span class="sb-sep">·</span>
-    <span class="sb-item sb-clickable" id="sbObjects" title="Kliknij, aby zaznaczć wszystkie elementy">0 elementów</span>
+    <span class="sb-item sb-clickable" id="sbObjects" title="Kliknij, aby zaznaczyć wszystkie elementy">0 elementów</span>
     <span class="sb-sep">·</span>
     <span class="sb-item sb-clickable" id="sbDoc" title="Kliknij, aby zmienić rozmiar płyty">300×200 mm</span>
     <span class="sb-sep">·</span>
@@ -2908,8 +2908,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   document.addEventListener('keydown',e=>{
     if(!_confirmOv.classList.contains('open')) return;
     if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(false); }
-    if(e.key==='Enter' && _confirmMode==='confirm'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
-    if(e.key==='Enter' && _confirmMode==='prompt'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
+    if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
     if(e.key==='Tab'){
       const focusable=[_confirmInput,_confirmCancel,_confirmOk].filter(el=>el.offsetParent!==null);
       if(!focusable.length) return;
@@ -7010,9 +7009,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   /* ---------------- Zakładki panelu bocznego ---------------- */
   document.querySelectorAll('.ptab').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.ptab').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
       document.querySelectorAll('.ptab-body').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
+      btn.setAttribute('aria-selected','true');
       const body=document.querySelector(`[data-ptab-body="${btn.dataset.ptab}"]`);
       if(body){ body.classList.add('active'); body.scrollTop=0; }
       if(btn.dataset.ptab==='pricing') fillPqPanel();
