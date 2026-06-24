@@ -6905,9 +6905,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       lqTime.textContent=`⏱ ${formatQuoteTime(q.timeMin)} min.sek · ${areaCm} cm²${q.qty>1?` · ${q.qty} szt.`:''}`;
     }
   }
-  // Alias zgodności (wołane z renderObjects/renderObjectEl po każdej edycji projektu)
-  function renderLiveQuote(){ renderQuoteAll(); }
-  var _lqTimer=null;
+  let _lqTimer=null;
   function scheduleLiveQuote(){ clearTimeout(_lqTimer); _lqTimer=setTimeout(renderQuoteAll,200); }
   quoteMatSel.addEventListener('change',()=>{ lqMat.value=quoteMatSel.value; renderQuoteAll(); });
   lqMat.addEventListener('change',()=>{ quoteMatSel.value=lqMat.value; renderQuoteAll(); });
@@ -7153,7 +7151,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const ds=depthStats.get(dep)||{cnt:0,cuts:0,engr:0};
       const cnt=ds.cnt, cuts=ds.cuts, engr=ds.engr;
       const sel=selDepths.has(dep)?' on':'';
-      const cntTip=cnt+' elem. ('+cuts+' cięć, '+engr+' grawerów), '+fmt(layerMM(dep))+' mm';
+      const cntTip=`${cnt} elem. (${cuts} cięć, ${engr} grawerów), ${fmt(layerMM(dep))} mm`;
       return `<div class="lyr-row${hidden?' lyr-hidden':''}${sel}" data-dep="${dep}">
         <button class="lyr-pick" data-pick="${dep}" style="background:${col}" title="${cntTip}" data-tooltip="Warstwa ${dep}: ${cntTip}">W${dep}</button>
         <span class="lyr-cnt">${cnt} el.</span>
