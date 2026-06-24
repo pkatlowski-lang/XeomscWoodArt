@@ -22,6 +22,7 @@
   --hole:#a86bf0; --hole-rgb:155,93,229; --success:#54d699; --success-rgb:84,214,153; --danger:#ff8a8a; --danger-rgb:255,138,138; --cut-rgb:255,59,59;
   --operator:#f7b733; --operator-rgb:247,183,51; --operator-dark:#e0892a; --operator-text:#1a1206;
   --warning:#ffaa3c; --warning-rgb:255,170,60;
+  --guide:#ff4fa6;
   /* Badge warstw 3D */
   --depth-1:#2a9d8f; --depth-2:#e76f51; --depth-3:#9b5de5; --depth-4:#f4a261; --depth-5:#06d6a0; --depth-6:#e63946; --depth-n:#888;
   /* Powierzchnie glassmorficzne */
@@ -242,12 +243,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .geo-score-txt{fill:transparent;stroke:var(--score);stroke-width:1.4px;vector-effect:non-scaling-stroke}
 .geo-hole{fill:rgba(var(--hole-rgb),.22);stroke:var(--hole);stroke-width:1.6px;stroke-dasharray:3 2;vector-effect:non-scaling-stroke}
 .geo-hole-txt{fill:rgba(var(--hole-rgb),.30);stroke:var(--hole);stroke-width:0.8px;vector-effect:non-scaling-stroke}
-.sel-box{fill:rgba(var(--accent-rgb),.05);stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:6 4;animation:marchingAnts 0.6s linear infinite}
+.sel-box{fill:rgba(var(--accent-rgb),.05);stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;stroke-dasharray:6 4;animation:marchingAnts 0.6s linear infinite;opacity:.55}
 @keyframes marchingAnts{to{stroke-dashoffset:-8}}
-.sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.sel-handle{fill:#fff;stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));pointer-events:none}
 .sel-rot-line{stroke:var(--accent);stroke-width:1.3px;vector-effect:non-scaling-stroke}
-.sel-rot{fill:var(--accent);stroke:#fff;stroke-width:1.2px;vector-effect:non-scaling-stroke}
-.guide-line{stroke:#ff4fa6;stroke-width:1px;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;pointer-events:none}
+.sel-rot{fill:var(--accent);stroke:#fff;stroke-width:1.2px;vector-effect:non-scaling-stroke;pointer-events:none}
+.guide-line{stroke:var(--guide);stroke-width:1px;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;pointer-events:none}
 
 /* ---- Linie pomocnicze (rulery -> przeciągane prowadnice) ---- */
 .guide-line-vis{stroke:var(--accent);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}
@@ -1027,6 +1028,8 @@ input[type=range]:focus-visible{outline:none}
 
 /* === dl-note — lepsza widoczność === */
 .dl-note:hover{border-color:rgba(var(--accent-rgb),.2)}
+.dl-note-grid{grid-column:1/-1;text-align:center}
+.u-hidden{display:none}
 
 /* === pq-sec — aktywna sekcja z lepszą wizualną === */
 .pq-sec:focus-within{border-left-color:var(--accent);box-shadow:0 3px 12px rgba(0,0,0,.18),0 0 0 1px rgba(var(--accent-rgb),.08)}
@@ -2291,12 +2294,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy projekt</button>
         <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (Ctrl+S)">💾 Zapisz projekt <kbd class="dd-kbd">Ctrl+S</kbd></button>
         <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json (Ctrl+O)">📂 Otwórz projekt <kbd class="dd-kbd">Ctrl+O</kbd></button>
-        <input type="file" id="loadProjectInput" accept=".json,application/json" style="display:none" aria-label="Otwórz projekt">
+        <input type="file" id="loadProjectInput" accept=".json,application/json" class="u-hidden" aria-label="Otwórz projekt">
         <hr class="dd-sep">
         <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
-        <input type="file" id="importImageInput" accept="image/*" style="display:none" aria-label="Importuj obraz">
+        <input type="file" id="importImageInput" accept="image/*" class="u-hidden" aria-label="Importuj obraz">
         <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie; napisy <text> jako edytowalny tekst">📐 Importuj SVG</button>
-        <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" style="display:none" aria-label="Importuj SVG">
+        <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" class="u-hidden" aria-label="Importuj SVG">
       </div>
     </div>
     <!-- MENU: NARZĘDZIA -->
@@ -2318,7 +2321,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
         <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny">💰 Wycena</button>
         <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty klawiszowe <kbd class="dd-kbd">?</kbd></button>
-        <button class="tbtn cfgbtn" id="pricingCfgBtn" style="display:none" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
+        <button class="tbtn cfgbtn u-hidden" id="pricingCfgBtn" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
       </div>
     </div>
     <!-- MENU: EKSPORT -->
@@ -2352,7 +2355,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <div class="gallery" id="gallery"></div>
         <label class="tbtn gallery-upload-btn add-action" title="Wrzuć własny kształt SVG jako bazę">
           📤 Wrzuć własną bazę (SVG)
-          <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" style="display:none" aria-label="Wrzuć bazę SVG">
+          <input type="file" id="galleryUpload" accept=".svg,image/svg+xml" class="u-hidden" aria-label="Wrzuć bazę SVG">
         </label>
         <h2>Galeria motywów <span class="h2-badge" id="motifCountBadge">0</span></h2>
         <p class="dl-note">Gotowe sylwetki ozdobne (natura, zwierzęta). Kliknij, aby dodać na arkusz — możesz je skalować, łączyć i otaczać ramką (operacja „Suma" łączy kształty w jeden element do cięcia).</p>
@@ -2373,7 +2376,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
                reszta logiki edytora działała bez zmian. -->
           <input type="hidden" id="docWInput" value="760">
           <input type="hidden" id="docHInput" value="760">
-          <select id="docPreset" style="display:none"><option value=""></option></select>
+          <select id="docPreset" class="u-hidden"><option value=""></option></select>
         </div>
         <div class="field">
           <label>Siatka (mm)</label>
@@ -2823,7 +2826,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
     <div class="confirm-msg" id="confirmMsg"></div>
     <label for="confirmInput" class="sr-only" id="confirmInputLabel">Wartość</label>
-    <input type="text" class="confirm-input" id="confirmInput" style="display:none" aria-labelledby="confirmInputLabel">
+    <input type="text" class="confirm-input u-hidden" id="confirmInput" aria-labelledby="confirmInputLabel">
     <div class="confirm-actions">
       <button type="button" class="tbtn" id="confirmCancel" title="Anuluj (Esc)">Anuluj</button>
       <button type="button" class="tbtn tbtn-primary" id="confirmOk" title="Potwierdź">OK</button>
@@ -2870,7 +2873,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     _confirmIcon.textContent=opts.icon||'⚠️';
     _confirmOk.textContent=opts.ok||'OK';
     _confirmCancel.textContent=opts.cancel||'Anuluj';
-    _confirmInput.style.display='none';
+    _confirmInput.classList.add('u-hidden');
     if(opts.danger){ _confirmOk.className='tbtn tbtn-danger'; } else { _confirmOk.className='tbtn tbtn-primary'; }
     _confirmOv.classList.add('open');
     _confirmOk.focus();
@@ -2884,7 +2887,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     _confirmOk.textContent=opts.ok||'OK';
     _confirmCancel.textContent=opts.cancel||'Anuluj';
     _confirmOk.className='tbtn tbtn-primary';
-    _confirmInput.style.display='';
+    _confirmInput.classList.remove('u-hidden');
     _confirmInput.value=defaultVal||'';
     _confirmOv.classList.add('open');
     _confirmInput.focus();
@@ -3488,7 +3491,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const padX=fs*0.6, padY=fs*0.4;
     const w=dl.text.length*fs*0.58+padX*2, h=fs+padY*2;
     const x=dl.x+fs*0.7, y=dl.y+fs*0.7;
-    return `<g class="drag-label" style="pointer-events:none">
+    return `<g class="drag-label">
       <rect x="${fmt(x)}" y="${fmt(y)}" width="${fmt(w)}" height="${fmt(h)}" rx="${fmt(fs*0.25)}" fill="#1c1c1cdd" stroke="${ACCENT}" stroke-width="${fmt(Math.max(fs*0.04,0.05))}"/>
       <text x="${fmt(x+w/2)}" y="${fmt(y+h/2+fs*0.32)}" text-anchor="middle" font-size="${fmt(fs)}" font-family="sans-serif" fill="#fff">${escapeXml(dl.text)}</text>
     </g>`;
@@ -3522,13 +3525,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         const bb=rotatedBBox(o); minx=Math.min(minx,bb.minx); miny=Math.min(miny,bb.miny); maxx=Math.max(maxx,bb.maxx); maxy=Math.max(maxy,bb.maxy);
         const b=objBBox(o), c={x:b.x+b.w/2,y:b.y+b.h/2};
         const bx=Math.min(b.x,b.x+b.w), by=Math.min(b.y,b.y+b.h), bw=Math.abs(b.w), bh=Math.abs(b.h);
-        s+=`<g transform="rotate(${fmt(o.rotation||0)} ${fmt(c.x)} ${fmt(c.y)})"><rect class="sel-box" x="${fmt(bx)}" y="${fmt(by)}" width="${fmt(bw)}" height="${fmt(bh)}" style="opacity:.55"/></g>`;
+        s+=`<g transform="rotate(${fmt(o.rotation||0)} ${fmt(c.x)} ${fmt(c.y)})"><rect class="sel-box" x="${fmt(bx)}" y="${fmt(by)}" width="${fmt(bw)}" height="${fmt(bh)}"/></g>`;
       });
       const hr=state.view.w*0.005, hit=hr*3;
       const corners=[['nw',minx,miny],['ne',maxx,miny],['se',maxx,maxy],['sw',minx,maxy]];
       let hs='';
       corners.forEach(([k,hx,hy])=>{
-        hs+=`<circle class="sel-handle" cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hr)}" style="pointer-events:none"/>`;
+        hs+=`<circle class="sel-handle" cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hr)}""/>`;
         hs+=`<circle cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hit)}" fill="transparent" data-mhandle="${k}"/>`;
       });
       s=`<rect x="${fmt(minx)}" y="${fmt(miny)}" width="${fmt(maxx-minx)}" height="${fmt(maxy-miny)}" fill="none" stroke="${ACCENT}" stroke-width="1.6px" vector-effect="non-scaling-stroke"/>`+s+hs+guideLinesMarkup()+dragLabelMarkup();
@@ -3549,10 +3552,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const rotR=state.view.w*0.011, rotHit=rotR*2.4; // uchwyt obrotu — większy, łatwiej chwycić
       const rotY=b.y-rotR*4;
       s+=`<line class="sel-rot-line" x1="${fmt(c.x)}" y1="${fmt(b.y)}" x2="${fmt(c.x)}" y2="${fmt(rotY)}"/>`;
-      s+=`<circle class="sel-rot" cx="${fmt(c.x)}" cy="${fmt(rotY)}" r="${fmt(rotR*1.25)}" style="pointer-events:none"/>`;
+      s+=`<circle class="sel-rot" cx="${fmt(c.x)}" cy="${fmt(rotY)}" r="${fmt(rotR*1.25)}""/>`;
       s+=`<circle cx="${fmt(c.x)}" cy="${fmt(rotY)}" r="${fmt(rotHit)}" fill="transparent" data-handle="rot"/>`;
       hs.forEach(([k,hx,hy])=>{
-        s+=`<circle class="sel-handle" cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hr)}" style="pointer-events:none"/>`;
+        s+=`<circle class="sel-handle" cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hr)}""/>`;
         s+=`<circle cx="${fmt(hx)}" cy="${fmt(hy)}" r="${fmt(hit)}" fill="transparent" data-handle="${k}"/>`;
       });
     }
@@ -6604,7 +6607,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   }
 
   /* ---------------- Eksport warstw 3D ---------------- */
-  const DEPTH_COLORS=['#2a9d8f','#e76f51','#9b5de5','#f4a261','#06d6a0','#e63946'];
+  const _rs=getComputedStyle(document.documentElement);
+  const DEPTH_COLORS=Array.from({length:6},(_,i)=>_rs.getPropertyValue(`--depth-${i+1}`).trim()||['#2a9d8f','#e76f51','#9b5de5','#f4a261','#06d6a0','#e63946'][i]);
   function depthColor(d){ return DEPTH_COLORS[(d-1)%DEPTH_COLORS.length]; }
 
   function showExport3D(){
@@ -6962,7 +6966,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   function refreshPricingUI(){ syncMatSelectors(); renderQuoteAll(); }
   // Operator zawsze ma dostęp do edycji (konfiguracja jest w zakładce); ?admin=1 pokazuje skrót w toolbarze
   const IS_OPERATOR = !!(window.xeoDesktop && window.xeoDesktop.isDesktop) || new URLSearchParams(location.search).has('admin');
-  if(IS_OPERATOR){ const pcb=document.getElementById('pricingCfgBtn'); if(pcb) pcb.style.display=''; }
+  if(IS_OPERATOR){ const pcb=document.getElementById('pricingCfgBtn'); if(pcb) pcb.classList.remove('u-hidden'); }
 
   /* ---------------- Menu rozwijalne (dropdown) — ARIA role=menu ---------------- */
   document.querySelectorAll('.dd[data-dd]').forEach(dd=>{
@@ -9238,11 +9242,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const motifSearchInput=document.getElementById('motifSearchInput');
   const motifCountBadge=document.getElementById('motifCountBadge');
   function renderMotifs(query){
-    if(!MOTIFS.length){ motifsEl.innerHTML='<div class="dl-note" style="grid-column:1/-1;text-align:center">⏳ Generowanie motywów…</div>'; return; }
+    if(!MOTIFS.length){ motifsEl.innerHTML='<div class="dl-note dl-note-grid">⏳ Generowanie motywów…</div>'; return; }
     const q=(query||'').trim().toLowerCase();
     const filtered=q?MOTIFS.filter(m=>m.label.toLowerCase().includes(q)||m.id.toLowerCase().includes(q)):MOTIFS;
     if(motifCountBadge) motifCountBadge.textContent=filtered.length+(q?'/'+MOTIFS.length:'');
-    if(!filtered.length){ motifsEl.innerHTML='<div class="dl-note" style="grid-column:1/-1;text-align:center">Brak motywów pasujących do „'+escapeXml(q)+'"</div>'; return; }
+    if(!filtered.length){ motifsEl.innerHTML='<div class="dl-note dl-note-grid">Brak motywów pasujących do „'+escapeXml(q)+'"</div>'; return; }
     motifsEl.innerHTML=filtered.map(m=>{
       const fr=m.fillRule==='evenodd'?' fill-rule="evenodd"':'';
       return `<div class="gallery-card" data-motif-id="${m.id}"><svg viewBox="${fmt(m.bx)} ${fmt(m.by)} ${fmt(m.bw)} ${fmt(m.bh)}" xmlns="http://www.w3.org/2000/svg"><path d="${escapeXml(m.d)}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"${fr}/></svg><span>${escapeXml(m.label)}</span></div>`;
