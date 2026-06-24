@@ -31,7 +31,7 @@
   --glass:rgba(26,34,51,.96); --glass-2:rgba(12,16,25,.96);
   --overlay-dark:rgba(0,0,0,.72); --overlay-strong:rgba(0,0,0,.78);
   /* Promienie, cienie, typografia */
-  --r:12px; --r-xxs:3px; --r-xs:6px; --r-sm:8px; --r-md:10px; --r-lg:18px;
+  --r:12px; --r-hair:2px; --r-xxs:3px; --r-xs:6px; --r-sm:8px; --r-md:10px; --r-lg:18px;
   --sh-sm:0 1px 2px rgba(0,0,0,.35); --sh:0 8px 24px -8px rgba(0,0,0,.55);
   --sh-lg:0 24px 60px -14px rgba(0,0,0,.7); --glow:0 0 0 3px rgba(var(--accent-rgb),.22);
   --grad-accent:linear-gradient(135deg,var(--accent),var(--accent-2));
@@ -83,7 +83,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .tbtn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3)}
 .tbtn-block{width:100%;justify-content:center;margin-top:6px}
 .tbtn .ico{font-size:1rem;line-height:1}
-.zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;transition:transform var(--tr-fast) ease;cursor:pointer;padding:2px 8px;border-radius:var(--r-xs)}
+.zoomval{min-width:50px;text-align:center;font-size:.8rem;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;transition:transform var(--tr-fast) var(--ease-out);cursor:pointer;padding:2px 8px;border-radius:var(--r-xs)}
 .zoomval.zoom-bump{transform:scale(1.12)}
 
 /* ---- Główny układ 3-kolumnowy ---- */
@@ -101,8 +101,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 var(--r-xxs) var(--r-xxs) 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn var(--an-base) ease-out}
 @keyframes toolIndicatorIn{from{transform:translateY(-50%) scaleY(0);opacity:0}to{transform:translateY(-50%) scaleY(1);opacity:1}}
 .panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative;overscroll-behavior:contain}
-.panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
-.panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
+.panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) var(--ease-out)}
+.panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) var(--ease-out)}
 .panel h2{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:16px 16px 8px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0;transition:color var(--tr-base),letter-spacing var(--tr-base)}
 .panel h2::before{content:'';width:5px;height:5px;border-radius:50%;flex:none;background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),.6)}
 .panel h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.2),var(--border));background-size:200% 100%;animation:h2SweepGrad 4s linear infinite}
@@ -113,7 +113,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab:hover{color:var(--text);background:rgba(255,255,255,.04);opacity:1;transform:translateX(1px)}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
 .ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);opacity:1;position:relative;overflow:hidden;animation:ptabActivate var(--an-fast) ease-out;text-shadow:0 1px 4px rgba(0,0,0,.3)}
-.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:absolute;scroll-behavior:smooth;scrollbar-gutter:stable;overscroll-behavior:contain;transition:opacity var(--tr-base) ease;opacity:0;pointer-events:none;top:0;left:0;right:0;bottom:0}
+.ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:absolute;scroll-behavior:smooth;scrollbar-gutter:stable;overscroll-behavior:contain;transition:opacity var(--tr-base) var(--ease-out);opacity:0;pointer-events:none;top:0;left:0;right:0;bottom:0}
 .ptab-body.active{display:flex;animation:ptabBodyIn var(--an-base) ease-out;box-shadow:inset 0 4px 8px -4px rgba(0,0,0,.15);opacity:1;pointer-events:auto;position:relative}
 .ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
 /* Wycena inline — każda sekcja jako wyraźna karta */
@@ -386,7 +386,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .frame-ctrl input[type=number]{width:68px;flex:0 0 68px}
 
 /* ---- Menu kontekstowe (PPM na płótnie) ---- */
-.ctx-menu{position:fixed;z-index:3000;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.12);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.96) translateY(-6px);transition:opacity var(--tr-base) ease,transform var(--tr-base) ease;will-change:transform,opacity}
+.ctx-menu{position:fixed;z-index:3000;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.12);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.96) translateY(-6px);transition:opacity var(--tr-base) var(--ease-out),transform var(--tr-base) var(--ease-out);will-change:transform,opacity}
 .ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0);animation:ctxMenuIn var(--an-micro) ease-out}
 .ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:var(--r-xs);cursor:pointer;font:inherit;transition:background var(--tr-base),color var(--tr-base),transform var(--tr-base),padding-left var(--tr-base);position:relative}
 .ctx-menu button:hover:not(:disabled){background:var(--grad-accent);color:var(--accent-text);padding-left:14px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.2)}
@@ -399,9 +399,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 /* ---- Modal eksportu 3D ---- */
 /* visibility:hidden po zakończeniu animacji znikania — usuwa zamknięte modale (i ich pola
    formularzy) z kolejności Tab; przy otwarciu staje się widoczny natychmiast */
-.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.75) radial-gradient(ellipse at 50% 30%,rgba(var(--accent-rgb),.04),transparent 70%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow);cursor:pointer}
-.modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) ease,visibility 0s}
-.modal-box{background:linear-gradient(180deg,var(--surface) 0%,var(--bg-2) 60%);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.75) radial-gradient(ellipse at 50% 30%,rgba(var(--accent-rgb),.04),transparent 70%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) var(--ease-out),visibility 0s linear var(--tr-slow);cursor:pointer}
+.modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) var(--ease-out),visibility 0s}
+.modal-box{background:linear-gradient(180deg,var(--surface) 0%,var(--bg-2) 60%);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) var(--ease-out);opacity:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1;animation:modalBoxIn var(--an-med) ease-out forwards}
 .modal-box h3{margin:0 0 14px;font-size:1.1rem;font-weight:800;padding-bottom:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--text),rgba(var(--accent-rgb),.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:background var(--tr-base),color var(--tr-base),border-color var(--tr-base),transform var(--tr-base),box-shadow var(--tr-base),rotate var(--tr-slow);z-index:2}
@@ -706,10 +706,10 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Custom tooltip — premium zastępujący natywne title === */
 [data-tooltip]{position:relative}
-[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);font-size:.72rem;font-weight:500;line-height:1.5;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;max-width:280px;border:1px solid var(--border-strong);box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.1);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) ease,transform var(--tr-base) ease,visibility 0s linear var(--tr-base);z-index:5000;letter-spacing:.01em}
-[data-tooltip]:hover::after,[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:opacity var(--tr-base) ease .35s,transform var(--tr-base) ease .35s,visibility 0s linear .35s}
-[data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border-strong);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) ease,visibility 0s linear var(--tr-base);z-index:5001}
-[data-tooltip]:hover::before,[data-tooltip]:focus-visible::before{opacity:1;visibility:visible;transition:opacity var(--tr-base) ease .35s,visibility 0s linear .35s}
+[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);font-size:.72rem;font-weight:500;line-height:1.5;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;max-width:280px;border:1px solid var(--border-strong);box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.1);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) var(--ease-out),transform var(--tr-base) var(--ease-out),visibility 0s linear var(--tr-base);z-index:5000;letter-spacing:.01em}
+[data-tooltip]:hover::after,[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);transition:opacity var(--tr-base) var(--ease-out) .35s,transform var(--tr-base) var(--ease-out) .35s,visibility 0s linear .35s}
+[data-tooltip]::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border-strong);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--tr-base) var(--ease-out),visibility 0s linear var(--tr-base);z-index:5001}
+[data-tooltip]:hover::before,[data-tooltip]:focus-visible::before{opacity:1;visibility:visible;transition:opacity var(--tr-base) var(--ease-out) .35s,visibility 0s linear .35s}
 [data-tooltip].tip-down::before{bottom:auto;top:calc(100% + 3px);border-top-color:transparent;border-bottom-color:var(--border-strong)}
 [data-tooltip].tip-down::after{bottom:auto;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px)}
 [data-tooltip].tip-down:hover::after,[data-tooltip].tip-down:focus-visible::after{transform:translateX(-50%) translateY(0)}
@@ -740,7 +740,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 @keyframes fadeInShort{from{opacity:0}to{opacity:1}}
 
 /* === Dropdown menu — hover efekt z płynnym paddingiem === */
-.dd-menu .tbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform var(--tr-base) ease}
+.dd-menu .tbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform var(--tr-base) var(--ease-out)}
 .dd-menu .tbtn:hover::before{transform:scaleY(1)}
 
 /* === Przycisk eksportu — premium pulsujący efekt === */
@@ -749,7 +749,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .tbtn-primary.dd-toggle:hover::after{transform:translate(-50%,-50%) scale(1);opacity:1}
 
 /* === Shortcuts grid — lepszy hover === */
-.sc-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);opacity:0;border-radius:2px;transition:opacity var(--tr-base)}
+.sc-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);opacity:0;border-radius:var(--r-hair);transition:opacity var(--tr-base)}
 .sc-row:hover::before{opacity:1}
 
 /* === Karta ceny w panelu wyceny — lepsza animacja === */
@@ -766,14 +766,14 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .info-box:hover .info-box-size{color:var(--accent)}
 
 /* === Ptab — aktywna zakładka lepsza wizualizacja === */
-.ptab.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:rgba(255,255,255,.2);border-radius:2px}
+.ptab.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:rgba(255,255,255,.2);border-radius:var(--r-hair)}
 
 /* === Empty note — ładniejszy styl z ikoną i subtelna pulsacja === */
 .empty-note::after{content:'';position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(var(--accent-rgb),.06),transparent 70%);border-radius:50%;pointer-events:none;animation:emptyNotePulse 4s ease-in-out infinite}
 @keyframes emptyNotePulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
 
 /* === Confirm overlay — lepszy backdrop === */
-.confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(0,0,0,.4),rgba(0,0,0,.85) 100%);display:flex;position:fixed;inset:0;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:7500;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow)}
+.confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(0,0,0,.4),rgba(0,0,0,.85) 100%);display:flex;position:fixed;inset:0;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:7500;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) var(--ease-out),visibility 0s linear var(--tr-slow)}
 
 /* === Panel right (właściwości) — sekcja h2 separator === */
 .panel.right h2{margin-top:4px}
@@ -788,7 +788,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 @keyframes priceGlow{0%,100%{box-shadow:0 2px 12px rgba(var(--accent-rgb),.12)}50%{box-shadow:0 2px 16px rgba(var(--accent-rgb),.25)}}
 /* === Wydajność — will-change na animowanych elementach === */
 .modal-ov .modal-box{will-change:transform,opacity;cursor:default}
-.confirm-box{will-change:transform,opacity;background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0}
+.confirm-box{will-change:transform,opacity;background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) var(--ease-out);opacity:0}
 .toast{will-change:transform,opacity;pointer-events:auto;max-width:380px;padding:12px 16px;border-radius:var(--r-md);font-size:.82rem;font-weight:500;line-height:1.5;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.55);animation:toastIn var(--tr-slow) ease-out;transition:opacity var(--tr-slow),transform var(--tr-slow);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
 /* === Lepsza separacja sekcji w panelu lewym === */
 @keyframes panelFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -812,7 +812,7 @@ input[type=range]:focus-visible{outline:none}
 /* === Animacja aktywności zakładki === */
 @keyframes ptabActivate{from{transform:scale(.95);opacity:.7}to{transform:scale(1);opacity:1}}
 /* === Text toolbar — lepsza widoczność wybranego stylu === */
-.text-toolbar .tbtn.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--text);border-radius:2px;opacity:.5}
+.text-toolbar .tbtn.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--text);border-radius:var(--r-hair);opacity:.5}
 
 /* === Font dropdown — lepsza animacja wejścia === */
 .font-dd-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transition:transform var(--tr-base)}
@@ -893,7 +893,7 @@ input[type=range]:focus-visible{outline:none}
 .seg button[data-align],.seg button[data-dist]{font-family:var(--font-b);letter-spacing:.02em}
 
 /* === v86: Lepsza wizualna separacja zakładek z ikoną === */
-.ptab::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:2px;background:transparent;transition:background var(--tr-base)}
+.ptab::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:var(--r-hair);background:transparent;transition:background var(--tr-base)}
 /* === v86: Karta galerii — badge liczby elementów === */
 .h2-badge{font-size:.6rem;font-weight:700;color:var(--accent);background:rgba(var(--accent-rgb),.12);border:1px solid rgba(var(--accent-rgb),.25);border-radius:var(--r-xs);padding:1px 6px;font-variant-numeric:tabular-nums;min-width:22px;text-align:center;transition:background var(--tr-base),color var(--tr-base)}
 
@@ -925,8 +925,8 @@ input[type=range]:focus-visible{outline:none}
 .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:skeletonPulse 1.5s ease-in-out infinite;border-radius:var(--r-sm)}
 
 /* === Modal confirm — zastępuje natywne confirm() === */
-.confirm-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) ease,visibility 0s}
-.confirm-ov.open .confirm-box{transform:scale(1) translateY(0);opacity:1;transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
+.confirm-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) var(--ease-out),visibility 0s}
+.confirm-ov.open .confirm-box{transform:scale(1) translateY(0);opacity:1;transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) var(--ease-out)}
 .confirm-box .confirm-icon{font-size:1.6rem;margin-bottom:6px;text-align:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));transition:transform var(--tr-slow);background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),transparent);border-radius:var(--r);padding:8px;display:inline-block}
 .confirm-box .confirm-msg{font-size:.86rem;line-height:1.55;color:var(--text);margin-bottom:18px}
 .confirm-box .confirm-actions{display:flex;justify-content:flex-end;gap:8px}
@@ -1090,8 +1090,8 @@ input[type=range]:focus-visible{outline:none}
 .splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px;animation:splashBrandIn var(--an-slow) ease-out}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
-.splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;animation:splashBarIn var(--an-med) ease-out .1s backwards}
-.splash-bar-fill{width:0%;height:100%;border-radius:2px;background:var(--grad-accent);transition:width var(--tr-slow) ease;box-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
+.splash-bar{width:200px;height:3px;border-radius:var(--r-hair);background:var(--surface3);overflow:hidden;animation:splashBarIn var(--an-med) ease-out .1s backwards}
+.splash-bar-fill{width:0%;height:100%;border-radius:var(--r-hair);background:var(--grad-accent);transition:width var(--tr-slow) var(--ease-out);box-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
 .splash-hint{font-size:.78rem;color:var(--muted);letter-spacing:.04em;animation:splashHintIn var(--an-slow) ease-out var(--an-base) backwards;transition:opacity var(--tr-slow);margin-top:8px}
 
 /* === Layers panel — number badge + drag grip === */
@@ -1121,7 +1121,7 @@ input[type=number]{position:relative}
 /* === Modal send — step indicator === */
 .send-steps{display:flex;align-items:center;gap:0;margin:0 0 18px;padding:0}
 .send-step{flex:1;text-align:center;font-size:.68rem;font-weight:700;color:var(--muted-2);padding:8px 4px;position:relative;transition:color var(--tr-slow);display:flex;flex-direction:column;align-items:center;gap:2px}
-.send-step::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--border);border-radius:2px;transition:background var(--tr-slow)}
+.send-step::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--border);border-radius:var(--r-hair);transition:background var(--tr-slow)}
 .send-step.active{color:var(--accent)}
 .send-step.active::after{background:var(--accent)}
 .send-step.done{color:var(--success)}
@@ -1163,7 +1163,7 @@ input[type=number]{position:relative}
 /* === Lepsza animacja live quote flash === */
 @keyframes lqFlashV2{0%{transform:scale(1.06);filter:brightness(1.4)}30%{transform:scale(1.01);filter:brightness(1.1)}100%{transform:scale(1);filter:brightness(1)}}
 /* === Q-field — lepsza label wizualizacja === */
-.q-field>span.lbl::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:12px;border-radius:2px;background:rgba(var(--accent-rgb),.3)}
+.q-field>span.lbl::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:12px;border-radius:var(--r-hair);background:rgba(var(--accent-rgb),.3)}
 
 /* === Modal box — subtilny top accent line === */
 .modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0;background:var(--grad-accent);opacity:.6;background-size:200% 100%;animation:modalTopBarGrad 3s linear infinite}
@@ -1189,7 +1189,7 @@ input[type=number]{position:relative}
 .toolbar .brand:hover .brand-name{filter:brightness(1.1);transition:letter-spacing var(--tr-slow);letter-spacing:.5px}
 
 /* === Depth legend row — hover akcent === */
-.lyr-row::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:transparent;transition:background var(--tr-base);border-radius:2px}
+.lyr-row::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:transparent;transition:background var(--tr-base);border-radius:var(--r-hair)}
 .lyr-row:hover::after{background:rgba(var(--accent-rgb),.2)}
 .lyr-row.on::after{background:var(--accent);content:'';position:absolute;right:6px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;box-shadow:0 0 6px rgba(var(--accent-rgb),.5);animation:lyrDotPulse 2s ease-in-out infinite}
 
@@ -1353,8 +1353,8 @@ input[type=number]{position:relative}
 .legend span.legend-active i{box-shadow:0 0 8px currentColor,0 1px 3px rgba(0,0,0,.35)}
 
 /* === v57: Lepsza wizualizacja drag-drop na warstwach === */
-.layers .layer.drop-target-above::before{content:'';position:absolute;top:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
-.layers .layer.drop-target-below::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
+.layers .layer.drop-target-above::before{content:'';position:absolute;top:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--r-hair);box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
+.layers .layer.drop-target-below::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--r-hair);box-shadow:0 0 6px rgba(var(--accent-rgb),.4)}
 
 /* === v58: Toolbar micro-interactions — przycisk zoom pulsuje po zmianie === */
 .zoomval.zoom-active{color:#fff;text-shadow:0 0 8px rgba(var(--accent-rgb),.6)}
@@ -1518,7 +1518,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 .d-badge[data-tooltip]::after{font-size:.65rem;padding:4px 8px;white-space:normal;min-width:120px;text-align:center;font-variant-numeric:tabular-nums}
 
 /* === v62: Send modal — connectors między krokami === */
-.send-step-connector{width:24px;height:2px;background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.15),var(--border));flex-shrink:0;border-radius:2px;transition:background var(--tr-slow);margin-top:-12px}
+.send-step-connector{width:24px;height:2px;background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.15),var(--border));flex-shrink:0;border-radius:var(--r-hair);transition:background var(--tr-slow);margin-top:-12px}
 .send-step.done~.send-step-connector{background:linear-gradient(90deg,var(--success),rgba(var(--success-rgb),.3),var(--success))}
 .send-step.active~.send-step-connector{background:var(--accent)}
 
@@ -1583,7 +1583,7 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 @keyframes depthValPulse{0%{transform:scale(1.15);color:var(--accent)}100%{transform:scale(1)}}
 
 /* === v63: Tabbed panel — hover indicator pod zakładką === */
-.ptab:hover:not(.active)::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(var(--accent-rgb),.2);border-radius:2px;animation:ptabHoverIn var(--an-fast) ease-out}
+.ptab:hover:not(.active)::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(var(--accent-rgb),.2);border-radius:var(--r-hair);animation:ptabHoverIn var(--an-fast) ease-out}
 @keyframes ptabHoverIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 /* === v63: Ogólne ulepszenie — gradient na hover select === */
@@ -1654,7 +1654,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .toolrail .tool-sep::after{content:'';position:absolute;left:50%;top:-2px;width:4px;height:4px;border-radius:50%;background:rgba(var(--accent-rgb),.12);transform:translateX(-50%)}
 
 /* === v64: Skrót klawiszowy w statusbar — wizualnie wyróżniony === */
-.sb-item kbd{font-size:.55rem;padding:0 3px;background:var(--surface3);border:1px solid var(--border);border-radius:2px;margin-left:3px}
+.sb-item kbd{font-size:.55rem;padding:0 3px;background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-hair);margin-left:3px}
 
 /* === v66: Kolorowe górne paski modali wg typu === */
 .modal-ov[aria-label*="Generator"] .modal-box::before{background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--operator))}
@@ -1762,7 +1762,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .confirm-box .confirm-ico{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(var(--accent2-rgb),.08));font-size:1.3rem;margin-bottom:8px;box-shadow:0 4px 12px rgba(var(--accent-rgb),.1)}
 
 /* === v69: Toolbar — border bottom gradient na aktywnej sekcji === */
-.tgroup:has(.tbtn.active)::after{content:'';position:absolute;bottom:-9px;left:0;right:0;height:2px;background:var(--grad-accent);opacity:.3;border-radius:2px}
+.tgroup:has(.tbtn.active)::after{content:'';position:absolute;bottom:-9px;left:0;right:0;height:2px;background:var(--grad-accent);opacity:.3;border-radius:var(--r-hair)}
 /* === v69: Modal box top bar — animated gradient === */
 @keyframes modalTopBarGrad{from{background-position:200% 0}to{background-position:-200% 0}}
 
@@ -2010,7 +2010,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .tpl button:hover::after{left:110%}
 
 /* === v77: Lepsze wyróżnienie aktywnego narzędzia toolrail === */
-.toolrail .tbtn.active::after{content:'';position:absolute;bottom:2px;left:30%;right:30%;height:2px;border-radius:2px;background:rgba(255,255,255,.5)}
+.toolrail .tbtn.active::after{content:'';position:absolute;bottom:2px;left:30%;right:30%;height:2px;border-radius:var(--r-hair);background:rgba(255,255,255,.5)}
 
 /* === v77: Lepsze multi-select info w panelu właściwości === */
 .multi-sel-info{display:flex;gap:8px;flex-wrap:wrap;margin:8px 16px;font-size:.72rem}
@@ -2032,7 +2032,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .gallery-card:hover::before{opacity:1}
 
 /* === v77: Quick search — kategoria z ikoną === */
-.qs-category::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:var(--accent);margin-right:6px;vertical-align:middle;opacity:.5}
+.qs-category::before{content:'';display:inline-block;width:3px;height:10px;border-radius:var(--r-hair);background:var(--accent);margin-right:6px;vertical-align:middle;opacity:.5}
 
 /* === v77: Responsywność — bardzo duże ekrany (2K+) panele === */
 
@@ -2091,7 +2091,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .layer:hover .layer-group-ico{opacity:.7}
 
 /* === v79: Lepszy border na active seg button === */
-.seg button.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(255,255,255,.3);border-radius:2px}
+.seg button.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(255,255,255,.3);border-radius:var(--r-hair)}
 
 /* === v79: Ulepszony scroll na polach numerycznych === */
 .field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
