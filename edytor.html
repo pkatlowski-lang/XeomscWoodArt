@@ -2805,7 +2805,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     el.setAttribute('role','alert');
     el.style.setProperty('--toast-dur',(dur/1000)+'s');
     if(icons[type]){
-      el.innerHTML='<span class="toast-ico">'+icons[type]+'</span><span class="toast-msg">'+msg.replace(/</g,'&lt;')+'</span>';
+      el.innerHTML='<span class="toast-ico">'+icons[type]+'</span><span class="toast-msg">'+escapeXml(msg)+'</span>';
     } else {
       el.textContent=msg;
     }
@@ -6848,7 +6848,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const lqMat=document.getElementById('lqMat'), lqPrice=document.getElementById('lqPrice'), lqTime=document.getElementById('lqTime');
   const qQtyInput=document.getElementById('qQty');
   const zl=v=>(Math.round(v*100)/100).toFixed(2).replace('.',',')+' zł';
-  function matOptionsHTML(){ return Object.entries(PRICING.materials).map(([k,m])=>`<option value="${k}">${String(m.label||'').replace(/</g,'&lt;')}</option>`).join(''); }
+  function matOptionsHTML(){ return Object.entries(PRICING.materials).map(([k,m])=>`<option value="${escapeXml(k)}">${escapeXml(m.label||'')}</option>`).join(''); }
   function syncMatSelectors(keepKey){
     const prev=keepKey!=null?keepKey:quoteMatSel.value;
     const opts=matOptionsHTML();
@@ -6863,7 +6863,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!_qExtrasBox) return;
     _qExtrasBox.innerHTML=quoteExtras.map((ex,i)=>
       `<div class="q-extra-row" data-exi="${i}">`
-      +`<input type="text" class="ex-name" placeholder="np. Malowanie" value="${String(ex.label||'').replace(/"/g,'&quot;')}">`
+      +`<input type="text" class="ex-name" placeholder="np. Malowanie" value="${escapeXml(ex.label||'')}">`
       +`<input type="number" class="ex-amt" step="0.5" min="0" placeholder="zł" value="${ex.amount!=null?ex.amount:''}">`
       +`<button type="button" class="pq-del" title="Usuń pozycję" aria-label="Usuń pozycję">✕</button></div>`
     ).join('');
@@ -7008,7 +7008,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const row=document.createElement('div');
     row.className='pq-mat-row'; row.dataset.key=key;
     row.innerHTML=
-      `<div class="pq-row-top"><input type="text" data-f="label" value="${String(m.label||'').replace(/"/g,'&quot;')}" placeholder="np. Sklejka 4 mm" class="input-flex-1"><button type="button" class="pq-del" title="Usuń materiał" aria-label="Usuń materiał">✕</button></div>`
+      `<div class="pq-row-top"><input type="text" data-f="label" value="${escapeXml(m.label||'')}" placeholder="np. Sklejka 4 mm" class="input-flex-1"><button type="button" class="pq-del" title="Usuń materiał" aria-label="Usuń materiał">✕</button></div>`
       +`<div class="pq-row-nums">`
       +`<label>Grubość mm<input type="number" data-f="mm" step="0.5" min="0" value="${m.mm!=null?m.mm:''}"></label>`
       +`<label>zł/cm²<input type="number" data-f="pricePerCm2" step="0.0001" min="0" value="${m.pricePerCm2!=null?m.pricePerCm2:''}"></label>`
@@ -7079,7 +7079,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const _pDel=document.getElementById('qProfDel');
   function renderProfileSelect(){
     if(!qProfileSel) return;
-    qProfileSel.innerHTML=PROFILES.profiles.map(p=>`<option value="${p.id}">${String(p.name||'Profil').replace(/</g,'&lt;')}</option>`).join('');
+    qProfileSel.innerHTML=PROFILES.profiles.map(p=>`<option value="${escapeXml(p.id)}">${escapeXml(p.name||'Profil')}</option>`).join('');
     qProfileSel.value=PROFILES.activeId;
     if(_pDel) _pDel.disabled=PROFILES.profiles.length<=1;
   }
