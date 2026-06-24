@@ -3526,7 +3526,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   }
 
   let _perfWarnShown=false;
-  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); document.getElementById('hintEmpty').classList.toggle('u-hidden',state.objects.length>0); if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
+  const _hintEmptyEl=document.getElementById('hintEmpty');
+  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); _hintEmptyEl.classList.toggle('u-hidden',state.objects.length>0); if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
     if(!_perfWarnShown && state.objects.length>=150){ _perfWarnShown=true; showToast('Dużo elementów ('+state.objects.length+') — edytor może działać wolniej. Rozważ grupowanie lub usunięcie zbędnych obiektów.','warning',5000); }
   }
 
@@ -5808,12 +5809,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   layerSearchEl.addEventListener('keydown',e=>{
     if(e.key==='Escape'){ layerSearchEl.value=''; layerSearchEl.classList.remove('layer-search-active'); renderLayers(); layerSearchEl.blur(); }
   });
+  const _lcBadgeEl=document.getElementById('layerCountBadge');
   function renderLayers(){
     const total=state.objects.length;
     const locked=state.objects.filter(o=>o.locked).length;
     const hidden=state.objects.filter(o=>!o.visible).length;
-    const lcBadge=document.getElementById('layerCountBadge');
-    if(lcBadge) lcBadge.textContent=total;
+    if(_lcBadgeEl) _lcBadgeEl.textContent=total;
     let counter='';
     if(total){
       const sel=state.selectedIds.length;
@@ -6011,6 +6012,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   const TOOL_LABELS={select:'↖ Zaznaczanie',rect:'▭ Prostokąt',circle:'◯ Elipsa',poly:'⬡ Wielokąt',star:'★ Gwiazda',line:'╱ Linia',pen:'✎ Pióro',text:'T Tekst',pan:'✋ Przesuwanie',eraser:'Gumka'};
   let _lastSizeHIndex=-1;
   const _sbSize=document.getElementById('sbSize');
+  const _zoomValEl=document.getElementById('zoomVal');
   function updateStatusBar(){
     if(_sbTool) _sbTool.textContent=TOOL_LABELS[state.tool]||state.tool;
     if(_sbObj){
@@ -6032,8 +6034,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(prev!==_sbZoom.textContent){
         _sbZoom.classList.add('zoom-changed');
         setTimeout(()=>_sbZoom.classList.remove('zoom-changed'),300);
-        const zv=document.getElementById('zoomVal');
-        if(zv){ zv.classList.add('zoom-bump'); setTimeout(()=>zv.classList.remove('zoom-bump'),120); }
+        if(_zoomValEl){ _zoomValEl.classList.add('zoom-bump'); setTimeout(()=>_zoomValEl.classList.remove('zoom-bump'),120); }
       }
     }
     if(_sbHistory){
@@ -6684,6 +6685,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   if(!sumScoreSpeed.value) sumScoreSpeed.value=1500;
   if(!sumEngraveSpeed.value) sumEngraveSpeed.value=6000;
   if(!sumEngraveSpacing.value) sumEngraveSpacing.value=0.1;
+  const _sumStatsEl=document.getElementById('summaryStats'), _sumTimeEl=document.getElementById('summaryTime');
   function renderSummary(){
     const s=computeProjectStats();
     const totalElements=s.cutCount+s.scoreCount+s.engraveCount;
@@ -6692,7 +6694,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const totalLen=s.cutLen+s.scoreLen;
     const cutPct=totalLen>0?Math.round(s.cutLen/totalLen*100):0;
     const scorePct=totalLen>0?Math.round(s.scoreLen/totalLen*100):0;
-    document.getElementById('summaryStats').innerHTML=
+    _sumStatsEl.innerHTML=
       `<div class="sum-row sum-cut"><span>✂ Cięcie</span><span class="sum-val">${s.cutCount} elem. · ${fmt(s.cutLen)} mm${totalLen>0?' ('+cutPct+'%)':''}</span></div>`
       +`<div class="sum-row sum-score"><span>〜 Nacięcie</span><span class="sum-val">${s.scoreCount} elem. · ${fmt(s.scoreLen)} mm${totalLen>0?' ('+scorePct+'%)':''}</span></div>`
       +`<div class="sum-row sum-engrave"><span>▦ Grawer</span><span class="sum-val">${s.engraveCount} elem. · ${fmt(s.engraveArea)} mm²</span></div>`
@@ -6702,7 +6704,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
     const engraveSpacing=Math.max(0.01,Number(sumEngraveSpacing.value)||0.1);
     const cutTime=s.cutLen/cutSpeed, scoreTime=s.scoreLen/scoreSpeed, engraveTime=(s.engraveArea/engraveSpacing)/engraveSpeed;
-    document.getElementById('summaryTime').innerHTML=
+    _sumTimeEl.innerHTML=
       `<div class="sum-time-row"><span>Cięcie</span><span>${formatTime(cutTime)}</span></div>`
       +`<div class="sum-time-row"><span>Nacięcie</span><span>${formatTime(scoreTime)}</span></div>`
       +`<div class="sum-time-row"><span>Grawer</span><span>${formatTime(engraveTime)}</span></div>`
@@ -6888,28 +6890,28 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     });
   }
   // Główny render ceny: karta w zakładce (cena/szt + razem + rozbicie) ORAZ widget na żywo
+  const _qCard=document.getElementById('qPriceCard');
+  const _qPP=document.getElementById('qPerPiece'), _qTot=document.getElementById('qTotal'),
+        _qQtyEcho=document.getElementById('qQtyEcho'), _qBrk=document.getElementById('qBreak'),
+        _qEmpty=document.getElementById('qEmptyMsg');
   function renderQuoteAll(){
     const hasWork=state.objects.some(o=>o.visible!==false && o.type!=='image');
-    const card=document.getElementById('qPriceCard');
-    const ppEl=document.getElementById('qPerPiece'), totEl=document.getElementById('qTotal'),
-          qtyEcho=document.getElementById('qQtyEcho'), brk=document.getElementById('qBreak'),
-          emptyMsg=document.getElementById('qEmptyMsg');
     if(!hasWork){
-      if(card) card.classList.add('empty');
-      if(ppEl) ppEl.textContent='–'; if(totEl) totEl.textContent='–';
-      if(brk) brk.innerHTML=''; if(emptyMsg) emptyMsg.classList.remove('u-hidden');
+      if(_qCard) _qCard.classList.add('empty');
+      if(_qPP) _qPP.textContent='–'; if(_qTot) _qTot.textContent='–';
+      if(_qBrk) _qBrk.innerHTML=''; if(_qEmpty) _qEmpty.classList.remove('u-hidden');
       if(lqPrice){ lqPrice.textContent='narysuj projekt…'; lqPrice.classList.add('lq-empty'); }
       if(lqTime) lqTime.textContent='';
       return;
     }
     const q=computeQuoteFull(quoteMatSel.value);
     if(!q) return;
-    if(card) card.classList.remove('empty');
-    if(emptyMsg) emptyMsg.classList.add('u-hidden');
-    if(ppEl){ const nv=zl(q.perPiece); if(ppEl.textContent!==nv){ppEl.classList.remove('price-flash');void ppEl.offsetWidth;ppEl.classList.add('price-flash');} ppEl.textContent=nv; }
-    if(qtyEcho) qtyEcho.textContent=q.qty;
-    if(totEl) totEl.textContent=zl(q.total);
-    if(brk) brk.innerHTML=
+    if(_qCard) _qCard.classList.remove('empty');
+    if(_qEmpty) _qEmpty.classList.add('u-hidden');
+    if(_qPP){ const nv=zl(q.perPiece); if(_qPP.textContent!==nv){_qPP.classList.remove('price-flash');void _qPP.offsetWidth;_qPP.classList.add('price-flash');} _qPP.textContent=nv; }
+    if(_qQtyEcho) _qQtyEcho.textContent=q.qty;
+    if(_qTot) _qTot.textContent=zl(q.total);
+    if(_qBrk) _qBrk.innerHTML=
       `<div class="br-row"><span>Materiał (${Math.round(quoteMaterialArea())} cm²)</span><b>${zl(q.materialCost)}</b></div>`
       +`<div class="br-row"><span>Praca lasera (${formatQuoteTime(q.timeMin)} min.sek)</span><b>${zl(q.laserCost)}</b></div>`
       +`<div class="br-row"><span>Pakowanie</span><b>${zl(q.pack)}</b></div>`
@@ -7023,21 +7025,25 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     row.querySelector('.pq-del').addEventListener('click',()=>row.remove());
     return row;
   }
+  const _pqMats=document.getElementById('pqMaterials'),
+        _pqLaserMin=document.getElementById('pqLaserMin'), _pqPack=document.getElementById('pqPack'),
+        _pqPackTier=document.getElementById('pqPackTier'), _pqMargin=document.getElementById('pqMargin'),
+        _pqBuffer=document.getElementById('pqBuffer'), _pqEngSpeed=document.getElementById('pqEngSpeed'),
+        _pqEngSpacing=document.getElementById('pqEngSpacing'), _pqStatus=document.getElementById('pqStatus');
   function fillPqPanel(){
-    const box=document.getElementById('pqMaterials'); box.innerHTML='';
-    Object.entries(PRICING.materials).forEach(([k,m])=>box.appendChild(pqMatRow(k,m)));
-    document.getElementById('pqLaserMin').value=PRICING.laserPerMin;
-    document.getElementById('pqPack').value=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
-    document.getElementById('pqPackTier').value=PRICING.packagingTier||5;
-    document.getElementById('pqMargin').value=Math.round(PRICING.margin*100);
-    document.getElementById('pqBuffer').value=Math.round((PRICING.timeBuffer-1)*100);
-    document.getElementById('pqEngSpeed').value=PRICING.engraveSpeed;
-    document.getElementById('pqEngSpacing').value=PRICING.engraveSpacing;
-    document.getElementById('pqStatus').textContent='';
+    _pqMats.innerHTML='';
+    Object.entries(PRICING.materials).forEach(([k,m])=>_pqMats.appendChild(pqMatRow(k,m)));
+    _pqLaserMin.value=PRICING.laserPerMin;
+    _pqPack.value=PRICING.packagingUnit!=null?PRICING.packagingUnit:0.25;
+    _pqPackTier.value=PRICING.packagingTier||5;
+    _pqMargin.value=Math.round(PRICING.margin*100);
+    _pqBuffer.value=Math.round((PRICING.timeBuffer-1)*100);
+    _pqEngSpeed.value=PRICING.engraveSpeed;
+    _pqEngSpacing.value=PRICING.engraveSpacing;
+    _pqStatus.textContent='';
   }
   function collectPqAndSave(){
-    const st=document.getElementById('pqStatus');
-    const rows=[...document.querySelectorAll('#pqMaterials .pq-mat-row')];
+    const rows=[..._pqMats.querySelectorAll('.pq-mat-row')];
     const mats={};
     rows.forEach(r=>{
       const label=r.querySelector('[data-f="label"]').value.trim();
@@ -7048,21 +7054,21 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       let key=r.dataset.key; if(!key||mats[key]) key='mat-'+Math.random().toString(36).slice(2,8);
       mats[key]={label, mm, speed:Math.max(1,speed), pricePerCm2:Math.max(0,price)};
     });
-    if(!Object.keys(mats).length){ st.className='c-error'; st.textContent='Dodaj przynajmniej jeden materiał.'; return; }
+    if(!Object.keys(mats).length){ _pqStatus.className='c-error'; _pqStatus.textContent='Dodaj przynajmniej jeden materiał.'; return; }
     PRICING.materials=mats;
-    PRICING.laserPerMin=Math.max(0,parseFloat(document.getElementById('pqLaserMin').value)||0);
-    PRICING.packagingUnit=Math.max(0,parseFloat(document.getElementById('pqPack').value)||0);
-    PRICING.packagingTier=Math.max(1,parseFloat(document.getElementById('pqPackTier').value)||5);
-    PRICING.margin=Math.max(0,(parseFloat(document.getElementById('pqMargin').value)||0)/100);
-    PRICING.timeBuffer=1+Math.max(0,(parseFloat(document.getElementById('pqBuffer').value)||0)/100);
-    PRICING.engraveSpeed=Math.max(1,parseFloat(document.getElementById('pqEngSpeed').value)||8000);
-    PRICING.engraveSpacing=Math.max(0.01,parseFloat(document.getElementById('pqEngSpacing').value)||0.1);
+    PRICING.laserPerMin=Math.max(0,parseFloat(_pqLaserMin.value)||0);
+    PRICING.packagingUnit=Math.max(0,parseFloat(_pqPack.value)||0);
+    PRICING.packagingTier=Math.max(1,parseFloat(_pqPackTier.value)||5);
+    PRICING.margin=Math.max(0,(parseFloat(_pqMargin.value)||0)/100);
+    PRICING.timeBuffer=1+Math.max(0,(parseFloat(_pqBuffer.value)||0)/100);
+    PRICING.engraveSpeed=Math.max(1,parseFloat(_pqEngSpeed.value)||8000);
+    PRICING.engraveSpacing=Math.max(0.01,parseFloat(_pqEngSpacing.value)||0.1);
     savePricing(); refreshPricingUI();
-    st.className='c-success'; st.textContent='✅ Zapisano.';
-    setTimeout(()=>{ if(st.textContent==='✅ Zapisano.'){ st.textContent=''; st.className=''; } },2500);
+    _pqStatus.className='c-success'; _pqStatus.textContent='✅ Zapisano.';
+    setTimeout(()=>{ if(_pqStatus.textContent==='✅ Zapisano.'){ _pqStatus.textContent=''; _pqStatus.className=''; } },2500);
   }
   document.getElementById('pqAddMat').addEventListener('click',()=>{
-    document.getElementById('pqMaterials').appendChild(pqMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
+    _pqMats.appendChild(pqMatRow('mat-'+Math.random().toString(36).slice(2,8),{label:'',mm:3,speed:500,pricePerCm2:0.005}));
   });
   document.getElementById('pqSave').addEventListener('click',collectPqAndSave);
   document.getElementById('pqRestore').addEventListener('click',async()=>{
@@ -7143,11 +7149,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
   /* ---------------- Manager warstw 3D ---------------- */
   const _dlEl=document.getElementById('depthLegend');
+  const _dcBadgeEl=document.getElementById('depthCountBadge');
   function renderDepthLegend(){
     if(!_dlEl) return;
     const depths=[...new Set(state.objects.map(o=>o.depth||1))].sort((a,b)=>a-b);
-    const dcBadge=document.getElementById('depthCountBadge');
-    if(dcBadge) dcBadge.textContent=depths.length;
+    if(_dcBadgeEl) _dcBadgeEl.textContent=depths.length;
     if(!depths.length){ _dlEl.innerHTML='<div class="dl-empty">Brak elementów. Dodaj kształt lub bazę — przypiszesz mu warstwę poniżej.</div>'; return; }
     const totalMM=depths.reduce((sum,dep)=>sum+layerMM(dep),0);
     const selDepths=new Set(getSelected().map(o=>o.depth||1));
