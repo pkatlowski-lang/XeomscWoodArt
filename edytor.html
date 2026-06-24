@@ -7142,15 +7142,16 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   renderQuoteAll();
 
   /* ---------------- Manager warstw 3D ---------------- */
+  const _dlEl=document.getElementById('depthLegend');
   function renderDepthLegend(){
-    const dlEl=document.getElementById('depthLegend'); if(!dlEl) return;
+    if(!_dlEl) return;
     const depths=[...new Set(state.objects.map(o=>o.depth||1))].sort((a,b)=>a-b);
     const dcBadge=document.getElementById('depthCountBadge');
     if(dcBadge) dcBadge.textContent=depths.length;
-    if(!depths.length){ dlEl.innerHTML='<div class="dl-empty">Brak elementów. Dodaj kształt lub bazę — przypiszesz mu warstwę poniżej.</div>'; return; }
+    if(!depths.length){ _dlEl.innerHTML='<div class="dl-empty">Brak elementów. Dodaj kształt lub bazę — przypiszesz mu warstwę poniżej.</div>'; return; }
     const totalMM=depths.reduce((sum,dep)=>sum+layerMM(dep),0);
     const selDepths=new Set(getSelected().map(o=>o.depth||1));
-    dlEl.innerHTML=depths.map(dep=>{
+    _dlEl.innerHTML=depths.map(dep=>{
       const col=depthColor(dep);
       const hidden=state.hiddenDepths.includes(dep);
       const cnt=state.objects.filter(o=>(o.depth||1)===dep).length;
@@ -7170,52 +7171,60 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <button class="lyr-eye" data-eye="${dep}" title="${hidden?'Pokaż warstwę':'Ukryj warstwę'}">${hidden?'◎':'◉'}</button>
       </div>`;
     }).join('')+(depths.length>1?`<div class="depth-footer">Łączna głębokość: ${fmt(totalMM)} mm (${depths.length} warstw)</div>`:'');
-    dlEl.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{
-      const dep=Number(b.dataset.pick);
+  }
+  _dlEl.addEventListener('click',e=>{
+    const pickBtn=e.target.closest('[data-pick]');
+    if(pickBtn){
+      const dep=Number(pickBtn.dataset.pick);
       state.selectedIds=expandGroupSelection(state.objects.filter(o=>(o.depth||1)===dep).map(o=>o.id));
-      renderOverlay(); renderLayers(); renderProps(); renderDepthLegend();
-    }));
-    dlEl.querySelectorAll('[data-eye]').forEach(b=>b.addEventListener('click',()=>{
-      const dep=Number(b.dataset.eye); const i=state.hiddenDepths.indexOf(dep);
+      renderOverlay(); renderLayers(); renderProps(); renderDepthLegend(); return;
+    }
+    const eyeBtn=e.target.closest('[data-eye]');
+    if(eyeBtn){
+      const dep=Number(eyeBtn.dataset.eye); const i=state.hiddenDepths.indexOf(dep);
       if(i>=0) state.hiddenDepths.splice(i,1); else state.hiddenDepths.push(dep);
       renderObjects(); renderOverlay(); renderDepthLegend(); scheduleLive3D();
-    }));
-    dlEl.querySelectorAll('[data-mm]').forEach(inp=>{
+    }
+  });
+  _dlEl.addEventListener('change',e=>{
+    const inp=e.target.closest('[data-mm]');
+    if(inp){
       const dep=Number(inp.dataset.mm);
-      inp.addEventListener('change',()=>{
-        setLayerMM(dep,inp.value); inp.value=fmt(layerMM(dep)); scheduleLive3D(); pushHistory();
-        const dval=inp.closest('.lyr-row')&&inp.closest('.lyr-row').querySelector('.lyr-pick');
-        if(dval){ dval.classList.add('depth-changed'); setTimeout(()=>dval.classList.remove('depth-changed'),300); }
-      });
-      inp.addEventListener('input',()=>{ setLayerMM(dep,inp.value); scheduleLive3D(); });
-    });
-    dlEl.querySelectorAll('[data-mat]').forEach(sel=>{
-      const dep=Number(sel.dataset.mat);
-      sel.addEventListener('change',()=>{
-        const v=sel.value;
-        if(v==='__manage__'){ openMaterialsModal(); sel.value=''; return; }
-        if(v===''){ return; }
-        setLayerMM(dep,v);
-        const matLabel=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
-        showToast('Warstwa '+dep+': '+matLabel+' ('+fmt(layerMM(dep))+' mm)','info',2000);
-        renderDepthLegend(); scheduleLive3D(); pushHistory();
-      });
-    });
-  }
+      setLayerMM(dep,inp.value); inp.value=fmt(layerMM(dep)); scheduleLive3D(); pushHistory();
+      const dval=inp.closest('.lyr-row')&&inp.closest('.lyr-row').querySelector('.lyr-pick');
+      if(dval){ dval.classList.add('depth-changed'); setTimeout(()=>dval.classList.remove('depth-changed'),300); }
+      return;
+    }
+    const sel=e.target.closest('[data-mat]');
+    if(sel){
+      const dep=Number(sel.dataset.mat); const v=sel.value;
+      if(v==='__manage__'){ openMaterialsModal(); sel.value=''; return; }
+      if(v===''){ return; }
+      setLayerMM(dep,v);
+      const matLabel=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+      showToast('Warstwa '+dep+': '+matLabel+' ('+fmt(layerMM(dep))+' mm)','info',2000);
+      renderDepthLegend(); scheduleLive3D(); pushHistory();
+    }
+  });
+  _dlEl.addEventListener('input',e=>{
+    const inp=e.target.closest('[data-mm]');
+    if(inp){ setLayerMM(Number(inp.dataset.mm),inp.value); scheduleLive3D(); }
+  });
 
   /* ---------------- Modal: biblioteka materiałów ---------------- */
   const modalMaterials=document.getElementById('modalMaterials');
+  const _matListEl=document.getElementById('matList');
   function renderMaterialsList(){
-    const listEl=document.getElementById('matList');
     const customs=loadCustomMaterials();
-    if(!customs.length){ listEl.innerHTML='<p class="mat-empty">Brak własnych materiałów. Dodaj pierwszy powyżej — pojawi się na liście „Materiał…" przy każdej warstwie.</p>'; return; }
-    listEl.innerHTML=customs.map((m,i)=>`<div class="mat-row" data-i="${i}"><span class="mat-label">${escapeXml(m.label)}</span><span class="lyr-unit">${fmt(m.mm)} mm</span><button type="button" class="mat-del" title="Usuń" aria-label="Usuń materiał">🗑</button></div>`).join('');
-    listEl.querySelectorAll('.mat-del').forEach(btn=>btn.addEventListener('click',()=>{
-      const i=Number(btn.closest('.mat-row').dataset.i);
-      const list=loadCustomMaterials(); list.splice(i,1); saveCustomMaterials(list);
-      renderMaterialsList(); renderDepthLegend();
-    }));
+    if(!customs.length){ _matListEl.innerHTML='<p class="mat-empty">Brak własnych materiałów. Dodaj pierwszy powyżej — pojawi się na liście „Materiał…" przy każdej warstwie.</p>'; return; }
+    _matListEl.innerHTML=customs.map((m,i)=>`<div class="mat-row" data-i="${i}"><span class="mat-label">${escapeXml(m.label)}</span><span class="lyr-unit">${fmt(m.mm)} mm</span><button type="button" class="mat-del" title="Usuń" aria-label="Usuń materiał">🗑</button></div>`).join('');
   }
+  _matListEl.addEventListener('click',e=>{
+    if(!e.target.closest('.mat-del')) return;
+    const row=e.target.closest('.mat-row'); if(!row) return;
+    const list=loadCustomMaterials(); list.splice(+row.dataset.i,1); saveCustomMaterials(list);
+    renderMaterialsList(); renderDepthLegend();
+  });
   function openMaterialsModal(){ renderMaterialsList(); modalMaterials.classList.add('open'); }
   document.getElementById('matAddBtn').addEventListener('click',()=>{
     const nameEl=document.getElementById('matName'), mmEl=document.getElementById('matMM');
