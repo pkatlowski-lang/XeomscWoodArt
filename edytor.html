@@ -318,7 +318,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer .lname{flex:1;font-size:.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .layer .lname input{width:100%;background:transparent;border:1px solid transparent;color:var(--text);font:inherit;font-size:.8rem;outline:none;border-radius:var(--r-xs);padding:1px 4px;caret-color:var(--accent);transition:background var(--tr-base),border-color var(--tr-base)}
 .layer .lname input:hover{background:rgba(var(--accent-rgb),.03)}
-.layer .lname input:focus{background:rgba(var(--accent-rgb),.06);border-color:var(--accent)}
 .layer .lico{font-size:.78rem;opacity:0;cursor:pointer;background:none;border:none;color:var(--muted);padding:2px 4px;border-radius:var(--r-xs);transition:opacity var(--tr-base),background var(--tr-base),color var(--tr-base),transform var(--tr-fast);line-height:1;flex-shrink:0}
 .layer .lico:hover{background:rgba(255,255,255,.08);color:var(--text);transform:scale(1.1)}
 .layer .lico:active{transform:scale(.9)}
@@ -730,7 +729,6 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .inline-text-editor:focus{box-shadow:0 0 0 4px rgba(var(--accent-rgb),.28),0 8px 28px rgba(0,0,0,.6)}
 
 /* === Warstwa — lepsza widoczność ikon === */
-.layer .lico{opacity:0;transition:opacity var(--tr-base),background var(--tr-base),color var(--tr-base),transform var(--tr-fast)}
 .layer:hover .lico{opacity:.8}
 .layer .lico:focus-visible{opacity:1;box-shadow:var(--glow)}
 .layer .lico:hover{opacity:1;background:rgba(255,255,255,.1);color:var(--text);transform:scale(1.08)}
@@ -797,9 +795,6 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 
 /* === Confirm overlay — lepszy backdrop === */
 .confirm-ov{background:rgba(0,0,0,.78) radial-gradient(ellipse at center,rgba(var(--accent-rgb),.04),transparent 70%)}
-
-/* === Confirm box — lepsza animacja wejścia === */
-.confirm-ov.open .confirm-box{transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
 
 /* === Panel right (właściwości) — sekcja h2 separator === */
 .panel.right h2{margin-top:4px}
@@ -1001,7 +996,6 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 
 /* === v86: Input number — wizualny feedback przy scrollwheel === */
 .field input[type=number]:hover{border-color:var(--border-strong);cursor:ns-resize}
-.field input[type=number]:focus{cursor:text}
 
 /* === v86: Lepsza widoczność field-hint === */
 .mt-8{margin-top:8px}
@@ -1140,9 +1134,6 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 /* === form-sec — ikona rotacji przy hover === */
 .form-sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--accent-rgb),.2),transparent)}
 
-/* === Animacja wejścia modalu — lepsza sprężystość === */
-.modal-ov.open .modal-box{transition:transform var(--tr-modal) var(--ease-bounce),opacity var(--tr-slow) ease}
-
 /* === Toolbar brand — subtelna animacja === */
 .toolbar .brand::before{transition:transform var(--tr-slow),box-shadow var(--tr-slow)}
 .toolbar .brand:hover::before{transform:rotate(15deg) scale(1.08);box-shadow:0 4px 18px rgba(var(--accent-rgb),.65),0 0 0 1px rgba(255,255,255,.12) inset}
@@ -1197,14 +1188,14 @@ textarea:focus{background:rgba(var(--accent-rgb),.02)}
 .sb-item{font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .sb-sep{opacity:.35}
 .sb-spacer{flex:1}
-.sb-zoom{color:var(--accent);font-weight:600}
+.sb-zoom{color:var(--accent);font-weight:600;cursor:pointer;padding:2px 8px;border-radius:var(--r-xs);transition:color var(--tr-base),background var(--tr-base),transform var(--tr-base)}
 .sb-save{font-size:.6rem;font-weight:600;transition:opacity var(--tr-slow)}
 
 /* === Splash screen / loading overlay === */
 .splash-ov{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
   background:radial-gradient(ellipse 800px 500px at 50% 45%,rgba(var(--accent-rgb),.06),var(--bg));transition:opacity .4s ease,visibility 0s linear .4s}
 .splash-ov.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px}
+.splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
 .splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden}
@@ -1368,7 +1359,6 @@ input[type=number]{position:relative}
 .statusbar:hover{background:linear-gradient(180deg,var(--surface2),var(--bg-2))}
 .sb-item{padding:2px 6px;border-radius:var(--r-xs);transition:color var(--tr-base),background var(--tr-base)}
 .sb-item:hover{color:var(--text);background:rgba(var(--accent-rgb),.06)}
-.sb-zoom{transition:color var(--tr-base),transform var(--tr-base)}
 .statusbar .sb-save{padding:2px 8px;border-radius:var(--r-xs);transition:color var(--tr-slow),background var(--tr-slow)}
 .statusbar .sb-save:not(:empty){background:rgba(var(--operator-rgb),.08);animation:saveIndicatorPulse 2s ease-in-out infinite}
 @keyframes saveIndicatorPulse{0%,100%{opacity:.7}50%{opacity:1}}
@@ -1431,7 +1421,6 @@ input[type=number]{position:relative}
 .quick-search-empty{padding:24px 16px;text-align:center;font-size:.82rem;color:var(--muted)}
 
 /* === Statusbar zoom — dblclick hint === */
-.sb-zoom{cursor:pointer;padding:2px 8px;border-radius:var(--r-xs);transition:color var(--tr-base),background var(--tr-base),transform var(--tr-base)}
 .sb-zoom:hover{background:rgba(var(--accent-rgb),.1);transform:scale(1.05)}
 
 /* === Toolbar zoomval — dblclick hint === */
@@ -2120,7 +2109,6 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 
 /* === v66: Lepszy styl pola tekstowego warstwy === */
 .layer .lname input{caret-color:var(--accent);transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base)}
-.layer .lname input:focus{box-shadow:0 0 0 2px rgba(var(--accent-rgb),.15)}
 
 /* === v66: Gallery kart — gradient na bottom (text fade) === */
 .gallery-card span{position:relative;z-index:1}
@@ -2130,8 +2118,7 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 .modal-box>*{position:relative;z-index:1}
 
 /* === v66: Toolbar brand — subtelna animacja na hover === */
-.toolbar .brand:hover .brand-name{transition:letter-spacing .3s}
-.toolbar .brand:hover .brand-name{letter-spacing:.5px}
+.toolbar .brand:hover .brand-name{transition:letter-spacing .3s;letter-spacing:.5px}
 
 /* === v66: Dropdown menu — staggered animation === */
 .dd.open .dd-menu .tbtn{animation:ddItemIn .12s ease-out backwards}
@@ -2280,9 +2267,6 @@ kbd:active{border-bottom-width:1px;margin-top:1px}
 .modal-box:focus-visible{outline:none}
 .modal-box:focus-within{box-shadow:var(--sh-lg),0 0 0 2px rgba(var(--accent-rgb),.15)}
 
-/* === v68: Splash screen — lepszy gradient na brand === */
-.splash-brand{text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px}
-
 /* === v68: Toolbar tgroup — hover podświetlenie === */
 .tgroup{transition:border-color var(--tr-base),background var(--tr-base)}
 .tgroup:hover{background:rgba(255,255,255,.015)}
@@ -2359,7 +2343,6 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 /* === v69: Input number — scroll indicator === */
 .field input[type=number]{cursor:ns-resize}
-.field input[type=number]:focus{cursor:text}
 
 /* === v69: Splash stage — check gradient fill === */
 .splash-stage.done .stage-check{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
