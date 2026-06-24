@@ -1033,6 +1033,8 @@ input[type=range]:focus-visible{outline:none}
 .u-hidden{display:none}
 .c-accent{color:var(--accent)}.c-cut{color:var(--cut)}.c-engrave{color:var(--engrave)}.c-score{color:var(--score)}.c-muted{color:var(--muted)}
 .c-success{color:var(--success)}.c-error{color:var(--cut-light)}
+.u-offscreen{position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0}
+.u-busy,.u-busy *{cursor:wait!important}
 
 /* === pq-sec — aktywna sekcja z lepszą wizualną === */
 .pq-sec:focus-within{border-left-color:var(--accent);box-shadow:0 3px 12px rgba(0,0,0,.18),0 0 0 1px rgba(var(--accent-rgb),.08)}
@@ -3003,7 +3005,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   async function loadLocalFonts(){
     if(!window.queryLocalFonts){ showToast('Ta przeglądarka nie udostępnia czcionek z komputera. Użyj Chrome lub Edge.','error',5000); return; }
     try{
-      document.body.style.cursor='wait';
+      document.body.classList.add('u-busy');
       showToast('Wczytywanie czcionek z komputera…','info');
       const fonts=await window.queryLocalFonts();
       const fams=[...new Set(fonts.map(f=>f.family))].sort((a,b)=>a.localeCompare(b));
@@ -3034,9 +3036,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       renderProps(); renderAll();
       const note=embeddedFamilies.size<fams.length?` (zarejestrowano do wektoryzacji ${embeddedFamilies.size}/${fams.length})`:'';
       const fcnt=fams.length, fpl=fcnt===1?'czcionkę':fcnt<=4?'czcionki':'czcionek';
-      document.body.style.cursor='';
+      document.body.classList.remove('u-busy');
       showToast('Wczytano '+fcnt+' '+fpl+' z komputera'+note+'. Znajdziesz je na liście czcionek.','success',4000);
-    }catch(e){ document.body.style.cursor=''; showToast('Nie udało się wczytać czcionek: '+e.message,'error',4000); }
+    }catch(e){ document.body.classList.remove('u-busy'); showToast('Nie udało się wczytać czcionek: '+e.message,'error',4000); }
   }
 
   /* ---- Rozwijana lista czcionek z PODGLĄDEM NA ŻYWO: najechanie na nazwę od razu
@@ -3831,7 +3833,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   function traceImageToPath(o){
     if(!o || o.type!=='image' || !o.src) return;
     showToast('Obrysowywanie obrazu…','info');
-    document.body.style.cursor='wait';
+    document.body.classList.add('u-busy');
     const img=new Image();
     img.onload=()=>{
       const MAXDIM=400;
@@ -3857,7 +3859,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         }
       }
       const rawPolys=traceMaskPolys(mask,W,H).map(p=>simplifyRing(p,1.2)).filter(r=>r.length>=3);
-      if(!rawPolys.length){ document.body.style.cursor=''; showToast('Nie udało się znaleźć konturu. Najlepiej działają proste, kontrastowe grafiki z przezroczystym tłem.','error',5000); return; }
+      if(!rawPolys.length){ document.body.classList.remove('u-busy'); showToast('Nie udało się znaleźć konturu. Najlepiej działają proste, kontrastowe grafiki z przezroczystym tłem.','error',5000); return; }
       const sx=(o.w||1)/W, sy=(o.h||1)/H;
       const localPolys=rawPolys.map(poly=>smoothRingToPolyline(poly,50).map(([px,py])=>[px*sx, py*sy]));
       // Grupujemy pierścienie w ODDZIELNE kształty: każdy kontur najwyższego poziomu (nie
@@ -3896,10 +3898,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       newObjs.forEach(c=>state.objects.push(c));
       state.selectedIds=newObjs.map(c=>c.id);
       pushHistory(); renderAll(); renderProps(); scheduleLive3D();
-      document.body.style.cursor='';
+      document.body.classList.remove('u-busy');
       showToast('Obrys utworzony — '+newObjs.length+(newObjs.length===1?' ścieżka':' ścieżki'),'success');
     };
-    img.onerror=()=>{ document.body.style.cursor=''; showToast('Nie udało się wczytać obrazu do obrysowania.','error'); };
+    img.onerror=()=>{ document.body.classList.remove('u-busy'); showToast('Nie udało się wczytać obrazu do obrysowania.','error'); };
     img.src=o.src;
   }
 
@@ -3919,7 +3921,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     // A = Rot(rot) * diag(effSx,effSy) - macierz transformacji wokół środka bbox
     const a00=cosR*effSx, a01=-sinR*effSy, a10=sinR*effSx, a11=cosR*effSy;
     const tmpSvg=document.createElementNS(SVG_NS,'svg');
-    tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+    tmpSvg.classList.add('u-offscreen');
     document.body.appendChild(tmpSvg);
     const tmpPath=document.createElementNS(SVG_NS,'path');
     tmpSvg.appendChild(tmpPath);
@@ -8554,7 +8556,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(!parts.length){ showToast('Brak rozpoznanych kształtów w pliku SVG','error'); return; }
       const combinedD = parts.join(' ');
       const tmpSvg = document.createElementNS(SVG_NS,'svg');
-      tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+      tmpSvg.classList.add('u-offscreen');
       document.body.appendChild(tmpSvg);
       const tmpPath = document.createElementNS(SVG_NS,'path');
       tmpPath.setAttribute('d', combinedD);
@@ -8617,7 +8619,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(!items.length){ showToast('Brak rozpoznanych kształtów w pliku SVG','error'); return; }
 
       const tmpSvg=document.createElementNS(SVG_NS,'svg');
-      tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+      tmpSvg.classList.add('u-offscreen');
       document.body.appendChild(tmpSvg);
       const tmpPath=document.createElementNS(SVG_NS,'path');
       tmpSvg.appendChild(tmpPath);
@@ -8743,7 +8745,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
      Mierzy rzeczywisty bbox przez tymczasowy off-screen SVG path.getBBox(). */
   function buildBuiltInBases(){
     const tmpSvg = document.createElementNS(SVG_NS,'svg');
-    tmpSvg.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+    tmpSvg.classList.add('u-offscreen');
     document.body.appendChild(tmpSvg);
     function mbox(d){ const p=document.createElementNS(SVG_NS,'path'); p.setAttribute('d',d); tmpSvg.appendChild(p);
       let b; try{b=p.getBBox();}catch(e){b={x:0,y:0,width:100,height:100};} tmpSvg.removeChild(p);
@@ -9119,7 +9121,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
      skalowania, łączenia (Suma) i otoczenia ramką. */
   function buildMotifs(){
     const tmp=document.createElementNS(SVG_NS,'svg');
-    tmp.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:0;height:0';
+    tmp.classList.add('u-offscreen');
     document.body.appendChild(tmp);
     const mbox=(d)=>{ const p=document.createElementNS(SVG_NS,'path'); p.setAttribute('d',d); tmp.appendChild(p);
       let b; try{b=p.getBBox();}catch(e){b={x:0,y:0,width:100,height:100};} tmp.removeChild(p);
