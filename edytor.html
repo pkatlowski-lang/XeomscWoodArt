@@ -121,7 +121,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-sec+.pq-sec{border-top:1px solid var(--border)}
 .pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border);transition:color var(--tr-base);position:relative;overflow:hidden}
 .pq-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.6);flex:none}
-.pq-mat-head{display:grid;grid-template-columns:1fr 24px;gap:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;padding:0 1px}
 .pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg-2);position:relative;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast);animation:matRowIn var(--an-base) ease-out}
 .pq-mat-row:hover{border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateY(-1px)}
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(var(--accent-rgb),.04)}
@@ -657,25 +656,6 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .hint::after{content:attr(data-tip);position:absolute;top:140%;left:50%;transform:translateX(-50%) translateY(-3px) scale(.97);width:260px;max-width:58vw;background:linear-gradient(180deg,rgba(26,34,51,.97),rgba(12,16,25,.97));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);border:1px solid rgba(var(--accent-rgb),.4);border-radius:var(--r-sm);padding:9px 12px;font-size:12px;font-weight:500;line-height:1.5;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 12px rgba(var(--accent-rgb),.12);opacity:0;visibility:hidden;transition:opacity var(--tr-base),transform var(--tr-base);z-index:3001;pointer-events:none;word-wrap:break-word;overflow-wrap:break-word}
 .hint:hover::after,.hint:focus::after,.hint:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0) scale(1)}
 .hint:focus-visible{outline:2px solid var(--text);outline-offset:1px}
-/* === Panel operatora: Cennik i materiały === */
-.op-box{max-width:760px}
-.op-intro{font-size:.8rem;color:var(--muted);line-height:1.55;margin:0 0 14px}
-.op-h{margin:18px 0 8px;font-size:.95rem;color:var(--text);display:flex;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
-.op-mat-head,.op-mat-row{display:grid;grid-template-columns:1fr 92px 108px 108px 38px;gap:8px;align-items:center}
-.op-mat-head{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;padding:0 2px}
-.op-mat-head span{display:flex;align-items:center}
-.op-mat-row{margin-bottom:7px}
-.op-box input[type=text],.op-box input[type=number]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r-sm);padding:7px 9px;font-size:.82rem;outline:none;box-sizing:border-box;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
-.op-box input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.18)}
-.op-del{background:rgba(var(--cut-light-rgb),.14);border:1px solid rgba(var(--cut-light-rgb),.45);color:var(--danger);border-radius:var(--r-sm);height:34px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:background var(--tr-base),border-color var(--tr-base),transform var(--tr-fast)}
-.op-del:hover{background:rgba(var(--cut-light-rgb),.28);border-color:rgba(var(--cut-light-rgb),.6)}
-.op-del:active{transform:scale(.9)}
-.op-add{margin-top:8px}
-.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-top:4px}
-.op-grid label{display:flex;flex-direction:column;font-size:.76rem;color:var(--muted);gap:5px}
-.op-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
-.op-save{background:linear-gradient(135deg,var(--accent),var(--accent-dark));border-color:var(--accent);color:var(--accent-text);font-weight:800}
-.op-status{font-size:.8rem;color:var(--success);min-height:18px;margin-top:8px;text-align:right;font-weight:600}
 /* === Menu rozwijalne (dropdown) === */
 .tspacer{flex:1 1 auto}
 .dd{position:relative}
@@ -841,8 +821,6 @@ input[type=range]:focus-visible{outline:none}
 /* === Inline text editor — lepsza dostępność === */
 .inline-text-editor::placeholder{color:rgba(255,255,255,.38)}
 
-/* === Op-box — lepsza organizacja formularza operatora === */
-.op-h::before{content:'';display:inline-block;width:4px;height:16px;border-radius:2px;background:var(--accent);margin-right:8px;flex-shrink:0}
 
 /* === Responsywność — tablet improvements === */
 
@@ -963,7 +941,6 @@ input[type=range]:focus-visible{outline:none}
 .modal-box.modal-xxl{max-width:1100px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.flex-row{display:flex;align-items:center;gap:8px}
 .flex-wrap-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:.8rem}
 .field-actions{padding:6px 0 0;display:flex;justify-content:flex-end;gap:8px}
 .modal-hint{font-size:.8rem;color:var(--muted);margin:0;line-height:1.5}
@@ -1074,7 +1051,6 @@ input[type=range]:focus-visible{outline:none}
 .tpl button:focus-visible{outline:none;box-shadow:var(--glow);border-color:var(--accent)}
 .seg button:focus-visible{outline:none;box-shadow:var(--glow)}
 .check-label input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.op-del:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(var(--cut-light-rgb),.35)}
 .gallery-card .del-base:focus-visible{outline:none;box-shadow:var(--glow)}
 .q-cfg-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
 .dd-toggle:focus-visible{outline:none;box-shadow:var(--glow)}
@@ -1727,12 +1703,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .sb-history-flash{animation:sbHistFlash var(--an-slow) ease-out}
 @keyframes sbHistFlash{0%{color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.5)}100%{color:inherit;text-shadow:none}}
 
-/* === v67: Lepsza wizualizacja usuwania — czerwony flash na warstwy === */
-@keyframes deleteFlash{0%{background:rgba(var(--cut-rgb),.15)}100%{background:transparent}}
-.layers-delete-flash{animation:deleteFlash var(--an-med) ease-out}
-
 /* === v67: Zoom smooth transition na wartość w statusbar === */
-.sb-zoom-transition{transition:color var(--tr-slow),transform var(--tr-base)}
 .zoom-changed{color:var(--accent)!important;transform:scale(1.08)}
 
 /* === v67: Context menu — badge z liczbą zaznaczonych === */
@@ -1747,9 +1718,6 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 
 /* === v67: Panel h2 — animowany separator z gradient sweep === */
 @keyframes h2SweepGrad{from{background-position:200% 0}to{background-position:-200% 0}}
-
-/* === v67: Lepsza wizualizacja wielokrotnego zaznaczenia w statusbar === */
-.sb-sel-count{color:var(--accent);font-weight:700}
 
 /* === v67: Pulsujący wskaźnik niezapisanych zmian === */
 @keyframes unsavedPulse{0%,100%{opacity:.6}50%{opacity:1}}
@@ -1820,10 +1788,6 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 /* === v69: Lepsza wizualizacja linijki — hover indicator === */
 .ruler-h:hover{background:linear-gradient(180deg,var(--surface3),var(--surface2));box-shadow:inset 0 -2px 4px rgba(var(--accent-rgb),.06)}
 .ruler-v:hover{background:linear-gradient(180deg,var(--surface3),var(--surface2));box-shadow:inset -2px 0 4px rgba(var(--accent-rgb),.06)}
-
-/* === v69: Toolbar brand — keyboard shortcut pulse === */
-@keyframes kbdFlash{0%{background:rgba(var(--accent-rgb),.2);color:var(--accent)}100%{background:var(--surface3);color:inherit}}
-.kbd-flash kbd{animation:kbdFlash var(--an-slow) ease-out}
 
 /* === v69: Bottombar — resize handle visual === */
 .bb-sec+.bb-sec{border-top:1px solid var(--border);position:relative}
@@ -2047,9 +2011,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 /* === v77: Lepsze wyróżnienie aktywnego narzędzia toolrail === */
 .toolrail .tbtn.active::after{content:'';position:absolute;bottom:2px;left:30%;right:30%;height:2px;border-radius:2px;background:rgba(255,255,255,.5)}
 
-/* === v77: Poprawiony autosave indicator w statusbar === */
-.sb-autosave-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px rgba(var(--success-rgb),.5);margin-right:4px;vertical-align:middle}
-
 /* === v77: Lepsze multi-select info w panelu właściwości === */
 .multi-sel-info{display:flex;gap:8px;flex-wrap:wrap;margin:8px 16px;font-size:.72rem}
 .multi-sel-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--r-xs);background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.15);color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;transition:background var(--tr-base),border-color var(--tr-base),transform var(--tr-fast);cursor:default}
@@ -2190,10 +2151,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .sb-size:hover{opacity:1;color:var(--muted)}
 .sb-size.sb-size-warn{color:var(--operator);opacity:1}
 
-/* === v82: Statusbar — wskaźnik autosave z odliczaniem === */
-.sb-autosave-timer{font-size:.55rem;color:var(--muted-2);font-variant-numeric:tabular-nums;transition:color var(--tr-slow)}
-.sb-autosave-timer:hover{color:var(--muted)}
-
 /* === v82: Panel właściwości — breadcrumb nawigacja === */
 .props-breadcrumb{display:flex;align-items:center;gap:4px;padding:8px 16px 4px;font-size:.62rem;color:var(--muted-2);user-select:none}
 .props-breadcrumb .bc-item{color:var(--muted);transition:color var(--tr-base);cursor:pointer}
@@ -2210,13 +2167,6 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .multi-sel-actions{display:flex;flex-wrap:wrap;gap:4px;margin:4px 16px 8px}
 .multi-sel-actions .tbtn{height:28px;font-size:.68rem;padding:0 10px}
 
-/* === v82: Panel boczny — sekcja collapsible === */
-.collapsible-header{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);cursor:pointer;transition:color var(--tr-base),background var(--tr-base);border-bottom:1px solid rgba(var(--accent-rgb),.04);user-select:none}
-.collapsible-header:hover{color:var(--text);background:rgba(var(--accent-rgb),.03)}
-.collapsible-header .coll-chev{transition:transform var(--tr-base);font-size:.5rem;opacity:.5}
-.collapsible-header.open .coll-chev{transform:rotate(90deg)}
-.collapsible-body{overflow:hidden;max-height:0;opacity:0;transition:max-height var(--tr-modal) ease,opacity var(--tr-slow) ease,padding var(--tr-slow) ease}
-.collapsible-body.open{max-height:2000px;opacity:1}
 
 /* === v82: Lepszy styl pola z podpowiedzią — interaktywne === */
 .field-hint:hover{border-color:rgba(var(--accent-rgb),.3);background:rgba(var(--accent-rgb),.06)}
@@ -4389,6 +4339,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     return result;
   }
   function clipMany(polys, kind){
+    if(!polys.length) return [];
     let acc=polys[0];
     for(let i=1;i<polys.length;i++){ const res=clipGH(acc,polys[i],kind);
       if(!res.length) return kind==='intersection'?[]:[acc];
