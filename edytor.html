@@ -37,6 +37,8 @@
   --font-d:'Poppins',system-ui,sans-serif; --font-b:'Inter','Poppins',system-ui,sans-serif;
   /* Standaryzacja przejść — spójny motion system */
   --tr-fast:.08s; --tr-base:.14s; --tr-slow:.22s; --tr-modal:.28s;
+  /* Tokeny animacji — jednolite duracje dla @keyframes */
+  --an-micro:.1s; --an-fast:.15s; --an-base:.2s; --an-med:.3s; --an-slow:.4s; --an-slower:.6s;
   --ease-out:cubic-bezier(.4,0,.2,1); --ease-bounce:cubic-bezier(.34,1.56,.64,1);
 }
 html,body{height:100%}
@@ -50,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .app{height:100vh;display:flex;flex-direction:column;background:
   radial-gradient(1300px 540px at 12% -12%, rgba(var(--accent-rgb),.07), transparent 60%),
   radial-gradient(1100px 640px at 112% 2%, rgba(var(--accent2-rgb),.06), transparent 55%),
-  var(--bg);animation:appFadeIn .4s ease-out}
+  var(--bg);animation:appFadeIn var(--an-slow) ease-out}
 @keyframes appFadeIn{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
 
 
@@ -95,11 +97,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .toolrail .tbtn .ico{font-size:1.24rem;line-height:1}
 .toolrail .tbtn:hover{background:var(--surface3);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .toolrail .tbtn.active{background:var(--grad-accent);color:var(--accent-text);border-color:transparent;box-shadow:0 4px 14px -2px rgba(var(--accent-rgb),.55);animation:toolGlow 2s ease-in-out infinite}
-.toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 var(--r-xxs) var(--r-xxs) 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn .2s ease-out}
+.toolrail .tbtn.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:0 var(--r-xxs) var(--r-xxs) 0;background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.8);animation:toolIndicatorIn var(--an-base) ease-out}
 @keyframes toolIndicatorIn{from{transform:translateY(-50%) scaleY(0);opacity:0}to{transform:translateY(-50%) scaleY(1);opacity:1}}
 .panel{flex:0 0 256px;background:linear-gradient(180deg,var(--surface),var(--bg-2));display:flex;flex-direction:column;overflow-y:auto;scroll-behavior:smooth;transition:box-shadow var(--tr-slow);scrollbar-gutter:stable;position:relative}
-.panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis .25s ease}
-.panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis .25s ease}
+.panel.left{border-right:1px solid var(--border);box-shadow:1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
+.panel.right{border-left:1px solid var(--border);box-shadow:-1px 0 4px rgba(0,0,0,.15);position:relative;transition:box-shadow var(--tr-slow),flex-basis var(--tr-modal) ease}
 .panel h2{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:16px 16px 8px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0;transition:color var(--tr-base),letter-spacing var(--tr-base)}
 .panel h2::before{content:'';width:5px;height:5px;border-radius:50%;flex:none;background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),.6)}
 .panel h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),rgba(var(--accent-rgb),.2),var(--border));background-size:200% 100%;animation:h2SweepGrad 4s linear infinite}
@@ -109,9 +111,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .ptab:active{transform:scale(.96)}
 .ptab:hover{color:var(--text);background:rgba(255,255,255,.04);opacity:1;transform:translateX(1px)}
 .ptab:focus-visible{outline:none;box-shadow:var(--glow)}
-.ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);opacity:1;position:relative;overflow:hidden;animation:ptabActivate .15s ease-out;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.ptab.active{color:var(--accent-text);background:var(--grad-accent);border-color:transparent;box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);opacity:1;position:relative;overflow:hidden;animation:ptabActivate var(--an-fast) ease-out;text-shadow:0 1px 4px rgba(0,0,0,.3)}
 .ptab-body{display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;position:absolute;scroll-behavior:smooth;scrollbar-gutter:stable;transition:opacity var(--tr-base) ease;opacity:0;pointer-events:none;top:0;left:0;right:0;bottom:0}
-.ptab-body.active{display:flex;animation:ptabBodyIn .2s ease-out;box-shadow:inset 0 4px 8px -4px rgba(0,0,0,.15);opacity:1;pointer-events:auto;position:relative}
+.ptab-body.active{display:flex;animation:ptabBodyIn var(--an-base) ease-out;box-shadow:inset 0 4px 8px -4px rgba(0,0,0,.15);opacity:1;pointer-events:auto;position:relative}
 .ptab-body.active::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.15),transparent);pointer-events:none;z-index:1}
 /* Wycena inline — każda sekcja jako wyraźna karta */
 .pq-sec{padding:12px 13px;margin:10px 14px;background:linear-gradient(180deg,var(--surface2),rgba(18,24,38,.8));border:1px solid var(--border);border-left:3px solid rgba(var(--accent-rgb),.3);border-radius:var(--r);box-shadow:0 2px 6px rgba(0,0,0,.12);transition:border-color var(--tr-base),box-shadow var(--tr-base),border-left-color var(--tr-base)}
@@ -120,7 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .pq-h{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--border);transition:color var(--tr-base);position:relative;overflow:hidden}
 .pq-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),.6);flex:none}
 .pq-mat-head{display:grid;grid-template-columns:1fr 24px;gap:4px;font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:4px;padding:0 1px}
-.pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg-2);position:relative;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast);animation:matRowIn .2s ease-out}
+.pq-mat-row{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg-2);position:relative;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast);animation:matRowIn var(--an-base) ease-out}
 .pq-mat-row:hover{border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateY(-1px)}
 .pq-mat-row .pq-row-top{display:flex;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(var(--accent-rgb),.04)}
 .pq-mat-row .pq-row-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
@@ -154,13 +156,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-pp{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .q-pp .q-pp-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
 .q-pp .q-pp-val{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;font-variant-numeric:tabular-nums;transition:transform var(--tr-base),color var(--tr-base)}
-.q-pp .q-pp-val.price-flash{animation:lqFlash .35s ease-out}
+.q-pp .q-pp-val.price-flash{animation:lqFlash var(--an-med) ease-out}
 .q-total{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--border)}
 .q-total .q-total-lbl{font-size:.74rem;color:var(--text);font-weight:600}
 .q-total .q-total-val{font-size:1.05rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .q-empty-msg{font-size:.78rem;color:var(--muted);font-weight:500;line-height:1.5}
 .q-break{display:flex;flex-direction:column;gap:4px;margin-top:8px;border-top:1px solid rgba(var(--accent-rgb),.06);padding-top:8px}
-.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);padding:5px 8px;border-bottom:1px solid rgba(var(--accent-rgb),.04);transition:color var(--tr-base),background var(--tr-base),padding-left var(--tr-base);border-radius:var(--r-xs);animation:brRowIn .15s ease-out backwards}
+.q-break .br-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);padding:5px 8px;border-bottom:1px solid rgba(var(--accent-rgb),.04);transition:color var(--tr-base),background var(--tr-base),padding-left var(--tr-base);border-radius:var(--r-xs);animation:brRowIn var(--an-fast) ease-out backwards}
 .q-break .br-row:last-child{border-bottom:none}
 .q-break .br-row:hover{color:var(--text);background:rgba(var(--accent-rgb),.04);padding-left:12px}
 .q-break .br-row b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
@@ -175,7 +177,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-cfg-toggle .chev{transition:transform var(--tr-base);display:inline-block}
 .q-cfg-toggle.open .chev{transform:rotate(90deg)}
 .q-cfg-body{display:none;padding:0 14px 14px}
-.q-cfg-body.open{display:block;animation:cfgBodyIn .2s ease-out}
+.q-cfg-body.open{display:block;animation:cfgBodyIn var(--an-base) ease-out}
 .stage{flex:55 1 0;position:relative;min-width:0;min-height:260px;contain:layout style;background:radial-gradient(1000px 680px at 50% 38%, #131b2e, #080b12 82%);box-shadow:inset 0 0 30px rgba(0,0,0,.2);border-left:1px solid var(--border);border-right:1px solid var(--border)}
 #canvas{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
 /* blokada natywnego zaznaczania tekstu przeglądarki na płótnie — bez tego przeciąganie
@@ -271,7 +273,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .field .row2{display:flex;gap:8px;align-items:center}
 .field input[type=number],.field input[type=text],.field select,.field textarea{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.85rem;transition:border-color var(--tr-base),box-shadow var(--tr-base),background var(--tr-base)}
 .field input:hover,.field select:hover,.field textarea:hover{border-color:var(--border-strong)}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25),inset 0 0 0 1px rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.03);animation:focusRingIn .15s ease-out forwards}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25),inset 0 0 0 1px rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.03);animation:focusRingIn var(--an-fast) ease-out forwards}
 #props .bind-sel{font-size:.69rem;padding:2px 5px;color:var(--muted);background:rgba(0,0,0,.15);border-color:var(--border);margin-top:2px;opacity:.68;transition:opacity var(--tr-base),border-color var(--tr-base),color var(--tr-base)}
 #props .bind-sel:hover,#props .bind-sel:focus{opacity:1;color:var(--text);border-color:var(--accent);outline:none}
 #props fieldset:disabled{opacity:.5;position:relative}
@@ -285,7 +287,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .seg button{flex:1;min-height:34px;padding:8px 6px;border-radius:var(--r-sm);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--muted);font-size:.74rem;font-weight:600;line-height:1.2;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),font-weight var(--tr-base);position:relative;overflow:hidden}
 .seg button:hover:not(.on){border-color:var(--border-strong);background:var(--surface3);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .seg button:active:not(.on){transform:scale(.97)}
-.seg button.on{border-color:transparent;color:var(--accent-text);background:var(--grad-accent);box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);text-shadow:0 1px 2px rgba(0,0,0,.3);border-image:linear-gradient(135deg,rgba(255,255,255,.15),transparent) 1;border-style:solid;border-width:1px;animation:segRipple .4s ease-out;font-weight:700;position:relative}
+.seg button.on{border-color:transparent;color:var(--accent-text);background:var(--grad-accent);box-shadow:0 3px 12px -3px rgba(var(--accent-rgb),.6);text-shadow:0 1px 2px rgba(0,0,0,.3);border-image:linear-gradient(135deg,rgba(255,255,255,.15),transparent) 1;border-style:solid;border-width:1px;animation:segRipple var(--an-slow) ease-out;font-weight:700;position:relative}
 .seg button.cut.on{background:var(--cut);border-color:var(--cut);color:#fff;box-shadow:0 3px 12px -3px rgba(var(--cut-rgb),.55);border-image:none}
 .seg button.engrave.on{background:var(--engrave);border-color:var(--engrave);color:#fff;box-shadow:0 3px 12px -3px rgba(0,0,0,.6);border-image:none}
 .seg button.score.on{background:var(--score);border-color:var(--score);color:#fff;box-shadow:0 3px 12px -3px rgba(var(--score-rgb),.55);border-image:none}
@@ -307,7 +309,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:var(--r-sm);border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),padding-left var(--tr-base);position:relative}
 .layer:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm);padding-left:12px;border-left-color:var(--accent)!important}
 .layer:active{transform:scale(.98)}
-.layer.sel{border-color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12),0 2px 8px rgba(var(--accent-rgb),.08);animation:layerSelPulse .3s ease-out;scroll-margin:8px}
+.layer.sel{border-color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12),0 2px 8px rgba(var(--accent-rgb),.08);animation:layerSelPulse var(--an-med) ease-out;scroll-margin:8px}
 .layer.lyr-cut{border-left-color:var(--cut-light)}
 .layer.lyr-cut.sel{border-color:var(--accent);border-left-color:var(--cut-light)}
 .layer.lyr-score{border-left-color:var(--score-light)}
@@ -347,7 +349,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Szablony (karty z odznaką ikony) ---- */
 .tpl{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 16px}
-.tpl button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 8px 11px;border-radius:var(--r);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);font-size:.73rem;font-weight:600;cursor:pointer;line-height:1.3;text-align:center;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),transform var(--tr-fast),box-shadow var(--tr-base);animation:galleryCardIn .2s ease-out backwards;position:relative;overflow:hidden}
+.tpl button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 8px 11px;border-radius:var(--r);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);font-size:.73rem;font-weight:600;cursor:pointer;line-height:1.3;text-align:center;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),transform var(--tr-fast),box-shadow var(--tr-base);animation:galleryCardIn var(--an-base) ease-out backwards;position:relative;overflow:hidden}
 .tpl button:hover{border-color:var(--accent);color:#fff;background:var(--surface3);transform:translateY(-3px) scale(1.02) rotate(.4deg);box-shadow:var(--sh),0 8px 20px rgba(var(--accent-rgb),.08)}
 .tpl button:active{transform:scale(.96)}
 .tpl .tpl-ico{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:var(--r);font-size:1.25rem;flex:none;background:radial-gradient(120% 120% at 30% 20%,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.06));border:1px solid rgba(var(--accent-rgb),.32);box-shadow:0 2px 10px -4px rgba(var(--accent-rgb),.5)}
@@ -356,7 +358,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Galeria podkładów / motywów ---- */
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px}
-.gallery-card{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--r);padding:0 6px 9px;cursor:pointer;text-align:center;font-size:.7rem;color:var(--text);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px;overflow:hidden;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),transform var(--tr-base) .02s,box-shadow var(--tr-slow);counter-increment:gallery-card;animation:galleryCardIn .2s ease-out backwards}
+.gallery-card{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--r);padding:0 6px 9px;cursor:pointer;text-align:center;font-size:.7rem;color:var(--text);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px;overflow:hidden;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),transform var(--tr-base) .02s,box-shadow var(--tr-slow);counter-increment:gallery-card;animation:galleryCardIn var(--an-base) ease-out backwards}
 .gallery-card:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3);transform:translateY(-3px) scale(1.02) rotate(-.4deg);box-shadow:0 8px 24px rgba(0,0,0,.25),0 0 0 1px rgba(var(--accent-rgb),.2),inset 0 -2px 12px rgba(var(--accent-rgb),.06)}
 .gallery-card:active{transform:scale(.96);box-shadow:var(--sh-sm)}
 /* miniatura na własnym „kafelku" — czytelniejsza prezentacja kształtu */
@@ -385,7 +387,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Menu kontekstowe (PPM na płótnie) ---- */
 .ctx-menu{position:fixed;z-index:3000;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:5px;min-width:210px;box-shadow:0 12px 36px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.12);font-size:.82rem;opacity:0;pointer-events:none;transform:scale(.96) translateY(-6px);transition:opacity var(--tr-base) ease,transform var(--tr-base) ease;will-change:transform,opacity}
-.ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0);animation:ctxMenuIn .12s ease-out}
+.ctx-menu.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0);animation:ctxMenuIn var(--an-micro) ease-out}
 .ctx-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;background:none;border:none;color:var(--text);text-align:left;border-radius:var(--r-xs);cursor:pointer;font:inherit;transition:background var(--tr-base),color var(--tr-base),transform var(--tr-base),padding-left var(--tr-base);position:relative}
 .ctx-menu button:hover:not(:disabled){background:var(--grad-accent);color:var(--accent-text);padding-left:14px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.2)}
 .ctx-menu button:hover:not(:disabled) .ctx-key{color:var(--accent-text);opacity:.7}
@@ -400,13 +402,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .modal-ov{display:flex;position:fixed;inset:0;background:rgba(0,0,0,.75) radial-gradient(ellipse at 50% 30%,rgba(var(--accent-rgb),.04),transparent 70%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:2000;align-items:flex-start;justify-content:center;padding-top:50px;overflow-y:auto;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr-slow) ease,visibility 0s linear var(--tr-slow);cursor:pointer}
 .modal-ov.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity var(--tr-slow) ease,visibility 0s}
 .modal-box{background:linear-gradient(180deg,var(--surface) 0%,var(--bg-2) 60%);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:22px 24px 24px;max-width:740px;width:95vw;position:relative;margin-bottom:40px;box-shadow:var(--sh-lg),0 0 0 1px rgba(0,0,0,.1);transform:scale(.96) translateY(-12px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1;animation:modalBoxIn .3s ease-out forwards}
+.modal-ov.open .modal-box{transform:scale(1) translateY(0);opacity:1;animation:modalBoxIn var(--an-med) ease-out forwards}
 .modal-box h3{margin:0 0 14px;font-size:1.1rem;font-weight:800;padding-bottom:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--text),rgba(var(--accent-rgb),.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.88rem;line-height:1;width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:background var(--tr-base),color var(--tr-base),border-color var(--tr-base),transform var(--tr-base),box-shadow var(--tr-base),rotate var(--tr-slow);z-index:2}
 .modal-close:hover{background:rgba(var(--cut-light-rgb),.28);border-color:var(--danger);color:var(--danger);transform:rotate(90deg) scale(1.08);box-shadow:0 0 12px rgba(var(--cut-light-rgb),.25)}
 .modal-close:active{transform:scale(.92)}
 .layers3d-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
-.layer3d-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1.5px solid var(--border);border-radius:var(--r-md);padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-base);cursor:default;animation:layer3dCardIn .2s ease-out backwards}
+.layer3d-card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1.5px solid var(--border);border-radius:var(--r-md);padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:140px;transition:border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-base);cursor:default;animation:layer3dCardIn var(--an-base) ease-out backwards}
 .layer3d-card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(var(--accent-rgb),.18);transform:translateY(-3px) scale(1.01);background:linear-gradient(180deg,rgba(var(--accent-rgb),.06),var(--surface))}
 .layer3d-card .card-head{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),transparent);border-radius:var(--r-xs);padding:6px 10px;margin:-4px -6px 0}
 .layer3d-card .lcount{font-size:.71rem;color:var(--muted)}
@@ -429,7 +431,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 
 /* ---- Podsumowanie projektu (modal) ---- */
 .sum-stats{display:flex;flex-direction:column;gap:5px}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),border-left-color var(--tr-base);cursor:default;animation:sumRowIn .15s ease-out backwards}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px 7px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));font-size:.82rem;border-left-width:3px;transition:background var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),border-left-color var(--tr-base);cursor:default;animation:sumRowIn var(--an-fast) ease-out backwards}
 .sum-row:hover{background:var(--surface3);box-shadow:var(--sh-sm);transform:translateX(3px);border-left-color:var(--accent)}
 .sum-row.sum-cut{border-left-color:var(--cut-light)}
 .sum-row.sum-score{border-left-color:var(--score-light)}
@@ -453,7 +455,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .live-quote select{padding:3px 5px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);font-family:inherit;font-size:.72rem;max-width:120px;transition:border-color var(--tr-base)}
 .live-quote select:focus{border-color:var(--accent)}
 .live-quote .lq-price{font-size:1.25rem;font-weight:800;color:var(--accent);letter-spacing:.5px;line-height:1.1;transition:color var(--tr-slow),transform var(--tr-base);font-variant-numeric:tabular-nums;will-change:transform,color;font-family:var(--font-d);text-shadow:0 1px 4px rgba(0,0,0,.3)}
-.live-quote .lq-price.lq-flash{animation:lqFlashV2 .4s ease-out}
+.live-quote .lq-price.lq-flash{animation:lqFlashV2 var(--an-slow) ease-out}
 .live-quote .lq-price.lq-empty{font-size:.76rem;font-weight:500;color:var(--muted)}
 .live-quote .lq-time{font-size:.72rem;color:var(--muted);margin-top:4px;padding-top:5px;border-top:1px solid var(--border)}
 .live-quote .lq-send{width:100%;height:36px;font-size:.76rem;margin-top:4px;position:relative;overflow:hidden}
@@ -538,7 +540,7 @@ kbd:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.35)}
 .dl-empty{font-size:.72rem;color:var(--muted);line-height:1.5}
 .lyr-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:linear-gradient(180deg,var(--surface2),var(--surface));transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),backdrop-filter var(--tr-slow);position:relative;animation:depthLegendIn .15s ease-out backwards;border-left-width:3px;border-left-style:solid;border-left-color:transparent;backdrop-filter:none}
 .lyr-row:hover{background:linear-gradient(90deg,var(--surface3),rgba(var(--accent-rgb),.04));border-color:var(--border-strong);box-shadow:var(--sh-sm);transform:translateX(2px);backdrop-filter:blur(2px)}
-.lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:lyrRowActivate .2s ease-out;position:relative}
+.lyr-row.on{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15);border-left-color:var(--accent);animation:lyrRowActivate var(--an-base) ease-out;position:relative}
 .lyr-row.lyr-hidden{opacity:.45}
 .lyr-pick{border:none;color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-xs);cursor:pointer;flex:0 0 auto;transition:filter var(--tr-base),transform var(--tr-fast);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .lyr-pick:hover{filter:brightness(1.25);transform:scale(1.04)}
@@ -738,7 +740,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .dd-kbd{margin-left:auto;font-size:.6rem;font-weight:600;color:var(--muted-2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r-xxs);padding:1px 5px;font-family:inherit;line-height:1.3;transition:color var(--tr-base),background var(--tr-base)}
 
 /* === Inline text editor na płycie — premium styl === */
-.inline-text-editor{position:fixed;z-index:6000;resize:none;overflow:hidden;text-align:center;line-height:1.15;box-sizing:border-box;color:#fff;background:rgba(13,22,36,.94);border:2px solid var(--accent);border-radius:var(--r-sm);padding:4px 6px;outline:none;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.18),0 8px 28px rgba(0,0,0,.55);caret-color:var(--accent);transition:box-shadow var(--tr-base);animation:inlineEditorIn .15s ease-out}
+.inline-text-editor{position:fixed;z-index:6000;resize:none;overflow:hidden;text-align:center;line-height:1.15;box-sizing:border-box;color:#fff;background:rgba(13,22,36,.94);border:2px solid var(--accent);border-radius:var(--r-sm);padding:4px 6px;outline:none;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.18),0 8px 28px rgba(0,0,0,.55);caret-color:var(--accent);transition:box-shadow var(--tr-base);animation:inlineEditorIn var(--an-fast) ease-out}
 .inline-text-editor:focus{box-shadow:0 0 0 4px rgba(var(--accent-rgb),.28),0 8px 28px rgba(0,0,0,.6)}
 
 /* === Warstwa — lepsza widoczność ikon === */
@@ -753,7 +755,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .layer.drop-target-below{border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.25)}
 .layer[draggable]{cursor:grab}
 .layer[draggable]:active{cursor:grabbing}
-.layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 2px;font-variant-numeric:tabular-nums;letter-spacing:.02em;animation:fadeInShort .15s ease-out;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.layers-counter{font-size:.66rem;color:var(--muted-2);padding:4px 16px 2px;font-variant-numeric:tabular-nums;letter-spacing:.02em;animation:fadeInShort var(--an-fast) ease-out;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 @keyframes fadeInShort{from{opacity:0}to{opacity:1}}
 
 /* === Dropdown menu — hover efekt z płynnym paddingiem === */
@@ -806,7 +808,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 /* === Wydajność — will-change na animowanych elementach === */
 .modal-ov .modal-box{will-change:transform,opacity;cursor:default}
 .confirm-box{will-change:transform,opacity;background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) ease;opacity:0}
-.toast{will-change:transform,opacity;pointer-events:auto;max-width:380px;padding:12px 16px;border-radius:var(--r-md);font-size:.82rem;font-weight:500;line-height:1.5;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.55);animation:toastIn .25s ease-out;transition:opacity var(--tr-slow),transform var(--tr-slow);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
+.toast{will-change:transform,opacity;pointer-events:auto;max-width:380px;padding:12px 16px;border-radius:var(--r-md);font-size:.82rem;font-weight:500;line-height:1.5;background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-strong);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.55);animation:toastIn var(--tr-slow) ease-out;transition:opacity var(--tr-slow),transform var(--tr-slow);position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:6px;cursor:pointer}
 /* === Lepsza separacja sekcji w panelu lewym === */
 @keyframes panelFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
@@ -1111,9 +1113,9 @@ input[type=range]:focus-visible{outline:none}
 .splash-brand{font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 4px 20px rgba(0,0,0,.5);letter-spacing:1px;animation:splashBrandIn .5s ease-out}
 .splash-brand::before{content:'✦';display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--r);
   background:var(--grad-accent);font-size:1.2rem;color:var(--accent-text);box-shadow:0 4px 20px rgba(var(--accent-rgb),.5)}
-.splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;animation:splashBarIn .3s ease-out .1s backwards}
+.splash-bar{width:200px;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;animation:splashBarIn var(--an-med) ease-out .1s backwards}
 .splash-bar-fill{width:0%;height:100%;border-radius:2px;background:var(--grad-accent);transition:width var(--tr-slow) ease;box-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
-.splash-hint{font-size:.78rem;color:var(--muted);letter-spacing:.04em;animation:splashHintIn .4s ease-out .2s backwards;transition:opacity var(--tr-slow);margin-top:8px}
+.splash-hint{font-size:.78rem;color:var(--muted);letter-spacing:.04em;animation:splashHintIn var(--an-slow) ease-out var(--an-base) backwards;transition:opacity var(--tr-slow);margin-top:8px}
 
 /* === Layers panel — number badge + drag grip === */
 .layer .drag-grip{flex:0 0 auto;cursor:grab;color:var(--muted-2);font-size:.55rem;padding:0 2px;opacity:0;transition:color var(--tr-base);user-select:none;line-height:1}
@@ -1122,7 +1124,7 @@ input[type=range]:focus-visible{outline:none}
 
 /* === Przycisk wysyłki — stany ładowania z CSS spinner === */
 .tbtn.btn-loading{pointer-events:none;position:relative;color:transparent!important}
-.tbtn.btn-loading::after{content:'';position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:btnSpin .6s linear infinite}
+.tbtn.btn-loading::after{content:'';position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:btnSpin var(--an-slower) linear infinite}
 @keyframes btnSpin{to{transform:rotate(360deg)}}
 .tbtn.btn-success{background:linear-gradient(135deg,var(--success),#3abf80)!important;border-color:var(--success)!important;color:var(--accent-text)!important;pointer-events:none}
 
@@ -1149,7 +1151,7 @@ input[type=number]{position:relative}
 .send-step.done::after{background:var(--success)}
 
 /* === Panel right — empty state z lepszym wyglądem === */
-#props .empty-note{text-align:center;animation:emptyNoteIn .25s ease-out}
+#props .empty-note{text-align:center;animation:emptyNoteIn var(--tr-slow) ease-out}
 #props .empty-note .empty-icon{font-size:1.8rem;display:block;margin-bottom:8px;opacity:.4;filter:grayscale(.4)}
 
 /* === Toolbar separatory — subtelny gradient === */
@@ -1191,7 +1193,7 @@ input[type=number]{position:relative}
 
 /* === Layer items — staggered animation === */
 @keyframes layerSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.layers .layer{animation:layerSlideIn .15s ease-out backwards}
+.layers .layer{animation:layerSlideIn var(--an-fast) ease-out backwards}
 .layers .layer:nth-child(n+2){animation-delay:20ms}
 .layers .layer:nth-child(n+4){animation-delay:40ms}
 .layers .layer:nth-child(n+8){animation-delay:60ms}
@@ -1203,7 +1205,7 @@ input[type=number]{position:relative}
 @keyframes splashBarIn{from{opacity:0;transform:scaleX(.6)}to{opacity:1;transform:scaleX(1)}}
 
 /* === Zoom badge — pulsujący akcent przy zmianie === */
-.zoom-badge.zoom-changed{animation:zoomBadgePulse .3s ease-out}
+.zoom-badge.zoom-changed{animation:zoomBadgePulse var(--an-med) ease-out}
 @keyframes zoomBadgePulse{0%{transform:scale(1.08);box-shadow:0 0 12px rgba(var(--accent-rgb),.3)}100%{transform:scale(1)}}
 
 /* === Toolbar brand — hover glow === */
@@ -1240,7 +1242,7 @@ input[type=number]{position:relative}
 @keyframes ptabBodyIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* === Toolbar tbtn — ripple feedback przy kliknięciu === */
-.tbtn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.2);transform:scale(0);animation:rippleAnim .45s ease-out forwards;pointer-events:none}
+.tbtn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.2);transform:scale(0);animation:rippleAnim var(--an-slow) ease-out forwards;pointer-events:none}
 @keyframes rippleAnim{to{transform:scale(2.5);opacity:0}}
 
 /* === Bottombar header — interaktywna animacja === */
@@ -1267,13 +1269,13 @@ input[type=number]{position:relative}
 .panel.left::after{content:'';position:sticky;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent,var(--bg-2));pointer-events:none;z-index:1;flex-shrink:0}
 
 /* === Focus trap w modalu — lepsza widoczność pierwszego focusa === */
-.modal-ov.open .modal-close{animation:modalCloseIn .3s ease-out .15s backwards}
+.modal-ov.open .modal-close{animation:modalCloseIn var(--an-med) ease-out var(--an-fast) backwards}
 @keyframes modalCloseIn{from{opacity:0;transform:rotate(-90deg) scale(.5)}to{opacity:1;transform:rotate(0) scale(1)}}
 
 /* === Ctrl+K wyszukiwarka — placeholder styl === */
 .quick-search-ov{display:none;position:fixed;inset:0;z-index:7800;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding-top:20vh}
-.quick-search-ov.open{display:flex;animation:qsOvIn .15s ease-out}
-.quick-search-box{width:90vw;max-width:480px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1.5px solid var(--border-strong);border-radius:var(--r);box-shadow:var(--sh-lg);overflow:hidden;animation:ddSlideIn .15s ease-out}
+.quick-search-ov.open{display:flex;animation:qsOvIn var(--an-fast) ease-out}
+.quick-search-box{width:90vw;max-width:480px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border:1.5px solid var(--border-strong);border-radius:var(--r);box-shadow:var(--sh-lg);overflow:hidden;animation:ddSlideIn var(--an-fast) ease-out}
 .quick-search-input{width:100%;padding:14px 16px 14px 42px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:1rem;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:14px center}
 .quick-search-input:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");border-bottom-color:var(--accent);box-shadow:0 1px 0 var(--accent)}
 .quick-search-input::placeholder{color:var(--muted-2)}
@@ -1290,7 +1292,7 @@ input[type=number]{position:relative}
 
 /* === Animacja wejścia warstwy po dodaniu obiektu === */
 @keyframes newObjectPulse{0%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.4)}70%{box-shadow:0 0 0 8px rgba(var(--accent-rgb),0)}100%{box-shadow:none}}
-.layer.just-added{animation:newObjectPulse .6s ease-out}
+.layer.just-added{animation:newObjectPulse var(--an-slower) ease-out}
 
 /* === Separator narzędzi — lepsza widoczność w toolrail === */
 .toolrail .tool-sep{width:40px;height:1px;margin:8px 0;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.12),transparent);opacity:.6;transition:opacity var(--tr-slow);position:relative}
@@ -1484,8 +1486,8 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 
 /* === v60: Splash — etapy z checkmarkami === */
 .splash-stages{display:flex;flex-direction:column;gap:3px;margin-top:6px;min-width:180px}
-.splash-stage{display:flex;align-items:center;gap:8px;font-size:.68rem;color:var(--muted-2);transition:color var(--tr-slow),opacity var(--tr-slow);opacity:.4;animation:splashStageIn .2s ease-out backwards}
-.splash-stage.stage-active{color:var(--accent);opacity:1;animation:stageActivePulse .4s ease-out}
+.splash-stage{display:flex;align-items:center;gap:8px;font-size:.68rem;color:var(--muted-2);transition:color var(--tr-slow),opacity var(--tr-slow);opacity:.4;animation:splashStageIn var(--an-base) ease-out backwards}
+.splash-stage.stage-active{color:var(--accent);opacity:1;animation:stageActivePulse var(--an-slow) ease-out}
 .splash-stage.stage-done{color:var(--success);opacity:.7}
 .splash-stage .stage-check{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.5rem;transition:background var(--tr-slow),border-color var(--tr-slow)}
 .splash-stage.stage-done .stage-check{background:rgba(var(--success-rgb),.15);border-color:var(--success)}
@@ -1600,11 +1602,11 @@ kbd:active{transform:translateY(1px);box-shadow:0 0 1px rgba(0,0,0,.3);border-bo
 /* === v63: Input focus — subtelna animacja ring === */
 @keyframes focusRingIn{from{box-shadow:0 0 0 0 rgba(var(--accent-rgb),0)}to{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.25)}}
 /* === v63: Depth ctrl — animacja wartości na zmianę === */
-.depth-ctrl .dval.depth-changed{animation:depthValPulse .3s ease-out}
+.depth-ctrl .dval.depth-changed{animation:depthValPulse var(--an-med) ease-out}
 @keyframes depthValPulse{0%{transform:scale(1.15);color:var(--accent)}100%{transform:scale(1)}}
 
 /* === v63: Tabbed panel — hover indicator pod zakładką === */
-.ptab:hover:not(.active)::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(var(--accent-rgb),.2);border-radius:2px;animation:ptabHoverIn .15s ease-out}
+.ptab:hover:not(.active)::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:rgba(var(--accent-rgb),.2);border-radius:2px;animation:ptabHoverIn var(--an-fast) ease-out}
 @keyframes ptabHoverIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 /* === v63: Ogólne ulepszenie — gradient na hover select === */
@@ -1647,7 +1649,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .quick-search-item:hover .qs-badge,.quick-search-item.qs-active .qs-badge{background:rgba(var(--accent-rgb),.2);color:#fff}
 
 /* === v64: Microinteractions — przycisk w panelu z pulse na click === */
-.tbtn-full:active,.tbtn-block:active,.btn-full-center:active{animation:btnClickPulse .2s ease-out}
+.tbtn-full:active,.tbtn-block:active,.btn-full-center:active{animation:btnClickPulse var(--an-base) ease-out}
 @keyframes btnClickPulse{0%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.35)}100%{box-shadow:0 0 0 10px rgba(var(--accent-rgb),0)}}
 
 /* === v64: Gallery card — lepsze aktywne oznaczenie z badge === */
@@ -1657,7 +1659,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .sb-session[title]{cursor:help}
 
 /* === v64: Confirm modal — lepsza wizualizacja ikon === */
-.confirm-ov.open .confirm-icon{animation:confirmIconIn .3s ease-out}
+.confirm-ov.open .confirm-icon{animation:confirmIconIn var(--an-med) ease-out}
 @keyframes confirmIconIn{from{transform:scale(0) rotate(-45deg)}to{transform:scale(1) rotate(0)}}
 
 /* === v64: Input placeholder — lepsza widoczność === */
@@ -1698,7 +1700,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .modal-box>*{position:relative;z-index:1}
 
 /* === v66: Dropdown menu — staggered animation === */
-.dd.open .dd-menu .tbtn{animation:ddItemIn .12s ease-out backwards}
+.dd.open .dd-menu .tbtn{animation:ddItemIn var(--an-micro) ease-out backwards}
 .dd.open .dd-menu .tbtn:nth-child(2){animation-delay:20ms}
 .dd.open .dd-menu .tbtn:nth-child(3){animation-delay:40ms}
 .dd.open .dd-menu .tbtn:nth-child(4){animation-delay:60ms}
@@ -1714,20 +1716,20 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 }
 
 /* === v66: Poprawka depth-changed animacja na button === */
-.lyr-pick.depth-changed{animation:lyrPickChange .3s ease-out}
+.lyr-pick.depth-changed{animation:lyrPickChange var(--an-med) ease-out}
 @keyframes lyrPickChange{0%{transform:scale(1.2);box-shadow:0 0 12px currentColor}100%{transform:scale(1);box-shadow:0 1px 3px rgba(0,0,0,.3)}}
 
 /* === v66: Lepsza wizualizacja zaznaczenia — multi-sel info === */
-.empty-note.note-compact{border-left:3px solid var(--accent);animation:noteCompactIn .2s ease-out}
+.empty-note.note-compact{border-left:3px solid var(--accent);animation:noteCompactIn var(--an-base) ease-out}
 @keyframes noteCompactIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 
 /* === v67: Undo/redo — subtelny flash na statusbar history === */
-.sb-history-flash{animation:sbHistFlash .4s ease-out}
+.sb-history-flash{animation:sbHistFlash var(--an-slow) ease-out}
 @keyframes sbHistFlash{0%{color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.5)}100%{color:inherit;text-shadow:none}}
 
 /* === v67: Lepsza wizualizacja usuwania — czerwony flash na warstwy === */
 @keyframes deleteFlash{0%{background:rgba(var(--cut-rgb),.15)}100%{background:transparent}}
-.layers-delete-flash{animation:deleteFlash .3s ease-out}
+.layers-delete-flash{animation:deleteFlash var(--an-med) ease-out}
 
 /* === v67: Zoom smooth transition na wartość w statusbar === */
 .sb-zoom-transition{transition:color var(--tr-slow),transform var(--tr-base)}
@@ -1796,7 +1798,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 @keyframes modalTopBarGrad{from{background-position:200% 0}to{background-position:-200% 0}}
 
 /* === v69: Layer row — pulsująca ikonka visibility na hover === */
-.layer .lico-vis:hover{animation:visIconPulse .3s ease-out}
+.layer .lico-vis:hover{animation:visIconPulse var(--an-med) ease-out}
 @keyframes visIconPulse{0%{transform:scale(1.3)}100%{transform:scale(1.08)}}
 
 /* === v69: Lepsza wizualizacja karty wyceny z shimmer === */
@@ -1821,7 +1823,7 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 
 /* === v69: Toolbar brand — keyboard shortcut pulse === */
 @keyframes kbdFlash{0%{background:rgba(var(--accent-rgb),.2);color:var(--accent)}100%{background:var(--surface3);color:inherit}}
-.kbd-flash kbd{animation:kbdFlash .4s ease-out}
+.kbd-flash kbd{animation:kbdFlash var(--an-slow) ease-out}
 
 /* === v69: Bottombar — resize handle visual === */
 .bb-sec+.bb-sec{border-top:1px solid var(--border);position:relative}
@@ -2092,7 +2094,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
 /* === v78: Karta wyceny — lepsza animacja ceny === */
 @keyframes priceUpdate{from{transform:scale(1.05);opacity:.8}to{transform:scale(1);opacity:1}}
-.q-pp-val.price-flash{animation:priceUpdate .3s ease-out}
+.q-pp-val.price-flash{animation:priceUpdate var(--an-med) ease-out}
 
 /* === v78: Ulepszone multi-select chipy — hover === */
 .multi-sel-chip:hover{background:rgba(var(--accent-rgb),.15);border-color:rgba(var(--accent-rgb),.3);transform:scale(1.04)}
@@ -2104,7 +2106,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 .depth-legend .lyr-row:first-child{margin-top:2px}
 
 /* === v78: Kontekstowe menu — animacja wejścia pozycji === */
-.ctx-menu.open button{animation:ctxItemIn .1s ease-out backwards}
+.ctx-menu.open button{animation:ctxItemIn var(--an-micro) ease-out backwards}
 .ctx-menu.open button:nth-child(2){animation-delay:15ms}
 .ctx-menu.open button:nth-child(3){animation-delay:30ms}
 .ctx-menu.open button:nth-child(4){animation-delay:45ms}
@@ -2165,7 +2167,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
 /* === v81: Ulepszone pasek zoomu — animacja zmiany === */
 @keyframes zoomPulse{0%{color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.4)}100%{color:inherit;text-shadow:none}}
-.sb-zoom.zoom-changed{animation:zoomPulse .4s ease-out}
+.sb-zoom.zoom-changed{animation:zoomPulse var(--an-slow) ease-out}
 
 /* === v81: Poprawa widoczności confirm actions === */
 .confirm-box .confirm-actions .tbtn-danger{box-shadow:0 2px 10px rgba(var(--cut-rgb),.25)}
@@ -2284,26 +2286,26 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       <button class="tbtn" id="zoomOut" title="Pomniejsz (Ctrl+-)" aria-label="Pomniejsz"><span class="ico">−</span></button>
       <span class="zoomval" id="zoomVal">100%</span>
       <button class="tbtn" id="zoomIn" title="Powiększ (Ctrl+=)" aria-label="Powiększ"><span class="ico">+</span></button>
-      <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku (Ctrl+0)">Dopasuj</button>
-      <button class="tbtn" id="zoomSelBtn" title="Przybliż do zaznaczenia (klawisz 2)">⌖ Zaznaczenie</button>
+      <button class="tbtn" id="zoomFit" title="Dopasuj cały arkusz do widoku (Ctrl+0)" aria-label="Dopasuj do widoku">Dopasuj</button>
+      <button class="tbtn" id="zoomSelBtn" title="Przybliż do zaznaczenia (klawisz 2)" aria-label="Przybliż do zaznaczenia">⌖ Zaznaczenie</button>
     </div>
     <div class="tgroup">
-      <button class="tbtn" id="snapBtn" title="Przyciągaj do siatki">⊞ Siatka</button>
-      <button class="tbtn" id="arrangeBtn" title="Rozmieść automatycznie — ułóż wszystkie elementy (odblokowane) jeden przy drugim na arkuszu, by zmieścić jak najwięcej na materiale">📐 Rozmieść</button>
+      <button class="tbtn" id="snapBtn" title="Przyciągaj do siatki" aria-label="Przyciągaj do siatki">⊞ Siatka</button>
+      <button class="tbtn" id="arrangeBtn" title="Rozmieść automatycznie — ułóż wszystkie elementy (odblokowane) jeden przy drugim na arkuszu, by zmieścić jak najwięcej na materiale" aria-label="Rozmieść automatycznie">📐 Rozmieść</button>
     </div>
     <div class="tspacer"></div>
     <!-- MENU: PLIK -->
     <div class="dd" data-dd>
       <button class="tbtn dd-toggle" type="button" title="Projekt: nowy, zapis, otwarcie, import" aria-label="Menu Plik">📂 Plik <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
-        <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa">🆕 Nowy projekt</button>
-        <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (Ctrl+S)">💾 Zapisz projekt <kbd class="dd-kbd">Ctrl+S</kbd></button>
-        <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json (Ctrl+O)">📂 Otwórz projekt <kbd class="dd-kbd">Ctrl+O</kbd></button>
+        <button class="tbtn" id="newProjectBtn" title="Nowy projekt — wyczyść płótno i zacznij od nowa" aria-label="Nowy projekt">🆕 Nowy projekt</button>
+        <button class="tbtn" id="saveProjectBtn" title="Zapisz cały projekt do pliku .json (Ctrl+S)" aria-label="Zapisz projekt">💾 Zapisz projekt <kbd class="dd-kbd">Ctrl+S</kbd></button>
+        <button class="tbtn" id="loadProjectBtn" title="Wczytaj projekt z pliku .json (Ctrl+O)" aria-label="Otwórz projekt">📂 Otwórz projekt <kbd class="dd-kbd">Ctrl+O</kbd></button>
         <input type="file" id="loadProjectInput" accept=".json,application/json" class="u-hidden" aria-label="Otwórz projekt">
         <hr class="dd-sep">
-        <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany">🖼 Importuj obraz</button>
+        <button class="tbtn" id="importImageBtn" title="Importuj obraz (PNG/JPG) jako warstwę pomocniczą do przerysowania — nie jest cięty ani eksportowany" aria-label="Importuj obraz">🖼 Importuj obraz</button>
         <input type="file" id="importImageInput" accept="image/*" class="u-hidden" aria-label="Importuj obraz">
-        <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie; napisy <text> jako edytowalny tekst">📐 Importuj SVG</button>
+        <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie; napisy <text> jako edytowalny tekst" aria-label="Importuj SVG">📐 Importuj SVG</button>
         <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" class="u-hidden" aria-label="Importuj SVG">
       </div>
     </div>
@@ -2311,31 +2313,31 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     <div class="dd" data-dd>
       <button class="tbtn dd-toggle" type="button" title="Dodatkowe narzędzia i generatory" aria-label="Menu Narzędzia">🧩 Narzędzia <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
-        <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)">🔤 Czcionki z PC</button>
-        <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)">🎨 Tryb warstw 3D</button>
-        <button class="tbtn" id="preview3dBtn" title="Podgląd 3D — interaktywna wizualizacja projektu jako stos warstw materiału">🎯 Podgląd 3D</button>
+        <button class="tbtn" id="loadFontsBtn" title="Wczytaj czcionki zainstalowane na komputerze (Chrome/Edge)" aria-label="Czcionki z PC">🔤 Czcionki z PC</button>
+        <button class="tbtn" id="depthViewBtn" title="Tryb warstw 3D — pokoloruj elementy według warstwy głębokości (kliknij ponownie aby wyłączyć)" aria-label="Tryb warstw 3D">🎨 Tryb warstw 3D</button>
+        <button class="tbtn" id="preview3dBtn" title="Podgląd 3D — interaktywna wizualizacja projektu jako stos warstw materiału" aria-label="Podgląd 3D">🎯 Podgląd 3D</button>
         <hr class="dd-sep">
-        <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał">🪗 Zawias żywy</button>
-        <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębate (ewolwentowe) z otworem na oś">⚙ Koło zębate</button>
+        <button class="tbtn" id="hingeGenBtn" title="Generator zawiasu — wzór nacięć (living hinge), który pozwala wygiąć sztywny materiał" aria-label="Generator zawiasu">🪗 Zawias żywy</button>
+        <button class="tbtn" id="gearGenBtn" title="Generator koła zębatego — parametryczne koło zębate (ewolwentowe) z otworem na oś" aria-label="Generator koła zębatego">⚙ Koło zębate</button>
       </div>
     </div>
     <!-- MENU: WIĘCEJ -->
     <div class="dd" data-dd>
       <button class="tbtn dd-toggle" type="button" title="Podsumowanie, wycena, skróty" aria-label="Menu Więcej">📊 Więcej <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
-        <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera">📊 Podsumowanie</button>
-        <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny">💰 Wycena</button>
-        <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)">⌨ Skróty klawiszowe <kbd class="dd-kbd">?</kbd></button>
-        <button class="tbtn cfgbtn u-hidden" id="pricingCfgBtn" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie">⚙ Cennik i materiały</button>
+        <button class="tbtn" id="summaryBtn" title="Podsumowanie projektu — szacowana długość cięcia/nacinania, powierzchnia grawerowania i czas pracy lasera" aria-label="Podsumowanie projektu">📊 Podsumowanie</button>
+        <button class="tbtn" id="quoteBtn" title="Wycena projektu — przejdź do zakładki wyceny" aria-label="Wycena projektu">💰 Wycena</button>
+        <button class="tbtn" id="helpBtn" title="Skróty klawiszowe (?)" aria-label="Skróty klawiszowe">⌨ Skróty klawiszowe <kbd class="dd-kbd">?</kbd></button>
+        <button class="tbtn cfgbtn u-hidden" id="pricingCfgBtn" title="Cennik i materiały — ustaw materiały, grubości, koszty i parametry wyceny pod siebie" aria-label="Cennik i materiały">⚙ Cennik i materiały</button>
       </div>
     </div>
     <!-- MENU: EKSPORT -->
     <div class="dd" data-dd>
       <button class="tbtn tbtn-primary dd-toggle" type="button" title="Pobierz gotowe pliki produkcyjne" aria-label="Menu Eksport">⬇ Eksport <span class="dd-caret">▾</span></button>
       <div class="dd-menu">
-        <button class="tbtn" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)">⬇ Pobierz SVG</button>
-        <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)">⬇ Pobierz DXF</button>
-        <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości">🧊 Eksport 3D</button>
+        <button class="tbtn" id="exportBtn" title="Pobierz gotowy plik SVG do wycięcia laserem (wszystkie warstwy w jednym pliku, z kolorami operacji)" aria-label="Pobierz SVG">⬇ Pobierz SVG</button>
+        <button class="tbtn" id="exportDxfBtn" title="Eksportuj projekt jako plik DXF (do programów CNC/laser, np. LightBurn, AutoCAD)" aria-label="Pobierz DXF">⬇ Pobierz DXF</button>
+        <button class="tbtn" id="export3dBtn" title="Eksport 3D — pobierz osobne SVG dla każdej warstwy głębokości" aria-label="Eksport 3D">🧊 Eksport 3D</button>
       </div>
     </div>
   </div>
@@ -2405,9 +2407,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <input type="text" id="layerSearch" class="layer-search" placeholder="Szukaj elementu po nazwie…" aria-label="Szukaj elementu">
         <div class="layers" id="layers"></div>
         <div class="legend" id="legendBar">
-          <span data-filter="cut" title="Kliknij, aby podświetlić elementy cięcia"><i class="li-cut"></i> cięcie</span>
-          <span data-filter="engrave" title="Kliknij, aby podświetlić elementy grawerowania"><i class="li-eng"></i> grawer</span>
-          <span data-filter="score" title="Kliknij, aby podświetlić elementy nacięcia"><i class="li-sco"></i> nacięcie</span>
+          <span data-filter="cut" title="Kliknij, aby podświetlić elementy cięcia" role="button" aria-label="Filtruj cięcie"><i class="li-cut"></i> cięcie</span>
+          <span data-filter="engrave" title="Kliknij, aby podświetlić elementy grawerowania" role="button" aria-label="Filtruj grawerowanie"><i class="li-eng"></i> grawer</span>
+          <span data-filter="score" title="Kliknij, aby podświetlić elementy nacięcia" role="button" aria-label="Filtruj nacięcie"><i class="li-sco"></i> nacięcie</span>
         </div>
       </div><!-- /ptab-body layers -->
 
@@ -2416,13 +2418,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <div class="pq-sec">
           <div class="pq-h">💼 Profil wyceny</div>
           <div class="qbar">
-            <select id="qProfile" title="Wybierz zapisany profil cennika"></select>
+            <select id="qProfile" title="Wybierz zapisany profil cennika" aria-label="Profil cennika"></select>
           </div>
           <div class="qbar-btns">
-            <button type="button" class="tbtn" id="qProfNew" title="Utwórz nowy profil (od domyślnych)">＋ Nowy</button>
-            <button type="button" class="tbtn" id="qProfRename" title="Zmień nazwę profilu">✎ Nazwa</button>
-            <button type="button" class="tbtn" id="qProfDup" title="Powiel bieżący profil">⧉ Powiel</button>
-            <button type="button" class="tbtn" id="qProfDel" title="Usuń bieżący profil">🗑 Usuń</button>
+            <button type="button" class="tbtn" id="qProfNew" title="Utwórz nowy profil (od domyślnych)" aria-label="Nowy profil">＋ Nowy</button>
+            <button type="button" class="tbtn" id="qProfRename" title="Zmień nazwę profilu" aria-label="Zmień nazwę profilu">✎ Nazwa</button>
+            <button type="button" class="tbtn" id="qProfDup" title="Powiel bieżący profil" aria-label="Powiel profil">⧉ Powiel</button>
+            <button type="button" class="tbtn" id="qProfDel" title="Usuń bieżący profil" aria-label="Usuń profil">🗑 Usuń</button>
           </div>
         </div>
         <!-- TWOJA WYCENA: materiał, ilość, cena na żywo -->
@@ -9133,21 +9135,21 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       return {bx:b.x,by:b.y,bw:Math.max(1,b.width),bh:Math.max(1,b.height)}; };
     const defs=[
       {id:'mo_tree', label:'Drzewo', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:3,tol:0.65,minArea:100,smoothIter:4,close:3})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:9,depth:8,trunk:0.2,width:0.05,spread:0.82,up:0.2,curve:0.36,foliage:true,foliageR:1.15,foliageMin:0.7,canopyBand:0.5,minW:2.6}),560,620,{ss:3,tol:0.5,minArea:80,smoothIter:5,close:3})},
       {id:'mo_acacia', label:'Akacja', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:3,tol:0.65,minArea:40,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:23,depth:9,trunk:0.16,width:0.045,spread:1.05,up:0.34,foliage:true,foliageR:1.0,foliageMin:0.9,canopyFlat:1,canopyBand:0.42,minW:2.4}),560,460,{ss:3,tol:0.5,minArea:35,smoothIter:5,close:2})},
       {id:'mo_tree_circle', label:'Drzewo w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),800,800,{ss:3,tol:0.65,minArea:50,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeCircleScene(ctx,W,H,{seed:23}),800,800,{ss:3,tol:0.5,minArea:40,smoothIter:5,close:2})},
       {id:'mo_tree_family', label:'Drzewo z rodziną', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeFamilyCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.65,minArea:40,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeFamilyCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.5,minArea:35,smoothIter:5,close:2})},
       {id:'mo_mtn_circle', label:'Góry w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.65,minArea:50,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawMountainCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.5,minArea:40,smoothIter:5,close:2})},
       {id:'mo_forest_circle', label:'Las w okręgu', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.65,minArea:50,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawPineForestCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.5,minArea:40,smoothIter:5,close:2})},
       {id:'mo_deer_circle', label:'Jeleń w lesie', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawDeerCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.65,minArea:30,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawDeerCircleScene(ctx,W,H,{}),800,800,{ss:3,tol:0.5,minArea:25,smoothIter:5,close:2})},
       {id:'mo_bare_tree', label:'Drzewo (gałęzie)', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:7,trunk:0.22,width:0.055,spread:0.72,up:0.18,curve:0.42,foliage:false,minW:3.8}),520,600,{ss:3,tol:0.65,minArea:60,smoothIter:4,close:1})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeShape(ctx,W,H,{seed:11,depth:7,trunk:0.22,width:0.055,spread:0.72,up:0.18,curve:0.42,foliage:false,minW:3.8}),520,600,{ss:3,tol:0.5,minArea:50,smoothIter:5,close:1})},
       {id:'mo_family', label:'Rodzina', fillRule:'evenodd',
         d:'M19.2,234 L300.8,234 L300.8,241.28 L19.2,241.28 Z M127.6,46.8 A15.6,15.6 0 1,0 96.4,46.8 A15.6,15.6 0 1,0 127.6,46.8 Z M91.2,72.8 L132.8,72.8 L138,182 L86,182 Z M96.43,181.43 L91.23,228.23 A5.2,5.2 0 0,1 101.57,229.37 L106.77,182.57 A5.2,5.2 0 0,1 96.43,181.43 Z M117.23,182.57 L122.43,229.37 A5.2,5.2 0 0,1 132.77,228.23 L127.57,181.43 A5.2,5.2 0 0,1 117.23,182.57 Z M190.3,65 A14.3,14.3 0 1,0 161.7,65 A14.3,14.3 0 1,0 190.3,65 Z M160.4,88.4 L191.6,88.4 L207.2,202.8 L144.8,202.8 Z M240.8,114.4 A10.4,10.4 0 1,0 220,114.4 A10.4,10.4 0 1,0 240.8,114.4 Z M217.4,135.2 L243.4,135.2 L246,197.6 L214.8,197.6 Z M218.71,197.28 L216.11,228.48 A3.9,3.9 0 0,1 223.89,229.12 L226.49,197.92 A3.9,3.9 0 0,1 218.71,197.28 Z M234.31,197.92 L236.91,229.12 A3.9,3.9 0 0,1 244.69,228.48 L242.09,197.28 A3.9,3.9 0 0,1 234.31,197.92 Z'},
       {id:'mo_pine', label:'Świerk', fillRule:'nonzero',
@@ -9197,7 +9199,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       {id:'mo_snowflake', label:'Śnieżynka', fillRule:'evenodd',
         d:'M153.75,150 L153.75,24 A3.75,3.75 0 0,1 146.25,24 L146.25,150 A3.75,3.75 0 0,1 153.75,150 Z M152.34,101.71 L122.78,78.14 A3.75,3.75 0 0,1 118.11,84 L147.66,107.57 A3.75,3.75 0 0,1 152.34,101.71 Z M152.34,107.57 L181.89,84 A3.75,3.75 0 0,1 177.22,78.14 L147.66,101.71 A3.75,3.75 0 0,1 152.34,107.57 Z M152.34,56.35 L122.78,32.78 A3.75,3.75 0 0,1 118.11,38.64 L147.66,62.21 A3.75,3.75 0 0,1 152.34,56.35 Z M152.34,62.21 L181.89,38.64 A3.75,3.75 0 0,1 177.22,32.78 L147.66,56.35 A3.75,3.75 0 0,1 152.34,62.21 Z M156,24 A6,6 0 1,0 144,24 A6,6 0 1,0 156,24 Z M151.88,153.25 L260.99,90.25 A3.75,3.75 0 0,1 257.24,83.75 L148.13,146.75 A3.75,3.75 0 0,1 151.88,153.25 Z M192.99,127.88 L198.62,90.5 A3.75,3.75 0 0,1 191.21,89.38 L185.57,126.76 A3.75,3.75 0 0,1 192.99,127.88 Z M187.91,130.81 L223.1,144.62 A3.75,3.75 0 0,1 225.84,137.64 L190.65,123.83 A3.75,3.75 0 0,1 187.91,130.81 Z M232.27,105.2 L237.91,67.82 A3.75,3.75 0 0,1 230.49,66.7 L224.86,104.08 A3.75,3.75 0 0,1 232.27,105.2 Z M227.2,108.13 L262.38,121.94 A3.75,3.75 0 0,1 265.12,114.96 L229.94,101.15 A3.75,3.75 0 0,1 227.2,108.13 Z M265.12,87 A6,6 0 1,0 253.12,87 A6,6 0 1,0 265.12,87 Z M148.13,153.25 L257.24,216.25 A3.75,3.75 0 0,1 260.99,209.75 L151.88,146.75 A3.75,3.75 0 0,1 148.13,153.25 Z M190.65,176.17 L225.84,162.36 A3.75,3.75 0 0,1 223.1,155.38 L187.91,169.19 A3.75,3.75 0 0,1 190.65,176.17 Z M185.57,173.24 L191.21,210.62 A3.75,3.75 0 0,1 198.62,209.5 L192.99,172.12 A3.75,3.75 0 0,1 185.57,173.24 Z M229.94,198.85 L265.12,185.04 A3.75,3.75 0 0,1 262.38,178.06 L227.2,191.87 A3.75,3.75 0 0,1 229.94,198.85 Z M224.86,195.92 L230.49,233.3 A3.75,3.75 0 0,1 237.91,232.18 L232.27,194.8 A3.75,3.75 0 0,1 224.86,195.92 Z M265.12,213 A6,6 0 1,0 253.12,213 A6,6 0 1,0 265.12,213 Z M146.25,150 L146.25,276 A3.75,3.75 0 0,1 153.75,276 L153.75,150 A3.75,3.75 0 0,1 146.25,150 Z M147.66,198.29 L177.22,221.86 A3.75,3.75 0 0,1 181.89,216 L152.34,192.43 A3.75,3.75 0 0,1 147.66,198.29 Z M147.66,192.43 L118.11,216 A3.75,3.75 0 0,1 122.78,221.86 L152.34,198.29 A3.75,3.75 0 0,1 147.66,192.43 Z M147.66,243.65 L177.22,267.22 A3.75,3.75 0 0,1 181.89,261.36 L152.34,237.79 A3.75,3.75 0 0,1 147.66,243.65 Z M147.66,237.79 L118.11,261.36 A3.75,3.75 0 0,1 122.78,267.22 L152.34,243.65 A3.75,3.75 0 0,1 147.66,237.79 Z M156,276 A6,6 0 1,0 144,276 A6,6 0 1,0 156,276 Z M148.13,146.75 L39.01,209.75 A3.75,3.75 0 0,1 42.76,216.25 L151.88,153.25 A3.75,3.75 0 0,1 148.13,146.75 Z M107.01,172.12 L101.38,209.5 A3.75,3.75 0 0,1 108.79,210.62 L114.43,173.24 A3.75,3.75 0 0,1 107.01,172.12 Z M112.09,169.19 L76.9,155.38 A3.75,3.75 0 0,1 74.16,162.36 L109.35,176.17 A3.75,3.75 0 0,1 112.09,169.19 Z M67.73,194.8 L62.09,232.18 A3.75,3.75 0 0,1 69.51,233.3 L75.14,195.92 A3.75,3.75 0 0,1 67.73,194.8 Z M72.8,191.87 L37.62,178.06 A3.75,3.75 0 0,1 34.88,185.04 L70.06,198.85 A3.75,3.75 0 0,1 72.8,191.87 Z M46.88,213 A6,6 0 1,0 34.88,213 A6,6 0 1,0 46.88,213 Z M151.88,146.75 L42.76,83.75 A3.75,3.75 0 0,1 39.01,90.25 L148.13,153.25 A3.75,3.75 0 0,1 151.88,146.75 Z M109.35,123.83 L74.16,137.64 A3.75,3.75 0 0,1 76.9,144.62 L112.09,130.81 A3.75,3.75 0 0,1 109.35,123.83 Z M114.43,126.76 L108.79,89.38 A3.75,3.75 0 0,1 101.38,90.5 L107.01,127.88 A3.75,3.75 0 0,1 114.43,126.76 Z M70.06,101.15 L34.88,114.96 A3.75,3.75 0 0,1 37.62,121.94 L72.8,108.13 A3.75,3.75 0 0,1 70.06,101.15 Z M75.14,104.08 L69.51,66.7 A3.75,3.75 0 0,1 62.09,67.82 L67.73,105.2 A3.75,3.75 0 0,1 75.14,104.08 Z M46.88,87 A6,6 0 1,0 34.88,87 A6,6 0 1,0 46.88,87 Z M162,150 A12,12 0 1,0 138,150 A12,12 0 1,0 162,150 Z'},
       {id:'mo_tree_life', label:'Drzewo życia', fillRule:'evenodd',
-        d:rasterizeShapeToD((ctx,W,H)=>drawTreeOfLifeScene(ctx,W,H,{seed:42}),800,800,{ss:3,tol:0.65,minArea:40,smoothIter:4,close:2})},
+        d:rasterizeShapeToD((ctx,W,H)=>drawTreeOfLifeScene(ctx,W,H,{seed:42}),800,800,{ss:3,tol:0.5,minArea:35,smoothIter:5,close:2})},
       {id:'mo_dreamcatcher', label:'Łapacz snów', fillRule:'evenodd',
         d:'M270,130 A120,120 0 1,0 30,130 A120,120 0 1,0 270,130 Z M258,130 A108,108 0 1,0 42,130 A108,108 0 1,0 258,130 Z M151.5,130 L151.5,22 A1.5,1.5 0 0,1 148.5,22 L148.5,130 A1.5,1.5 0 0,1 151.5,130 Z M151.06,131.06 L227.43,54.69 A1.5,1.5 0 0,1 225.31,52.57 L148.94,128.94 A1.5,1.5 0 0,1 151.06,131.06 Z M150,131.5 L258,131.5 A1.5,1.5 0 0,1 258,128.5 L150,128.5 A1.5,1.5 0 0,1 150,131.5 Z M148.94,131.06 L225.31,207.43 A1.5,1.5 0 0,1 227.43,205.31 L151.06,128.94 A1.5,1.5 0 0,1 148.94,131.06 Z M148.5,130 L148.5,238 A1.5,1.5 0 0,1 151.5,238 L151.5,130 A1.5,1.5 0 0,1 148.5,130 Z M148.94,128.94 L72.57,205.31 A1.5,1.5 0 0,1 74.69,207.43 L151.06,131.06 A1.5,1.5 0 0,1 148.94,128.94 Z M150,128.5 L42,128.5 A1.5,1.5 0 0,1 42,131.5 L150,131.5 A1.5,1.5 0 0,1 150,128.5 Z M151.06,128.94 L74.69,52.57 A1.5,1.5 0 0,1 72.57,54.69 L148.94,131.06 A1.5,1.5 0 0,1 151.06,128.94 Z M177,130 A27,27 0 1,0 123,130 A27,27 0 1,0 177,130 Z M175.5,130 A25.5,25.5 0 1,0 124.5,130 A25.5,25.5 0 1,0 175.5,130 Z M204,130 A54,54 0 1,0 96,130 A54,54 0 1,0 204,130 Z M202.5,130 A52.5,52.5 0 1,0 97.5,130 A52.5,52.5 0 1,0 202.5,130 Z M231,130 A81,81 0 1,0 69,130 A81,81 0 1,0 231,130 Z M229.5,130 A79.5,79.5 0 1,0 70.5,130 A79.5,79.5 0 1,0 229.5,130 Z M158,130 A8,8 0 1,0 142,130 A8,8 0 1,0 158,130 Z M64.27,216.66 L76.22,295.76 A1.75,1.75 0 0,1 79.69,295.24 L67.73,216.14 A1.75,1.75 0 0,1 64.27,216.66 Z M67.48,227.59 L52.1,234.76 A0.75,0.75 0 0,1 52.73,236.12 L68.11,228.94 A0.75,0.75 0 0,1 67.48,227.59 Z M67.69,229.01 L84.51,231.32 A0.75,0.75 0 0,1 84.71,229.84 L67.9,227.52 A0.75,0.75 0 0,1 67.69,229.01 Z M68.9,237.08 L54.56,244.11 A0.75,0.75 0 0,1 55.22,245.45 L69.56,238.43 A0.75,0.75 0 0,1 68.9,237.08 Z M69.11,238.5 L84.88,240.97 A0.75,0.75 0 0,1 85.11,239.49 L69.34,237.02 A0.75,0.75 0 0,1 69.11,238.5 Z M70.32,246.58 L57.03,253.45 A0.75,0.75 0 0,1 57.71,254.78 L71.01,247.92 A0.75,0.75 0 0,1 70.32,246.58 Z M70.53,247.99 L85.26,250.62 A0.75,0.75 0 0,1 85.52,249.14 L70.79,246.51 A0.75,0.75 0 0,1 70.53,247.99 Z M71.74,256.08 L59.49,262.79 A0.75,0.75 0 0,1 60.21,264.11 L72.46,257.4 A0.75,0.75 0 0,1 71.74,256.08 Z M71.95,257.48 L85.63,260.26 A0.75,0.75 0 0,1 85.93,258.79 L72.25,256.01 A0.75,0.75 0 0,1 71.95,257.48 Z M73.15,265.59 L61.95,272.13 A0.75,0.75 0 0,1 62.71,273.43 L73.91,266.88 A0.75,0.75 0 0,1 73.15,265.59 Z M73.36,266.96 L86,269.91 A0.75,0.75 0 0,1 86.34,268.45 L73.7,265.5 A0.75,0.75 0 0,1 73.36,266.96 Z M74.57,275.09 L64.41,281.48 A0.75,0.75 0 0,1 65.21,282.75 L75.37,276.36 A0.75,0.75 0 0,1 74.57,275.09 Z M74.77,276.45 L86.37,279.55 A0.75,0.75 0 0,1 86.75,278.1 L75.16,275 A0.75,0.75 0 0,1 74.77,276.45 Z M75.98,284.6 L66.86,290.83 A0.75,0.75 0 0,1 67.71,292.07 L76.82,285.84 A0.75,0.75 0 0,1 75.98,284.6 Z M76.18,285.94 L86.73,289.2 A0.75,0.75 0 0,1 87.17,287.76 L76.62,284.5 A0.75,0.75 0 0,1 76.18,285.94 Z M148.25,250 L148.25,330 A1.75,1.75 0 0,1 151.75,330 L151.75,250 A1.75,1.75 0 0,1 148.25,250 Z M149.79,261.28 L133.51,266.08 A0.75,0.75 0 0,1 133.93,267.52 L150.21,262.72 A0.75,0.75 0 0,1 149.79,261.28 Z M149.79,262.72 L166.07,267.52 A0.75,0.75 0 0,1 166.49,266.08 L150.21,261.28 A0.75,0.75 0 0,1 149.79,262.72 Z M149.77,270.88 L134.55,275.68 A0.75,0.75 0 0,1 135,277.12 L150.23,272.32 A0.75,0.75 0 0,1 149.77,270.88 Z M149.77,272.32 L165,277.12 A0.75,0.75 0 0,1 165.45,275.68 L150.23,270.88 A0.75,0.75 0 0,1 149.77,272.32 Z M149.76,280.49 L135.59,285.29 A0.75,0.75 0 0,1 136.07,286.71 L150.24,281.91 A0.75,0.75 0 0,1 149.76,280.49 Z M149.76,281.91 L163.93,286.71 A0.75,0.75 0 0,1 164.41,285.29 L150.24,280.49 A0.75,0.75 0 0,1 149.76,281.91 Z M149.74,290.1 L136.63,294.9 A0.75,0.75 0 0,1 137.15,296.3 L150.26,291.5 A0.75,0.75 0 0,1 149.74,290.1 Z M149.74,291.5 L162.85,296.3 A0.75,0.75 0 0,1 163.37,294.9 L150.26,290.1 A0.75,0.75 0 0,1 149.74,291.5 Z M149.72,299.7 L137.67,304.5 A0.75,0.75 0 0,1 138.22,305.9 L150.28,301.1 A0.75,0.75 0 0,1 149.72,299.7 Z M149.72,301.1 L161.78,305.9 A0.75,0.75 0 0,1 162.33,304.5 L150.28,299.7 A0.75,0.75 0 0,1 149.72,301.1 Z M149.7,309.31 L138.7,314.11 A0.75,0.75 0 0,1 139.3,315.49 L150.3,310.69 A0.75,0.75 0 0,1 149.7,309.31 Z M149.7,310.69 L160.7,315.49 A0.75,0.75 0 0,1 161.3,314.11 L150.3,309.31 A0.75,0.75 0 0,1 149.7,310.69 Z M149.67,318.92 L139.73,323.72 A0.75,0.75 0 0,1 140.38,325.08 L150.33,320.28 A0.75,0.75 0 0,1 149.67,318.92 Z M149.67,320.28 L159.62,325.08 A0.75,0.75 0 0,1 160.27,323.72 L150.33,318.92 A0.75,0.75 0 0,1 149.67,320.28 Z M232.27,216.14 L220.31,295.24 A1.75,1.75 0 0,1 223.78,295.76 L235.73,216.66 A1.75,1.75 0 0,1 232.27,216.14 Z M232.1,227.52 L215.29,229.84 A0.75,0.75 0 0,1 215.49,231.32 L232.31,229.01 A0.75,0.75 0 0,1 232.1,227.52 Z M231.89,228.94 L247.27,236.12 A0.75,0.75 0 0,1 247.9,234.76 L232.52,227.59 A0.75,0.75 0 0,1 231.89,228.94 Z M230.66,237.02 L214.89,239.49 A0.75,0.75 0 0,1 215.12,240.97 L230.89,238.5 A0.75,0.75 0 0,1 230.66,237.02 Z M230.44,238.43 L244.78,245.45 A0.75,0.75 0 0,1 245.44,244.11 L231.1,237.08 A0.75,0.75 0 0,1 230.44,238.43 Z M229.21,246.51 L214.48,249.14 A0.75,0.75 0 0,1 214.74,250.62 L229.47,247.99 A0.75,0.75 0 0,1 229.21,246.51 Z M228.99,247.92 L242.29,254.78 A0.75,0.75 0 0,1 242.97,253.45 L229.68,246.58 A0.75,0.75 0 0,1 228.99,247.92 Z M227.75,256.01 L214.07,258.79 A0.75,0.75 0 0,1 214.37,260.26 L228.05,257.48 A0.75,0.75 0 0,1 227.75,256.01 Z M227.54,257.4 L239.79,264.11 A0.75,0.75 0 0,1 240.51,262.79 L228.26,256.08 A0.75,0.75 0 0,1 227.54,257.4 Z M226.3,265.5 L213.66,268.45 A0.75,0.75 0 0,1 214,269.91 L226.64,266.96 A0.75,0.75 0 0,1 226.3,265.5 Z M226.09,266.88 L237.29,273.43 A0.75,0.75 0 0,1 238.05,272.13 L226.85,265.59 A0.75,0.75 0 0,1 226.09,266.88 Z M224.84,275 L213.25,278.1 A0.75,0.75 0 0,1 213.63,279.55 L225.23,276.45 A0.75,0.75 0 0,1 224.84,275 Z M224.63,276.36 L234.79,282.75 A0.75,0.75 0 0,1 235.59,281.48 L225.43,275.09 A0.75,0.75 0 0,1 224.63,276.36 Z M223.38,284.5 L212.83,287.76 A0.75,0.75 0 0,1 213.27,289.2 L223.82,285.94 A0.75,0.75 0 0,1 223.38,284.5 Z M223.18,285.84 L232.29,292.07 A0.75,0.75 0 0,1 233.14,290.83 L224.02,284.6 A0.75,0.75 0 0,1 223.18,285.84 Z'},
       {id:'mo_compass', label:'Kompas', fillRule:'evenodd',
