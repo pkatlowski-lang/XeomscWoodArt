@@ -2860,7 +2860,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       el.textContent=msg;
     }
     _toastC.appendChild(el);
-    const dismiss=()=>{ el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); };
+    let dismissed=false;
+    const dismiss=()=>{ if(dismissed) return; dismissed=true; el.classList.add('toast-out'); setTimeout(()=>el.remove(),250); };
     el.addEventListener('click',dismiss);
     setTimeout(dismiss,dur);
   }
@@ -2881,6 +2882,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     _confirmCancel.textContent=opts.cancel||'Anuluj';
     _confirmInput.classList.add('u-hidden');
     if(opts.danger){ _confirmOk.className='tbtn tbtn-danger'; } else { _confirmOk.className='tbtn tbtn-primary'; }
+    if(_confirmResolve) _confirmResolve(false);
     _confirmOv.classList.add('open');
     _confirmOk.focus();
     return new Promise(resolve=>{ _confirmResolve=resolve; });
@@ -2895,6 +2897,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     _confirmOk.className='tbtn tbtn-primary';
     _confirmInput.classList.remove('u-hidden');
     _confirmInput.value=defaultVal||'';
+    if(_confirmResolve) _confirmResolve(null);
     _confirmOv.classList.add('open');
     _confirmInput.focus();
     _confirmInput.select();
@@ -3029,7 +3032,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
           await ff.load();
           document.fonts.add(ff);
           embeddedFamilies.add(fd.family);
-        }catch(e){}
+        }catch(e){ console.warn('Czcionka nie załadowana:',fd.family,e.message); }
         if(i>0 && i%50===0) showToast(`Ładowanie czcionek… ${i}/${fonts.length}`,'info',1500);
       }
       localFonts=fams.map(f=>[`"${f}"`, f]);
@@ -6806,7 +6809,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         if(!s.profiles.some(p=>p.id===s.activeId)) s.activeId=s.profiles[0].id;
         return s;
       }
-    }catch(e){}
+    }catch(e){ console.warn('Wczytywanie profili wyceny:',e.message); }
     let cfg;
     try{ cfg=normalizeConfig(JSON.parse(localStorage.getItem(PRICING_KEY)||'null')); }
     catch(e){ cfg=JSON.parse(JSON.stringify(QUOTE_DEFAULTS)); }
