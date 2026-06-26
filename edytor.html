@@ -6190,7 +6190,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const blob=new Blob([JSON.stringify(obj,null,1)],{type:'application/json'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
   }
   document.getElementById('saveProjectBtn').addEventListener('click',()=>{
     const proj=serializeProject();
@@ -7703,7 +7703,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const full=`<?xml version="1.0" encoding="UTF-8"?>\n${r.svg}`;
     const blob=new Blob([full],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-warstwy-${Date.now()}.svg`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),10000);
   }
 
   /* ---------------- Eksport ---------------- */
@@ -7747,7 +7747,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const svg=buildExportSvgString();
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),10000);
     const expObjs=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference');
     const expCount=expObjs.length;
     const sizeKB=(blob.size/1024).toFixed(1);
@@ -7888,7 +7888,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       `0\nSECTION\n2\nENTITIES\n${ents}0\nENDSEC\n0\nEOF\n`;
     const blob=new Blob([dxf],{type:'application/dxf'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.dxf`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),10000);
     const sizeKB=(blob.size/1024).toFixed(1);
     showToast(`DXF wyeksportowany (${objs.length} elem., ${depths.length} warstw, ${sizeKB} KB)`,'success');
     markSaved();
