@@ -6370,7 +6370,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(selArr.length && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
       e.preventDefault(); const step=e.shiftKey?state.grid:1;
       let dx=0,dy=0; if(e.key==='ArrowUp')dy=-step; if(e.key==='ArrowDown')dy=step; if(e.key==='ArrowLeft')dx=-step; if(e.key==='ArrowRight')dx=step;
-      selArr.forEach(o=>{ o.x+=dx; o.y+=dy; });
+      // zablokowane elementy nie reagują na przesuwanie strzałkami — spójnie z przeciąganiem myszą
+      const movable=selArr.filter(o=>!o.locked);
+      if(!movable.length) return;
+      movable.forEach(o=>{ o.x+=dx; o.y+=dy; });
       renderObjects(); renderOverlay(); syncPropsLive(); pushHistory(); scheduleLive3D(); return;
     }
     // precyzyjny obrót zaznaczenia: , / . = -5°/+5°, Shift+, / Shift+. (znaki < / >) = -1°/+1°
