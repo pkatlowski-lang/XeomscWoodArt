@@ -4951,11 +4951,18 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(h==='e'||h==='w'){
         const flipSgn=o.flipX?-1:1, mag=clamp(nw/(nb.width||1),0.05,20);
         o.tsx=mag; const tsxEff=mag*flipSgn;
-        o.x = (h==='e') ? (b.x-d.txOffX*tsxEff) : ((b.x+b.w)-(d.txOffX+nb.width)*tsxEff);
+        // przy odbiciu (tsx<0) lewa i prawa krawędź bbox zamieniają się: lewą krawędź wyznacza
+        // offset (txOffX+width), a prawą sam txOffX. Bez tego rozróżnienia kotwiczenie krawędzi
+        // odbitego napisu przy skalowaniu E/W przesuwało go (bbox.x = ax + offset*tsx).
+        const leftF  = o.flipX ? (d.txOffX+nb.width) : d.txOffX;
+        const rightF = o.flipX ? d.txOffX : (d.txOffX+nb.width);
+        o.x = (h==='e') ? (b.x - leftF*tsxEff) : ((b.x+b.w) - rightF*tsxEff);
       } else {
         const flipSgn=o.flipY?-1:1, mag=clamp(nh/(nb.height||1),0.05,20);
         o.tsy=mag; const tsyEff=mag*flipSgn;
-        const ay = (h==='s') ? (b.y-d.txOffY*tsyEff) : ((b.y+b.h)-(d.txOffY+nb.height)*tsyEff);
+        const topF    = o.flipY ? (d.txOffY+nb.height) : d.txOffY;
+        const bottomF = o.flipY ? d.txOffY : (d.txOffY+nb.height);
+        const ay = (h==='s') ? (b.y - topF*tsyEff) : ((b.y+b.h) - bottomF*tsyEff);
         o.y = ay-textAnchorOffset(o);
       }
       return;
