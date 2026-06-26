@@ -6816,7 +6816,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   // Czas grawerowania (wypełnienia) z pola w mm² — trasa skanowania to pole/odstęp linii,
   // plus nadmiarowe skanowanie po obu stronach każdej linii.
   function quoteEngraveTimeMin(areaMm2){
-    return (areaMm2/PRICING.engraveSpacing)/PRICING.engraveSpeed*(1+2*PRICING.engraveOverscan);
+    // guard: uszkodzony localStorage może przepuścić 0 przez normalizeConfig (spread nadpisuje
+    // domyślne), a dzielenie przez 0 dałoby Infinity → NaN w całej wycenie
+    const spacing=Math.max(0.01, PRICING.engraveSpacing||0.1);
+    const speed=Math.max(1, PRICING.engraveSpeed||8000);
+    return (areaMm2/spacing)/speed*(1+2*(PRICING.engraveOverscan||0));
   }
   // Rozbicie czasu cyklu lasera: cięcie/nacięcie wg prędkości materiału + grawerowanie
   // (wypełnienie) wg parametrów grawera, razem +15% bufora (tolerancja błędowa).
@@ -7686,7 +7690,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       // bo wszystko co leży na/nad tą płytą wymaga pełnego materiału pod sobą
       const cutObjs=vis.filter(o=>(o.depth||1)>=dep && (o.type==='text' || o.role==='hole' || (BOOL_TYPES.includes(o.type) && o.mode!=='engrave')));
       const rings=mergeLayerRings(cutObjs, dep);
-      const cutPaths=rings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${COLORS.cut}" stroke-width="0.3"/>`).join('');
+      const cutPaths=rings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${COLORS.cut}" stroke-width="0.12"/>`).join('');
       // tekst tej warstwy w trybie "grawer" — wypełniona zwektoryzowana sylwetka liter (do grawerowania).
       // Kontur do CIĘCIA liter jest już częścią cutPaths (cutObjs zawiera cały tekst niezależnie od trybu).
       const textEngrave=vis.filter(o=>o.type==='text' && (o.depth||1)===dep && o.mode==='engrave' && o.role!=='hole')
@@ -7717,7 +7721,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   // obrysu tam, gdzie elementy się stykają lub nakładają.
   function buildExportSvgString(){
     const W=state.docW,H=state.docH;
-    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference');
+    // ukryte warstwy głębi (toggle "oko" w legendzie) są też pomijane w eksporcie — spójnie
+    // z płótnem, podglądem 3D i eksportem rozdzielonym; bez tego laser wycinałby niewidoczne elementy
+    const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
     let body='';
     depths.forEach(dep=>{
@@ -7751,7 +7757,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const blob=new Blob([svg],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`projekt-laser-${Date.now()}.svg`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),10000);
-    const expObjs=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference');
+    const expObjs=state.objects.filter(o=>o.visible&&o.type!=='image'&&o.mode!=='reference'&&!state.hiddenDepths.includes(o.depth||1));
     const expCount=expObjs.length;
     const sizeKB=(blob.size/1024).toFixed(1);
     const depths=[...new Set(expObjs.map(o=>o.depth||1))].length;
