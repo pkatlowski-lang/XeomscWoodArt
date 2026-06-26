@@ -4896,7 +4896,11 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       startInlineTextEdit(o); // od razu edycja nowego napisu na płycie (na dotyku otwiera klawiaturę)
     } else if(m==='move'||m==='resize'||m==='rotate'||m==='mresize'){
       state.guideLines=null; renderOverlay();
-      pushHistory(); renderProps(); scheduleLive3D();
+      // zwykłe kliknięcie obiektu (zaznaczenie bez przeciągnięcia) uruchamia tryb 'move',
+      // ale nic nie przesuwa — nie zapisujemy wtedy pustego kroku do historii
+      const noMove = m==='move' && drag.items && !drag.items.some(it=>it.o.x!==it.ox||it.o.y!==it.oy);
+      if(!noMove) pushHistory();
+      renderProps(); scheduleLive3D();
     } else if(m==='nodeMove'){
       if(drag.moved){ recalcPathBBox(o); nodeClickInfo=null; pushHistory(); renderAll(); renderProps(); scheduleLive3D(); }
       else { nodeClickInfo={id:o.id, idx:drag.idx, time:Date.now()}; }
