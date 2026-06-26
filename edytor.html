@@ -7746,9 +7746,14 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         const rings=mergeLayerRings(mode==='cut'?[...objs,...holes]:objs, dep);
         body+=rings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${col}" stroke-width="0.12"${dash}/>`).join('');
       });
-      // otwory bez żadnego materiału cięcia w tej warstwie (skrajny przypadek) — rysujemy
-      // je niezależnie, jak dotychczas, przerywaną fioletową linią
-      if(!holesUsed) body+=holes.map(o=>objMarkup(o,true)).join('');
+      // otwory w warstwie bez żadnego materiału CIĘCIA (np. tylko nacięcie) — otwór i tak musi
+      // być fizycznie wycięty, więc eksportujemy go jako pełny kontur cięcia (czerwony, ciągły),
+      // spójnie z eksportem rozdzielonym; wcześniej rysowany był jako fioletowa przerywana linia,
+      // której laser nie rozpoznałby jako cięcia
+      if(!holesUsed && holes.length){
+        const holeRings=mergeLayerRings(holes, dep);
+        body+=holeRings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${COLORS.cut}" stroke-width="0.12"/>`).join('');
+      }
     });
     return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm">\n${body}\n</svg>`;
   }
