@@ -360,7 +360,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .tpl button:hover .tpl-ico{background:radial-gradient(120% 120% at 30% 20%,rgba(var(--accent-rgb),.34),rgba(var(--accent-rgb),.12));border-color:var(--accent);box-shadow:0 0 12px rgba(var(--accent-rgb),.3)}
 .tpl .tpl-txt{display:block}
 
-/* ---- Galeria podkładów / motywów ---- */
+/* ---- Galeria baz podstawowych ---- */
 .gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px}
 .gallery-card{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--r);padding:0 6px 9px;cursor:pointer;text-align:center;font-size:.7rem;color:var(--text);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px;overflow:hidden;transition:border-color var(--tr-base),color var(--tr-base),background var(--tr-base),transform var(--tr-base) .02s,box-shadow var(--tr-slow);counter-increment:gallery-card;animation:galleryCardIn var(--an-base) ease-out backwards}
 .gallery-card:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3);transform:translateY(-3px) scale(1.02) rotate(-.4deg);box-shadow:0 8px 24px rgba(0,0,0,.25),0 0 0 1px rgba(var(--accent-rgb),.2),inset 0 -2px 12px rgba(var(--accent-rgb),.06)}
@@ -2278,13 +2278,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     </nav>
     <aside class="panel left">
       <div class="ptabs" role="tablist" aria-label="Panel boczny">
-        <button class="ptab active" data-ptab="add" role="tab" aria-selected="true" aria-controls="ptab-add" title="Dodaj kształty, szablony i motywy" aria-label="Zakładka Dodaj">➕ Dodaj</button>
+        <button class="ptab active" data-ptab="add" role="tab" aria-selected="true" aria-controls="ptab-add" title="Dodaj kształty, szablony i bazy" aria-label="Zakładka Dodaj">➕ Dodaj</button>
         <button class="ptab" data-ptab="sheet" role="tab" aria-selected="false" aria-controls="ptab-sheet" title="Arkusz, siatka i parametry" aria-label="Zakładka Arkusz">📄 Arkusz</button>
         <button class="ptab" data-ptab="layers" role="tab" aria-selected="false" aria-controls="ptab-layers" title="Warstwy i kolejność elementów" aria-label="Zakładka Warstwy">▦ Warstwy</button>
         <button class="ptab" data-ptab="pricing" role="tab" aria-selected="false" aria-controls="ptab-pricing" title="Wycena projektu" aria-label="Zakładka Wycena">💰 Wycena</button>
       </div>
 
-      <!-- ZAKŁADKA: DODAJ — szablony, bazy, motywy -->
+      <!-- ZAKŁADKA: DODAJ — szablony, bazy -->
       <div class="ptab-body active" data-ptab-body="add" id="ptab-add" role="tabpanel">
         <h2>Szablony startowe</h2>
         <div class="tpl" id="templates"></div>
