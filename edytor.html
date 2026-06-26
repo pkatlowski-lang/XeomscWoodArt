@@ -2875,6 +2875,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(false); }
     if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); _closeConfirm(true); }
     if(e.key==='Tab'){
+      const focusable=_confirmOv.querySelectorAll('button:not(:disabled),input:not(.u-hidden)');
+      if(focusable.length){ const first=focusable[0], last=focusable[focusable.length-1];
+        if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+      }
+    }
+    if(e.key==='Tab'){
       const focusable=[_confirmInput,_confirmCancel,_confirmOk].filter(el=>el.offsetParent!==null);
       if(!focusable.length) return;
       const first=focusable[0], last=focusable[focusable.length-1];
