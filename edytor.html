@@ -829,7 +829,7 @@ input[type=range]:focus-visible{outline:none}
 
 /* === Reduced motion — respektuj preferencje użytkownika === */
 @media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .gallery-card:hover,.tpl button:hover{transform:none}
   .toolrail .tbtn:hover{transform:none}
   .layer:active,.tbtn:active:not(:disabled){transform:none}
@@ -3512,7 +3512,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 
   let _perfWarnShown=false;
   const _hintEmptyEl=document.getElementById('hintEmpty');
-  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); _hintEmptyEl.classList.toggle('u-hidden',state.objects.length>0); if(typeof scheduleLive3D==='function') scheduleLive3D(); updateStatusBar();
+  function renderAll(){ renderObjects(); renderOverlay(); renderGuides(); renderLayers(); renderDepthLegend(); _hintEmptyEl.classList.toggle('u-hidden',state.objects.length>0); scheduleLive3D(); updateStatusBar();
     if(!_perfWarnShown && state.objects.length>=150){ _perfWarnShown=true; showToast(`Dużo elementów (${state.objects.length}) — edytor może działać wolniej. Rozważ grupowanie lub usunięcie zbędnych obiektów.`,'warning',5000); }
   }
 
