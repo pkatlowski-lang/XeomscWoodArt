@@ -5028,7 +5028,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(b.dataset.bool){ booleanOp(b.dataset.bool); return; }
     if(b.dataset.group){ b.dataset.group==='group'?groupSel():ungroupSel(); return; }
     if(b.dataset.rot90!==undefined){ rotate90(Number(b.dataset.rot90)); return; }
-    if(b.dataset.setdepth!==undefined){ const dd=Number(b.dataset.setdepth); getSelected().forEach(ob=>ob.depth=dd); renderAll(); renderProps(); pushHistory(); return; }
+    if(b.dataset.setdepth!==undefined){ const dd=Number(b.dataset.setdepth); getSelected().forEach(ob=>ob.depth=dd); pruneHiddenDepths(); renderAll(); renderProps(); pushHistory(); return; }
     if(b.closest('[data-seg="mmode"]')&&b.dataset.mode){ const m=b.dataset.mode; getSelected().forEach(o=>o.mode=m); renderObjects(); renderLayers(); pushHistory(); return; }
   });
   function field(label, inner){ return `<div class="field"><label>${label}</label>${inner}</div>`; }
@@ -5655,8 +5655,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(frameBtn) frameBtn.addEventListener('click',()=>addTextFrame());
     const ddBtn=propsEl.querySelector('#depthDown'), duBtn=propsEl.querySelector('#depthUp');
     if(ddBtn&&duBtn){
-      ddBtn.addEventListener('click',()=>{ const o=getSel(); if(!o) return; o.depth=Math.max(1,(o.depth||1)-1); renderAll(); renderProps(); pushHistory(); });
-      duBtn.addEventListener('click',()=>{ const o=getSel(); if(!o) return; o.depth=(o.depth||1)+1; renderAll(); renderProps(); pushHistory(); });
+      ddBtn.addEventListener('click',()=>{ const o=getSel(); if(!o) return; o.depth=Math.max(1,(o.depth||1)-1); pruneHiddenDepths(); renderAll(); renderProps(); pushHistory(); });
+      duBtn.addEventListener('click',()=>{ const o=getSel(); if(!o) return; o.depth=(o.depth||1)+1; pruneHiddenDepths(); renderAll(); renderProps(); pushHistory(); });
     }
   }
   propsEl.addEventListener('click',e=>{
@@ -6247,11 +6247,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const dupInfo=Object.entries(dupTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
     const dupDepths=[...new Set(copies.map(c=>c.depth||1))].length;
     showToast(`Powielono ${copies.length} elem. (${dupInfo}, ${dupDepths} warst${dupDepths===1?'wa':'w'})`,'info',1500); }
+  // usuwa z hiddenDepths wpisy warstw, które już nie istnieją (po usunięciu elementów lub
+  // przeniesieniu ich na inną głębię) — bez tego nowy element na "wskrzeszonej" warstwie
+  // byłby niespodziewanie ukryty
+  function pruneHiddenDepths(){
+    if(!state.hiddenDepths.length) return;
+    const used=new Set(state.objects.map(o=>o.depth||1));
+    state.hiddenDepths=state.hiddenDepths.filter(d=>used.has(d));
+  }
   function deleteSel(){ const ids=state.selectedIds.slice(); if(!ids.length) return;
     const deleted=state.objects.filter(o=>ids.includes(o.id));
     const delTypes={}; deleted.forEach(o=>{delTypes[o.type]=(delTypes[o.type]||0)+1;});
     const delInfo=Object.entries(delTypes).map(([t,n])=>`${n}× ${t}`).join(', ');
-    state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pushHistory(); renderAll(); renderProps();
+    state.objects=state.objects.filter(o=>!ids.includes(o.id)); state.selectedIds=[]; pruneHiddenDepths(); pushHistory(); renderAll(); renderProps();
     showToast(`Usunięto ${deleted.length} elem. (${delInfo})`,'warning',1800); }
 
   /* ---------------- Schowek: kopiuj / wklej (Ctrl+C / Ctrl+V) ---------------- */
