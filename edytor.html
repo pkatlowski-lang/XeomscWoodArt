@@ -4678,7 +4678,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(done) return; done=true;
       const val=cancel? orig : ta.value;
       closeInlineTextEdit();
-      const changed=(o.text||'')!==val;
+      // porównujemy z ORYGINALNYM tekstem (orig), bo handler 'input' aktualizuje o.text na bieżąco —
+      // porównanie o.text!==val zawsze dałoby false i edycja nie trafiałaby do historii (undo nie działał)
+      const changed=orig!==val;
+      if(!cancel && val.trim()==='' && orig!==''){ showToast('Tekst nie może być pusty — przywrócono poprzedni','warning',2500); }
       o.text = (val.trim()==='') ? orig : val;   // pusty napis -> przywróć poprzedni
       renderAll(); renderProps(); scheduleLive3D();
       if(changed && !cancel && o.text!==orig) pushHistory();
