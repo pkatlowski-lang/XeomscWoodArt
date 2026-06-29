@@ -6675,17 +6675,20 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     state.objects.forEach(o=>{
       if(o.visible===false || o.mode==='reference') return;
       const reps=repeatTransforms(o).length;
+      // liczniki elementów uwzględniają powielenia (reps) — spójnie z długościami i polami,
+      // które już sumują wszystkie kopie; inaczej podsumowanie pokazywałoby np. "1 elem. · 90 mm"
+      // dla 3 powielonych linii (mylące — długość 3 kopii, ale licznik 1)
       if(o.type==='line'){
         const len=Math.hypot(o.w,o.h)*reps;
-        if(o.mode==='score'){ scoreLen+=len; scoreCount++; } else { cutLen+=len; cutCount++; }
+        if(o.mode==='score'){ scoreLen+=len; scoreCount+=reps; } else { cutLen+=len; cutCount+=reps; }
         return;
       }
       if(o.mode==='engrave'){
-        engraveArea+=objInkArea(o); engraveCount++;
+        engraveArea+=objInkArea(o); engraveCount+=reps;
       } else {
         const polys=objSubPolysRepeated(o);
         const len=polys.reduce((a,p)=>a+polyPerimeter(p),0);
-        if(o.mode==='score'){ scoreLen+=len; scoreCount++; } else { cutLen+=len; cutCount++; }
+        if(o.mode==='score'){ scoreLen+=len; scoreCount+=reps; } else { cutLen+=len; cutCount+=reps; }
       }
     });
     return {cutLen, scoreLen, engraveArea, cutCount, scoreCount, engraveCount};
