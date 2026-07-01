@@ -4331,19 +4331,30 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     status = kind==='intersection'?!cIn : kind==='union'?cIn : /*difference*/ !cIn;
     for(const v of Clist){ if(v.inter){ v.entry=status; status=!status; } }
     const result=[];
+    // Zabezpieczenie przed nieskończoną pętlą: zdegenerowana geometria (współliniowe/pokrywające
+    // się krawędzie z precyzyjnych plików, np. LightBurn) potrafi zaburzyć naprzemienność
+    // entry/exit tak, że pętla trawersacji nigdy nie trafi na przecięcie. Limit iteracji =
+    // wielokrotność liczby wierzchołków; po przekroczeniu przerywamy bezpiecznie (bez zawieszenia).
+    const _cap=Math.max(2000,(Slist.length+Clist.length)*8);
+    let _outer=0, _bailed=false;
     while(true){ let start=null; for(const v of Slist){ if(v.inter&&!v.visited){ start=v; break; } } if(!start) break;
-      const ring=[]; let cur=start;
+      if(++_outer>Slist.length+Clist.length+8){ _bailed=true; break; }
+      const ring=[]; let cur=start, _g=0;
       do{ cur.visited=true; if(cur.neighbour) cur.neighbour.visited=true;
-        if(cur.entry){ do{ cur=cur.next; ring.push([cur.x,cur.y]); }while(!cur.inter); }
-        else { do{ cur=cur.prev; ring.push([cur.x,cur.y]); }while(!cur.inter); }
-        cur=cur.neighbour; } while(cur && cur!==start);
+        if(cur.entry){ do{ cur=cur.next; ring.push([cur.x,cur.y]); }while(!cur.inter && ++_g<_cap); }
+        else { do{ cur=cur.prev; ring.push([cur.x,cur.y]); }while(!cur.inter && ++_g<_cap); }
+        cur=cur.neighbour; } while(cur && cur!==start && _g<_cap);
+      if(_g>=_cap){ _bailed=true; break; }
       if(ring.length>=3) result.push(ring); }
+    // przy degeneracji zwracamy null → wołający (unionAll/clipMany) użyje bezpiecznego fallbacku
+    if(_bailed) return null;
     return result;
   }
   function clipMany(polys, kind){
     if(!polys.length) return [];
     let acc=polys[0];
     for(let i=1;i<polys.length;i++){ const res=clipGH(acc,polys[i],kind);
+      if(res===null) continue;   // zdegenerowana geometria — pomiń składnik zamiast zawiesić
       if(!res.length) return kind==='intersection'?[]:[acc];
       acc=res.reduce((a,b)=>Math.abs(polyArea(b))>Math.abs(polyArea(a))?b:a, res[0]); }
     return [acc];
@@ -4368,10 +4379,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     let rings;
     if(kind==='xor'){
       // XOR = (A - B) + (B - A): co zostaje, gdy usunąć część wspólną z obu kształtów
-      rings = clipGH(polys[0],polys[1],'difference').concat(clipGH(polys[1],polys[0],'difference'));
+      const a=clipGH(polys[0],polys[1],'difference'), b=clipGH(polys[1],polys[0],'difference');
+      rings = (a===null||b===null)?null:a.concat(b);
     } else {
       rings = polys.length===2 ? clipGH(polys[0],polys[1],kind) : clipMany(polys,kind);
     }
+    if(rings===null){ showToast('Zbyt złożona geometria dla tej operacji (nakładające się/współliniowe krawędzie). Spróbuj uprościć kształty.','error',5000); return; }
     if(!rings.length){ showToast(kind==='intersection'?'Kształty nie mają części wspólnej.':kind==='difference'?'Po odjęciu nie zostało nic.':kind==='xor'?'Kształty pokrywają się całkowicie.':'Operacja nie dała wyniku.','error'); return; }
     finalizeBoolean(sel, rings.map(polyToPathD).join(' '), polysBBoxMulti(rings), sel[0].mode);
   }
@@ -8796,7 +8809,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!file) return;
     const reader=new FileReader();
     reader.onerror=()=>showToast('Nie udało się odczytać pliku','error');
-    reader.onload=e=>{
+    reader.onload=e=>{ try{
       let doc;
       try{ doc=new DOMParser().parseFromString(e.target.result,'application/xml'); }
       catch(err){ showToast('Nieprawidłowy plik LightBurn','error'); return; }
@@ -8849,32 +8862,43 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const _tmpSvg=document.createElementNS(SVG_NS,'svg'); _tmpSvg.classList.add('u-offscreen'); document.body.appendChild(_tmpSvg);
       const _tmpPath=document.createElementNS(SVG_NS,'path'); _tmpSvg.appendChild(_tmpPath);
       const bboxOf=d=>{ _tmpPath.setAttribute('d',d); try{ return _tmpPath.getBBox(); }catch(_){ return {x:0,y:0,width:0,height:0}; } };
-      let newObjs, usedIdx, depthOf;
+      let newObjs, usedIdx, depthOf, skippedBad=0;
+      const _fin=v=>typeof v==='number' && isFinite(v);
       try{
+        // najpierw policz bbox każdego kształtu w przestrzeni LightBurn; ODRZUĆ kształty z
+        // niefinitową geometrią (NaN/Infinity z egzotycznego formatu) — inaczej jeden zły
+        // kształt zatruwałby Math.min/max całego rysunku (NaN) i wszystkie obiekty wyszłyby
+        // zepsute, a operacje boolowskie w podglądzie mogłyby się zawiesić
+        const good=[];
         let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
         items.forEach(it=>{ const b=bboxOf(transformPathDGeneral(it.localD, it.mat));
+          if(!_fin(b.x)||!_fin(b.y)||!_fin(b.width)||!_fin(b.height)){ skippedBad++; return; }
+          it.wb={x:b.x,y:b.y,w:b.width,h:b.height}; good.push(it);
           minx=Math.min(minx,b.x); miny=Math.min(miny,b.y); maxx=Math.max(maxx,b.x+b.width); maxy=Math.max(maxy,b.y+b.height); });
+        if(!good.length || !_fin(minx) || !_fin(maxx)){ document.body.removeChild(_tmpSvg); showToast('Nie udało się odczytać poprawnej geometrii z pliku LightBurn.','error',5000); return; }
         const combW=Math.max(1e-6,maxx-minx), combH=Math.max(1e-6,maxy-miny);
         const wcx=(minx+maxx)/2, wcy=(miny+maxy)/2;
         const scale=Math.min(1, (state.docW*0.92)/combW, (state.docH*0.92)/combH);
         // macierz globalna: skala + wyśrodkowanie + ODBICIE osi Y (LightBurn Y↑ → ekran Y↓)
         const matGlobal=[scale,0,0,-scale, state.docW/2 - wcx*scale, state.docH/2 + wcy*scale];
         // 4) Mapowanie warstw → głębie edytora (kolejno wg CutIndex)
-        usedIdx=[...new Set(items.map(it=>it.cutIndex))].sort((a,b)=>a-b);
+        usedIdx=[...new Set(good.map(it=>it.cutIndex))].sort((a,b)=>a-b);
         depthOf={}; usedIdx.forEach((ci,i)=>depthOf[ci]=i+1);
-        // 5) Twórz obiekty
-        newObjs=items.map(it=>{
+        // 5) Twórz obiekty (pomijając te, których finalny bbox też wyszedłby niefinitowy)
+        newObjs=good.map(it=>{
           const d=transformPathDGeneral(it.localD, matMultiply(matGlobal, it.mat));
           const b=bboxOf(d);
+          if(!_fin(b.x)||!_fin(b.width)){ skippedBad++; return null; }
           const cs=cutMap[it.cutIndex]||{mode:'cut'};
           return { id:uid(), type:'path', name:cs.name||'', d, fillRule:'nonzero',
             bx:b.x, by:b.y, bw:Math.max(0.01,b.width), bh:Math.max(0.01,b.height),
             x:0, y:0, rotation:0, sx:1, sy:1, mode:cs.mode||'cut',
             visible:true, locked:false, depth:depthOf[it.cutIndex]||1, repeat:{type:'none'},
             lbrnLayer:cs.name||('C'+it.cutIndex), lbrnType:cs.type||'', lbrnSpeed:cs.speed||0, lbrnPower:cs.power||0, lbrnPasses:cs.passes||1 };
-        });
-      } catch(err){ document.body.removeChild(_tmpSvg); showToast('Błąd przetwarzania geometrii LightBurn','error'); return; }
+        }).filter(Boolean);
+      } catch(err){ try{document.body.removeChild(_tmpSvg);}catch(_){}; showToast('Błąd przetwarzania geometrii LightBurn','error'); return; }
       document.body.removeChild(_tmpSvg);
+      if(!newObjs.length){ showToast('Nie udało się odczytać poprawnej geometrii z pliku LightBurn.','error',5000); return; }
       // 6) Grubość materiału z projektu (MaterialHeight) → przypisz warstwom
       const matH=parseFloat(root.getAttribute('MaterialHeight')||'0')||0;
       if(matH>0) usedIdx.forEach(ci=>setLayerMM(depthOf[ci], matH));
@@ -8885,8 +8909,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const layerInfo=usedIdx.map(ci=>{ const c=cutMap[ci]||{}; const mn={cut:'cięcie',engrave:'grawer',score:'nacięcie'}[c.mode||'cut'];
         return `${c.name||('C'+ci)}: ${mn}, ${fmt(c.speed||0)} mm/s, ${fmt(c.power||0)}%${(c.passes>1)?' ×'+c.passes:''}`; }).join(' · ');
       let msg=`Zaimportowano ${newObjs.length} elem. z LightBurn — ${usedIdx.length} warstw (${layerInfo})`;
-      if(skippedText||skippedOther) msg+=` · pominięto ${skippedText+skippedOther} (tekst/inne)`;
+      const skTot=skippedText+skippedOther+skippedBad;
+      if(skTot) msg+=` · pominięto ${skTot}${skippedText?' (w tym tekst)':''}`;
       showToast(msg,'success',6000);
+    }catch(err){ showToast('Błąd importu pliku LightBurn: '+(err&&err.message||err),'error',6000); }
     };
     reader.readAsText(file);
   }
