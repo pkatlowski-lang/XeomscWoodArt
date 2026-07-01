@@ -5283,6 +5283,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       <button class="cut ${o.mode==='cut'?'on':''}" data-mode="cut" title="Laser tnie materiał na wylot">Cięcie</button>
       <button class="engrave ${o.mode==='engrave'?'on':''}" data-mode="engrave" title="Laser graweruje wzór na powierzchni">Grawer</button>
       <button class="score ${o.mode==='score'?'on':''}" data-mode="score" title="Delikatne nacięcie — linia łamania/zginania">Nacięcie</button></div></div>`;
+    // parametry cięcia wczytane z pliku LightBurn (tylko do odczytu) — prędkość, moc, przejścia
+    if(o.lbrnSpeed!=null || o.lbrnPower!=null || o.lbrnLayer){
+      h+=`<div class="field"><label>🔥 Parametry LightBurn</label><div class="field-hint" style="cursor:default">Warstwa: <strong>${escapeXml(o.lbrnLayer||'—')}</strong>${o.lbrnType?` (${escapeXml(o.lbrnType)})`:''}<br>Prędkość: <strong>${fmt(o.lbrnSpeed||0)} mm/s</strong> · Moc: <strong>${fmt(o.lbrnPower||0)}%</strong>${(o.lbrnPasses>1)?` · Przejścia: <strong>${o.lbrnPasses}</strong>`:''}</div></div>`;
+    }
     if(BOOL_TYPES.includes(o.type) || o.type==='text'){
       const _isTxt=o.type==='text';
       h+=`<div class="field"><label>Rola w warstwie</label><div class="seg" data-seg="role">
@@ -8845,28 +8849,31 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const _tmpSvg=document.createElementNS(SVG_NS,'svg'); _tmpSvg.classList.add('u-offscreen'); document.body.appendChild(_tmpSvg);
       const _tmpPath=document.createElementNS(SVG_NS,'path'); _tmpSvg.appendChild(_tmpPath);
       const bboxOf=d=>{ _tmpPath.setAttribute('d',d); try{ return _tmpPath.getBBox(); }catch(_){ return {x:0,y:0,width:0,height:0}; } };
-      let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
-      items.forEach(it=>{ const b=bboxOf(transformPathDGeneral(it.localD, it.mat));
-        minx=Math.min(minx,b.x); miny=Math.min(miny,b.y); maxx=Math.max(maxx,b.x+b.width); maxy=Math.max(maxy,b.y+b.height); });
-      const combW=Math.max(1e-6,maxx-minx), combH=Math.max(1e-6,maxy-miny);
-      const wcx=(minx+maxx)/2, wcy=(miny+maxy)/2;
-      const scale=Math.min(1, (state.docW*0.92)/combW, (state.docH*0.92)/combH);
-      // macierz globalna: skala + wyśrodkowanie + ODBICIE osi Y (LightBurn Y↑ → ekran Y↓)
-      const matGlobal=[scale,0,0,-scale, state.docW/2 - wcx*scale, state.docH/2 + wcy*scale];
-      // 4) Mapowanie warstw → głębie edytora (kolejno wg CutIndex)
-      const usedIdx=[...new Set(items.map(it=>it.cutIndex))].sort((a,b)=>a-b);
-      const depthOf={}; usedIdx.forEach((ci,i)=>depthOf[ci]=i+1);
-      // 5) Twórz obiekty
-      const newObjs=items.map(it=>{
-        const d=transformPathDGeneral(it.localD, matMultiply(matGlobal, it.mat));
-        const b=bboxOf(d);
-        const cs=cutMap[it.cutIndex]||{mode:'cut'};
-        return { id:uid(), type:'path', name:cs.name||'', d, fillRule:'nonzero',
-          bx:b.x, by:b.y, bw:Math.max(0.01,b.width), bh:Math.max(0.01,b.height),
-          x:0, y:0, rotation:0, sx:1, sy:1, mode:cs.mode||'cut',
-          visible:true, locked:false, depth:depthOf[it.cutIndex]||1, repeat:{type:'none'},
-          lbrnLayer:cs.name||('C'+it.cutIndex), lbrnType:cs.type||'', lbrnSpeed:cs.speed||0, lbrnPower:cs.power||0, lbrnPasses:cs.passes||1 };
-      });
+      let newObjs, usedIdx, depthOf;
+      try{
+        let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+        items.forEach(it=>{ const b=bboxOf(transformPathDGeneral(it.localD, it.mat));
+          minx=Math.min(minx,b.x); miny=Math.min(miny,b.y); maxx=Math.max(maxx,b.x+b.width); maxy=Math.max(maxy,b.y+b.height); });
+        const combW=Math.max(1e-6,maxx-minx), combH=Math.max(1e-6,maxy-miny);
+        const wcx=(minx+maxx)/2, wcy=(miny+maxy)/2;
+        const scale=Math.min(1, (state.docW*0.92)/combW, (state.docH*0.92)/combH);
+        // macierz globalna: skala + wyśrodkowanie + ODBICIE osi Y (LightBurn Y↑ → ekran Y↓)
+        const matGlobal=[scale,0,0,-scale, state.docW/2 - wcx*scale, state.docH/2 + wcy*scale];
+        // 4) Mapowanie warstw → głębie edytora (kolejno wg CutIndex)
+        usedIdx=[...new Set(items.map(it=>it.cutIndex))].sort((a,b)=>a-b);
+        depthOf={}; usedIdx.forEach((ci,i)=>depthOf[ci]=i+1);
+        // 5) Twórz obiekty
+        newObjs=items.map(it=>{
+          const d=transformPathDGeneral(it.localD, matMultiply(matGlobal, it.mat));
+          const b=bboxOf(d);
+          const cs=cutMap[it.cutIndex]||{mode:'cut'};
+          return { id:uid(), type:'path', name:cs.name||'', d, fillRule:'nonzero',
+            bx:b.x, by:b.y, bw:Math.max(0.01,b.width), bh:Math.max(0.01,b.height),
+            x:0, y:0, rotation:0, sx:1, sy:1, mode:cs.mode||'cut',
+            visible:true, locked:false, depth:depthOf[it.cutIndex]||1, repeat:{type:'none'},
+            lbrnLayer:cs.name||('C'+it.cutIndex), lbrnType:cs.type||'', lbrnSpeed:cs.speed||0, lbrnPower:cs.power||0, lbrnPasses:cs.passes||1 };
+        });
+      } catch(err){ document.body.removeChild(_tmpSvg); showToast('Błąd przetwarzania geometrii LightBurn','error'); return; }
       document.body.removeChild(_tmpSvg);
       // 6) Grubość materiału z projektu (MaterialHeight) → przypisz warstwom
       const matH=parseFloat(root.getAttribute('MaterialHeight')||'0')||0;
