@@ -6755,7 +6755,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const scoreSpeed=Math.max(1,Number(sumScoreSpeed.value)||1);
     const engraveSpeed=Math.max(1,Number(sumEngraveSpeed.value)||1);
     const engraveSpacing=Math.max(0.01,Number(sumEngraveSpacing.value)||0.1);
-    const cutTime=s.cutLen/cutSpeed, scoreTime=s.scoreLen/scoreSpeed, engraveTime=(s.engraveArea/engraveSpacing)/engraveSpeed;
+    // czas graweru z tym samym mnożnikiem nadmiarowego skanowania (overscan) co wycena —
+    // bez niego podsumowanie pokazywało krótszy czas niż wycena wysyłana do pracowni
+    const cutTime=s.cutLen/cutSpeed, scoreTime=s.scoreLen/scoreSpeed, engraveTime=(s.engraveArea/engraveSpacing)/engraveSpeed*(1+2*(PRICING.engraveOverscan||0));
     _sumTimeEl.innerHTML=
       `<div class="sum-time-row"><span>Cięcie</span><span>${formatTime(cutTime)}</span></div>`
       +`<div class="sum-time-row"><span>Nacięcie</span><span>${formatTime(scoreTime)}</span></div>`
@@ -7867,6 +7869,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(!hasWork) return null;
     const matKey=quoteMatSel.value;
     const mat=PRICING.materials[matKey];
+    if(!mat) return null;   // nieistniejący klucz materiału (np. usunięty z cennika) — bez tego quoteTimeMin(mat) rzucałby ogólny błąd
     const qf=computeQuoteFull(matKey);
     const price=computeQuote(matKey);
     const timeMin=quoteTimeMin(mat);
@@ -9306,8 +9309,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   qsInput.addEventListener('input',()=>{ _qsIdx=-1; renderQsResults(qsInput.value.trim().toLowerCase()); });
   qsInput.addEventListener('keydown',e=>{
     const items=qsResults.querySelectorAll('.quick-search-item');
-    if(e.key==='ArrowDown'){ e.preventDefault(); _qsIdx=Math.min(_qsIdx+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('qs-active',i===_qsIdx)); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); _qsIdx=Math.max(_qsIdx-1,0); items.forEach((el,i)=>el.classList.toggle('qs-active',i===_qsIdx)); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
+    if(e.key==='ArrowDown'){ e.preventDefault(); _qsIdx=Math.min(_qsIdx+1,items.length-1); items.forEach((el,i)=>{el.classList.toggle('qs-active',i===_qsIdx); el.setAttribute('aria-selected',i===_qsIdx);}); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); _qsIdx=Math.max(_qsIdx-1,0); items.forEach((el,i)=>{el.classList.toggle('qs-active',i===_qsIdx); el.setAttribute('aria-selected',i===_qsIdx);}); items[_qsIdx]?.scrollIntoView({block:'nearest'}); }
     else if(e.key==='Enter'){ e.preventDefault(); if(_qsIdx>=0) items[_qsIdx]?.click(); else if(items.length) items[0].click(); }
     else if(e.key==='Escape'){ closeQuickSearch(); }
   });
