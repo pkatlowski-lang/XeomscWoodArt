@@ -2237,6 +2237,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         <input type="file" id="importImageInput" accept="image/*" class="u-hidden" aria-label="Importuj obraz">
         <button class="tbtn" id="importSvgBtn" title="Importuj plik SVG jako edytowalne obiekty — kolory cięcia/grawerowania/nacięcia rozpoznawane automatycznie; napisy <text> jako edytowalny tekst" aria-label="Importuj SVG">📐 Importuj SVG</button>
         <input type="file" id="importSvgInput" accept=".svg,image/svg+xml" class="u-hidden" aria-label="Importuj SVG">
+        <button class="tbtn" id="importLbrnBtn" title="Importuj plik LightBurn (.lbrn / .lbrn2) — cała grafika wraz z warstwami i parametrami cięcia (prędkość, moc, przejścia)" aria-label="Importuj LightBurn">🔥 Importuj LightBurn</button>
+        <input type="file" id="importLbrnInput" accept=".lbrn,.lbrn2" class="u-hidden" aria-label="Importuj LightBurn">
       </div>
     </div>
     <!-- MENU: NARZĘDZIA -->
@@ -5514,6 +5516,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   _importSvgInput.addEventListener('change',e=>{
     importSvgAsObjects(e.target.files[0]); e.target.value='';
   });
+  document.getElementById('importLbrnBtn').addEventListener('click',()=>{
+    const inp=document.getElementById('importLbrnInput'); inp.value=''; inp.click();
+  });
+  const _importLbrnInput=document.getElementById('importLbrnInput');
+  _importLbrnInput.addEventListener('change',e=>{
+    importLbrnFile(e.target.files[0]); e.target.value='';
+  });
   const WHEEL_HINT='Przewiń kółkiem myszy nad polem, aby zmienić wartość (Shift = większy krok ×10)';
   function rangeField(label,prop,val,min,max,step,o){
     const bound=o&&isBound(o,prop);
@@ -8733,6 +8742,148 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     reader.readAsText(file);
   }
 
+  /* ---------------- Import plików LightBurn (.lbrn / .lbrn2) ----------------
+     Format LightBurn to XML: <LightBurnProject> zawiera <CutSetting> (warstwy z parametrami:
+     speed=prędkość mm/s, maxPower=moc %, numPasses=przejścia, index łączy z CutIndex kształtów)
+     oraz <Shape Type="Rect|Ellipse|Path|Group|Text"> z macierzą <XForm>a b c d e f</XForm>.
+     Ścieżki: <VertList> (wierzchołki V x y + uchwyty Béziera c0/c1) i <PrimList> (segmenty:
+     L=linia, B=Bézier). Układ Y w LightBurn jest „do góry" — odbijamy go do układu ekranu.
+     Wczytujemy grafikę ORAZ parametry cięcia (zapisywane przy obiektach jako lbrn*). */
+  const LBRN_NUM='-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?';
+  function lbrnParseVertList(str){
+    const verts=[];
+    const re=new RegExp('V\\s*('+LBRN_NUM+')\\s+('+LBRN_NUM+')((?:\\s*c[01][xy]'+LBRN_NUM+')*)','g');
+    let m;
+    while((m=re.exec(str))){
+      const v={pos:[parseFloat(m[1]),parseFloat(m[2])], c0x:0,c0y:0,c1x:0,c1y:0};
+      const cre=new RegExp('c([01])([xy])('+LBRN_NUM+')','g'); let cm;
+      while((cm=cre.exec(m[3]||''))) v['c'+cm[1]+cm[2]]=parseFloat(cm[3]);
+      verts.push(v);
+    }
+    return verts;
+  }
+  function lbrnParsePrimList(str){
+    const prims=[]; const re=/([LB])\s*(\d+)\s+(\d+)/g; let m;
+    while((m=re.exec(str))) prims.push({type:m[1], a:+m[2], b:+m[3]});
+    return prims;
+  }
+  // Buduje string 'd' ze ścieżki LightBurn (wierzchołki + segmenty). Uchwyty Béziera: cp1 = A + A.c1
+  // (uchwyt wychodzący z A), cp2 = B + B.c0 (uchwyt wchodzący do B) — standardowa konwencja.
+  function lbrnBuildPathD(verts, prims){
+    if(!verts.length) return '';
+    if(!prims.length) return polyToPathD(verts.map(v=>v.pos));  // brak segmentów → domknięty polilinia
+    let d='', chainStart=null, prevB=null;
+    for(const pr of prims){
+      const A=verts[pr.a], B=verts[pr.b]; if(!A||!B) continue;
+      if(prevB!==pr.a){ chainStart=pr.a; d+=`M${fmt(A.pos[0])} ${fmt(A.pos[1])}`; }
+      if(pr.type==='B'){
+        const c1x=A.pos[0]+(A.c1x||0), c1y=A.pos[1]+(A.c1y||0);
+        const c2x=B.pos[0]+(B.c0x||0), c2y=B.pos[1]+(B.c0y||0);
+        d+=`C${fmt(c1x)} ${fmt(c1y)} ${fmt(c2x)} ${fmt(c2y)} ${fmt(B.pos[0])} ${fmt(B.pos[1])}`;
+      } else {
+        d+=`L${fmt(B.pos[0])} ${fmt(B.pos[1])}`;
+      }
+      prevB=pr.b;
+      if(pr.b===chainStart){ d+='Z'; prevB=null; }   // segment wraca do początku → domknij kontur
+    }
+    return d;
+  }
+  function importLbrnFile(file){
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onerror=()=>showToast('Nie udało się odczytać pliku','error');
+    reader.onload=e=>{
+      let doc;
+      try{ doc=new DOMParser().parseFromString(e.target.result,'application/xml'); }
+      catch(err){ showToast('Nieprawidłowy plik LightBurn','error'); return; }
+      if(doc.querySelector('parsererror')){ showToast('Nieprawidłowy plik LightBurn (.lbrn/.lbrn2)','error'); return; }
+      const root=doc.querySelector('LightBurnProject');
+      if(!root){ showToast('To nie jest plik projektu LightBurn','error'); return; }
+      // 1) CutSetting → mapa warstw z parametrami
+      const cutMap={};
+      root.querySelectorAll('CutSetting').forEach(cs=>{
+        const gv=t=>{ const el=cs.querySelector(t); return el?el.getAttribute('Value'):null; };
+        const idx=parseInt(gv('index')||'0',10)||0;
+        const type=cs.getAttribute('type')||'Cut';
+        const name=gv('name')||'';
+        const speed=parseFloat(gv('speed')||'0')||0;
+        const power=parseFloat(gv('maxPower')||gv('maxPower2')||'0')||0;
+        const passes=parseInt(gv('numPasses')||'1',10)||1;
+        let mode = /scan|image/i.test(type) ? 'engrave' : 'cut';
+        if(mode==='cut' && /naci|score|line|mark|zagi|fold/i.test(name)) mode='score';
+        cutMap[idx]={type,name,speed,power,passes,mode};
+      });
+      // 2) Zbierz kształty (rekurencyjnie przez grupy), akumulując macierz XForm
+      const items=[]; let skippedText=0, skippedOther=0;
+      const parseXForm=el=>{ const xf=el.querySelector(':scope > XForm'); if(!xf) return matIdentity();
+        const n=(xf.textContent.match(new RegExp(LBRN_NUM,'g'))||[]).map(Number);
+        return n.length>=6?[n[0],n[1],n[2],n[3],n[4],n[5]]:matIdentity(); };
+      const shapeToLocalD=sh=>{
+        const type=sh.getAttribute('Type');
+        if(type==='Rect'){ const W=parseFloat(sh.getAttribute('W')||'0'), H=parseFloat(sh.getAttribute('H')||'0'), Cr=parseFloat(sh.getAttribute('Cr')||'0');
+          if(!(W>0)||!(H>0)) return null; return roundedRectD(-W/2,-H/2,W,H,Math.max(0,Math.min(Cr,Math.min(W,H)/2))); }
+        if(type==='Ellipse'){ const Rx=parseFloat(sh.getAttribute('Rx')||'0'), Ry=parseFloat(sh.getAttribute('Ry')||'0');
+          if(!(Rx>0)||!(Ry>0)) return null; return ellipseD(0,0,Rx,Ry); }
+        if(type==='Path'){ const vl=sh.querySelector(':scope > VertList'), pl=sh.querySelector(':scope > PrimList');
+          if(!vl) return null; const d=lbrnBuildPathD(lbrnParseVertList(vl.textContent), pl?lbrnParsePrimList(pl.textContent):[]); return d||null; }
+        return null;
+      };
+      (function walk(node, mat){
+        for(const child of node.children){
+          if(child.tagName!=='Shape') continue;
+          const type=child.getAttribute('Type');
+          const xf=matMultiply(mat, parseXForm(child));
+          if(type==='Group'){ const kids=child.querySelector(':scope > Children'); if(kids) walk(kids, xf); continue; }
+          if(type==='Text'){ skippedText++; continue; }
+          const localD=shapeToLocalD(child);
+          if(localD){ items.push({localD, mat:xf, cutIndex:parseInt(child.getAttribute('CutIndex')||'0',10)||0}); }
+          else if(type && type!=='Group') skippedOther++;
+        }
+      })(root, matIdentity());
+      if(!items.length){ showToast(skippedText?'Plik zawiera tylko tekst — import tekstu LightBurn nie jest jeszcze obsługiwany.':'Brak rozpoznanych kształtów w pliku LightBurn.','error',5000); return; }
+      // 3) Zmierz łączny bbox w przestrzeni LightBurn (po XForm), następnie dopasuj skalę i wyśrodkuj
+      const _tmpSvg=document.createElementNS(SVG_NS,'svg'); _tmpSvg.classList.add('u-offscreen'); document.body.appendChild(_tmpSvg);
+      const _tmpPath=document.createElementNS(SVG_NS,'path'); _tmpSvg.appendChild(_tmpPath);
+      const bboxOf=d=>{ _tmpPath.setAttribute('d',d); try{ return _tmpPath.getBBox(); }catch(_){ return {x:0,y:0,width:0,height:0}; } };
+      let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+      items.forEach(it=>{ const b=bboxOf(transformPathDGeneral(it.localD, it.mat));
+        minx=Math.min(minx,b.x); miny=Math.min(miny,b.y); maxx=Math.max(maxx,b.x+b.width); maxy=Math.max(maxy,b.y+b.height); });
+      const combW=Math.max(1e-6,maxx-minx), combH=Math.max(1e-6,maxy-miny);
+      const wcx=(minx+maxx)/2, wcy=(miny+maxy)/2;
+      const scale=Math.min(1, (state.docW*0.92)/combW, (state.docH*0.92)/combH);
+      // macierz globalna: skala + wyśrodkowanie + ODBICIE osi Y (LightBurn Y↑ → ekran Y↓)
+      const matGlobal=[scale,0,0,-scale, state.docW/2 - wcx*scale, state.docH/2 + wcy*scale];
+      // 4) Mapowanie warstw → głębie edytora (kolejno wg CutIndex)
+      const usedIdx=[...new Set(items.map(it=>it.cutIndex))].sort((a,b)=>a-b);
+      const depthOf={}; usedIdx.forEach((ci,i)=>depthOf[ci]=i+1);
+      // 5) Twórz obiekty
+      const newObjs=items.map(it=>{
+        const d=transformPathDGeneral(it.localD, matMultiply(matGlobal, it.mat));
+        const b=bboxOf(d);
+        const cs=cutMap[it.cutIndex]||{mode:'cut'};
+        return { id:uid(), type:'path', name:cs.name||'', d, fillRule:'nonzero',
+          bx:b.x, by:b.y, bw:Math.max(0.01,b.width), bh:Math.max(0.01,b.height),
+          x:0, y:0, rotation:0, sx:1, sy:1, mode:cs.mode||'cut',
+          visible:true, locked:false, depth:depthOf[it.cutIndex]||1, repeat:{type:'none'},
+          lbrnLayer:cs.name||('C'+it.cutIndex), lbrnType:cs.type||'', lbrnSpeed:cs.speed||0, lbrnPower:cs.power||0, lbrnPasses:cs.passes||1 };
+      });
+      document.body.removeChild(_tmpSvg);
+      // 6) Grubość materiału z projektu (MaterialHeight) → przypisz warstwom
+      const matH=parseFloat(root.getAttribute('MaterialHeight')||'0')||0;
+      if(matH>0) usedIdx.forEach(ci=>setLayerMM(depthOf[ci], matH));
+      state.objects.push(...newObjs);
+      state.selectedIds=newObjs.map(o=>o.id);
+      pushHistory(); renderAll(); renderProps();
+      // 7) Podsumowanie z parametrami cięcia (co która warstwa)
+      const layerInfo=usedIdx.map(ci=>{ const c=cutMap[ci]||{}; const mn={cut:'cięcie',engrave:'grawer',score:'nacięcie'}[c.mode||'cut'];
+        return `${c.name||('C'+ci)}: ${mn}, ${fmt(c.speed||0)} mm/s, ${fmt(c.power||0)}%${(c.passes>1)?' ×'+c.passes:''}`; }).join(' · ');
+      let msg=`Zaimportowano ${newObjs.length} elem. z LightBurn — ${usedIdx.length} warstw (${layerInfo})`;
+      if(skippedText||skippedOther) msg+=` · pominięto ${skippedText+skippedOther} (tekst/inne)`;
+      showToast(msg,'success',6000);
+    };
+    reader.readAsText(file);
+  }
+
   /* Persist/load custom bases from localStorage. */
   function loadCustomBases(){
     try{ return JSON.parse(localStorage.getItem('laser_edytor_custom_bases_v1')||'[]'); }catch(e){ return []; }
@@ -8851,7 +9002,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const files=e.dataTransfer && e.dataTransfer.files; if(!files || !files.length) return;
     e.preventDefault();
     for(const file of files){
-      if(/svg/i.test(file.type) || /\.svg$/i.test(file.name)) importSvgAsObjects(file);
+      if(/\.lbrn2?$/i.test(file.name)) importLbrnFile(file);
+      else if(/svg/i.test(file.type) || /\.svg$/i.test(file.name)) importSvgAsObjects(file);
       else if(/^image\//.test(file.type)) importImageFile(file);
     }
   });
@@ -9049,6 +9201,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     {ico:'⚙',label:'Koło zębate',hint:'',cat:'generator',action:()=>document.getElementById('gearGenBtn')?.click()},
     {ico:'🖼',label:'Importuj obraz',hint:'',cat:'plik',action:()=>document.getElementById('importImageBtn')?.click()},
     {ico:'🔲',label:'Importuj SVG',hint:'',cat:'plik',action:()=>document.getElementById('importSvgBtn')?.click()},
+    {ico:'🔥',label:'Importuj LightBurn (.lbrn2)',hint:'',cat:'plik',action:()=>document.getElementById('importLbrnBtn')?.click()},
     {ico:'⬇',label:'Eksport DXF',hint:'',cat:'eksport',action:()=>document.getElementById('exportDxfBtn')?.click()},
     {ico:'🧊',label:'Eksport 3D',hint:'',cat:'eksport',action:()=>document.getElementById('export3dBtn')?.click()},
     {ico:'🎨',label:'Tryb warstw 3D',hint:'',cat:'widok',action:()=>document.getElementById('depthViewBtn')?.click()},
