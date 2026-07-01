@@ -8816,9 +8816,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(doc.querySelector('parsererror')){ showToast('Nieprawidłowy plik LightBurn (.lbrn/.lbrn2)','error'); return; }
       const root=doc.querySelector('LightBurnProject');
       if(!root){ showToast('To nie jest plik projektu LightBurn','error'); return; }
-      // 1) CutSetting → mapa warstw z parametrami
+      // 1) CutSetting → mapa warstw z parametrami (CutSetting_Img = warstwy obrazkowe LightBurn)
       const cutMap={};
-      root.querySelectorAll('CutSetting').forEach(cs=>{
+      root.querySelectorAll('CutSetting, CutSetting_Img').forEach(cs=>{
         const gv=t=>{ const el=cs.querySelector(t); return el?el.getAttribute('Value'):null; };
         const idx=parseInt(gv('index')||'0',10)||0;
         const type=cs.getAttribute('type')||'Cut';
@@ -8826,7 +8826,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         const speed=parseFloat(gv('speed')||'0')||0;
         const power=parseFloat(gv('maxPower')||gv('maxPower2')||'0')||0;
         const passes=parseInt(gv('numPasses')||'1',10)||1;
-        let mode = /scan|image/i.test(type) ? 'engrave' : 'cut';
+        // Tool (T1/T2) = warstwy narzędziowe LightBurn: prowadnice bez wyjścia na laser →
+        // tryb 'reference' edytora (widoczne, ale nie cięte ani nie eksportowane)
+        let mode = /tool/i.test(type) ? 'reference'
+          : /scan|image/i.test(type) ? 'engrave' : 'cut';
         if(mode==='cut' && /naci|score|line|mark|zagi|fold/i.test(name)) mode='score';
         cutMap[idx]={type,name,speed,power,passes,mode};
       });
