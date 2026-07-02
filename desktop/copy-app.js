@@ -107,8 +107,10 @@ function main() {
 
   // 1) przycisk „Wyślij do wyceny" w widżecie wyceny na żywo
   html = removeButtonById(html, 'lqSend');
-  // 2) przycisk „Wyślij projekt do wyceny" w oknie Wyceny (razem z jego polem)
-  html = removeDivContainingId(html, 'sendQuoteOpenBtn', 'pole z przyciskiem wysyłki w modalu Wyceny');
+  // 2) przycisk „Wyślij projekt do wyceny" w sekcji Wyceny — usuwamy SAM przycisk:
+  //    w aktualnym edytorze stoi bezpośrednio w sekcji pq-sec (bez diva-otoczki),
+  //    a wycinanie „najbliższego <div przed id" trafiało w sąsiedni element (q-break)
+  html = removeButtonById(html, 'sendQuoteOpenBtn');
   // 3) całe okno formularza wysyłki do pracowni
   html = removeDivContainingId(html, 'modalSendQuote', 'modal formularza wysyłki');
   // 4) moduł Firebase obsługujący wysyłkę
