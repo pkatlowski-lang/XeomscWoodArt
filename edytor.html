@@ -3957,13 +3957,33 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     polys=[];
     for(const sd of subs){
       // szybka ścieżka dla czystych łamanych M/L/Z (np. z polyToPathD — pudełko, koło
-      // zębate, zawias): odczytujemy wierzchołki wprost z `d`. Dla ścieżek z mnóstwem
-      // segmentów getTotalLength/getPointAtLength potrafią zamrozić kartę na wiele sekund.
+      // zębate, zawias): odczytujemy wierzchołki wprost z `d`.
       if(/^[MLZ0-9.\-,\s]+$/.test(sd)){
         const nums=(sd.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);
         const pts=[]; for(let i=0;i+1<nums.length;i+=2) pts.push([nums[i],nums[i+1]]);
         if(pts.length>=3){ polys.push(pts); continue; }
       }
+      // ścieżki z krzywymi: próbkowanie ANALITYCZNE segmentów (parsePathToAbsSegs
+      // normalizuje wszystko do M/L/C) — bez DOM. getTotalLength/getPointAtLength na
+      // setkach krzywych (realne pliki LightBurn) blokowały wątek na wiele sekund.
+      let segs=null; try{ segs=parsePathToAbsSegs(sd); }catch(e){ segs=null; }
+      if(segs && segs.length){
+        const pts=[]; let cur=null;
+        const cub=(p0,p1,p2,p3,t)=>{ const u=1-t; return u*u*u*p0+3*u*u*t*p1+3*u*t*t*p2+t*t*t*p3; };
+        for(const s of segs){
+          if(s.cmd==='Z') continue;
+          if(s.cmd==='M'){ cur=s.pts[0]; pts.push(cur.slice()); continue; }
+          if(s.cmd==='L'){ cur=s.pts[0]; pts.push(cur.slice()); continue; }
+          const p0=cur||s.pts[0], [c1,c2,p3]=s.pts;
+          // szacunek długości z cięciw (górne ograniczenie) → gęstość ~co 0.8 mm
+          const est=Math.hypot(c1[0]-p0[0],c1[1]-p0[1])+Math.hypot(c2[0]-c1[0],c2[1]-c1[1])+Math.hypot(p3[0]-c2[0],p3[1]-c2[1]);
+          const n=Math.max(4,Math.min(60,Math.ceil(est/0.8)));
+          for(let i=1;i<=n;i++){ const t=i/n; pts.push([cub(p0[0],c1[0],c2[0],p3[0],t), cub(p0[1],c1[1],c2[1],p3[1],t)]); }
+          cur=p3;
+        }
+        if(pts.length>=3){ polys.push(pts); continue; }
+      }
+      // ostatnia deska ratunku (nieparsowalne d): pomiar przez DOM jak dawniej
       const path=document.createElementNS(SVG_NS,'path'); path.setAttribute('d',sd);
       let len; try{ len=path.getTotalLength(); }catch(e){ continue; }
       if(len<0.5) continue;
@@ -3971,7 +3991,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       for(let i=0;i<n;i++){ const p=path.getPointAtLength(len*i/n); pts.push([p.x,p.y]); }
       polys.push(pts);
     }
-    if(_subPolysLocalCache.size>200) _subPolysLocalCache.clear();
+    // limit duży: realne projekty (import LightBurn) mają setki unikalnych 'd';
+    // stary limit 200 powodował czyszczenie w kółko i liczenie wszystkiego od zera
+    if(_subPolysLocalCache.size>2000) _subPolysLocalCache.clear();
     _subPolysLocalCache.set(d, polys);
     return polys;
   }
@@ -7328,7 +7350,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   // Buduje stos warstw w podanym <div> sceny. sw = szerokość w px.
   // Grubość każdej warstwy bierze się z state.layerMM (w mm) i jest skalowana do px,
   // dzięki czemu grubsza warstwa jest realnie wyższa w wizualizacji.
-  function buildLayerScene(sceneEl, sw, pxPerMM){
+  function buildLayerScene(sceneEl, sw, pxPerMM, opts){
     const W=state.docW, H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
@@ -7353,7 +7375,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const textOnlyLayer=ownGeom.length>0 && ownGeom.every(o=>o.type==='text');
       const thick=textOnlyLayer ? 3 : Math.max(3, mm*pxPerMM);     // grubość płyty w px (proporcjonalna do mm)
       // scalony obrys geometrii (bez wewnętrznych linii) — jedna ścieżka, otwory przez fill-rule evenodd
-      const rings=mergeLayerRings(geomObjs, dep);
+      const rings=mergeLayerRings(geomObjs, dep, opts);
       const zTop=zBase+thick;                   // górna ścianka tej płyty
       // pierścienie będące "dziurami" (np. wnętrze liter "o"/"a") leżą wewnątrz innego,
       // większego pierścienia tej samej warstwy — pomijamy dla nich ścianki boczne, żeby przez
@@ -7442,7 +7464,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     live3dTitle.textContent=`🧊 3D — ${tMM.toFixed(1)} mm · ${depthList.length} warst${depthList.length===1?'wa':'w'}`;
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
-    const n=buildLayerScene(live3dScene, sw, pxPerMM);
+    const n=buildLayerScene(live3dScene, sw, pxPerMM, {maxDim:800});
     if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<span class="empty-hint">Narzędzia: <kbd class="kbd-xxs">R</kbd> prostokąt · <kbd class="kbd-xxs">O</kbd> elipsa · <kbd class="kbd-xxs">T</kbd> tekst · <kbd class="kbd-xxs">P</kbd> ścieżka<br>lub wybierz szablon z panelu po lewej</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
@@ -7453,7 +7475,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   let svgSplitTimer=null;
   function scheduleSvgSplit(){ clearTimeout(svgSplitTimer); svgSplitTimer=setTimeout(updateSvgSplit, 280); }
   function updateSvgSplit(){
-    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
+    let r=null; try{ r=buildSeparatedSVG({maxDim:800}); }catch(e){ console.warn('Błąd podziału SVG',e); }
     if(r){
       bbSvgEl.innerHTML=r.svg;
       const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))];
@@ -7509,7 +7531,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     p3dHint.textContent=P3D_HINT_NET;
     const sw=Math.min(360, Math.round(W/H*300));
     const pxPerMM=Math.max(2, Math.min(10, 200/totalStackMM()));
-    buildLayerScene(p3dScene, sw, pxPerMM);
+    buildLayerScene(p3dScene, sw, pxPerMM, {maxDim:1200});
   }
   function showPreview3D(){
     const W=state.docW, H=state.docH;
@@ -7546,7 +7568,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   /* ----- Powiększony podgląd rozdzielonego SVG ----- */
   const _modalSvgPrevEl=document.getElementById('modalSvgPrev');
   function showSvgPreview(){
-    let r=null; try{ r=buildSeparatedSVG(); }catch(e){ console.warn('Błąd podziału SVG',e); }
+    let r=null; try{ r=buildSeparatedSVG({maxDim:1200}); }catch(e){ console.warn('Błąd podziału SVG',e); }
     document.getElementById('svgPrevWrap').innerHTML = r ? r.svg : '<div class="bb-empty">Brak elementów do podglądu.<br><span class="bb-hint-sub">Narysuj elementy na płycie, aby wygenerować plik SVG</span></div>';
     openModal(_modalSvgPrevEl);
     if(r){ const depths=[...new Set(state.objects.filter(o=>o.visible&&o.type!=='image').map(o=>o.depth||1))]; showToast(`Podgląd SVG — ${depths.length} warstw`,'info',1500); }
@@ -7560,23 +7582,40 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
      (model podpierający) i łączymy je w jeden obrys (union) — wspólne pola znikają,
      zostaje jedna scalona bryła warstwy. Dekoracje (grawer/nacięcie) z danej warstwy
      rysujemy na wierzchu. Wszystkie warstwy w JEDNYM pliku, rozsunięte obok siebie. */
-  function unionAll(polys){
+  function unionAll(polys, deadline){
     // deterministyczny mikro-jitter (~0.004mm, niewidoczny dla lasera) — bez niego
     // gęsto próbkowane kontury (objSubPolys) mają mnóstwo współliniowych punktów,
     // na których Greiner-Hormann gubi część przecięć i nie scala nakładających się kształtów
     const EPS=0.004;
     const jitter=pts=>pts.map((p,i)=>[p[0]+Math.sin((i+1)*12.9898)*EPS, p[1]+Math.cos((i+1)*78.233)*EPS]);
     const list=polys.filter(p=>p&&p.length>=3).map(jitter);
-    let changed=true, guard=0;
-    while(changed && guard++<200){ changed=false;
+    // pre-filtr bbox: klipowanie (drogi Greiner–Hormann) tylko dla par, których prostokąty
+    // otaczające w ogóle się przecinają — przy setkach konturów (import LightBurn) redukuje
+    // liczbę klipów o rzędy wielkości
+    const bb=list.map(p=>{ let a=Infinity,b2=Infinity,c=-Infinity,d2=-Infinity;
+      for(const q of p){ if(q[0]<a)a=q[0]; if(q[0]>c)c=q[0]; if(q[1]<b2)b2=q[1]; if(q[1]>d2)d2=q[1]; }
+      return [a,b2,c,d2]; });
+    const bbOverlap=(x,y)=>!(bb[x][2]<bb[y][0]||bb[y][2]<bb[x][0]||bb[x][3]<bb[y][1]||bb[y][3]<bb[x][1]);
+    // deadline (performance.now()): podglądy na żywo pracują z budżetem czasowym — po jego
+    // przekroczeniu zwracamy CZĘŚCIOWO scaloną listę (obraz nadal poprawny, tylko bez pełnej
+    // sumy). Eksport/pobranie pliku woła bez deadline'u (pełna jakość).
+    let changed=true, guard=0, timedOut=false;
+    while(changed && guard++<400 && !timedOut){ changed=false;
       for(let i=0;i<list.length && !changed;i++){
+        if(deadline && performance.now()>deadline){ timedOut=true; break; }
         for(let j=i+1;j<list.length && !changed;j++){
+          if(!bbOverlap(i,j)) continue;
           let overlap=false;
-          try{ overlap=clipGH(list[i],list[j],'intersection').length>0; }catch(e){}
+          try{ const ov=clipGH(list[i],list[j],'intersection'); overlap=!!(ov&&ov.length); }catch(e){}
           if(overlap){
             let u=null; try{ u=clipGH(list[i],list[j],'union'); }catch(e){}
             if(u&&u.length){ const ring=u.reduce((a,b)=>Math.abs(polyArea(b))>Math.abs(polyArea(a))?b:a,u[0]);
-              list.splice(j,1); list.splice(i,1,ring); changed=true; }
+              list.splice(j,1); bb.splice(j,1);
+              list.splice(i,1,ring);
+              let a=Infinity,b2=Infinity,c=-Infinity,d2=-Infinity;
+              for(const q of ring){ if(q[0]<a)a=q[0]; if(q[0]>c)c=q[0]; if(q[1]<b2)b2=q[1]; if(q[1]>d2)d2=q[1]; }
+              bb.splice(i,1,[a,b2,c,d2]);
+              changed=true; }
           }
         }
       }
@@ -7610,13 +7649,16 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   // obiekt też zajmuje to miejsce, suma "lighter" i tak je wypełni.
   // holeCutouts: poligony obiektów oznaczonych jako "otwór" — odejmowane na końcu od
   // całej scalonej sylwetki warstwy (prawdziwe wycięcie, niezależnie od tego co jest pod spodem).
-  function rasterMergeRings(fillGroups, holeCutouts){
+  function rasterMergeRings(fillGroups, holeCutouts, opts){
     const allPolys=[];
     fillGroups.forEach(g=>{ g.shells.forEach(p=>allPolys.push(p)); g.holes.forEach(p=>allPolys.push(p)); });
     holeCutouts.forEach(p=>allPolys.push(p));
     const bb=polysBBoxMulti(allPolys);
     if(!(bb.maxx>bb.minx) || !(bb.maxy>bb.miny)) return [];
-    const MAXDIM=1500, pad=2;
+    // maxDim: podglądy na żywo (3D / mini-SVG) rasteryzują w niższej rozdzielczości —
+    // czas trace/compositingu spada ~4×, a sylwetka na ekranie ~300px wygląda tak samo.
+    // Eksport/pobranie pliku woła bez opts → pełne 1500.
+    const MAXDIM=(opts&&opts.maxDim)||1500, pad=2;
     const spanW=bb.maxx-bb.minx, spanH=bb.maxy-bb.miny;
     // res nigdy nie może być na tyle duże, by W/H przekroczyło MAXDIM — przy dużych
     // sylwetkach (np. cały arkusz pudełka ~6000mm) dolny limit res=3 dawał płótno
@@ -7627,31 +7669,50 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     const fillPath=(ctx,poly)=>{ ctx.beginPath(); poly.forEach((p,i)=>{ const [px,py]=toPx(p); i?ctx.lineTo(px,py):ctx.moveTo(px,py); }); ctx.closePath(); ctx.fill(); };
     const finalCnv=document.createElement('canvas'); finalCnv.width=W; finalCnv.height=H;
     const fctx=finalCnv.getContext('2d');
+    // każdy obiekt na własnym płótnie: wypełniamy jego powłoki, odejmujemy jego własne dziury,
+    // dopiero potem sumujemy "lighter" (OR) z resztą — dzięki temu dziura jednego obiektu
+    // nie kasuje materiału innego obiektu, który leży w tym samym miejscu.
+    // JEDEN reużywany bufor tmp (clearRect między obiektami): tworzenie osobnego canvasa
+    // 1500×1500 dla każdego z setek obiektów (realne pliki LightBurn) kosztowało sekundy
+    // samych alokacji i było głównym źródłem "ścinania" podglądów.
+    let tmp=null, tctx=null;
     fillGroups.forEach(g=>{
       if(!g.shells.length) return;
-      // każdy obiekt na własnym płótnie: wypełniamy jego powłoki, odejmujemy jego własne dziury,
-      // dopiero potem sumujemy "lighter" (OR) z resztą — dzięki temu dziura jednego obiektu
-      // nie kasuje materiału innego obiektu, który leży w tym samym miejscu
-      const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H;
-      const tctx=tmp.getContext('2d'); tctx.fillStyle='#fff';
+      // obiekt BEZ własnych dziur nie potrzebuje osobnego bufora — rysujemy wprost na
+      // płótnie wynikowym (unikamy pełnoekranowego drawImage na każdy obiekt; przy
+      // setkach liści z importu LightBurn to była większość czasu scalania)
+      if(!g.holes.length){
+        fctx.globalCompositeOperation='source-over'; fctx.fillStyle='#fff';
+        g.shells.forEach(poly=>fillPath(fctx,poly));
+        return;
+      }
+      if(!tmp){ tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; tctx=tmp.getContext('2d'); }
+      else tctx.clearRect(0,0,W,H);
+      tctx.globalCompositeOperation='source-over'; tctx.fillStyle='#fff';
       g.shells.forEach(poly=>fillPath(tctx,poly));
-      if(g.holes.length){ tctx.globalCompositeOperation='destination-out'; tctx.fillStyle='#fff'; g.holes.forEach(poly=>fillPath(tctx,poly)); }
+      tctx.globalCompositeOperation='destination-out'; tctx.fillStyle='#fff'; g.holes.forEach(poly=>fillPath(tctx,poly));
       fctx.globalCompositeOperation='lighter';
       fctx.drawImage(tmp,0,0);
     });
     if(holeCutouts.length){ fctx.globalCompositeOperation='destination-out'; fctx.fillStyle='#fff'; holeCutouts.forEach(poly=>fillPath(fctx,poly)); }
+    const _dbg=window.__lzrProf; const _t1=_dbg?performance.now():0;
     let img; try{ img=fctx.getImageData(0,0,W,H).data; }catch(e){ return []; }
     const mask=new Uint8Array(W*H);
     for(let i=0;i<W*H;i++) mask[i]=img[i*4+3]>=128?1:0;
+    const _t2=_dbg?performance.now():0;
     const polys=traceMaskPolys(mask,W,H);
-    return polys.map(p=>simplifyRing(p,1.2).map(([px,py])=>[(px-pad)/res+bb.minx,(py-pad)/res+bb.miny])).filter(r=>r.length>=3);
+    const _t3=_dbg?performance.now():0;
+    const out=polys.map(p=>simplifyRing(p,1.2).map(([px,py])=>[(px-pad)/res+bb.minx,(py-pad)/res+bb.miny])).filter(r=>r.length>=3);
+    if(_dbg){ const _t4=performance.now(); _dbg.push({W,H,fills:fillGroups.length, getImg:Math.round(_t2-_t1), trace:Math.round(_t3-_t2), simplify:Math.round(_t4-_t3), tracedPolys:polys.length, tracedPts:polys.reduce((a,p)=>a+p.length,0)}); }
+    return out;
   }
   // Przygotowuje obrys jednej warstwy: dla każdego obiektu wyznacza jego powłoki i własne
   // dziury (np. wnętrze liter "a"/"o"), obiekty oznaczone jako "otwór" (o.role==='hole')
   // trafiają osobno jako wycięcia odejmowane od całości. Następnie scala wszystko przez
   // rasterMergeRings — bez sztucznych linii wewnętrznych na częściach wspólnych.
   // dep = numer warstwy, dla której budujemy plik (objs to już elementy z warstw >= dep).
-  function mergeLayerRings(objs, dep){
+  function mergeLayerRings(objs, dep, opts){
+    const _dbgM=window.__lzrProf; const _m0=_dbgM?performance.now():0;
     const fillGroups=[], holeCutouts=[], lineRings=[];
     // poligony o znikomej powierzchni (np. otwarte linie nacięć z generatora zawiasu) nie mają
     // czego wypełnić/wyciąć przy rasteryzacji — suma/różnica z polem ~0 nie zmienia maski i taka
@@ -7684,6 +7745,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       });
       if(shells.length) fillGroups.push({shells,holes,text:o.type==='text'});
     });
+    const _m1=_dbgM?performance.now():0;
+    if(_dbgM&&_m1-_m0>50) _dbgM.push({phase:'prolog', dep, objs:objs.length, ms:Math.round(_m1-_m0)});
     if(!fillGroups.length) return lineRings;
     // Grupowanie metodą "union-find" wg nakładania się obwiedni (bbox): rasteryzujemy
     // TYLKO te grupy obiektów, które faktycznie się nakładają i wymagają scalenia.
@@ -7713,11 +7776,12 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         if(fg[0].text){ fg[0].shells.forEach(s=>{s.__textSmooth=true;}); fg[0].holes.forEach(h=>{h.__textSmooth=true;}); }
         fg[0].shells.forEach(s=>result.push(s)); fg[0].holes.forEach(h=>result.push(h)); return;
       }
-      rasterMergeRings(fg,hc).forEach(r=>result.push(r));
+      rasterMergeRings(fg,hc,opts).forEach(r=>result.push(r));
     });
+    if(_dbgM){ const _m2=performance.now(); if(_m2-_m1>50) _dbgM.push({phase:'groups+raster', dep, ms:Math.round(_m2-_m1)}); }
     return result;
   }
-  function buildSeparatedSVG(){
+  function buildSeparatedSVG(opts){
     const W=state.docW,H=state.docH;
     const vis=state.objects.filter(o=>o.visible && o.type!=='image' && o.mode!=='reference' && !state.hiddenDepths.includes(o.depth||1));
     const depths=[...new Set(vis.map(o=>o.depth||1))].sort((a,b)=>a-b);
@@ -7731,7 +7795,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       // od trybu) z warstw >= dep — scalone w jeden obrys bez wewnętrznych linii (unionAll),
       // bo wszystko co leży na/nad tą płytą wymaga pełnego materiału pod sobą
       const cutObjs=vis.filter(o=>(o.depth||1)>=dep && (o.type==='text' || o.role==='hole' || (BOOL_TYPES.includes(o.type) && o.mode!=='engrave')));
-      const rings=mergeLayerRings(cutObjs, dep);
+      const rings=mergeLayerRings(cutObjs, dep, opts);
       const cutPaths=rings.map(r=>`<path d="${ringSmoothD(r)}" fill="none" stroke="${COLORS.cut}" stroke-width="0.12"/>`).join('');
       // tekst tej warstwy w trybie "grawer" — wypełniona zwektoryzowana sylwetka liter (do grawerowania).
       // Kontur do CIĘCIA liter jest już częścią cutPaths (cutObjs zawiera cały tekst niezależnie od trybu).
@@ -8771,13 +8835,21 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
      Wczytujemy grafikę ORAZ parametry cięcia (zapisywane przy obiektach jako lbrn*). */
   const LBRN_NUM='-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?';
   function lbrnParseVertList(str){
+    // Format zweryfikowany na realnym pliku z LightBurn 2.x:
+    //   V x y [c0x..c0y..] [c1x..c1y..]
+    // Uchwyty Béziera są WSPÓŁRZĘDNYMI ABSOLUTNYMI (nie offsetami!).
+    // Samotne "cNx1" (bez pary cNy) to FLAGA braku uchwytu — uchwyt ważny
+    // jest tylko wtedy, gdy obecne są OBIE współrzędne (x i y).
     const verts=[];
     const re=new RegExp('V\\s*('+LBRN_NUM+')\\s+('+LBRN_NUM+')((?:\\s*c[01][xy]'+LBRN_NUM+')*)','g');
     let m;
     while((m=re.exec(str))){
-      const v={pos:[parseFloat(m[1]),parseFloat(m[2])], c0x:0,c0y:0,c1x:0,c1y:0};
+      const v={pos:[parseFloat(m[1]),parseFloat(m[2])], c0x:null,c0y:null,c1x:null,c1y:null};
       const cre=new RegExp('c([01])([xy])('+LBRN_NUM+')','g'); let cm;
       while((cm=cre.exec(m[3]||''))) v['c'+cm[1]+cm[2]]=parseFloat(cm[3]);
+      // c0/c1 ważne tylko jako pełna para x+y (absolutna pozycja punktu kontrolnego)
+      v.c0=(v.c0x!=null && v.c0y!=null)?[v.c0x,v.c0y]:null;
+      v.c1=(v.c1x!=null && v.c1y!=null)?[v.c1x,v.c1y]:null;
       verts.push(v);
     }
     return verts;
@@ -8787,8 +8859,10 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     while((m=re.exec(str))) prims.push({type:m[1], a:+m[2], b:+m[3]});
     return prims;
   }
-  // Buduje string 'd' ze ścieżki LightBurn (wierzchołki + segmenty). Uchwyty Béziera: cp1 = A + A.c1
-  // (uchwyt wychodzący z A), cp2 = B + B.c0 (uchwyt wchodzący do B) — standardowa konwencja.
+  // Buduje string 'd' ze ścieżki LightBurn (wierzchołki + segmenty).
+  // Semantyka zweryfikowana na realnym pliku: dla segmentu B a→b punkty kontrolne to
+  // cp1 = verts[a].c0 (uchwyt WYCHODZĄCY z a), cp2 = verts[b].c1 (uchwyt WCHODZĄCY do b) —
+  // oba ABSOLUTNE; brak uchwytu (flaga cNx1) → punkt kontrolny w pozycji wierzchołka.
   function lbrnBuildPathD(verts, prims){
     if(!verts.length) return '';
     if(!prims.length) return polyToPathD(verts.map(v=>v.pos));  // brak segmentów → domknięty polilinia
@@ -8797,9 +8871,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const A=verts[pr.a], B=verts[pr.b]; if(!A||!B) continue;
       if(prevB!==pr.a){ chainStart=pr.a; d+=`M${fmt(A.pos[0])} ${fmt(A.pos[1])}`; }
       if(pr.type==='B'){
-        const c1x=A.pos[0]+(A.c1x||0), c1y=A.pos[1]+(A.c1y||0);
-        const c2x=B.pos[0]+(B.c0x||0), c2y=B.pos[1]+(B.c0y||0);
-        d+=`C${fmt(c1x)} ${fmt(c1y)} ${fmt(c2x)} ${fmt(c2y)} ${fmt(B.pos[0])} ${fmt(B.pos[1])}`;
+        const cp1=A.c0||A.pos, cp2=B.c1||B.pos;
+        d+=`C${fmt(cp1[0])} ${fmt(cp1[1])} ${fmt(cp2[0])} ${fmt(cp2[1])} ${fmt(B.pos[0])} ${fmt(B.pos[1])}`;
       } else {
         d+=`L${fmt(B.pos[0])} ${fmt(B.pos[1])}`;
       }
@@ -8807,6 +8880,49 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       if(pr.b===chainStart){ d+='Z'; prevB=null; }   // segment wraca do początku → domknij kontur
     }
     return d;
+  }
+  // --- Szybka geometria segmentowa dla importu LightBurn (bez DOM/getBBox) ---
+  // Realne pliki mają setki krzywych; getBBox na offscreen <path> kosztuje ~100-200ms/szt.
+  // (wymuszony layout SVG), co dawało >30s importu. Tu: parsujemy 'd' RAZ do segmentów,
+  // transformujemy segmenty macierzami i liczymy bbox ANALITYCZNIE (ekstrema Béziera
+  // z miejsc zerowych pochodnej) — dokładnie jak getBBox, ale w mikrosekundach.
+  function lbrnTransformSegs(segs, mat){
+    const tp=p=>matApply(mat,p[0],p[1]);
+    return segs.map(s=>({cmd:s.cmd, pts:s.pts.map(tp)}));
+  }
+  function lbrnSegsToD(segs){
+    return segs.map(s=>{
+      if(s.cmd==='Z') return 'Z';
+      if(s.cmd==='M') return 'M'+fmt(s.pts[0][0])+' '+fmt(s.pts[0][1]);
+      if(s.cmd==='L') return 'L'+fmt(s.pts[0][0])+' '+fmt(s.pts[0][1]);
+      return 'C'+s.pts.map(p=>fmt(p[0])+' '+fmt(p[1])).join(' ');
+    }).join('');
+  }
+  function lbrnSegsBBox(segs){
+    let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity, cur=null;
+    const addPt=(x,y)=>{ if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; };
+    // ekstrema składowej kubicznej: miejsca zerowe pochodnej (równanie kwadratowe) w t∈(0,1)
+    const cubicExtrema=(p0,p1,p2,p3)=>{
+      const a=-p0+3*p1-3*p2+p3, b=2*(p0-2*p1+p2), c=p1-p0, out=[];
+      if(Math.abs(a)<1e-12){ if(Math.abs(b)>1e-12){ const t=-c/b; if(t>0&&t<1) out.push(t); } return out; }
+      const disc=b*b-4*a*c; if(disc<0) return out;
+      const sq=Math.sqrt(disc);
+      for(const t of [(-b+sq)/(2*a), (-b-sq)/(2*a)]) if(t>0&&t<1) out.push(t);
+      return out;
+    };
+    const cubicAt=(p0,p1,p2,p3,t)=>{ const u=1-t; return u*u*u*p0+3*u*u*t*p1+3*u*t*t*p2+t*t*t*p3; };
+    for(const s of segs){
+      if(s.cmd==='Z') continue;
+      if(s.cmd==='M'||s.cmd==='L'){ cur=s.pts[0]; addPt(cur[0],cur[1]); continue; }
+      // C: końce + ekstrema wewnętrzne obu osi
+      const p0=cur||s.pts[0], [c1,c2,p3]=s.pts;
+      addPt(p0[0],p0[1]); addPt(p3[0],p3[1]);
+      const ts=[...cubicExtrema(p0[0],c1[0],c2[0],p3[0]), ...cubicExtrema(p0[1],c1[1],c2[1],p3[1])];
+      for(const t of ts) addPt(cubicAt(p0[0],c1[0],c2[0],p3[0],t), cubicAt(p0[1],c1[1],c2[1],p3[1],t));
+      cur=p3;
+    }
+    if(!isFinite(minx)) return {x:0,y:0,width:0,height:0};
+    return {x:minx,y:miny,width:maxx-minx,height:maxy-miny};
   }
   function importLbrnFile(file){
     if(!file) return;
@@ -8841,14 +8957,32 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const parseXForm=el=>{ const xf=el.querySelector(':scope > XForm'); if(!xf) return matIdentity();
         const n=(xf.textContent.match(new RegExp(LBRN_NUM,'g'))||[]).map(Number);
         return n.length>=6?[n[0],n[1],n[2],n[3],n[4],n[5]]:matIdentity(); };
+      // LightBurn 2.x DEDUPLIKUJE geometrię (instancing): Shape z VertID/PrimID niesie
+      // pełny VertList/PrimList tylko przy PIERWSZYM wystąpieniu; kolejne Shape z tym
+      // samym ID mają wyłącznie XForm i reużywają zarejestrowaną geometrię.
+      const vertReg={}, primReg={};
       const shapeToLocalD=sh=>{
         const type=sh.getAttribute('Type');
         if(type==='Rect'){ const W=parseFloat(sh.getAttribute('W')||'0'), H=parseFloat(sh.getAttribute('H')||'0'), Cr=parseFloat(sh.getAttribute('Cr')||'0');
           if(!(W>0)||!(H>0)) return null; return roundedRectD(-W/2,-H/2,W,H,Math.max(0,Math.min(Cr,Math.min(W,H)/2))); }
         if(type==='Ellipse'){ const Rx=parseFloat(sh.getAttribute('Rx')||'0'), Ry=parseFloat(sh.getAttribute('Ry')||'0');
           if(!(Rx>0)||!(Ry>0)) return null; return ellipseD(0,0,Rx,Ry); }
-        if(type==='Path'){ const vl=sh.querySelector(':scope > VertList'), pl=sh.querySelector(':scope > PrimList');
-          if(!vl) return null; const d=lbrnBuildPathD(lbrnParseVertList(vl.textContent), pl?lbrnParsePrimList(pl.textContent):[]); return d||null; }
+        if(type==='Path'){
+          const vid=sh.getAttribute('VertID'), pid=sh.getAttribute('PrimID');
+          const vl=sh.querySelector(':scope > VertList'), pl=sh.querySelector(':scope > PrimList');
+          let verts=null, prims=null;
+          if(vl){ verts=lbrnParseVertList(vl.textContent); if(vid!=null) vertReg[vid]=verts; }
+          else if(vid!=null && vertReg[vid]) verts=vertReg[vid];          // instancja — geometria z rejestru
+          if(pl){ const t=pl.textContent;
+            prims=/^\s*LineClosed\s*$/.test(t) ? 'closed' : lbrnParsePrimList(t);   // LineClosed = domknięta polilinia
+            if(pid!=null) primReg[pid]=prims; }
+          else if(pid!=null && primReg[pid]!=null) prims=primReg[pid];
+          if(!verts || !verts.length) return null;
+          const d = (prims==='closed' || !prims || !prims.length)
+            ? polyToPathD(verts.map(v=>v.pos))
+            : lbrnBuildPathD(verts, prims);
+          return d||null;
+        }
         return null;
       };
       (function walk(node, mat){
@@ -8865,23 +8999,23 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       })(root, matIdentity());
       if(!items.length){ showToast(skippedText?'Plik zawiera tylko tekst — import tekstu LightBurn nie jest jeszcze obsługiwany.':'Brak rozpoznanych kształtów w pliku LightBurn.','error',5000); return; }
       // 3) Zmierz łączny bbox w przestrzeni LightBurn (po XForm), następnie dopasuj skalę i wyśrodkuj
-      const _tmpSvg=document.createElementNS(SVG_NS,'svg'); _tmpSvg.classList.add('u-offscreen'); document.body.appendChild(_tmpSvg);
-      const _tmpPath=document.createElementNS(SVG_NS,'path'); _tmpSvg.appendChild(_tmpPath);
-      const bboxOf=d=>{ _tmpPath.setAttribute('d',d); try{ return _tmpPath.getBBox(); }catch(_){ return {x:0,y:0,width:0,height:0}; } };
       let newObjs, usedIdx, depthOf, skippedBad=0;
       const _fin=v=>typeof v==='number' && isFinite(v);
       try{
-        // najpierw policz bbox każdego kształtu w przestrzeni LightBurn; ODRZUĆ kształty z
-        // niefinitową geometrią (NaN/Infinity z egzotycznego formatu) — inaczej jeden zły
-        // kształt zatruwałby Math.min/max całego rysunku (NaN) i wszystkie obiekty wyszłyby
-        // zepsute, a operacje boolowskie w podglądzie mogłyby się zawiesić
+        // Pipeline segmentowy (bez DOM): parsuj 'd' RAZ → segmenty świata (macierz XForm)
+        // → bbox analitycznie → finalna macierz → serializacja. Odrzucamy kształty
+        // z niefinitową geometrią, żeby NaN nie zatruł Math.min/max całego rysunku.
         const good=[];
         let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
-        items.forEach(it=>{ const b=bboxOf(transformPathDGeneral(it.localD, it.mat));
-          if(!_fin(b.x)||!_fin(b.y)||!_fin(b.width)||!_fin(b.height)){ skippedBad++; return; }
-          it.wb={x:b.x,y:b.y,w:b.width,h:b.height}; good.push(it);
+        items.forEach(it=>{
+          let segs; try{ segs=parsePathToAbsSegs(it.localD); }catch(_){ skippedBad++; return; }
+          if(!segs.length){ skippedBad++; return; }
+          const w=lbrnTransformSegs(segs, it.mat);
+          const b=lbrnSegsBBox(w);
+          if(!_fin(b.x)||!_fin(b.y)||!_fin(b.width)||!_fin(b.height)||!(b.width||b.height)){ skippedBad++; return; }
+          it.wsegs=w; good.push(it);
           minx=Math.min(minx,b.x); miny=Math.min(miny,b.y); maxx=Math.max(maxx,b.x+b.width); maxy=Math.max(maxy,b.y+b.height); });
-        if(!good.length || !_fin(minx) || !_fin(maxx)){ document.body.removeChild(_tmpSvg); showToast('Nie udało się odczytać poprawnej geometrii z pliku LightBurn.','error',5000); return; }
+        if(!good.length || !_fin(minx) || !_fin(maxx)){ showToast('Nie udało się odczytać poprawnej geometrii z pliku LightBurn.','error',5000); return; }
         const combW=Math.max(1e-6,maxx-minx), combH=Math.max(1e-6,maxy-miny);
         const wcx=(minx+maxx)/2, wcy=(miny+maxy)/2;
         const scale=Math.min(1, (state.docW*0.92)/combW, (state.docH*0.92)/combH);
@@ -8890,20 +9024,19 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         // 4) Mapowanie warstw → głębie edytora (kolejno wg CutIndex)
         usedIdx=[...new Set(good.map(it=>it.cutIndex))].sort((a,b)=>a-b);
         depthOf={}; usedIdx.forEach((ci,i)=>depthOf[ci]=i+1);
-        // 5) Twórz obiekty (pomijając te, których finalny bbox też wyszedłby niefinitowy)
+        // 5) Twórz obiekty — finalne segmenty z już policzonych segmentów świata
         newObjs=good.map(it=>{
-          const d=transformPathDGeneral(it.localD, matMultiply(matGlobal, it.mat));
-          const b=bboxOf(d);
+          const fs=lbrnTransformSegs(it.wsegs, matGlobal);
+          const b=lbrnSegsBBox(fs);
           if(!_fin(b.x)||!_fin(b.width)){ skippedBad++; return null; }
           const cs=cutMap[it.cutIndex]||{mode:'cut'};
-          return { id:uid(), type:'path', name:cs.name||'', d, fillRule:'nonzero',
+          return { id:uid(), type:'path', name:cs.name||'', d:lbrnSegsToD(fs), fillRule:'nonzero',
             bx:b.x, by:b.y, bw:Math.max(0.01,b.width), bh:Math.max(0.01,b.height),
             x:0, y:0, rotation:0, sx:1, sy:1, mode:cs.mode||'cut',
             visible:true, locked:false, depth:depthOf[it.cutIndex]||1, repeat:{type:'none'},
             lbrnLayer:cs.name||('C'+it.cutIndex), lbrnType:cs.type||'', lbrnSpeed:cs.speed||0, lbrnPower:cs.power||0, lbrnPasses:cs.passes||1 };
         }).filter(Boolean);
-      } catch(err){ try{document.body.removeChild(_tmpSvg);}catch(_){}; showToast('Błąd przetwarzania geometrii LightBurn','error'); return; }
-      document.body.removeChild(_tmpSvg);
+      } catch(err){ showToast('Błąd przetwarzania geometrii LightBurn','error'); return; }
       if(!newObjs.length){ showToast('Nie udało się odczytać poprawnej geometrii z pliku LightBurn.','error',5000); return; }
       // 6) Grubość materiału z projektu (MaterialHeight) → przypisz warstwom
       const matH=parseFloat(root.getAttribute('MaterialHeight')||'0')||0;
