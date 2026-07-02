@@ -154,7 +154,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .q-field select,.q-field input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r-xs);padding:7px 8px;font-size:.82rem;outline:none;width:100%;box-sizing:border-box;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 .q-field select:focus,.q-field input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.18)}
 .q-price-card{background:linear-gradient(160deg,rgba(var(--accent-rgb),.12),rgba(var(--accent-rgb),.03));border:1.5px solid var(--accent);border-radius:var(--r);padding:12px 13px;margin:2px 0 10px;transition:box-shadow var(--tr-slow)}
-.q-price-card:not(.empty){box-shadow:0 2px 12px rgba(var(--accent-rgb),.12);animation:priceGlow 3s ease-in-out infinite;position:relative;overflow:hidden;transition:box-shadow var(--tr-slow),border-color var(--tr-base),transform var(--tr-base)}
+.q-price-card:not(.empty){box-shadow:0 2px 14px rgba(var(--accent-rgb),.18);position:relative;overflow:hidden;transition:box-shadow var(--tr-slow),border-color var(--tr-base),transform var(--tr-base)}
 .q-price-card.empty{background:var(--surface2);border-color:var(--border);position:relative}
 .q-pp{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .q-pp .q-pp-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
@@ -187,6 +187,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
    po napisie "podświetlało" litery na niebiesko i otwierało systemowe menu zaznaczenia */
 #canvas *{user-select:none}
 #canvas text{pointer-events:bounding-box;cursor:move}
+/* podczas przeciągania hit-test po setkach krzywych (import LightBurn) kosztował ~0.8 s/klatkę —
+   wskaźnik jest przechwycony (setPointerCapture), więc wyłączamy pointer-events na czas gestu */
+/* Hit-test przeglądarki po setkach krzywych (import LightBurn) kosztował 60-90 ms na KAŻDY
+   ruch myszy (hover). Obiekty mają pointer-events:none NA STAŁE — kliknięcia rozwiązuje
+   własny, tani hit-test w JS (pickObjectAt: bbox + point-in-poly z cache konturów). */
+#gObjects{pointer-events:none}
+#gGrid{pointer-events:none}   /* 1500+ dekoracyjnych linii siatki — bez hit-testu przeglądarki */
+#canvas.lzr-dragging #gOverlay{pointer-events:none}
+/* Nakładka przeciągania: mała osobna scena SVG nad płótnem — podczas gestu przenosimy do niej
+   przeciągane obiekty, więc główna (ciężka) scena w ogóle się nie przemalowuje */
+#dragLayer{position:absolute;top:20px;right:0;bottom:0;left:22px;width:auto;height:auto;pointer-events:none;display:none;will-change:transform}
+#dragLabelHtml{position:fixed;z-index:6500;pointer-events:none;background:var(--glass-2);border:1px solid rgba(var(--accent-rgb),.4);color:var(--text);font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:var(--r-xs);font-variant-numeric:tabular-nums;transform:translate(14px,14px)}
 .stage .hint-empty{position:absolute;left:calc(50% + 11px);top:34px;transform:translateX(-50%);font-size:.8rem;color:var(--text);background:linear-gradient(180deg,rgba(18,24,38,.75),rgba(8,11,18,.75));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:8px 16px;border-radius:100px;pointer-events:none;border:1px solid rgba(var(--accent-rgb),.22);box-shadow:0 4px 12px rgba(0,0,0,.3);font-weight:500;letter-spacing:.02em;text-align:center;line-height:1.5;animation:hintEmptyFloat 4s ease-in-out infinite}
 
 /* ---- Linijki (rulery) wzdłuż krawędzi płótna ---- */
@@ -309,7 +321,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);line-heigh
 .layer-search{width:calc(100% - 20px);margin:0 10px 8px;padding:7px 10px 7px 32px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:.8rem;box-sizing:border-box;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239fb3c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:9px center;transition:border-color var(--tr-base),box-shadow var(--tr-base)}
 .layer-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233fc7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
 .layers{display:flex;flex-direction:column;gap:2px;padding:0 10px 14px;scroll-behavior:smooth;overflow-y:auto;overscroll-behavior:contain;max-height:calc(100vh - 300px)}
-.layer{display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:var(--r-sm);border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),padding-left var(--tr-base);position:relative}
+.layer{contain:layout style;display:flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;border-radius:var(--r-sm);border:1.5px solid transparent;border-left-width:3px;border-left-color:transparent;background:var(--surface2);cursor:pointer;transition:background var(--tr-base),border-color var(--tr-base),box-shadow var(--tr-base),transform var(--tr-fast),padding-left var(--tr-base);position:relative}
 .layer:hover{background:var(--surface3);border-color:var(--border-strong);box-shadow:var(--sh-sm);padding-left:12px;border-left-color:var(--accent)!important}
 .layer:active{transform:scale(.98)}
 .layer.sel{border-color:var(--accent);border-left-color:var(--accent);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12),0 2px 8px rgba(var(--accent-rgb),.08);animation:layerSelPulse var(--an-med) ease-out;scroll-margin:8px}
@@ -790,7 +802,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent
 .stage::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 
 /* === Karta ceny — puls animacja akcentu kiedy jest aktywna === */
-@keyframes priceGlow{0%,100%{box-shadow:0 2px 12px rgba(var(--accent-rgb),.12)}50%{box-shadow:0 2px 16px rgba(var(--accent-rgb),.25)}}
+/* priceGlow usunięty: animowany box-shadow malował kartę co klatkę (drogo przy dużym DOM) */
 /* === Wydajność — will-change na animowanych elementach === */
 .modal-ov .modal-box{will-change:transform,opacity;cursor:default}
 .confirm-box{will-change:transform,opacity;background:linear-gradient(180deg,var(--surface2),var(--bg-2));border:1px solid var(--border-strong);border-radius:var(--r);padding:22px 24px 18px;max-width:400px;width:90vw;box-shadow:var(--sh-lg);transform:scale(.92) translateY(-8px);transition:transform var(--tr-slow) var(--ease-out),opacity var(--tr-slow) var(--ease-out);opacity:0}
@@ -1069,7 +1081,7 @@ input[type=range]:focus-visible{outline:none}
 .gear-warn{color:var(--cut-light)}
 
 /* === Status bar — dolny pasek informacyjny === */
-.statusbar{display:flex;align-items:center;gap:4px;padding:3px 14px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-top:1px solid var(--border);font-size:.65rem;color:var(--muted-2);flex-shrink:0;min-height:22px;user-select:none;transition:background var(--tr-slow);contain:layout style}
+.statusbar{display:flex;align-items:center;gap:4px;padding:3px 14px;background:linear-gradient(180deg,var(--surface),var(--bg-2));border-top:1px solid var(--border);font-size:.65rem;color:var(--muted-2);flex-shrink:0;min-height:22px;user-select:none;transition:background var(--tr-slow);contain:layout style paint}
 .sb-item{font-variant-numeric:tabular-nums;letter-spacing:.02em;padding:2px 6px;border-radius:var(--r-xs);transition:color var(--tr-base),background var(--tr-base)}
 .sb-sep{opacity:.35;background:linear-gradient(180deg,var(--accent),var(--muted-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding:0 2px;color:rgba(var(--accent-rgb),.2);font-size:.5rem}
 .sb-spacer{flex:1}
@@ -1754,14 +1766,16 @@ select optgroup{background:var(--bg-2);color:var(--muted);font-weight:700;font-s
 .tgroup:has(.tbtn.active)::after{content:'';position:absolute;bottom:-9px;left:0;right:0;height:2px;background:var(--grad-accent);opacity:.3;border-radius:var(--r-hair)}
 /* === v69: Modal box top bar — animated gradient === */
 @keyframes modalTopBarGrad{from{background-position:200% 0}to{background-position:-200% 0}}
+/* zamknięte modale nie animują pasków gradientu — visibility:hidden nie pauzuje animacji CSS */
+.modal-ov:not(.open) .modal-box::before{animation-play-state:paused}
 
 /* === v69: Layer row — pulsująca ikonka visibility na hover === */
 .layer .lico-vis:hover{animation:visIconPulse var(--an-med) ease-out}
 @keyframes visIconPulse{0%{transform:scale(1.3)}100%{transform:scale(1.08)}}
 
 /* === v69: Lepsza wizualizacja karty wyceny z shimmer === */
-.q-price-card:not(.empty)::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.06),transparent);animation:priceShimmer 4s ease-in-out infinite}
-@keyframes priceShimmer{0%{left:-100%}50%{left:200%}100%{left:200%}}
+.q-price-card:not(.empty)::before{content:'';position:absolute;top:0;left:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.06),transparent);transform:translateX(-110%);animation:priceShimmer 4s ease-in-out infinite;will-change:transform}
+@keyframes priceShimmer{0%{transform:translateX(-110%)}50%{transform:translateX(420%)}100%{transform:translateX(420%)}}
 
 /* === v69: Depth badge — gradient shimmer na aktywnym === */
 .lyr-row.on .d-badge,.la-btn.on{position:relative;overflow:hidden}
@@ -2422,6 +2436,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       <div class="ruler ruler-h" id="rulerH" title="Przeciągnij w dół, aby utworzyć linię pomocniczą"></div>
       <div class="ruler ruler-v" id="rulerV" title="Przeciągnij w prawo, aby utworzyć linię pomocniczą"></div>
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Płótno edytora laserowego"></svg>
+      <svg id="dragLayer" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
+      <div id="dragLabelHtml" class="u-hidden" aria-hidden="true"></div>
       <div class="hint-empty" id="hintEmpty">Wybierz narzędzie i narysuj kształt — albo kliknij gotowy szablon po lewej</div>
     </section>
 
@@ -3399,8 +3415,29 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   // jednego obiektu zamiast renderować od nowa cały dokument — eliminuje "zacinanie się"
   // przy przesuwaniu/skalowaniu/obracaniu w plikach z dużą liczbą elementów (powielenia).
   function renderObjectEl(o){
-    const el=gObjects.querySelector(`[data-id="${o.id}"]`);
+    const el=gObjects.querySelector(`[data-id="${o.id}"]`) || dragLayerEl.querySelector(`[data-id="${o.id}"]`);
     if(!el || !o.visible || (state.hiddenDepths.length && state.hiddenDepths.includes(o.depth||1))){ renderObjects(); return; }
+    // SZYBKA ŚCIEŻKA przeciągania: dla 'path' bez powieleń pozycja/obrót/skala siedzą
+    // wyłącznie w transformie wewnętrznego <g> — aktualizujemy sam atrybut zamiast
+    // przebudowywać innerHTML. Podmiana innerHTML wymusza w przeglądarce ponowny parsing
+    // i tesselację krzywych, co przy złożonych ścieżkach z importu LightBurn dawało
+    // ~0.7 s na KAŻDĄ klatkę ruchu (zacinanie przy przesuwaniu).
+    // TRYB KOMPOZYTORA podczas gestu przesuwania: sam JS jest szybki (~2 ms), ale każda
+    // zmiana geometrii SVG wymusza PRZEMALOWANIE sceny (przy setkach krzywych z importu
+    // LightBurn ~60-80 ms/klatkę → ~14 FPS). Na czas przeciągania ruch wykonujemy
+    // transformem CSS (warstwa GPU — zero repaintów reszty), a właściwą geometrię
+    // zapisujemy raz przy puszczeniu (cleanup w pointerup gałęzi 'move').
+    if(o.type==='path' && (!o.repeat || o.repeat.type==='none' || !o.repeat.type)){
+      const g=el.firstElementChild;
+      if(g && g.tagName==='g' && el.children.length===1 && g.hasAttribute('transform')){
+        const lcx=(o.bx||0)+(o.bw||0)/2, lcy=(o.by||0)+(o.bh||0)/2;
+        const sx=(o.sx||1)*(o.flipX?-1:1), sy=(o.sy||1)*(o.flipY?-1:1);
+        const scalePart=(sx!==1||sy!==1)?` translate(${fmt(lcx)} ${fmt(lcy)}) scale(${fmt(sx)} ${fmt(sy)}) translate(${fmt(-lcx)} ${fmt(-lcy)})`:'';
+        g.setAttribute('transform',`translate(${fmt(o.x||0)} ${fmt(o.y||0)}) rotate(${fmt(o.rotation||0)} ${fmt(lcx)} ${fmt(lcy)})${scalePart}`);
+        scheduleLiveQuote();
+        return;
+      }
+    }
     const inner=innerGeometry(o,false);
     el.innerHTML=repeatTransforms(o).map(t=> t? `<g transform="${t}">${inner}</g>` : inner).join('');
     scheduleLiveQuote();
@@ -4583,9 +4620,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         startHandle(e,handle,docP); return;
       }
       if(mhandle){ startMResize(e,mhandle,docP); return; }
-      const grp=e.target.closest && e.target.closest('[data-id]');
-      if(grp){
-        const id=grp.getAttribute('data-id'); const o=state.objects.find(x=>x.id===id);
+      const hitObj=pickObjectAt(docP);
+      if(hitObj){
+        const id=hitObj.id; const o=hitObj;
         if(e.shiftKey){ toggleSelection(id); return; }            // shift+klik = dodaj/odejmij z zaznaczenia
         if(o && o.type==='text' && !o.locked && maybeInlineTextDblClick(o)) return; // dwuklik napisu -> edycja w miejscu
         if(!state.selectedIds.includes(id)) select(id);           // klik na nowy = zaznacz tylko jego
@@ -4617,7 +4654,70 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     state.guides={v:[],h:[]}; renderGuides();
   });
 
-  function setCapture(e){ try{ canvas.setPointerCapture(e.pointerId); }catch(_){} }
+  function setCapture(e){ try{ canvas.setPointerCapture(e.pointerId); }catch(_){} canvas.classList.add('lzr-dragging'); }
+  // Własny hit-test kliknięć (obiekty mają pointer-events:none — patrz CSS #gObjects).
+  // Od wierzchu stosu: szybki test obróconego bbox, potem dokładny point-in-poly na
+  // konturach z cache (evenodd — dziury liter nie łapią), a dla konturów-cięć także
+  // bliskość krawędzi (łatwe klikanie cienkich obrysów).
+  function pickObjectAt(docP){
+    const tol=Math.max(0.8, state.view.w*0.008);
+    const pt=[docP.x, docP.y];
+    for(let i=state.objects.length-1;i>=0;i--){
+      const o=state.objects[i];
+      if(!o.visible) continue;
+      if(state.hiddenDepths.length && state.hiddenDepths.includes(o.depth||1)) continue;
+      const bb=rotatedBBox(o);
+      if(pt[0]<bb.minx-tol||pt[0]>bb.maxx+tol||pt[1]<bb.miny-tol||pt[1]>bb.maxy+tol) continue;
+      if(o.type==='image' || o.type==='text') return o;               // jak dotychczasowe bounding-box
+      if(o.type==='line'){
+        const x1=o.x,y1=o.y,x2=o.x+o.w,y2=o.y+o.h;
+        const L2=Math.max(1e-9,(x2-x1)**2+(y2-y1)**2);
+        const t=Math.max(0,Math.min(1,((pt[0]-x1)*(x2-x1)+(pt[1]-y1)*(y2-y1))/L2));
+        const dx=pt[0]-(x1+t*(x2-x1)), dy=pt[1]-(y1+t*(y2-y1));
+        if(dx*dx+dy*dy<=tol*tol*4) return o;
+        continue;
+      }
+      let polys; try{ polys=objSubPolysRepeated(o); }catch(_){ polys=[]; }
+      if(!polys.length) return o;                                      // brak konturów → licz bbox
+      let inside=0;
+      for(const poly of polys) if(pointInPoly(pt, poly)) inside++;
+      if(inside%2===1) return o;                                       // evenodd: dziury nie łapią
+      // kliknięcie blisko samej krawędzi (cienkie obrysy cięcia/nacięcia)
+      for(const poly of polys){
+        for(let k=0;k<poly.length;k++){
+          const a=poly[k], b=poly[(k+1)%poly.length];
+          const L2=Math.max(1e-9,(b[0]-a[0])**2+(b[1]-a[1])**2);
+          const t=Math.max(0,Math.min(1,((pt[0]-a[0])*(b[0]-a[0])+(pt[1]-a[1])*(b[1]-a[1]))/L2));
+          const dx=pt[0]-(a[0]+t*(b[0]-a[0])), dy=pt[1]-(a[1]+t*(b[1]-a[1]));
+          if(dx*dx+dy*dy<=tol*tol) return o;
+        }
+      }
+    }
+    return null;
+  }
+  // — warstwa kompozytora dla przeciągania: przenosimy WĘZŁY przeciąganych obiektów do małej
+  //   svg nad sceną (bez klonowania — ten sam DOM, zero ponownej tesselacji), a po geście
+  //   wstawiamy je z powrotem w to samo miejsce (zachowana kolejność / z-index)
+  const dragLayerEl=document.getElementById('dragLayer');
+  const dragLabelHtml=document.getElementById('dragLabelHtml');
+  let _dragMoved=null, _dragPxPerMM=1;   // [{el, next}] — do przywrócenia kolejności
+  function dragLayerBegin(items){
+    dragLayerEl.setAttribute('viewBox', canvas.getAttribute('viewBox')||`0 0 ${state.docW} ${state.docH}`);
+    dragLayerEl.setAttribute('preserveAspectRatio','xMidYMid meet');
+    _dragMoved=[];
+    items.forEach(it=>{ const el=gObjects.querySelector(`[data-id="${it.o.id}"]`);
+      if(el){ _dragMoved.push({el, next: el.nextSibling}); dragLayerEl.appendChild(el); } });
+    if(_dragMoved.length){
+      const r=renderedRect(); _dragPxPerMM=(r&&r.width&&state.view.w)?(r.width/state.view.w):1;
+      dragLayerEl.style.transform=''; dragLayerEl.style.display='block'; gOverlay.innerHTML='';
+    }
+  }
+  function dragLayerEnd(){
+    if(!_dragMoved) return;
+    _dragMoved.forEach(({el,next})=>{ try{ gObjects.insertBefore(el, next && next.parentNode===gObjects ? next : null); }catch(_){ gObjects.appendChild(el); } });
+    _dragMoved=null; dragLayerEl.style.display='none'; dragLayerEl.style.transform=''; dragLayerEl.removeAttribute('viewBox');
+    dragLabelHtml.classList.add('u-hidden');
+  }
 
   function startPan(e){ setCapture(e); canvas.style.cursor='grabbing';
     drag={mode:'pan', r:renderedRect(), sx:e.clientX, sy:e.clientY, vx:state.view.x, vy:state.view.y, vw:state.view.w, vh:state.view.h}; }
@@ -4656,11 +4756,13 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       const items=copies.map(s=>({o:s,ox:s.x,oy:s.y,bb:rotatedBBox(s)}));
       const excl=items.map(it=>it.o.id);
       drag={mode:'move', o, items, sx:docP.x, sy:docP.y, snapT:snapTargets(excl)};
+      dragLayerBegin(items);
       return;
     }
     const items=getSelected().filter(s=>!s.locked).map(s=>({o:s,ox:s.x,oy:s.y,bb:rotatedBBox(s)}));
     const excl=items.map(it=>it.o.id);
     drag={mode:'move', o, items, sx:docP.x, sy:docP.y, snapT:snapTargets(excl)};
+    dragLayerBegin(items);
   }
   function startMarquee(e,docP){
     setCapture(e);
@@ -4848,8 +4950,16 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
         drag.items.forEach(it=>{ it.o.x=it.ox+dx; it.o.y=it.oy+dy; });
       }
       const mb=objBBox(drag.o);
-      state.dragLabel={text:`X: ${fmt(mb.x)}  Y: ${fmt(mb.y)} mm`, x:docP.x, y:docP.y};
-      drag.items.forEach(it=>renderObjectEl(it.o)); renderOverlay(); syncPropsLive();
+      if(_dragMoved){
+        const it0=drag.items[0];
+        dragLayerEl.style.transform=`translate(${fmt((it0.o.x-it0.ox)*_dragPxPerMM)}px, ${fmt((it0.o.y-it0.oy)*_dragPxPerMM)}px)`;
+        dragLabelHtml.textContent=`X: ${fmt(mb.x)}  Y: ${fmt(mb.y)} mm`;
+        dragLabelHtml.style.left=e.clientX+'px'; dragLabelHtml.style.top=e.clientY+'px';
+        dragLabelHtml.classList.remove('u-hidden');
+      } else {
+        state.dragLabel={text:`X: ${fmt(mb.x)}  Y: ${fmt(mb.y)} mm`, x:docP.x, y:docP.y};
+        drag.items.forEach(it=>renderObjectEl(it.o)); renderOverlay(); syncPropsLive();
+      }
     } else if(drag.mode==='marquee'){
       const x=Math.min(drag.x0,docP.x), y=Math.min(drag.y0,docP.y), w=Math.abs(docP.x-drag.x0), h=Math.abs(docP.y-drag.y0);
       drag.rect={x,y,w,h};
@@ -4909,6 +5019,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     }
   });
   window.addEventListener('pointerup', e=>{
+    canvas.classList.remove('lzr-dragging');
     pointers.delete(e.pointerId);
     if(pinch){ if(pointers.size<2){ pinch=null; drag=null; } return; }
     if(!drag) return;
@@ -4935,6 +5046,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       renderAll(); pushHistory(); renderProps(); scheduleLive3D();
       startInlineTextEdit(o); // od razu edycja nowego napisu na płycie (na dotyku otwiera klawiaturę)
     } else if(m==='move'||m==='resize'||m==='rotate'||m==='mresize'){
+      // koniec gestu: wstaw węzły z powrotem do głównej sceny i narysuj finalnie
+      if(m==='move'){ dragLayerEnd(); if(drag.items) drag.items.forEach(it=>renderObjectEl(it.o)); }
       state.guideLines=null; renderOverlay();
       // zwykłe kliknięcie obiektu (zaznaczenie bez przeciągnięcia) uruchamia tryb 'move',
       // ale nic nie przesuwa — nie zapisujemy wtedy pustego kroku do historii
@@ -4959,6 +5072,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     drag=null;
   });
   window.addEventListener('pointercancel', e=>{
+    canvas.classList.remove('lzr-dragging');
+    dragLayerEnd();
     pointers.delete(e.pointerId); if(pointers.size<2) pinch=null;
     if(drag&&(drag.mode==='guideNewH'||drag.mode==='guideNewV'||drag.mode==='guideMove')) renderGuides();
     drag=null; state.guideLines=null; state.dragLabel=null; renderOverlay();
@@ -6129,18 +6244,20 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     },1000);
   }
   if(_sbCoords){
-    canvas.addEventListener('pointermove',e=>{
-      const rect=canvas.getBoundingClientRect();
-      const scaleX=state.view.w/rect.width, scaleY=state.view.h/rect.height;
-      const mx=state.view.x+(e.clientX-rect.left)*scaleX;
-      const my=state.view.y+(e.clientY-rect.top)*scaleY;
-      if(mx>=0 && my>=0 && mx<=state.docW && my<=state.docH){
-        _sbCoords.textContent=`⊞ ${Math.round(mx)}, ${Math.round(my)} mm`;
-      } else {
-        _sbCoords.textContent='⊞ ---';
-      }
-    });
-    canvas.addEventListener('pointerleave',()=>{ _sbCoords.textContent=''; });
+    // Wskaźnik współrzędnych BEZ layout-thrashu: poprzednia wersja robiła
+    // getBoundingClientRect (wymusza layout) + textContent (brudzi layout) na KAŻDY
+    // pointermove — przy dużej scenie SVG dawało to ~60 ms na każdy ruch myszy.
+    // Teraz: współrzędne łapane tanio, przeliczenie i zapis w rAF (raz na klatkę),
+    // renderedRect() z cache widoku i zapis DOM tylko przy zmianie wartości.
+    let _cx=0,_cy=0,_cPend=false,_cLast='';
+    const _cFlush=()=>{ _cPend=false;
+      const r=renderedRect(); if(!r.width||!r.height) return;
+      const mx=state.view.x+(_cx-r.left)/r.width*state.view.w;
+      const my=state.view.y+(_cy-r.top)/r.height*state.view.h;
+      const txt=(mx>=0&&my>=0&&mx<=state.docW&&my<=state.docH)?`⊞ ${Math.round(mx)}, ${Math.round(my)} mm`:'⊞ ---';
+      if(txt!==_cLast){ _cLast=txt; _sbCoords.textContent=txt; } };
+    canvas.addEventListener('pointermove',e=>{ _cx=e.clientX; _cy=e.clientY; if(!_cPend){ _cPend=true; requestAnimationFrame(_cFlush); } },{passive:true});
+    canvas.addEventListener('pointerleave',()=>{ _cLast=''; _sbCoords.textContent=''; });
   }
 
   _undoBtnEl.addEventListener('click',undo);
@@ -6357,9 +6474,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     if(_inlineEditor) return; // edycja w miejscu już otwarta (wykryta na pointerdown)
     if(state.tool==='pen' && state.penDraft){ penFinish(); return; }
     // dwuklik / dwukrotne dotknięcie napisu -> od razu edycja jego treści (kursor w polu tekstu)
-    const tgrp = e.target.closest && e.target.closest('[data-id]');
-    if(tgrp){
-      const to=state.objects.find(x=>x.id===tgrp.getAttribute('data-id'));
+    const tHit=pickObjectAt(clientToDoc(e));
+    if(tHit){
+      const to=tHit;
       if(to && to.type==='text' && !to.locked){
         if(!state.selectedIds.includes(to.id) || state.selectedIds.length!==1){ select(to.id); }
         else { renderProps(); }
@@ -6536,8 +6653,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
   canvas.addEventListener('contextmenu', e=>{
     e.preventDefault();
     if(state.tool!=='select'){ closeCtxMenu(); return; }
-    const grp=e.target.closest && e.target.closest('[data-id]');
-    if(grp){ const id=grp.getAttribute('data-id'); if(!state.selectedIds.includes(id)) select(id); }
+    const cmHit=pickObjectAt(clientToDoc(e));
+    if(cmHit){ if(!state.selectedIds.includes(cmHit.id)) select(cmHit.id); }
     const sel=getSelected();
     let h='';
     if(sel.length){
@@ -7386,11 +7503,20 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
       // ---- ściany boczne: prawdziwe pionowe "kwadraty" wzdłuż każdej krawędzi obrysu (poza dziurami) ----
       // gęste kontury (np. palce łączeniowe pudełka) uproszczone do progu ~0.6px na ekranie —
       // setki/tysiące mikroskopijnych ścianek z transformacją 3D potrafią zamrozić kartę na wiele sekund
-      const wallTol=Math.max(0.05, 0.6/scale);
+      const wallTol=Math.max(0.05, 0.6/scale)*((opts&&opts.wallTolMul)||1);
       let walls='';
-      rings.forEach((ring,ringIdx)=>{
-        if(isHoleRing[ringIdx]) return;
-        const wRing=ring.length>200?simplifyRing(ring,wallTol):ring;
+      // LOD dla podglądu na żywo: ~2000 ścianek 3D (import LightBurn) = ~2000 warstw
+      // kompozytora przeliczanych KAŻDĄ klatkę (60+ ms nawet przy bezczynności). Budujemy
+      // ściany od NAJWIĘKSZYCH konturów i tniemy przy limicie opts.wallCap — mini-podgląd
+      // wygląda tak samo, a pełna szczegółowość zostaje w dużym oknie 3D (bez capu).
+      const _order=rings.map((r,i)=>i).sort((a,b)=>Math.abs(polyArea(rings[b]))-Math.abs(polyArea(rings[a])));
+      const _wallCap=(opts&&opts.wallCap)||Infinity;
+      let _wallCount=0;
+      for(const ringIdx of _order){
+        if(_wallCount>=_wallCap) break;
+        const ring=rings[ringIdx];
+        if(isHoleRing[ringIdx]) continue;
+        const wRing=(ring.length>200||((opts&&opts.wallTolMul)&&ring.length>24))?simplifyRing(ring,wallTol):ring;
         const n=wRing.length;
         for(let i=0;i<n;i++){
           const a=wRing[i], b=wRing[(i+1)%n];
@@ -7407,8 +7533,9 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
           const sx=ax-ux*WALL_OVERLAP, sy=ay-uy*WALL_OVERLAP;
           const wlen=len+WALL_OVERLAP*2, wthick=thick+WALL_OVERLAP*2;
           walls+=`<div class="l3d-wall" style="width:${fmt(wlen)}px;height:${fmt(wthick)}px;background:${wallCol};transform:translate3d(${fmt(sx)}px,${fmt(sy)}px,${fmt(zBase-WALL_OVERLAP)}px) rotateZ(${fmt(ang)}deg) rotateX(90deg)"></div>`;
+          if(++_wallCount>=_wallCap) break;
         }
-      });
+      }
       // ---- góra płyty: jeden scalony kształt (bez szwów) + ewentualne elementy nie-geometryczne (tekst) ----
       const topPath=rings.length?`<path d="${rings.map(ringSmoothD).join(' ')}" fill="${col}" fill-rule="evenodd" stroke="${col}" stroke-width="0.6"/>`:'';
       _silFill=col;
@@ -7464,7 +7591,7 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
     live3dTitle.textContent=`🧊 3D — ${tMM.toFixed(1)} mm · ${depthList.length} warst${depthList.length===1?'wa':'w'}`;
     let sw=Math.round(W/H*(sh*0.62)); sw=Math.max(120,Math.min(sw, sw0*0.75));
     const pxPerMM=Math.max(1.5, Math.min(7, (sh*0.45)/totalStackMM()));
-    const n=buildLayerScene(live3dScene, sw, pxPerMM, {maxDim:800});
+    const n=buildLayerScene(live3dScene, sw, pxPerMM, {maxDim:800, wallCap:300, wallTolMul:3});
     if(!n){ live3dScene.style.width='auto'; live3dScene.style.height='auto'; live3dScene.innerHTML='<div class="live3d-empty">Dodaj elementy na płytę,<br>aby zobaczyć wizualizację 3D<span class="empty-hint">Narzędzia: <kbd class="kbd-xxs">R</kbd> prostokąt · <kbd class="kbd-xxs">O</kbd> elipsa · <kbd class="kbd-xxs">T</kbd> tekst · <kbd class="kbd-xxs">P</kbd> ścieżka<br>lub wybierz szablon z panelu po lewej</span></div>'; }
     applyLiveRot();
     scheduleSvgSplit();
