@@ -3,7 +3,8 @@
     "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}.${ext}"
   },
   "dmg": {
-    "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}-${arch}.${ext}"
+    "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}-${arch}.${ext}",
+    "backgroundColor": "#0b1220"
   },
   "linux": {
     "artifactName": "Xeomsc-Laser-PROBA-7dni-${version}.${ext}"

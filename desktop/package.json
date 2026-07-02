@@ -91,7 +91,8 @@
       "artifactName": "Xeomsc-Laser-${version}-${arch}.${ext}"
     },
     "dmg": {
-      "title": "Xeomsc-Laser ${version}"
+      "title": "Xeomsc-Laser ${version}",
+      "backgroundColor": "#0b1220"
     },
     "linux": {
       "target": ["AppImage"],
