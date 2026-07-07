@@ -117,6 +117,21 @@
         .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Statyczna scena hero — widoczna NATYCHMIAST (zdjęcia z panelu nakładają się wyżej, gdy wstaną) */
+        .hero-static{position:absolute;inset:0;background:
+            radial-gradient(900px 480px at 78% 30%, rgba(56,189,248,.16), transparent 62%),
+            radial-gradient(700px 420px at 15% 78%, rgba(2,132,199,.12), transparent 60%),
+            repeating-linear-gradient(115deg, transparent 0 46px, rgba(56,189,248,.045) 46px 47px),
+            linear-gradient(160deg,#0b1526 0%,#020617 55%,#0a0f1e 100%);}
+        .hero-static::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 10%, transparent 55%, rgba(2,6,23,.55) 100%);}
+        .hero-art{position:absolute;top:50%;right:4%;transform:translateY(-50%);width:min(44vw,560px);aspect-ratio:1;pointer-events:none;opacity:.85}
+        .hero-art .ring-spin{transform-origin:50% 50%;animation:heroRingSpin 26s linear infinite}
+        .hero-art .ring-spin2{transform-origin:50% 50%;animation:heroRingSpin 40s linear infinite reverse}
+        @keyframes heroRingSpin{to{transform:rotate(360deg)}}
+        .hero-scroll-cue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;color:rgba(255,255,255,.75);font-size:1.15rem;animation:heroCue 2.2s ease-in-out infinite;text-decoration:none}
+        .hero-scroll-cue:hover{color:#38bdf8}
+        @keyframes heroCue{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
+        @media (prefers-reduced-motion: reduce){.hero-art .ring-spin,.hero-art .ring-spin2,.hero-scroll-cue{animation:none}}
         .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease-in-out; z-index: 1; }
         .hero-slide.active { opacity: 1; z-index: 10; }
 
@@ -551,14 +566,34 @@
     <div id="main-content" class="pt-24 transition-all duration-300 bg-slate-950">
         <!-- Hero Section -->
         <section id="home" class="relative h-[calc(100vh-6rem)] flex items-center hero-bg overflow-hidden pt-10">
-            <div class="absolute inset-0 z-0" id="hero-carousel-container">
-                <div class="w-full h-full bg-stone-200 animate-pulse"></div>
+            <!-- Warstwa 0: statyczna scena — pierwsze wrażenie bez czekania na dane -->
+            <div class="hero-static z-0"></div>
+            <!-- Dekoracja „laser" (ukryta na telefonie — tam liczy się tekst i CTA) -->
+            <div class="hero-art hidden md:block z-[15]" aria-hidden="true">
+                <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <circle cx="200" cy="200" r="168" stroke="rgba(56,189,248,.28)" stroke-width="1.5"/>
+                    <g class="ring-spin">
+                        <circle cx="200" cy="200" r="140" stroke="rgba(56,189,248,.5)" stroke-width="2" stroke-dasharray="3 14" stroke-linecap="round"/>
+                        <circle cx="200" cy="60" r="5" fill="#38bdf8"/>
+                        <circle cx="200" cy="60" r="11" fill="rgba(56,189,248,.25)"/>
+                    </g>
+                    <g class="ring-spin2">
+                        <circle cx="200" cy="200" r="103" stroke="rgba(125,211,252,.35)" stroke-width="1.5" stroke-dasharray="26 18" stroke-linecap="round"/>
+                    </g>
+                    <line x1="200" y1="16" x2="200" y2="52" stroke="rgba(56,189,248,.35)" stroke-width="1.5"/>
+                    <line x1="200" y1="348" x2="200" y2="384" stroke="rgba(56,189,248,.35)" stroke-width="1.5"/>
+                    <line x1="16" y1="200" x2="52" y2="200" stroke="rgba(56,189,248,.35)" stroke-width="1.5"/>
+                    <line x1="348" y1="200" x2="384" y2="200" stroke="rgba(56,189,248,.35)" stroke-width="1.5"/>
+                    <path d="M200 152l13 33 35 3-27 23 8 34-29-18-29 18 8-34-27-23 35-3z" fill="rgba(56,189,248,.16)" stroke="rgba(125,211,252,.55)" stroke-width="1.5" stroke-linejoin="round"/>
+                    <circle cx="200" cy="200" r="2.5" fill="#7dd3fc"/>
+                </svg>
             </div>
+            <div class="absolute inset-0 z-0" id="hero-carousel-container"></div>
             
             <div class="absolute inset-0 bg-slate-950/65 z-10"></div>
             
             <div class="max-w-7xl mx-auto px-6 relative z-20 w-full">
-                <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left">
+                <div class="w-full md:w-2/3 lg:w-1/2 text-center md:text-left pb-16 md:pb-0">
                     <span class="inline-block py-2 px-5 rounded-full bg-sky-500/10 backdrop-blur text-sky-300 text-xs font-bold mb-6 border border-sky-500/30 uppercase tracking-widest shadow-lg">
                         Pracownia Laserowa
                     </span>
@@ -587,6 +622,7 @@
                     </div>
                 </div>
             </div>
+            <a href="#editor-demo" class="hero-scroll-cue" aria-label="Przewiń niżej"><i class="fa-solid fa-chevron-down"></i></a>
         </section>
 
         <!-- EDYTOR ONLINE — wideo demonstracyjne -->
