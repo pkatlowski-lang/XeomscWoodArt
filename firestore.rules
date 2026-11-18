@@ -63,6 +63,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /portfolio_inquiries/{id} {
+      function validInquiry() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['name','email','message','date','status','read','mailboxId','replyKey'])
+          && id.matches('[a-f0-9-]{36}') && d.mailboxId == id
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 90
+          && d.email is string && d.email.size() <= 180 && d.email.matches('.+@.+')
+          && d.message is string && d.message.size() > 0 && d.message.size() <= 3500
+          && d.replyKey is string && d.replyKey.matches('[A-Za-z0-9_-]{87}')
+          && d.date == request.time && d.status == 'new' && d.read == false;
+      }
+      allow create: if isAnon() && validInquiry();
+      allow get, list, update, delete: if isAdmin();
+    }
+
     // Wszystko inne — zablokowane.
     match /{document=**} {
       allow read, write: if false;

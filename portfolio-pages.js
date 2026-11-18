@@ -1,8 +1,9 @@
-import {$,node,button,photo,dialogControls} from './portfolio-studio/public/common.js';
+import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
 import {samples, liveProjects} from './portfolio-catalog.js';
+import {studioPhoto as photo,setPhoto,publishedChanges,mergeProjects} from './panel/photos.js';
 let projects=[], selectedCategory='';
 function ask(project=null) {
-  const address = new URL('pracownia.html', location.href);
+  const address = new URL('/zapytanie/', location.href);
   address.searchParams.set('zapytanie', project ? project.title : '');
   if (project?.code) address.searchParams.set('kod', project.code);
   location.assign(address.href);
@@ -13,7 +14,7 @@ function openProject(project) {
   const counter=node('span'), thumbs=node('div','','thumbs');
   function select(i) {
     index=(i+project.photos.length)%project.photos.length;
-    image.src=project.photos[index].url; image.alt=project.photos[index].alt;
+    setPhoto(image,project.photos[index]);
     counter.textContent=(index+1)+' / '+project.photos.length;
     [...thumbs.children].forEach((b,j)=>b.setAttribute('aria-pressed',String(j===index)));
   }
@@ -47,12 +48,11 @@ function filters(){
 dialogControls(); document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask());
 $('#search').oninput=draw;
 if (location.hash && !['#galeria','#start'].includes(location.hash)) {
-  location.replace('pracownia.html'+location.search+location.hash);
+  location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
   projects=samples;filters();draw();
-  try {
-    const latest=await liveProjects();
-    if(latest.length){projects=latest;selectedCategory='';filters();draw();}
-  } catch { /* The two bundled studies and the contact form remain accessible. */ }
+  const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
+  const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
+  projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
 }
 

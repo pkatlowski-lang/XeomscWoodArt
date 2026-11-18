@@ -1,6 +1,6 @@
 const imageDir='portfolio-studio/public/images/';
 function study(title,category,description,files) {
-  return {title,category,description,material:'Sklejka',photos:files.map(name=>({alt:title+' — wizualizacja',url:imageDir+name+'.jpg'}))};
+  return {id:'sample-'+files[0],title,category,description,material:'Sklejka',photos:files.map(name=>({alt:title+' — wizualizacja',url:'/'+imageDir+name+'.jpg'}))};
 }
 export const samples=[
   study('Baza do koszyka','Makrama','Wizualizacja okrągłej bazy z otworami do przeplatania sznurka. Średnica projektu 10 cm.',['baza','baza-rysunek']),
@@ -15,8 +15,8 @@ function unpack(field) {
 }
 export function catalogRows(categories,galleries) {
   const rows=[];
-  for(const cat of Object.values(categories||{}).filter(c=>c&&!c.isHidden).sort((a,b)=>(a.order??9999)-(b.order??9999))) {
-    for(const sub of Object.values(cat.subs||{})) {
+  for(const [catId,cat] of Object.entries(categories||{}).filter(([,c])=>c&&!c.isHidden).sort(([,a],[,b])=>(a.order??9999)-(b.order??9999))) {
+    for(const [subId,sub] of Object.entries(cat.subs||{})) {
       if (!sub || sub.isHidden) continue;
       for(const p of sub.products||[]) {
         if(!p||p.isHidden) continue;
@@ -24,14 +24,15 @@ export function catalogRows(categories,galleries) {
         const unique=[...new Set(urls.map(u=>typeof u==='string'?u:u?.src).filter(u=>typeof u==='string' && (/^https:\/\//i.test(u)||/^data:image\/(jpeg|png|webp);base64,/i.test(u))))];
         if(!unique.length) continue;
         const title=String(p.title||p.name||'Projekt pracowni');
-        rows.push({title,category:String(cat.title||'Realizacje'),description:String(p.desc||''),material:String(p.material||''),code:String(p.code||''),photos:unique.map((url,i)=>({url,alt:title+' — zdjęcie '+(i+1)}))});
+        rows.push({id:JSON.stringify([catId,subId,p.id||p.code||title]),title,category:String(cat.title||'Realizacje'),description:String(p.desc||''),material:String(p.material||''),code:String(p.code||''),photos:unique.map((url,i)=>({url,alt:title+' — zdjęcie '+(i+1)}))});
       }
     }
   }
   return rows;
 }
+export const catalogConfig={"apiKey":"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw","authDomain":"xeomsc-a8edd.firebaseapp.com","projectId":"xeomsc-a8edd","storageBucket":"xeomsc-a8edd.firebasestorage.app","messagingSenderId":"43822805612","appId":"1:43822805612:web:d343653e47777d8ebf5e49"};
 export async function liveProjects() {
-  const config={"apiKey":"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw","authDomain":"xeomsc-a8edd.firebaseapp.com","projectId":"xeomsc-a8edd","storageBucket":"xeomsc-a8edd.firebasestorage.app","messagingSenderId":"43822805612","appId":"1:43822805612:web:d343653e47777d8ebf5e49"};
+  const config=catalogConfig;
   const [{initializeApp},{getAuth,signInAnonymously}]=await Promise.all([
     import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js')
