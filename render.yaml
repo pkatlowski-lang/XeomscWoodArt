@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: xeomsc-portfolio
+    runtime: node
+    plan: starter
+    rootDir: portfolio-studio
+    buildCommand: node --test test/studio.test.mjs
+    startCommand: node server.mjs
+    healthCheckPath: /
+    autoDeployTrigger: off
+    disk:
+      name: studio-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24.22.3"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_PASSWORD
+        sync: false
