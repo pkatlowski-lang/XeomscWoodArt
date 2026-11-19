@@ -1,6 +1,6 @@
 import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
 import {samples, liveProjects} from './portfolio-catalog.js';
-import {studioPhoto as photo,setPhoto,publishedChanges,mergeProjects} from './panel/photos.js';
+import {studioPhoto as photo,setPhoto,publishedChanges,mergeProjects} from './panel/photos.js?v=0c6b69a';
 let projects=[], selectedCategory='';
 function ask(project=null) {
   const address = new URL('/zapytanie/', location.href);
@@ -50,7 +50,7 @@ $('#search').oninput=draw;
 if (location.hash && !['#galeria','#start'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
-  projects=samples;filters();draw();
+  projects=mergeProjects(samples,[]);filters();draw();
   const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
   projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
