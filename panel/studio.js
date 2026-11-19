@@ -1,6 +1,6 @@
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword} from './backend.js?v=wycena2';
+import {api,resetPassword,signedReply} from './backend.js?v=skrzynka3';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -128,17 +128,27 @@ async function removeSelectedProject() {
   }
 }
 $('#delete').onclick = removeSelectedProject;
-async function refreshInbox(){threads=await api('admin/inbox');$('#badge').textContent=String(threads.filter(t=>t.unread).length);drawInbox();}
+let inboxVersion = 0, threadVersion = 0;
+async function refreshInbox() {
+  const version = ++inboxVersion;
+  const result = await api('admin/inbox');
+  if (version !== inboxVersion) return;
+  threads = result;
+  drawInbox();
+}
 function drawInbox() {
+  $('#badge').textContent=String(threads.filter(t=>t.unread).length);
   const filter=$('#inboxfilter').value;
   const rows=threads.filter(t=>filter==='all'||(filter==='new'&&t.unread)||(filter==='closed'&&t.closed)||(filter==='open'&&!t.closed));
   $('#threads').replaceChildren(...rows.map(t=>{
-    const b=button('',()=>openThread(t).catch(feedback),'entry');b.append(node('span',(t.unread?'● ':'')+t.name+' · '+t.subject),node('small',t.closed?'Zamknięta':'Otwarta'));return b;
+    const b=button('',()=>openThread(t).catch(feedback),'entry');b.append(node(t.unread?'strong':'span',(t.unread?'● ':'')+t.name+' · '+t.subject),node('small',t.closed?'Zamknięta':'Otwarta'));return b;
   }));
   if(!rows.length) $('#threads').textContent='Brak rozmów w tym widoku.';
 }
 async function openThread(t,action='view',text='') {
+  const version = ++threadVersion;
   const data=await api('admin/thread',{id:t.id,action,text});
+  if (version !== threadVersion) return;
   if(current?.id!==t.id) {$('#answer').reset();$('#answer output').textContent='';}
   current={...t,addressable:data.addressable,closed:data.closed};$('#choose').hidden=true;$('#conversation').hidden=false;
   $('#topic').textContent=t.subject;$('#sender').textContent=t.name+' · '+t.email;
@@ -155,11 +165,36 @@ async function openThread(t,action='view',text='') {
 $('#reload').onclick=()=>{(current?openThread(current):refreshInbox()).catch(feedback);};$('#inboxfilter').onchange=drawInbox;
 bindForm($('#answer'),async f=>{if(!current.addressable){
     if(!/^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(current.email))throw Error('Brak poprawnego adresu e-mail klienta.');
-    location.href='mailto:'+encodeURIComponent(current.email)+'?subject='+encodeURIComponent('Odpowiedź pracowni Xeomsc Laser')+'&body='+encodeURIComponent(f.get('text'));
+    location.href='mailto:'+encodeURIComponent(current.email)+'?subject='+encodeURIComponent('Odpowiedź pracowni Xeomsc Laser')+'&body='+encodeURIComponent(signedReply(f.get('text')));
     return 'Dokończ wysyłanie w swojej poczcie.';
   }
   await openThread(current,'reply',f.get('text'));$('#answer').reset();return 'Odpowiedź jest dostępna w rozmowie klienta.';});
 $('#close-thread').onclick=()=>openThread(current,current.closed?'open':'close').catch(feedback);
+$('#delete-thread').onclick = async () => {
+  const target = current;
+  const inbox = $('#inbox');
+  if (!target || inbox.inert) return;
+  if (!confirm('Usunąć ze skrzynki rozmowę z ' + target.name + ' dotyczącą „' + target.subject + '”?')) return;
+  inbox.inert = true;
+  ++threadVersion;
+  try {
+    await api('admin/delete-thread', {id:target.id});
+    ++inboxVersion;
+    threads = threads.filter(thread => thread.id !== target.id);
+    current = null;
+    $('#answer').reset();
+    $('#history').replaceChildren();
+    $('#conversation').hidden = true;
+    $('#choose').hidden = false;
+    drawInbox();
+    $('#feedback').textContent = 'Usunięto rozmowę ze skrzynki.';
+  } catch (error) {
+    feedback(error);
+  } finally {
+    inbox.inert = false;
+    (current ? $('#delete-thread') : $('#inboxfilter')).focus();
+  }
+};
 $('#quote').onclick=()=>tab('calc',current);
 const calc=$('#calcform');let quote='';
 function calculate(){

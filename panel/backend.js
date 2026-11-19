@@ -1,6 +1,6 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {getAuth,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import {getOwnerConfig} from './config.js';
 import {samples,liveProjects} from '../portfolio-catalog.js';
 import {mergeProjects} from './photos.js';
@@ -62,6 +62,12 @@ const inquiries=collection(db,'portfolio_inquiries');
 function thread(snap){
   const m=snap.data();return {id:snap.id,name:m.name||'Klient',email:m.email||'',subject:(m.message||'Zapytanie').slice(0,75),unread:!m.read,closed:m.status==='closed',date:m.date?.toDate().toISOString()||''};
 }
+export function signedReply(text) {
+  const message = text.trim();
+  if (!message) throw Error('Wpisz treść odpowiedzi.');
+  const body = message.replace(/(?:^|\n)\s*Pozdrawiam[ ,!.\t]*(?:\s+Xeomsc Laser[.!]?)?\s*$/iu, '').trimEnd();
+  return (body ? body + '\n\n' : '') + 'Pozdrawiam,\nXeomsc Laser';
+}
 async function conversation(input){
   const ref=doc(inquiries,input.id);
   const snap=await getDocFromServer(ref);
@@ -75,7 +81,7 @@ async function conversation(input){
     const mailbox=record('pf-reply-'+m.mailboxId);
     if(input.action==='reply'){
       if(closed||!input.text?.trim())throw Error('Otwórz rozmowę i wpisz odpowiedź.');
-      const body=input.text.trim();
+      const body=signedReply(input.text);
       const envelope=await seal(m.replyKey,body);
       let sent=[];
       await runTransaction(db,async tx=>{
@@ -114,6 +120,7 @@ export async function api(path,body){
   }
   if(path==='admin/projects'||path==='admin/remove')return changeProject(body,path==='admin/remove');
   if(path==='admin/inbox')return (await getDocsFromServer(inquiries)).docs.map(thread).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  if(path==='admin/delete-thread')return deleteDoc(doc(inquiries,body.id));
   if(path==='admin/thread')return conversation(body);
   throw Error('Nieznana operacja.');
 }
