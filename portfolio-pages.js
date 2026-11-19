@@ -1,6 +1,7 @@
 import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
 import {samples, liveProjects} from './portfolio-catalog.js';
-import {studioPhoto as photo,setPhoto,publishedChanges,mergeProjects} from './panel/photos.js?v=0c6b69a';
+import {studioPhoto as photo,publishedChanges,mergeProjects} from './panel/photos.js?v=0c6b69a';
+import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
 let projects=[], selectedCategory='';
 function ask(project=null) {
   const address = new URL('/zapytanie/', location.href);
@@ -8,33 +9,13 @@ function ask(project=null) {
   if (project?.code) address.searchParams.set('kod', project.code);
   location.assign(address.href);
 }
-function openProject(project) {
-  let index=0;
-  const panel=$('#detailbody'), large=node('div','','viewer'), image=photo(project.photos[0]);
-  const counter=node('span'), thumbs=node('div','','thumbs');
-  function select(i) {
-    index=(i+project.photos.length)%project.photos.length;
-    setPhoto(image,project.photos[index]);
-    counter.textContent=(index+1)+' / '+project.photos.length;
-    [...thumbs.children].forEach((b,j)=>b.setAttribute('aria-pressed',String(j===index)));
-  }
-  for(const [i,p] of project.photos.entries()) {
-    const thumb=button('',()=>select(i)); thumb.setAttribute('aria-label','Zdjęcie '+(i+1));thumb.append(photo(p));thumbs.append(thumb);
-  }
-  large.append(image);
-  const row=node('div','','row');
-  if(project.photos.length>1) row.append(button('← Poprzednie',()=>select(index-1)),counter,button('Następne →',()=>select(index+1)));
-  const details=node('div','','pad');
-  details.append(row,thumbs,node('p',project.category+' · '+project.material,'eyebrow'),node('h2',project.title),node('p',project.description,'prose'),button('Zapytaj o tę realizację ↗',()=>ask(project),'btn'));
-  panel.replaceChildren(large,details);select(0);$('#detail').showModal();
-  $('#detail').onkeydown=e=>{if(e.key==='ArrowLeft')select(index-1);if(e.key==='ArrowRight')select(index+1);};
-}
 function draw() {
   const q=$('#search').value.trim().toLocaleLowerCase('pl');
   const shown=projects.filter(p=>(!selectedCategory||p.category===selectedCategory)&&[p.title,p.description,p.material,p.category].join(' ').toLocaleLowerCase('pl').includes(q));
   $('#count').textContent=shown.length?'Liczba realizacji: '+shown.length:'Brak pasujących realizacji.';
   $('#grid').replaceChildren(...shown.map(p=>{
-    const card=button('',()=>openProject(p),'card'), frame=node('div','','frame'), image=photo(p.photos[0]);
+    const card=node('a','','card'), frame=node('div','','frame'), image=photo(p.photos[0]);
+    card.href=projectPath(p);
     image.loading='lazy';frame.append(image,node('span',p.photos.length+' zdj.','number'));
     card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));return card;
   }));
@@ -50,9 +31,9 @@ $('#search').oninput=draw;
 if (location.hash && !['#galeria','#start'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
-  projects=mergeProjects(samples,[]);filters();draw();
+  projects=mergeProjects(samples,[]);filters();
   const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
-  projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
+  rememberProjectLinks(base);projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
 }
 

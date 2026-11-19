@@ -20,7 +20,7 @@ async function submit(event){
     await setDoc(doc(getFirestore(app),'portfolio_inquiries',box.id),{
       name:m.name.trim(),email:m.email.trim(),message:m.message.trim(),date:serverTimestamp(),status:'new',read:false,mailboxId:box.id,replyKey:box.publicKey
     });
-    const link=document.createElement('a');link.href=box.link;link.textContent='Otwórz prywatny link do odpowiedzi';
+    const link=document.createElement('a');link.href=box.link+'.'+Date.now();link.textContent='Otwórz prywatny link do odpowiedzi';
     status.replaceChildren('Zapytanie wysłane. ',link);location.replace(link.href);
   }catch{btn.disabled=false;status.textContent='Nie udało się wysłać zapytania. Spróbuj ponownie lub skorzystaj z kontaktu na stronie głównej.';}
 }

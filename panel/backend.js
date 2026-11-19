@@ -75,17 +75,24 @@ async function conversation(input){
     const mailbox=record('pf-reply-'+m.mailboxId);
     if(input.action==='reply'){
       if(closed||!input.text?.trim())throw Error('Otwórz rozmowę i wpisz odpowiedź.');
-      const envelope=await seal(m.replyKey,input.text.trim());
+      const body=input.text.trim();
+      const envelope=await seal(m.replyKey,body);
+      let sent=[];
       await runTransaction(db,async tx=>{
         const latest=(await tx.get(ref)).data();
+        sent=latest?.sent||[];
+        if(input.requestId && sent.some(post=>post.requestId===input.requestId))return;
         if(!latest || latest.status==='closed')throw Error('Rozmowa jest zamknięta.');
         const previous=JSON.parse((await tx.get(mailbox)).data()?.letters||'[]');
         const serialized=JSON.stringify([...previous,envelope]);
         if(serialized.length>850000)throw Error('Ta rozmowa jest pełna. Odpowiedz e-mailem.');
         tx.set(mailbox,{letters:serialized});
-        tx.update(ref,{status:'replied',read:true,sent:[...(latest.sent||[]),{body:input.text.trim(),created:envelope.created}]});
+        const post={body,created:envelope.created};
+        if(input.requestId)post.requestId=input.requestId;
+        sent=[...sent,post];
+        tx.update(ref,{status:'replied',read:true,sent});
       });
-      m.sent=[...(m.sent||[]),{body:input.text.trim(),created:envelope.created}];
+      m.sent=sent;
     }
   }
   if(!m.read && input.action==='view')await updateDoc(ref,{read:true});

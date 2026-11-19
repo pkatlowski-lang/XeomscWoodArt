@@ -1,14 +1,20 @@
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword} from './backend.js';
+import {api,resetPassword} from './backend.js?v=wycena2';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
 function feedback(e) {$('#feedback').textContent=e.message || String(e);}
-function tab(name) {
+let quoteTarget=null,quoteAttempt=null,sendingQuote=false;
+function tab(name,recipient=null) {
+  quoteTarget=name==='calc' && recipient && !recipient.closed ? recipient : null;
+  $('#quote-delivery').hidden=!quoteTarget;
+  $('#quote-recipient').textContent=quoteTarget?'Wycena dla '+quoteTarget.name+' · '+quoteTarget.email:'';
+  $('#quote-status').textContent='';
+  if(name==='calc')calculate();
   for(const t of ['projects','inbox','calc']) $('#'+t).hidden=t!==name;
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===name)));
-  $('#insert').hidden=!current || !!current.closed;
+
   if(name==='inbox') refreshInbox().catch(feedback);
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
@@ -100,6 +106,7 @@ async function openThread(t,action='view',text='') {
   }
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
   messages($('#history'),data.posts);$('#answer').hidden=data.closed;
+  $('#quote').hidden=data.closed||!data.addressable;
   $('#close-thread').textContent=data.closed?'Otwórz ponownie':'Zamknij rozmowę';
   await refreshInbox().catch(feedback);
 }
@@ -111,16 +118,34 @@ bindForm($('#answer'),async f=>{if(!current.addressable){
   }
   await openThread(current,'reply',f.get('text'));$('#answer').reset();return 'Odpowiedź jest dostępna w rozmowie klienta.';});
 $('#close-thread').onclick=()=>openThread(current,current.closed?'open':'close').catch(feedback);
-$('#quote').onclick=()=>tab('calc');
+$('#quote').onclick=()=>tab('calc',current);
 const calc=$('#calcform');let quote='';
 function calculate(){
+  $('#send-quote').disabled=true;
   if(!calc.checkValidity()){quote='';$('#total').textContent='Uzupełnij poprawnie pola kalkulatora.';return;}
   const f=new FormData(calc),r=estimate(f);
   if(!Number.isFinite(r.total)){quote='';$('#total').textContent='Sprawdź wartości.';return;}
   quote='Wycena dla '+f.get('qty')+' szt.: '+money(r.total)+' łącznie ('+money(r.unit)+' za sztukę).';
+  $('#send-quote').disabled=sendingQuote || !quoteTarget || r.total<=0 || (quoteAttempt?.delivered && quoteAttempt.target===quoteTarget.id && quoteAttempt.body===quote);
   $('#total').replaceChildren(node('p','Materiał '+money(r.material)+' · Laser '+money(r.laser)+' · Dodatki '+money(r.extra)),node('h3',money(r.total)),node('p',money(r.unit)+' za sztukę'));
 }
-calc.oninput=calculate;calc.onsubmit=e=>e.preventDefault();calculate();
+$('#send-quote').onclick=async()=>{
+  const target=quoteTarget,body=quote;
+  if(!target || sendingQuote || !body || $('#send-quote').disabled)return;
+  if(quoteAttempt?.target!==target.id || quoteAttempt?.body!==body)
+    quoteAttempt={target:target.id,body,requestId:crypto.randomUUID(),delivered:false};
+  const attempt=quoteAttempt;
+  sendingQuote=true;calculate();
+  $('#quote-status').textContent='Wysyłanie wyceny…';
+  try{
+    await api('admin/thread',{id:target.id,action:'reply',text:body,requestId:attempt.requestId});
+    attempt.delivered=true;
+    if(quoteTarget?.id===target.id)$('#quote-status').textContent='Wysłano do '+target.name+'. '+body;
+    if(current?.id===target.id)await openThread(target).catch(feedback);
+  }catch(error){if(quoteTarget?.id===target.id)$('#quote-status').textContent=error.message;}
+  finally{sendingQuote=false;calculate();}
+};
+calc.oninput=()=>{$('#quote-status').textContent='';calculate();};calc.onsubmit=e=>e.preventDefault();calculate();
 $('#insert').onclick=()=>{if(current&&!current.closed&&quote){tab('inbox');const box=$('#answer textarea');box.value=(box.value.trim()+'\n'+quote).trim();box.focus();}};
 $('#reset-password').onclick=async()=>{
   const f=$('#loginform'),out=f.querySelector('output');
