@@ -1,3 +1,5 @@
+import {workshopProjects} from '../assets/realizacje/projekty.js';
+
 const documents = 'https://firestore.googleapis.com/v1/projects/xeomsc-licencje/databases/(default)/documents/app_config/';
 const cache = new Map();
 export async function publicRecord(id) {
@@ -23,7 +25,7 @@ export function setPhoto(img,p) {
 export function studioPhoto(p){const img=document.createElement('img');setPhoto(img,p);return img;}
 export function mergeProjects(base,changes) {
   const overlays=new Map(changes.map(p=>[p.id,p]));
-  const originals=base.filter(p=>!overlays.has(p.id));
+  const originals=[...workshopProjects,...base].filter(p=>!overlays.has(p.id));
   return [...changes.filter(p=>!p.removed),...originals].sort((a,b)=>Number(!!b.featured)-Number(!!a.featured));
 }
 export async function publishedChanges() {
