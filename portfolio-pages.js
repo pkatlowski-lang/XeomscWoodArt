@@ -28,7 +28,7 @@ function filters(){
 }
 dialogControls(); document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask());
 $('#search').oninput=draw;
-if (location.hash && !['#galeria','#start'].includes(location.hash)) {
+if (location.hash && !['#galeria','#start','#projekt-indywidualny'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
   projects=mergeProjects(samples,[]);filters();
