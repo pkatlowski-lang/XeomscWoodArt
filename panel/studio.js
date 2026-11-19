@@ -1,6 +1,7 @@
+import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply} from './backend.js?v=skrzynka3';
+import {api,resetPassword,signedReply} from './backend.js?v=strona-glowna';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -12,9 +13,10 @@ function tab(name,recipient=null) {
   $('#quote-recipient').textContent=quoteTarget?'Wycena dla '+quoteTarget.name+' · '+quoteTarget.email:'';
   $('#quote-status').textContent='';
   if(name==='calc')calculate();
-  for(const t of ['projects','inbox','calc']) $('#'+t).hidden=t!==name;
+  for(const t of ['projects','homepage','inbox','calc']) $('#'+t).hidden=t!==name;
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===name)));
 
+  if(name==='homepage') loadHome();
   if(name==='inbox') refreshInbox().catch(feedback);
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
@@ -112,6 +114,52 @@ async function compress(file) {
     throw Error('Zdjęcie po zmniejszeniu nadal jest za duże.');
   } finally {bitmap.close();}
 }
+const homeForm = $('#home-form');
+const homeFields = homeForm.querySelector('fieldset');
+const homeFile = $('#home-file');
+const homePreview = $('#home-preview');
+const homeStatus = homeForm.querySelector('output');
+let homeRevision = null, homeLoading = false, homeImage = defaultHomeImage, previewUrl = '';
+async function loadHome() {
+  if (homeRevision !== null || homeLoading) return;
+  homeLoading = true;
+  $('#home-retry').hidden = true;
+  homeStatus.textContent = 'Wczytywanie strony głównej…';
+  try {
+    const data = await api('admin/homepage');
+    for (const [key, value] of Object.entries(defaultHome)) homeForm.elements[key].value = data[key] ?? value;
+    homeImage = data.image || defaultHomeImage;
+    homePreview.src = homeImage;
+    homeRevision = data.revision || 0;
+    homeFields.disabled = false;
+    homeStatus.textContent = '';
+  } catch (error) {
+    homeStatus.textContent = error.message;
+    $('#home-retry').hidden = false;
+  } finally { homeLoading = false; }
+}
+$('#home-retry').onclick = loadHome;
+homeFile.onchange = () => {
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  const file = homeFile.files[0];
+  previewUrl = file ? URL.createObjectURL(file) : '';
+  homePreview.src = previewUrl || homeImage;
+  homeStatus.textContent = '';
+};
+bindForm(homeForm, async values => {
+  const input = {...Object.fromEntries(values), revision:homeRevision};
+  homeFields.disabled = true;
+  try {
+    if (homeFile.files[0]) input.image = (await compress(homeFile.files[0])).data;
+    homeRevision = await api('admin/homepage', input);
+    if (input.image) homeImage = input.image;
+    homePreview.src = homeImage;
+    homeFile.value = '';
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = '';
+    return 'Opublikowano zmiany na stronie głównej.';
+  } finally { homeFields.disabled = false; }
+});
 async function addFiles(files) {
   if(loadingImages || !files.length)return;
   const out=form.querySelector('output');

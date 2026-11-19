@@ -1,6 +1,7 @@
+import {homeDocument, defaultHome, renderHome} from './panel/homepage.js';
 import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
 import {samples, liveProjects} from './portfolio-catalog.js';
-import {studioPhoto as photo,publishedChanges,mergeProjects} from './panel/photos.js?v=0c6b69a';
+import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
 let projects=[], selectedCategory='';
 function ask(project=null) {
@@ -31,6 +32,13 @@ $('#search').oninput=draw;
 if (location.hash && !['#galeria','#start','#projekt-indywidualny'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
+  publicRecord(homeDocument).then(fields => {
+    if (!fields) return;
+    const data = {...defaultHome};
+    for (const key of Object.keys(data)) data[key] = fields[key]?.stringValue ?? data[key];
+    data.image = fields.image?.stringValue;
+    renderHome($('.hero'), data);
+  }).catch(() => { /* The initial HTML already contains the workshop introduction. */ });
   projects=mergeProjects(samples,[]);filters();
   const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;

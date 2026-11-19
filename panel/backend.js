@@ -1,3 +1,4 @@
+import {homeDocument, homeChanges} from './homepage.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {getAuth,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
@@ -112,6 +113,18 @@ export async function api(path,body){
   }
   if(path==='logout'){verified=null;await signOut(auth);return;}
   await requireOwner();
+  if (path === 'admin/homepage') {
+    const ref = record(homeDocument);
+    if (!body) return (await getDocFromServer(ref)).data() || {};
+    const changes = homeChanges(body);
+    return runTransaction(db, async tx => {
+      const current = (await tx.get(ref)).data();
+      const revision = current?.revision || 0;
+      if (revision !== body.revision) throw Error('Inna karta zapisała zmiany. Skopiuj swój tekst i odśwież panel.');
+      tx.set(ref, {...changes, revision: revision + 1}, {merge:true});
+      return revision + 1;
+    });
+  }
   if(path==='admin/projects' && !body){
     const current=entries(await getDocFromServer(manifest));
     let base=[];
