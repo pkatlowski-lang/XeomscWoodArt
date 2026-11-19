@@ -24,21 +24,40 @@ async function enter() {
 }
 bindForm($('#loginform'),async f=>{await api('login',Object.fromEntries(f));await enter();$('#loginform').reset();});
 $('#logout').onclick=async()=>{try{await api('logout',{});location.reload();}catch(e){feedback(e);}};
+let removingProject = false;
+const rowDelete = button('🗑', removeSelectedProject, 'row-delete');
+function markSelectedProject() {
+  rowDelete.remove();
+  for (const row of $('#list').children) {
+    const selected = row.dataset.projectId === String(edit?.id);
+    row.firstElementChild.setAttribute('aria-pressed', String(selected));
+    if (selected) {
+      const label = 'Usuń realizację „' + edit.title + '”';
+      rowDelete.title = label;
+      rowDelete.setAttribute('aria-label', label);
+      row.append(rowDelete);
+    }
+  }
+}
 function list() {
   const q=$('#find').value.trim().toLowerCase();
   $('#list').replaceChildren(...projects.filter(p=>(p.title+' '+p.category).toLowerCase().includes(q)).map(p=>{
+    const row=node('div','','project-row');
+    row.dataset.projectId=p.id;
     const b=button('',()=>openEditor(p),'entry');
-    b.append(photo(p.photos[0]),node('span',p.title+' · '+(p.published?'Opublikowano':'Szkic')));return b;
+    b.append(photo(p.photos[0]),node('span',p.title+' · '+(p.published?'Opublikowano':'Szkic')));row.append(b);return row;
   }));
+  markSelectedProject();
   $('#categories').replaceChildren(...[...new Set(projects.map(p=>p.category))].map(c=>{const opt=node('option');opt.value=c;return opt;}));
 }
 function openEditor(project,force=false) {
-  if(loadingImages || (!force && dirty && !confirm('Porzucić niezapisane zmiany w realizacji?'))) return;
+  if(removingProject || loadingImages || (!force && dirty && !confirm('Porzucić niezapisane zmiany w realizacji?'))) return;
   form.reset();edit=project; pictures=(project?.photos||[]).map(p=>({...p}));
   if(project) {
     for(const k of ['title','category','material','description'])fields[k].value=project[k];
     fields.featured.checked=!!project.featured;
   }
+  markSelectedProject();
   $('#edit-title').textContent=project?'Edytuj realizację':'Nowa realizacja';
   $('#delete').hidden=!project;form.querySelector('output').textContent='';dirty=false;drawPhotos();
 }
@@ -85,7 +104,30 @@ bindForm(form,async f=>{
   const saved=await api('admin/projects',{id:edit?.id,revision:edit?.revision,...Object.fromEntries(f),published:true,featured:fields.featured.checked,photos:pictures});
   projects=await api('admin/projects');list();openEditor(projects.find(p=>p.id===saved.id),true);return 'Zapisano realizację.';
 });
-$('#delete').onclick=async()=>{if(!edit||!confirm('Usunąć realizację wraz ze zdjęciami?'))return;try{await api('admin/remove',{id:edit.id,revision:edit.revision});projects=await api('admin/projects');list();openEditor(null,true);}catch(e){feedback(e);}};
+async function removeSelectedProject() {
+  const target = edit;
+  if (!target || removingProject || loadingImages || form.querySelector('button:not([type=button])').disabled) return;
+  if (!confirm('Usunąć realizację „' + target.title + '” wraz ze zdjęciami?')) return;
+  removingProject = true;
+  rowDelete.disabled = true;
+  form.inert = true;
+  try {
+    await api('admin/remove', {id: target.id, revision: target.revision});
+    projects = projects.filter(project => project.id !== target.id);
+    removingProject = false;
+    openEditor(null, true);
+    list();
+    $('#feedback').textContent = 'Usunięto realizację „' + target.title + '”.';
+  } catch (error) {
+    feedback(error);
+    alert(error.message || 'Nie udało się usunąć realizacji.');
+  } finally {
+    removingProject = false;
+    form.inert = false;
+    rowDelete.disabled = false;
+  }
+}
+$('#delete').onclick = removeSelectedProject;
 async function refreshInbox(){threads=await api('admin/inbox');$('#badge').textContent=String(threads.filter(t=>t.unread).length);drawInbox();}
 function drawInbox() {
   const filter=$('#inboxfilter').value;

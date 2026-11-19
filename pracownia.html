@@ -3992,7 +3992,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
-                            <span class="font-semibold text-white text-sm">${escapeHTML(p.title)}</span>
+                            <button type="button" data-product-title class="font-semibold text-white text-sm text-left hover:underline">${escapeHTML(p.title)}</button>
                             ${p.isHidden ? '<span class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold shrink-0">UKRYTY</span>' : ''}
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
@@ -4004,7 +4004,7 @@
                     </div>
                     <div class="flex gap-1.5 shrink-0">
                         <button onclick="window.plToggle('${ck}','${sk}',${idx})" title="${p.isHidden?'Pokaż':'Ukryj'}" class="w-8 h-8 rounded-lg flex items-center justify-center transition ${p.isHidden ? 'bg-green-600/20 hover:bg-green-600/40 text-green-400' : 'bg-stone-600/40 hover:bg-stone-500/60 text-stone-400'}"><i class="fa-regular ${p.isHidden?'fa-eye':'fa-eye-slash'} text-xs"></i></button>
-                        <button onclick="window.plEdit('${ck}','${sk}',${idx})" title="Edytuj" class="w-8 h-8 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button data-product-edit onclick="window.plEdit('${ck}','${sk}',${idx})" title="Edytuj" class="w-8 h-8 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
                         <button onclick="window.plDel('${ck}','${sk}',${idx})" title="Usuń" class="w-8 h-8 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 </div>`).join('');
@@ -4025,8 +4025,8 @@
 
             container.innerHTML = `
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-3xl font-bold">Lista Produktów</h3>
-                    <span class="text-stone-500 text-sm">${all.length} produktów łącznie</span>
+                    <h3 id="pl-list-heading" tabindex="-1" class="text-3xl font-bold">Lista Produktów</h3>
+                    <span id="pl-total" class="text-stone-500 text-sm">${all.length} produktów łącznie</span>
                 </div>
                 <div class="flex flex-wrap gap-2 mb-3" id="pl-pills">${pills}</div>
                 <div id="pl-sub-bar" class="hidden mb-4">
@@ -4036,7 +4036,13 @@
                 </div>
                 <div id="pl-rows" class="space-y-2 mb-8">${window._plRows(all)}</div>
                 <div id="list-edit-form" class="hidden mt-4 bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
-                    <h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="pl-back" class="rounded-xl bg-stone-700 px-3 py-2 text-sm"><i aria-hidden="true" class="fa-solid fa-arrow-up mr-1"></i> Do listy</button>
+                            <button type="button" id="pl-delete-edited" class="rounded-xl bg-red-900 px-3 py-2 text-sm text-white"><i aria-hidden="true" class="fa-solid fa-trash mr-1"></i> Usuń produkt</button>
+                        </div>
+                    </div>
                     <input id="edit-p-t" class="calc-input" placeholder="Nazwa produktu">
                     <div class="grid grid-cols-2 gap-4">
                         <input id="edit-p-code" class="calc-input" placeholder="Kod produktu">
@@ -4061,6 +4067,15 @@
                         <button onclick="document.getElementById('list-edit-form').classList.add('hidden')" class="bg-stone-600 hover:bg-stone-500 px-6 py-3 rounded-xl font-bold transition">Anuluj</button>
                     </div>
                 </div>`;
+            document.getElementById('pl-rows').onclick = event => {
+                const title = event.target.closest('[data-product-title]');
+                if (title) title.closest('.group').querySelector('[data-product-edit]').click();
+            };
+            document.getElementById('pl-back').onclick = () => {
+                const heading = document.getElementById('pl-list-heading');
+                heading.focus({preventScroll:true});
+                heading.scrollIntoView({block:'start'});
+            };
         };
 
         window.plFilter = (catId, subId) => {
@@ -4093,8 +4108,9 @@
         };
 
         window.plEdit = (ck, sk, idx) => {
-            window._plEditCk = ck; window._plEditSk = sk; window._plEditIdx = idx;
             const p = siteData.categories[ck].subs[sk].products[idx];
+            window._plEditCk = ck; window._plEditSk = sk; window._plEditProduct = p;
+            document.getElementById('pl-delete-edited').onclick = () => window.plDel(ck, sk, p);
             const form = document.getElementById('list-edit-form');
             document.getElementById('edit-p-t').value = p.title || '';
             document.getElementById('edit-p-code').value = p.code || '';
@@ -4117,17 +4133,35 @@
             form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
         };
 
-        window.plDel = (ck, sk, idx) => {
-            window.openConfirm("Usunąć ten produkt?", () => {
-                siteData.categories[ck].subs[sk].products.splice(idx, 1);
-                saveData(); window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
+        window.plDel = (ck, sk, item) => {
+            const product = typeof item === 'number' ? siteData.categories[ck]?.subs[sk]?.products[item] : item;
+            if (!product) return;
+            window.openConfirm('Usunąć produkt „' + product.title + '”?', () => {
+                const products = siteData.categories[ck]?.subs[sk]?.products;
+                const position = products?.indexOf(product) ?? -1;
+                if (position < 0) { showToast('Lista się zmieniła. Wybierz produkt ponownie.', 'error'); return; }
+                products.splice(position, 1);
+                if (window._plEditProduct === product) {
+                    document.getElementById('list-edit-form').classList.add('hidden');
+                    window._plEditProduct = null;
+                }
+                saveData();
+                const {all, cats} = window._plBuild();
+                document.getElementById('pl-total').textContent = all.length + ' produktów łącznie';
+                document.querySelector('#pill-all span').textContent = '(' + all.length + ')';
+                for (const pill of document.querySelectorAll('[data-pcat]')) {
+                    const count = Object.values(cats[pill.dataset.pcat]?.subs || {}).reduce((sum, sub) => sum + (sub.products?.length || 0), 0);
+                    pill.querySelector('span').textContent = '(' + count + ')';
+                }
+                window.plFilter(window._plActiveCat, window._plActiveSub);
             });
         };
 
         window.plSaveEdit = () => {
-            const ck = window._plEditCk; const sk = window._plEditSk; const idx = window._plEditIdx;
-            if(ck === undefined) return;
-            const p = siteData.categories[ck].subs[sk].products[idx];
+            const ck = window._plEditCk, sk = window._plEditSk, p = window._plEditProduct;
+            if (!p || !siteData.categories[ck]?.subs[sk]?.products.includes(p)) {
+                showToast('Lista się zmieniła. Wybierz produkt ponownie.', 'error'); return;
+            }
             p.title = document.getElementById('edit-p-t').value;
             p.code = document.getElementById('edit-p-code').value;
             p.price = document.getElementById('edit-p-price').value;

@@ -1,4 +1,10 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=wycena2"></script></head><body>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=kosz-produktu"></script><style>
+#list .project-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
+#list .entry{flex:1;min-width:0;border:0}
+#list .entry[aria-pressed=true]{background:#eeefe4;font-weight:600}
+#list .row-delete{flex:none;min-width:44px;min-height:44px;margin-inline:.35rem;border:1px solid #ccaaa6;border-radius:.5rem;background:#fff5f2;color:#8d3029;font-size:1.3rem}
+#list .row-delete:hover{background:#f7e1dc}
+</style></head><body>
 <header><a class="brand" href="/"><i>✳</i> Xeomsc<span>Laser</span></a><nav><a href="/">Portfolio ↗</a><button id="logout" class="outline" hidden>Wyloguj</button></nav></header>
 <main class="workspace"><section id="login" class="login panel"><p class="eyebrow">Xeomsc Laser</p><h1>Panel pracowni</h1><form id="loginform"><label>E-mail administratora<input type="email" name="login" placeholder="Twój adres e-mail" required autocomplete="username"></label><label>Hasło<input name="password" type="password" required autocomplete="current-password"></label><button class="btn">Zaloguj się</button><button type="button" class="link" id="reset-password">Ustaw nowe hasło przez e-mail</button><output></output></form></section>
 <div id="desk" hidden><p class="eyebrow">Xeomsc Laser</p><h1>Panel pracowni</h1><nav class="tabs" aria-label="Narzędzia pracowni"><button data-tab="projects">Galeria</button><button data-tab="inbox">Wiadomości <span id="badge"></span></button><button data-tab="calc">Kalkulator wyceny</button></nav><p id="feedback" role="status"></p>
