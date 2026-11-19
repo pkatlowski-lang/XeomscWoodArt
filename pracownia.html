@@ -3986,7 +3986,7 @@
         window._plRows = (products) => {
             if(!products.length) return '<p class="text-stone-500 italic py-10 text-center">Brak produktów.</p>';
             return products.map(({p, ck, sk, idx, catTitle, subTitle, color}) => `
-                <div class="flex items-center gap-3 p-3 rounded-2xl bg-stone-800/60 border border-white/5 hover:border-white/15 transition group">
+                <div data-product-row class="flex items-center gap-3 p-3 rounded-2xl bg-stone-800/60 border border-white/5 hover:border-white/15 transition group cursor-pointer">
                     <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-stone-700 flex items-center justify-center">
                         ${p.image ? `<img src="${escapeHTML(p.image)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-image text-stone-500\\'></i>'">` : '<i class="fa-solid fa-image text-stone-500"></i>'}
                     </div>
@@ -4004,7 +4004,7 @@
                     </div>
                     <div class="flex gap-1.5 shrink-0">
                         <button onclick="window.plToggle('${ck}','${sk}',${idx})" title="${p.isHidden?'Pokaż':'Ukryj'}" class="w-8 h-8 rounded-lg flex items-center justify-center transition ${p.isHidden ? 'bg-green-600/20 hover:bg-green-600/40 text-green-400' : 'bg-stone-600/40 hover:bg-stone-500/60 text-stone-400'}"><i class="fa-regular ${p.isHidden?'fa-eye':'fa-eye-slash'} text-xs"></i></button>
-                        <button data-product-edit onclick="window.plEdit('${ck}','${sk}',${idx})" title="Edytuj" class="w-8 h-8 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button data-product-edit aria-controls="list-edit-form" onclick="window.plEdit('${ck}','${sk}',${idx},this.closest('[data-product-row]'))" title="Edytuj" class="w-8 h-8 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
                         <button onclick="window.plDel('${ck}','${sk}',${idx})" title="Usuń" class="w-8 h-8 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 </div>`).join('');
@@ -4037,7 +4037,7 @@
                 <div id="pl-rows" class="space-y-2 mb-8">${window._plRows(all)}</div>
                 <div id="list-edit-form" class="hidden mt-4 bg-stone-800 p-6 rounded-3xl border border-white/5 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3">
-                        <h4 class="text-xs uppercase font-bold text-blue-400">Edycja Produktu</h4>
+                        <h4 id="pl-edit-heading" tabindex="-1" class="text-sm font-bold text-blue-400">Edycja produktu</h4>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" id="pl-back" class="rounded-xl bg-stone-700 px-3 py-2 text-sm"><i aria-hidden="true" class="fa-solid fa-arrow-up mr-1"></i> Do listy</button>
                             <button type="button" id="pl-delete-edited" class="rounded-xl bg-red-900 px-3 py-2 text-sm text-white"><i aria-hidden="true" class="fa-solid fa-trash mr-1"></i> Usuń produkt</button>
@@ -4068,13 +4068,17 @@
                     </div>
                 </div>`;
             document.getElementById('pl-rows').onclick = event => {
-                const title = event.target.closest('[data-product-title]');
-                if (title) title.closest('.group').querySelector('[data-product-edit]').click();
+                const row = event.target.closest('[data-product-row]');
+                if (row && (!event.target.closest('button') || event.target.closest('[data-product-title]'))) {
+                    row.querySelector('[data-product-edit]').click();
+                }
             };
             document.getElementById('pl-back').onclick = () => {
-                const heading = document.getElementById('pl-list-heading');
-                heading.focus({preventScroll:true});
-                heading.scrollIntoView({block:'start'});
+                const form = document.getElementById('list-edit-form');
+                const origin = (form.previousElementSibling?.matches('[data-product-row]') && form.previousElementSibling.querySelector('[data-product-title]')) || document.getElementById('pl-list-heading');
+                form.classList.add('hidden');
+                origin.focus({preventScroll:true});
+                origin.scrollIntoView({block:'nearest'});
             };
         };
 
@@ -4098,7 +4102,13 @@
                 if(subId) filtered = filtered.filter(x => x.sk === subId);
             } else if(subBar) { subBar.classList.add('hidden'); }
             const rows = document.getElementById('pl-rows');
-            if(rows) rows.innerHTML = window._plRows(filtered);
+            if (rows) {
+                const form = document.getElementById('list-edit-form');
+                if (rows.contains(form)) rows.after(form);
+                rows.innerHTML = window._plRows(filtered);
+                const selected = filtered.findIndex(entry => entry.p === window._plEditProduct);
+                if (selected >= 0 && !form.classList.contains('hidden')) rows.children[selected].after(form);
+            }
         };
 
         window.plToggle = (ck, sk, idx) => {
@@ -4107,9 +4117,18 @@
             window._plBuild(); window.plFilter(window._plActiveCat, window._plActiveSub);
         };
 
-        window.plEdit = (ck, sk, idx) => {
+        window.plEdit = (ck, sk, idx, row) => {
             const p = siteData.categories[ck].subs[sk].products[idx];
+            const editor = document.getElementById('list-edit-form');
+            row.after(editor);
+            const heading = document.getElementById('pl-edit-heading');
+            if (window._plEditProduct === p && !editor.classList.contains('hidden')) {
+                heading.focus({preventScroll:true});
+                heading.scrollIntoView({block:'nearest'});
+                return;
+            }
             window._plEditCk = ck; window._plEditSk = sk; window._plEditProduct = p;
+            heading.textContent = 'Edytuj: ' + p.title;
             document.getElementById('pl-delete-edited').onclick = () => window.plDel(ck, sk, p);
             const form = document.getElementById('list-edit-form');
             document.getElementById('edit-p-t').value = p.title || '';
@@ -4130,7 +4149,9 @@
             if (galleryUrls.length === 0 && p.image) galleryUrls = [p.image];
             galleryUrls.forEach(u => { window.appendGalleryRow(galContainer, u); });
             window.appendGalleryRow(galContainer); // pusty wiersz na nowe zdjęcie
-            form.classList.remove('hidden'); form.scrollIntoView({ behavior: 'smooth' });
+            form.classList.remove('hidden');
+            heading.focus({preventScroll:true});
+            heading.scrollIntoView({block:'nearest'});
         };
 
         window.plDel = (ck, sk, item) => {

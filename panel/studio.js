@@ -25,6 +25,18 @@ async function enter() {
 bindForm($('#loginform'),async f=>{await api('login',Object.fromEntries(f));await enter();$('#loginform').reset();});
 $('#logout').onclick=async()=>{try{await api('logout',{});location.reload();}catch(e){feedback(e);}};
 let removingProject = false;
+const projectEditor = $('#project-editor');
+const narrowGallery = matchMedia('(max-width:720px)');
+function placeProjectEditor() {
+  const list = $('#list');
+  const selected = list.querySelector('.entry[aria-pressed="true"]')?.parentElement;
+  if (narrowGallery.matches && selected) {
+    if (projectEditor.parentElement !== selected) selected.append(projectEditor);
+  } else if (projectEditor.parentElement !== $('#projects')) {
+    $('#projects').append(projectEditor);
+  }
+}
+narrowGallery.addEventListener('change', placeProjectEditor);
 const rowDelete = button('🗑', removeSelectedProject, 'row-delete');
 function markSelectedProject() {
   rowDelete.remove();
@@ -35,33 +47,45 @@ function markSelectedProject() {
       const label = 'Usuń realizację „' + edit.title + '”';
       rowDelete.title = label;
       rowDelete.setAttribute('aria-label', label);
-      row.append(rowDelete);
+      row.firstElementChild.after(rowDelete);
     }
   }
+  placeProjectEditor();
 }
 function list() {
   const q=$('#find').value.trim().toLowerCase();
   $('#list').replaceChildren(...projects.filter(p=>(p.title+' '+p.category).toLowerCase().includes(q)).map(p=>{
     const row=node('div','','project-row');
     row.dataset.projectId=p.id;
-    const b=button('',()=>openEditor(p),'entry');
+    const b=button('',()=>showEditor(p),'entry');
+    b.setAttribute('aria-controls','project-editor');
     b.append(photo(p.photos[0]),node('span',p.title+' · '+(p.published?'Opublikowano':'Szkic')));row.append(b);return row;
   }));
   markSelectedProject();
   $('#categories').replaceChildren(...[...new Set(projects.map(p=>p.category))].map(c=>{const opt=node('option');opt.value=c;return opt;}));
 }
 function openEditor(project,force=false) {
-  if(removingProject || loadingImages || (!force && dirty && !confirm('Porzucić niezapisane zmiany w realizacji?'))) return;
+  if(removingProject || loadingImages || (!force && form.querySelector('.btn').disabled)) return;
+  if(!force && project && edit?.id===project.id) return true;
+  if(!force && dirty && !confirm('Porzucić niezapisane zmiany w realizacji?')) return;
   form.reset();edit=project; pictures=(project?.photos||[]).map(p=>({...p}));
   if(project) {
     for(const k of ['title','category','material','description'])fields[k].value=project[k];
     fields.featured.checked=!!project.featured;
   }
   markSelectedProject();
-  $('#edit-title').textContent=project?'Edytuj realizację':'Nowa realizacja';
+  $('#edit-title').textContent=project?'Edytuj: '+project.title:'Nowa realizacja';
   $('#delete').hidden=!project;form.querySelector('output').textContent='';dirty=false;drawPhotos();
+  return true;
 }
-form.oninput=()=>dirty=true;$('#new').onclick=()=>openEditor(null);$('#find').oninput=list;
+function showEditor(project) {
+  if (!openEditor(project)) return;
+  projectEditor.scrollTop = 0;
+  const title = $('#edit-title');
+  title.focus({preventScroll:true});
+  title.scrollIntoView({block:'nearest'});
+}
+form.oninput=()=>dirty=true;$('#new').onclick=()=>showEditor(null);$('#find').oninput=list;
 function drawPhotos() {
   $('#pictures').replaceChildren(...pictures.map((p,i)=>{
     const row=node('div','','picrow'), label=node('label',i===0?'Okładka · opis zdjęcia':'Opis zdjęcia'),input=node('input');
