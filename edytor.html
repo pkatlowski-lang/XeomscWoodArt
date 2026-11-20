@@ -9585,31 +9585,8 @@ button:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4
 </script>
 
 <script type="module">
-/* Wysyłka projektu do panelu administratora (kolekcja messages — ta sama, którą
-   czyta panel wiadomości na stronie głównej). Logowanie anonimowe, jak strona. */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw",
-  authDomain:"xeomsc-a8edd.firebaseapp.com",
-  projectId:"xeomsc-a8edd",
-  storageBucket:"xeomsc-a8edd.firebasestorage.app",
-  messagingSenderId:"43822805612",
-  appId:"1:43822805612:web:d343653e47777d8ebf5e49"
-};
-const APP_ID='xeomsc-fusionart';
-let _db=null;
-async function ensureDb(){
-  if(_db) return _db;
-  const app=initializeApp(firebaseConfig);
-  const auth=getAuth(app);
-  await signInAnonymously(auth);
-  _db=getFirestore(app);
-  return _db;
-}
-
+import {newMailbox,deliverInquiry} from '/zapytanie/dostarczenie.js';
+let editorMailbox;
 const ov=document.getElementById('modalSendQuote');
 const statusEl=document.getElementById('sendQuoteStatus');
 const submitBtn=document.getElementById('sendQuoteSubmit');
@@ -9652,29 +9629,13 @@ submitBtn.addEventListener('click', async ()=>{
     const qtyTxt=(q.qty&&q.qty>1)?`\nIlość: ${q.qty} szt. (cena/szt.: ${(q.perPiece||0).toFixed(2).replace('.',',')} zł)`:'';
     const quoteTxt=`— WYCENA Z EDYTORA —\nMateriał: ${q.material}${qtyTxt}\nCena${q.qty>1?' razem':''}: ${q.price.toFixed(2).replace('.',',')} zł${exTxt}\nCzas pracy lasera (min.sek): ${q.timeMin}\nZużycie materiału: ${q.areaCm2} cm²`;
     setStatus('Wysyłam do pracowni…');
-    const db=await ensureDb();
-    await addDoc(collection(db,'artifacts',APP_ID,'public','data','messages'),{
-      name: name||'Klient edytora wyceny',
-      email,
+    editorMailbox ||= await newMailbox();
+    const href = await deliverInquiry(editorMailbox,{
+      name:name||'Klient edytora wyceny',email,
       message:(userMsg?userMsg+'\n\n':'')+quoteTxt+(payload.note?'\n'+payload.note:''),
-      attachment: payload.projImg,
-      vizImg: payload.vizImg||null,
-      svgFile: payload.svgFile||null,
-      svgName: 'projekt-laser-'+Date.now()+'.svg',
-      source:'edytor',
-      quote:q,
-      date:new Date().toISOString(),
-      status:'new',
-      read:false
+      attachment:payload.projImg, vizImg:payload.vizImg, svgFile:payload.svgFile
     });
-    submitBtn.classList.remove('btn-loading');
-    submitBtn.classList.add('btn-success');
-    submitBtn.textContent='✓ Wysłano!';
-    setSendStep(3);
-    setStatus('✅ Wysłano! Odpowiemy na '+email);
-    showToast('Projekt wysłany do pracowni!','success',4000);
-    celebrateExport();
-    setTimeout(()=>{ ov.classList.remove('open'); submitBtn.disabled=false; submitBtn.classList.remove('btn-success'); submitBtn.textContent='Wyślij projekt'; },2500);
+    location.assign(href);
   }catch(err){
     const msg=err?.code==='unavailable'?'Serwer niedostępny — sprawdź połączenie z internetem':
               err?.code==='permission-denied'?'Brak uprawnień — odśwież stronę i spróbuj ponownie':

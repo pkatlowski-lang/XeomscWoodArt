@@ -1,7 +1,7 @@
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply} from './backend.js?v=strona-glowna';
+import {api,resetPassword,signedReply} from './backend.js?v=katalog2';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -13,9 +13,10 @@ function tab(name,recipient=null) {
   $('#quote-recipient').textContent=quoteTarget?'Wycena dla '+quoteTarget.name+' · '+quoteTarget.email:'';
   $('#quote-status').textContent='';
   if(name==='calc')calculate();
-  for(const t of ['projects','homepage','inbox','calc']) $('#'+t).hidden=t!==name;
+  for(const t of ['projects','categories-admin','homepage','inbox','calc']) $('#'+t).hidden=t!==name;
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===name)));
 
+  if(name==='categories-admin' && !categoryState) loadCategories().catch(feedback);
   if(name==='homepage') loadHome();
   if(name==='inbox') refreshInbox().catch(feedback);
 }
@@ -114,6 +115,44 @@ async function compress(file) {
     throw Error('Zdjęcie po zmniejszeniu nadal jest za duże.');
   } finally {bitmap.close();}
 }
+const categoryForm = $('#category-form'), parentList = $('#category-parent'), itemList = $('#category-item');
+let categoryState = null;
+function categoryOption(text,value) { return new Option(text,value); }
+function categoryItems() {
+  return parentList.value ? categoryState.categories.find(c=>c.id===parentList.value)?.subs || [] : categoryState.categories;
+}
+function selectCategory() {
+  const items = categoryItems(), current = items.find(c=>c.id===itemList.value);
+  categoryForm.elements.title.value = current?.title || '';
+  categoryForm.elements.order.value = current?.order ?? (items.length ? Math.max(...items.map(c=>c.order))+1 : 0);
+  categoryForm.elements.hidden.checked = !!current?.hidden;
+}
+function drawCategories() {
+  itemList.replaceChildren(categoryOption('Dodaj nową pozycję',''),...categoryItems().map(c=>categoryOption(c.title,c.id)));
+  selectCategory();
+}
+function applyCategories(data) {
+  const previous = parentList.value;
+  categoryState = data;
+  parentList.replaceChildren(categoryOption('Kategorie główne',''),...data.categories.map(c=>categoryOption('Podkategorie: '+c.title,c.id)));
+  parentList.value = data.categories.some(c=>c.id===previous) ? previous : '';
+  drawCategories();
+}
+async function loadCategories() {
+  categoryForm.querySelector('button').disabled = true;
+  applyCategories(await api('admin/categories'));
+  categoryForm.querySelector('button').disabled = false;
+}
+parentList.onchange = drawCategories;
+itemList.onchange = selectCategory;
+$('#category-reload').onclick = () => loadCategories().catch(feedback);
+bindForm(categoryForm,async values=>{
+  if (!categoryState) throw Error('Wczytaj katalog.');
+  const data = await api('admin/categories',{parent:parentList.value,id:itemList.value,title:values.get('title'),order:values.get('order'),hidden:values.has('hidden'),revision:categoryState.revision});
+  applyCategories(data);
+  projects = await api('admin/projects'); list();
+  return 'Zapisano kategorię.';
+});
 const homeForm = $('#home-form');
 const homeFields = homeForm.querySelector('fieldset');
 const homeFile = $('#home-file');
@@ -227,6 +266,17 @@ async function openThread(t,action='view',text='') {
   const attach=$('#attachment');attach.replaceChildren();
   if(typeof data.attachment==='string' && (/^data:image\/(png|jpeg|webp);base64,/i.test(data.attachment)||/^https:\/\//i.test(data.attachment))){
     const image=node('img');image.alt='Załącznik klienta';image.referrerPolicy='no-referrer';image.style.maxHeight='200px';image.src=data.attachment;attach.append(image);
+  }
+  if (typeof data.vizImg==='string' && /^data:image\/(?:jpeg|png|webp);base64,/i.test(data.vizImg)) {
+    const preview = node('img'); preview.src=data.vizImg; preview.alt='Wizualizacja projektu'; preview.style.maxHeight='200px'; attach.append(preview);
+  }
+  if (typeof data.svgFile==='string' && data.svgFile) {
+    const download=button('Pobierz projekt SVG',()=>{
+      const url=URL.createObjectURL(new Blob([data.svgFile],{type:'application/octet-stream'}));
+      const a=node('a'); a.href=url; a.download='projekt-laser.svg'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    });
+    attach.append(download);
   }
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
   messages($('#history'),data.posts);$('#answer').hidden=data.closed;

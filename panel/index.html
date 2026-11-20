@@ -1,4 +1,4 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=strona-glowna"></script><style>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=katalog2"></script><style>
 #list .project-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
 #list .entry{flex:1;min-width:0;border:0}
 #list .entry[aria-pressed=true]{background:#eeefe4;font-weight:600}
@@ -24,9 +24,17 @@
 </style></head><body>
 <header><a class="brand" href="/"><i>✳</i> Xeomsc<span>Laser</span></a><nav><a href="/">Portfolio ↗</a><button id="logout" class="outline" hidden>Wyloguj</button></nav></header>
 <main class="workspace"><section id="login" class="login panel"><p class="eyebrow">Xeomsc Laser</p><h1>Panel pracowni</h1><form id="loginform"><label>E-mail administratora<input type="email" name="login" placeholder="Twój adres e-mail" required autocomplete="username"></label><label>Hasło<input name="password" type="password" required autocomplete="current-password"></label><button class="btn">Zaloguj się</button><button type="button" class="link" id="reset-password">Ustaw nowe hasło przez e-mail</button><output></output></form></section>
-<div id="desk" hidden><p class="eyebrow">Xeomsc Laser</p><h1>Panel pracowni</h1><nav class="tabs" aria-label="Narzędzia pracowni"><button data-tab="projects">Galeria</button><button data-tab="homepage">Strona główna</button><button data-tab="inbox">Wiadomości <span id="badge"></span></button><button data-tab="calc">Kalkulator wyceny</button></nav><p id="feedback" role="status"></p>
+<div id="desk" hidden><p class="eyebrow">Xeomsc Laser</p><h1>Panel pracowni</h1><nav class="tabs" aria-label="Narzędzia pracowni"><button data-tab="projects">Galeria</button><button data-tab="categories-admin">Kategorie</button><button data-tab="homepage">Strona główna</button><button data-tab="inbox">Wiadomości <span id="badge"></span></button><button data-tab="calc">Kalkulator wyceny</button></nav><p id="feedback" role="status"></p>
 <section id="projects" class="split"><aside class="panel"><div class="heading"><h2>Realizacje</h2><button id="new" class="outline">+ Nowa</button></div><label>Szukaj realizacji<input id="find" type="search"></label><div id="list"></div></aside>
 <section id="project-editor" class="panel" aria-labelledby="edit-title"><h2 id="edit-title" tabindex="-1">Nowa realizacja</h2><form id="editor"><label>Nazwa projektu<input name="title" required maxlength="100"></label><div class="pair"><label>Kategoria<input name="category" required list="categories" maxlength="60"><datalist id="categories"></datalist></label><label>Materiał<input name="material" maxlength="100" placeholder="np. sklejka 3 mm"></label></div><label>Opis<textarea name="description" rows="3" maxlength="2200"></textarea></label><label class="drop" id="drop">Wybierz zdjęcia lub przeciągnij je tutaj<input id="files" type="file" multiple accept="image/jpeg,image/png,image/webp"></label><small>Do 12 zdjęć JPG, PNG lub WebP. Pierwsze będzie okładką. Przed zapisem możesz zmienić kolejność i opis zdjęcia.</small><div id="pictures"></div><label class="check"><input name="featured" type="checkbox"> Wyróżnij na początku galerii</label><div class="actions"><button class="btn">Opublikuj w galerii</button><button id="delete" type="button" class="outline" hidden>Usuń realizację</button></div><output></output></form></section></section>
+<section id="categories-admin" class="panel" hidden><h2>Kategorie katalogu</h2>
+<form id="category-form"><label>Poziom<select id="category-parent"></select></label>
+<label>Kategoria lub podkategoria<select id="category-item"></select></label>
+<label>Nazwa<input name="title" required maxlength="60"></label>
+<label>Kolejność<input name="order" type="number" min="0" step="1" required></label>
+<label class="check"><input name="hidden" type="checkbox"> Ukryj w katalogu wraz z zawartością</label>
+<button class="btn" type="submit" disabled>Zapisz kategorię</button><output role="status"></output></form>
+<button id="category-reload" class="link" type="button">Wczytaj ponownie</button></section>
 <section id="homepage" class="panel" hidden aria-labelledby="home-heading">
   <h2 id="home-heading">Strona główna</h2>
   <form id="home-form">

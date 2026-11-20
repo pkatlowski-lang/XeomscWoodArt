@@ -8,12 +8,6 @@ export const samples=[
   study('Krążki do personalizacji','Półfabrykaty','Krążki ze sklejki o średnicy 5 cm mają prosty obrys i miejsce na drobny motyw, inicjały lub krótki napis. Na wizualizacji możesz ocenić proporcje elementu przed przygotowaniem własnej dekoracji. Krążek tej wielkości sprawdzi się jako mała etykieta prezentowa lub baza do ozdobienia.\n\nW zapytaniu podaj liczbę krążków i informację, czy chcesz otrzymać czystą powierzchnię, czy grawer według własnego wzoru.',['krazki','krazek'])
 ];
 
-function unpack(field) {
-  if (!field) return undefined;
-  if ('mapValue' in field) return Object.fromEntries(Object.entries(field.mapValue.fields||{}).map(([key,val])=>[key,unpack(val)]));
-  if ('arrayValue' in field) return (field.arrayValue.values||[]).map(unpack);
-  return Object.values(field)[0];
-}
 export function catalogRows(categories,galleries) {
   const rows=[];
   for(const [catId,cat] of Object.entries(categories||{}).filter(([,c])=>c&&!c.isHidden).sort(([,a],[,b])=>(a.order??9999)-(b.order??9999))) {
@@ -31,18 +25,15 @@ export function catalogRows(categories,galleries) {
   }
   return rows;
 }
-export const catalogConfig={"apiKey":"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw","authDomain":"xeomsc-a8edd.firebaseapp.com","projectId":"xeomsc-a8edd","storageBucket":"xeomsc-a8edd.firebasestorage.app","messagingSenderId":"43822805612","appId":"1:43822805612:web:d343653e47777d8ebf5e49"};
+export async function readWorkshop() {
+  const url = 'https://firestore.googleapis.com/v1/projects/xeomsc-licencje/databases/(default)/documents/app_config/pf-workshop-v1';
+  const response = await fetch(url, {cache:'no-store',referrerPolicy:'no-referrer'});
+  if (!response.ok) throw Error('Katalog jest chwilowo niedostępny.');
+  const data = (await response.json()).fields?.catalog?.stringValue;
+  if (!data) throw Error('Brak opublikowanego katalogu.');
+  return JSON.parse(data);
+}
 export async function liveProjects() {
-  const config=catalogConfig;
-  const [{initializeApp},{getAuth,signInAnonymously}]=await Promise.all([
-    import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
-    import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js')
-  ]);
-  const auth=getAuth(initializeApp(config));await auth.authStateReady();
-  const user=auth.currentUser || (await signInAnonymously(auth)).user;
-  const url=new URL('https://firestore.googleapis.com/v1/projects/'+config.projectId+'/databases/(default)/documents/artifacts/xeomsc-fusionart/public/data/siteConfig/main');
-  for(const key of ['categories','galleries'])url.searchParams.append('mask.fieldPaths',key);
-  const response=await fetch(url,{headers:{Authorization:'Bearer '+await user.getIdToken()}});
-  if(!response.ok) throw Error('Katalog jest chwilowo niedostępny.');
-  const {fields}=await response.json();return catalogRows(unpack(fields?.categories),unpack(fields?.galleries));
+  const {categories,galleries} = await readWorkshop();
+  return catalogRows(categories,galleries);
 }

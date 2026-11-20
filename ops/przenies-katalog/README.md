@@ -1,0 +1,9 @@
+# Przeniesienie katalogu pracowni
+
+Źródłem jest projekt `xeomsc-a8edd`, a celem `xeomsc-licencje`. Użyj konta z uprawnieniami IAM do odczytu źródła i zapisu celu. Uruchom skrypt poza serwerem WWW, z poświadczeniami Application Default Credentials. Skrypt podaje jedynie liczbę kategorii i rozmów.
+
+1. Pobierz aktywne reguły i wykonaj kopię obu baz. Porównaj faktyczne reguły docelowe z plikiem `firestore.rules`. Dodaj reguły prywatnego dokumentu katalogu oraz opcjonalnych załączników zapytania, zachowując pozostałe reguły.
+2. W katalogu tego skryptu wykonaj `npm install`, następnie `node migrate.mjs`. Polecenie domyślnie sprawdza dane bez zapisu. Dopiero `node migrate.mjs --apply` kopiuje katalog i historię do celu. Każda rozmowa otrzymuje stały identyfikator. Pliki i dane klientów trafiają do prywatnych dokumentów. Publiczna kopia katalogu zawiera pola przeznaczone do prezentacji.
+3. Przed połączeniem zmian z main sprawdź na przygotowanej wersji listę kategorii i produktów, kilka zdjęć, prywatność, zapytanie o produkt oraz wysyłkę projektu z edytora do nowej skrzynki z załącznikami. Użyj kontrolnej rozmowy właściciela. Sprawdź odczyt odpowiedzi przez prywatny link. Potwierdź, że zwykły użytkownik nie ma dostępu do prywatnego katalogu i skrzynki w testach reguł.
+4. Podczas przełączania wstrzymaj edycję starego katalogu. Po przekierowaniu ruchu zamknij klientom dostęp do dawnych dokumentów konfiguracji i wiadomości w regułach projektu źródłowego. Przejrzyj również szerokie reguły obejmujące te ścieżki. Zachowaj uprawnienia innych aplikacji w projekcie. Wykonaj ponownie migrację rozmów, aby uwzględnić wiadomości z czasu przełączenia, i sprawdź końcową liczbę. Skrypt zatrzymuje się w razie sprzecznych wersji.
+5. Sprawdź serwis pod docelową domeną i potwierdź reguły obu baz. Stare rekordy pozostają w źródle jako zabezpieczenie na czas uzgodnienia danych.
