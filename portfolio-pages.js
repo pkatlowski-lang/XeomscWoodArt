@@ -1,6 +1,6 @@
 import {homeDocument, defaultHome, renderHome} from './panel/homepage.js';
 import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
-import {samples, liveProjects} from './portfolio-catalog.js';
+import {samples, liveProjects} from './portfolio-catalog.js?v=katalog2';
 import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
 let projects=[], selectedCategory='';

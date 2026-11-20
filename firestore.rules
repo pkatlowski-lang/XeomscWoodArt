@@ -63,10 +63,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /portfolio_catalog/{id} {
+      allow read, write: if isAdmin();
+    }
+
     match /portfolio_inquiries/{id} {
       function validInquiry() {
         let d = request.resource.data;
-        return d.keys().hasOnly(['name','email','message','date','status','read','mailboxId','replyKey'])
+        return d.keys().hasOnly(['name','email','message','date','status','read','mailboxId','replyKey','attachment','vizImg','svgFile'])
+          && d.get('attachment','') is string && d.get('vizImg','') is string && d.get('svgFile','') is string
+          && d.get('attachment','').size() + d.get('vizImg','').size() + d.get('svgFile','').size() <= 900000
           && id.matches('[a-f0-9-]{36}') && d.mailboxId == id
           && d.name is string && d.name.size() > 0 && d.name.size() <= 90
           && d.email is string && d.email.size() <= 180 && d.email.matches('.+@.+')

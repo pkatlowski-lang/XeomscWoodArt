@@ -1,5 +1,5 @@
 import {createPhotoViewer} from './powiekszenie.js';
-import {liveProjects,samples} from '/portfolio-catalog.js';
+import {liveProjects,samples} from '/portfolio-catalog.js?v=katalog2';
 import {publishedChanges,mergeProjects,setPhoto,studioPhoto} from '/panel/photos.js?v=opisy2';
 import {projectPath,rememberProjectLinks} from './adresy.js';
 

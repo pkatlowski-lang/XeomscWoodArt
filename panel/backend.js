@@ -1,9 +1,10 @@
+import {publicWorkshop, changeCategory} from './catalog-data.mjs';
 import {homeDocument, homeChanges} from './homepage.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {getAuth,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import {getOwnerConfig} from './config.js';
-import {samples,liveProjects} from '../portfolio-catalog.js';
+import {samples,liveProjects} from '../portfolio-catalog.js?v=katalog2';
 import {mergeProjects} from './photos.js';
 import {seal} from './letter.js';
 
@@ -103,7 +104,7 @@ async function conversation(input){
     }
   }
   if(!m.read && input.action==='view')await updateDoc(ref,{read:true});
-  return {closed,addressable,attachment:m.attachment,posts:[{role:'client',body:m.message||'',created:m.date?.toDate().toISOString()},...(m.sent||[]).map(l=>({role:'studio',body:l.body,created:l.created}))]};
+  return {closed,addressable,attachment:m.attachment,vizImg:m.vizImg,svgFile:m.svgFile,posts:[{role:'client',body:m.message||'',created:m.date?.toDate().toISOString()},...(m.sent||[]).map(l=>({role:'studio',body:l.body,created:l.created}))]};
 }
 export async function api(path,body){
   if(path==='login'){
@@ -113,6 +114,30 @@ export async function api(path,body){
   }
   if(path==='logout'){verified=null;await signOut(auth);return;}
   await requireOwner();
+  if (path === 'admin/categories') {
+    const ref = doc(db,'portfolio_catalog','main');
+    const structure = snap => {
+      if (!snap.exists()) throw Error('Katalog oczekuje na przeniesienie danych.');
+      const data = snap.data();
+      const catalog = JSON.parse(data.catalog);
+      return {catalog,revision:data.revision};
+    };
+    if (body) {
+      await runTransaction(db, async tx => {
+        const {catalog,revision} = structure(await tx.get(ref));
+        if (revision !== body.revision) throw Error('Katalog zmienił się w innej karcie. Wczytaj listę ponownie.');
+        changeCategory(catalog,body);
+        tx.update(ref,{catalog:JSON.stringify(catalog),revision:revision+1});
+        tx.set(record('pf-workshop-v1'),{catalog:JSON.stringify(publicWorkshop(catalog)),revision:revision+1});
+      });
+      original = null;
+    }
+    const {catalog,revision} = structure(await getDocFromServer(ref));
+    const listing = items => Object.entries(items || {}).sort((a,b)=>(a[1].order||0)-(b[1].order||0)).map(([id,x])=>({
+      id,title:x.title,order:x.order||0,hidden:!!x.isHidden,...(x.subs ? {subs:listing(x.subs)} : {})
+    }));
+    return {revision,categories:listing(catalog.categories)};
+  }
   if (path === 'admin/homepage') {
     const ref = record(homeDocument);
     if (!body) return (await getDocFromServer(ref)).data() || {};
