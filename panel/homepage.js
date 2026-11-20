@@ -2,7 +2,7 @@ export const homeDocument = 'pf-home-intro-v1';
 export const defaultHome = {
   eyebrow: 'Pracownia cięcia i graweru',
   title: 'Ze szkicu\nw drewno.',
-  description: 'Wycinamy i grawerujemy w sklejce. Zobacz detale naszych projektów lub opowiedz nam, co chcesz stworzyć.',
+  description: 'Wycinam i graweruję w sklejce – od pojedynczego napisu po wielowarstwowe logo Twojej firmy.',
   caption: 'Sklejka · cięcie laserowe',
   alt: 'Wizualizacja drewnianej bazy z równym rzędem otworów wzdłuż krawędzi'
 };

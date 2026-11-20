@@ -64,6 +64,13 @@ async function load(){
   showPhoto(index);const ask=new URL('/zapytanie/',location.origin);
   ask.searchParams.set('zapytanie',p.title);if(p.code)ask.searchParams.set('kod',p.code);
   $('#ask').href=ask.href;
+  const material = $('#project-material');
+  if (material && p.material?.trim()) {
+    material.querySelector('dd').textContent = p.material.trim();
+    material.hidden = false;
+  }
+  const sampleSize = { 'sample-baza': 'Średnica 10 cm', 'sample-krazki': 'Średnica 5 cm' };
+  if (dynamic && sampleSize[p.id] && !p.revision) $('.project-specs div:last-child dd').textContent = sampleSize[p.id];
   if(dynamic || p.revision || p.customDescription){
     $('h1').textContent=p.title;$('#category').textContent=p.category;
     const description=p.description||p.title+' – realizacja pracowni Xeomsc Laser. Zobacz zdjęcia i zapytaj o szczegóły.';

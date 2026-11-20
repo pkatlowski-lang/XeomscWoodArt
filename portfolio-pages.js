@@ -37,6 +37,7 @@ if (location.hash && !['#galeria','#start','#projekt-indywidualny'].includes(loc
     const data = {...defaultHome};
     for (const key of Object.keys(data)) data[key] = fields[key]?.stringValue ?? data[key];
     data.image = fields.image?.stringValue;
+    if (data.description === 'Wycinamy i grawerujemy w sklejce. Zobacz detale naszych projektów lub opowiedz nam, co chcesz stworzyć.') data.description = defaultHome.description;
     renderHome($('.hero'), data);
   }).catch(() => { /* The initial HTML already contains the workshop introduction. */ });
   projects=mergeProjects(samples,[]);filters();
