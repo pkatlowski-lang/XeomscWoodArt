@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Portfolio pracowni Xeomsc Laser. Obejrzyj projekty ze sklejki i porozmawiaj z pracownią o własnej realizacji."><link rel="canonical" href="https://xeomsc-laser.pl/"><meta property="og:image" content="https://xeomsc-laser.pl/portfolio-studio/public/images/baza.jpg"><title>Cięcie laserowe i grawerowanie w sklejce | Xeomsc Laser</title><link rel="stylesheet" href="portfolio-studio/public/style.css"><link rel="stylesheet" href="/realizacje/projekt.css"><script type="module" src="portfolio-pages.js?v=karuzela"></script><style>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Portfolio pracowni Xeomsc Laser. Obejrzyj projekty ze sklejki i porozmawiaj z pracownią o własnej realizacji."><link rel="canonical" href="https://xeomsc-laser.pl/"><meta property="og:image" content="https://xeomsc-laser.pl/portfolio-studio/public/images/baza.jpg"><title>Cięcie laserowe i grawerowanie w sklejce | Xeomsc Laser</title><link rel="stylesheet" href="portfolio-studio/public/style.css"><link rel="stylesheet" href="/realizacje/projekt.css"><script type="module" src="portfolio-pages.js?v=cennik"></script><style>
 .order-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 4rem); padding: clamp(2rem, 4vw, 4rem) 5vw; border-top: 1px solid var(--line); }
 .order-details section { border-inline-start: 2px solid var(--accent); padding-inline-start: 1.2rem; }
 .order-details h2 { margin: 0 0 .65rem; font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
@@ -49,8 +49,12 @@
 #recent-prev { grid-column: 1; justify-self: start; }
 #recent-next { grid-column: -2; justify-self: end; }
 @media (max-width: 720px) { .recent-carousel { --tracks: minmax(0, 1fr); } }
+.category-prices {max-width:52rem;margin:1rem 0}
+.category-prices > div {display:grid;grid-template-columns:1fr auto;gap:.25rem 1rem;border-bottom:1px solid var(--line);padding:.8rem 0}
+.category-prices dd {margin:0;font-weight:600}
+.category-prices small {display:block;color:var(--muted);font-weight:400}
 </style></head>
-<body><header><a class="brand" href="/"><i>✳</i> Xeomsc<span>Laser</span></a><nav><a href="#galeria">Realizacje</a><button class="navbutton ask">Kontakt ↗</button></nav></header><noscript><p>Kontakt z pracownią: <a href="tel:+48537191717">+48 537 191 717</a>.</p></noscript>
+<body><header><a class="brand" href="/"><i>✳</i> Xeomsc<span>Laser</span></a><nav><a href="#galeria">Realizacje</a><a id="price-link" href="#cennik" hidden>Cennik</a><button class="navbutton ask">Kontakt ↗</button></nav></header><noscript><p>Kontakt z pracownią: <a href="tel:+48537191717">+48 537 191 717</a>.</p></noscript>
 <main><section class="hero"><div class="herocopy"><p class="eyebrow"><b></b> Pracownia cięcia i graweru</p><h1>Ze szkicu<br><em>w drewno.</em></h1><p>Wycinam i graweruję w sklejce – od pojedynczego napisu po wielowarstwowe logo Twojej firmy.</p><div class="actions"><a class="btn" href="#galeria">Odkryj realizacje <span>↓</span></a><button class="link ask">Zapytaj o projekt ↗</button></div></div><figure class="herofigure"><div class="fine tl"></div><div class="fine br"></div><img src="portfolio-studio/public/images/baza.jpg" alt="Wizualizacja drewnianej bazy z równym rzędem otworów wzdłuż krawędzi"><figcaption><span>Studium detalu</span>Sklejka · cięcie laserowe</figcaption></figure></section>
 <section id="ostatnio-wykonane" class="section" aria-labelledby="recent-title" hidden>
   <div class="heading"><h2 id="recent-title">Ostatnio <em>wykonane.</em></h2></div>
@@ -86,6 +90,10 @@
 <a class="card" href="/realizacje/dekoracyjne-ksztalty-ze-sklejki-na-zamowienie/"><div class="frame"><img loading="lazy" src="https://i.ibb.co/HTWypS3D/f911b1137587.jpg" alt="Dekoracyjne kształty ze sklejki na zamówienie"></div><small>Bazy i Rękodzieło</small><h3>Dekoracyjne kształty ze sklejki na zamówienie</h3></a>
 <a class="card" href="/realizacje/pudelko-slubne-na-pieniadze/"><div class="frame"><img loading="lazy" src="https://i.ibb.co/wNY3qkSK/7ad552cff8e3.png" alt="Pudełko ślubne na pieniądze"></div><small>Pudełka i Kasetki</small><h3>Pudełko ślubne na pieniądze</h3></a>
 </div><p><a class="link" href="pracownia.html#products">Pełny katalog pracowni ↗</a></p></section>
+<section id="cennik" class="section" hidden aria-labelledby="price-title">
+  <h2 id="price-title">Cennik kategorii</h2>
+  <dl class="category-prices"></dl>
+</section>
 <div class="order-details" role="region" aria-label="Informacje o zamówieniu">
   <section>
     <h2>Czas realizacji</h2>

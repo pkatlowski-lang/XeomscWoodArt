@@ -1,7 +1,8 @@
+import {categoryKey,formatPrice} from '../realizacje/ceny.js';
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=sesja2';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=cennik';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -13,9 +14,10 @@ function tab(name,recipient=null) {
   $('#quote-recipient').textContent=quoteTarget?'Wycena dla '+quoteTarget.name+' · '+quoteTarget.email:'';
   $('#quote-status').textContent='';
   if(name==='calc')calculate();
-  for(const t of ['projects','homepage','inbox','calc']) $('#'+t).hidden=t!==name;
+  for(const t of ['projects','pricing','homepage','inbox','calc']) $('#'+t).hidden=t!==name;
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===name)));
 
+  if(name==='pricing') loadRates().catch(feedback);
   if(name==='homepage') loadHome();
   if(name==='inbox') refreshInbox().catch(feedback);
 }
@@ -77,6 +79,7 @@ function openEditor(project,force=false) {
   form.reset();edit=project; pictures=(project?.photos||[]).map(p=>({...p}));
   if(project) {
     for(const k of ['title','category','material','description'])fields[k].value=project[k];
+    fields.actualPrice.value = project.actualGrosze > 0 ? project.actualGrosze / 100 : '';
     fields.featured.checked=!!project.featured;
   }
   markSelectedProject();
@@ -118,6 +121,39 @@ async function compress(file) {
     throw Error('Zdjęcie po zmniejszeniu nadal jest za duże.');
   } finally {bitmap.close();}
 }
+const priceForm = $('#price-form');
+const priceFields = priceForm.querySelector('fieldset');
+let rates = null;
+function fillRate() {
+  const key = categoryKey(priceForm.elements.category.value);
+  const rate = rates?.find(row => categoryKey(row.category) === key);
+  priceForm.elements.amount.value = rate ? rate.amount / 100 : '';
+  priceForm.elements.variant.value = rate?.variant || '';
+}
+function priceButtons() {
+  $('#saved-rates').replaceChildren(...rates.map(rate => button(rate.category + ' · od ' + formatPrice(rate.amount), () => {
+    priceForm.elements.category.value = rate.category;
+    fillRate();
+  })));
+}
+async function loadRates() {
+  if (rates !== null) return;
+  rates = await api('admin/prices');
+  priceButtons();
+  priceFields.disabled = false;
+}
+priceForm.elements.category.oninput = fillRate;
+bindForm(priceForm,async data => {
+  const values = Object.fromEntries(data);
+  const previous = rates.find(row => categoryKey(row.category) === categoryKey(values.category)) || null;
+  priceFields.disabled = true;
+  try {
+    rates = await api('admin/prices',{...values,previous});
+    priceButtons();
+    fillRate();
+    return 'Zapisano cennik.';
+  } finally {priceFields.disabled = false;}
+});
 const homeForm = $('#home-form');
 const homeFields = homeForm.querySelector('fieldset');
 const homeFile = $('#home-file');

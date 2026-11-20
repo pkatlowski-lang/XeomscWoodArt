@@ -1,6 +1,7 @@
+import {projectPrices,publishedPrices} from './ceny.js';
 import {createPhotoViewer} from './powiekszenie.js';
 import {liveProjects,samples} from '/portfolio-catalog.js';
-import {publishedChanges,mergeProjects,setPhoto,studioPhoto} from '/panel/photos.js?v=opisy2';
+import {publishedChanges,mergeProjects,setPhoto,studioPhoto,publicRecord} from '/panel/photos.js?v=opisy2';
 import {projectPath,rememberProjectLinks} from './adresy.js';
 
 const $=selector=>document.querySelector(selector);
@@ -46,7 +47,7 @@ function missing(){
   notice.textContent='Ta realizacja jest niedostępna. Wróć do galerii, aby zobaczyć aktualne projekty.';
 }
 async function load(){
-  const [legacy,overlays]=await Promise.allSettled([liveProjects(),publishedChanges()]);
+  const [legacy,overlays,prices]=await Promise.allSettled([liveProjects(),publishedChanges(),publishedPrices(publicRecord)]);
   const base=legacy.status==='fulfilled' && legacy.value.length?legacy.value:samples;
   rememberProjectLinks(base);
   const rows=mergeProjects(base,overlays.status==='fulfilled'?overlays.value:[]);
@@ -64,6 +65,17 @@ async function load(){
   showPhoto(index);const ask=new URL('/zapytanie/',location.origin);
   ask.searchParams.set('zapytanie',p.title);if(p.code)ask.searchParams.set('kod',p.code);
   $('#ask').href=ask.href;
+  const lines = projectPrices(p,prices.status === 'fulfilled' ? prices.value : []);
+  if (lines.length) {
+    const box = document.createElement('div');
+    box.className = 'project-prices';
+    for (const line of lines) {
+      const entry = document.createElement('p');
+      entry.textContent = line;
+      box.append(entry);
+    }
+    $('.project-specs').after(box);
+  }
   const material = $('#project-material');
   if (material && p.material?.trim()) {
     material.querySelector('dd').textContent = p.material.trim();

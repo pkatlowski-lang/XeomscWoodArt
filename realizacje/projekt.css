@@ -2,3 +2,7 @@
 .project-specs { display: flex; flex-wrap: wrap; gap: .75rem 2rem; margin: 1rem 0; padding: .85rem 0; border-block: 1px solid var(--line); }
 .project-specs dt { font-size: .85rem; color: var(--muted); }
 .project-specs dd { margin: .15rem 0 0; font-weight: 600; }
+
+.project-prices { margin: 1rem 0; padding-inline-start: 1rem; border-inline-start: 3px solid var(--accent); }
+.project-prices p { margin: .2rem 0; }
+.project-prices p:last-child { font-weight: 600; }

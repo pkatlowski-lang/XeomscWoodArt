@@ -4,6 +4,8 @@ import {samples, liveProjects} from './portfolio-catalog.js';
 import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
 import {initRecent} from './realizacje/ostatnie.js';
+import {projectPrices,formatPrice,publishedPrices} from './realizacje/ceny.js';
+let rates = [];
 let projects=[], selectedCategory='';
 function ask(project=null) {
   const address = new URL('/zapytanie/', location.href);
@@ -15,7 +17,9 @@ function projectCard(p) {
   const card=node('a','','card'), frame=node('div','','frame'), image=photo(p.photos[0]);
   card.href=projectPath(p);
   image.loading='lazy';frame.append(image,node('span',p.photos.length+' zdj.','number'));
-  card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));return card;
+  card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));
+  for (const line of projectPrices(p,rates)) card.append(node('p',line));
+  return card;
 }
 function draw() {
   const q=$('#search').value.trim().toLocaleLowerCase('pl');
@@ -31,7 +35,7 @@ function filters(){
 }
 dialogControls(); document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask());
 $('#search').oninput=draw;
-if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wykonane'].includes(location.hash)) {
+if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wykonane','#cennik'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
   publicRecord(homeDocument).then(fields => {
@@ -43,7 +47,18 @@ if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wy
     renderHome($('.hero'), data);
   }).catch(() => { /* The initial HTML already contains the workshop introduction. */ });
   projects=mergeProjects(samples,[]);filters();
-  const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
+  const [latest,changes,priceResult]=await Promise.allSettled([liveProjects(),publishedChanges(),publishedPrices(publicRecord)]);
+  rates = priceResult.status === 'fulfilled' ? priceResult.value : [];
+  if (rates.length) {
+    $('.category-prices').replaceChildren(...rates.map(rate => {
+      const row = node('div'), title = node('dt',rate.category);
+      if (rate.variant) title.append(node('small',rate.variant));
+      row.append(title,node('dd','od ' + formatPrice(rate.amount)));
+      return row;
+    }));
+    $('#cennik').hidden = false; $('#price-link').hidden = false;
+    if (location.hash === '#cennik') $('#cennik').scrollIntoView();
+  }
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
   rememberProjectLinks(base);projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
   initRecent(projects, changes.status === 'fulfilled' ? changes.value : [], projectCard);

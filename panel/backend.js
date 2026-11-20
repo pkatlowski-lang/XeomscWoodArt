@@ -1,3 +1,4 @@
+import {priceDocument, parsePrice, categoryKey} from '../realizacje/ceny.js';
 import {homeDocument, homeChanges} from './homepage.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {initializeAuth,browserLocalPersistence,indexedDBLocalPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
@@ -58,6 +59,10 @@ async function changeProject(input,remove){
     let sequence = old.reduce((highest, item) => Math.max(highest, item.addedOrder || 0), 0);
     for (const item of [...old].reverse()) {
       if (!item.addedOrder && /^[0-9a-f-]{36}$/i.test(item.id)) item.addedOrder = ++sequence;
+    }
+    if (!remove) {
+      const amount = input.actualPrice === undefined ? prev?.actualGrosze : parsePrice(input.actualPrice);
+      if (amount != null) next.actualGrosze = amount;
     }
     if (prev?.addedOrder) next.addedOrder = prev.addedOrder;
     else if (!input.id) next.addedOrder = ++sequence;
@@ -186,6 +191,25 @@ export async function api(path,body){
   }
   if(path==='logout'){verified=null;await signOut(auth);return;}
   await requireOwner();
+  if (path === 'admin/prices') {
+    const ref = record(priceDocument);
+    const readRates = snapshot => JSON.parse(snapshot.data()?.rates || '[]');
+    if (!body) return readRates(await getDocFromServer(ref));
+    const category = body.category.trim(), variant = body.variant.trim();
+    if (!category || category.length > 100 || variant.length > 140) throw Error('Sprawdź nazwę kategorii i opis wariantu.');
+    const amount = parsePrice(body.amount);
+    return runTransaction(db, async tx => {
+      const rates = readRates(await tx.get(ref));
+      const matches = row => categoryKey(row.category) === categoryKey(category);
+      const previous = rates.find(matches) || null;
+      if (JSON.stringify(previous) !== JSON.stringify(body.previous)) throw Error('Cennik zmieniono w innej karcie. Odśwież panel.');
+      const updated = rates.filter(row => !matches(row));
+      if (amount !== null) updated.push({category,amount,variant});
+      updated.sort((a,b) => a.category.localeCompare(b.category,'pl'));
+      tx.set(ref,{rates:JSON.stringify(updated)});
+      return updated;
+    });
+  }
   if (path === 'admin/homepage') {
     const ref = record(homeDocument);
     if (!body) return (await getDocFromServer(ref)).data() || {};
