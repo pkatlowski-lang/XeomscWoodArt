@@ -51,6 +51,13 @@ async function changeProject(input,remove){
   await runTransaction(db,async tx=>{
     const old=entries(await tx.get(manifest)),prev=old.find(p=>p.id===id);
     if((prev?.revision||0)!==(input.revision||0))throw Error('Ten projekt zmieniono w innym oknie. Odśwież panel.');
+    // Older panel entries only have manifest order. Preserve it on the first save.
+    let sequence = old.reduce((highest, item) => Math.max(highest, item.addedOrder || 0), 0);
+    for (const item of [...old].reverse()) {
+      if (!item.addedOrder && /^[0-9a-f-]{36}$/i.test(item.id)) item.addedOrder = ++sequence;
+    }
+    if (prev?.addedOrder) next.addedOrder = prev.addedOrder;
+    else if (!input.id) next.addedOrder = ++sequence;
     const replacement=JSON.stringify([next,...old.filter(p=>p.id!==id)]);
     if(new TextEncoder().encode(replacement).length>850000)throw Error('Brak miejsca w indeksie galerii. Skróć opisy lub usuń nieużywane realizacje.');
     for(const item of assets)tx.set(record('pf-img-'+item.asset),{data:item.data});

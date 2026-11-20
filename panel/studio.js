@@ -1,7 +1,7 @@
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply} from './backend.js?v=strona-glowna';
+import {api,resetPassword,signedReply} from './backend.js?v=karuzela';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;

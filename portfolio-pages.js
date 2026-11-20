@@ -3,6 +3,7 @@ import {$,node,button,dialogControls} from './portfolio-studio/public/common.js'
 import {samples, liveProjects} from './portfolio-catalog.js';
 import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
+import {initRecent} from './realizacje/ostatnie.js';
 let projects=[], selectedCategory='';
 function ask(project=null) {
   const address = new URL('/zapytanie/', location.href);
@@ -10,16 +11,17 @@ function ask(project=null) {
   if (project?.code) address.searchParams.set('kod', project.code);
   location.assign(address.href);
 }
+function projectCard(p) {
+  const card=node('a','','card'), frame=node('div','','frame'), image=photo(p.photos[0]);
+  card.href=projectPath(p);
+  image.loading='lazy';frame.append(image,node('span',p.photos.length+' zdj.','number'));
+  card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));return card;
+}
 function draw() {
   const q=$('#search').value.trim().toLocaleLowerCase('pl');
   const shown=projects.filter(p=>(!selectedCategory||p.category===selectedCategory)&&[p.title,p.description,p.material,p.category].join(' ').toLocaleLowerCase('pl').includes(q));
   $('#count').textContent=shown.length?'Liczba realizacji: '+shown.length:'Brak pasujących realizacji.';
-  $('#grid').replaceChildren(...shown.map(p=>{
-    const card=node('a','','card'), frame=node('div','','frame'), image=photo(p.photos[0]);
-    card.href=projectPath(p);
-    image.loading='lazy';frame.append(image,node('span',p.photos.length+' zdj.','number'));
-    card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));return card;
-  }));
+  $('#grid').replaceChildren(...shown.map(projectCard));
 }
 function filters(){
   $('#filters').replaceChildren(...['',...new Set(projects.map(p=>p.category))].map(c=>{
@@ -29,7 +31,7 @@ function filters(){
 }
 dialogControls(); document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask());
 $('#search').oninput=draw;
-if (location.hash && !['#galeria','#start','#projekt-indywidualny'].includes(location.hash)) {
+if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wykonane'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
   publicRecord(homeDocument).then(fields => {
@@ -44,5 +46,6 @@ if (location.hash && !['#galeria','#start','#projekt-indywidualny'].includes(loc
   const [latest,changes]=await Promise.allSettled([liveProjects(),publishedChanges()]);
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
   rememberProjectLinks(base);projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
+  initRecent(projects, changes.status === 'fulfilled' ? changes.value : [], projectCard);
 }
 
