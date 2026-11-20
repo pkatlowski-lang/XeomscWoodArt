@@ -1,6 +1,6 @@
 import {homeDocument, homeChanges} from './homepage.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import {getAuth,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import {initializeAuth,browserLocalPersistence,indexedDBLocalPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import {getOwnerConfig} from './config.js';
 import {samples,liveProjects} from '../portfolio-catalog.js';
@@ -8,7 +8,10 @@ import {mergeProjects} from './photos.js';
 import {seal} from './letter.js';
 
 const owners=initializeApp(await getOwnerConfig(),'portfolio-owner');
-const auth=getAuth(owners),db=getFirestore(owners);
+const auth = initializeAuth(owners, {
+  persistence: [browserLocalPersistence, indexedDBLocalPersistence, browserSessionPersistence]
+});
+const db = getFirestore(owners);
 const record=id=>doc(db,'app_config',id);
 const manifest=record('pf-catalog-v1');
 let verified=null, original=null;
@@ -17,7 +20,7 @@ export async function resetPassword(email){
   if(!email.trim().includes('@'))throw Error('Wpisz e-mail konta administratora.');
   await sendPasswordResetEmail(auth,email.trim());
 }
-async function requireOwner(){
+export async function requireOwner(){
   await auth.authStateReady();
   const user=auth.currentUser;
   if(!user || !user.email)throw denied();
@@ -172,8 +175,13 @@ async function conversation(input){
 }
 export async function api(path,body){
   if(path==='login'){
-    try{await signInWithEmailAndPassword(auth,body.login.trim(),body.password);await requireOwner();}
-    catch{await signOut(auth);throw Error('Sprawdź e-mail i hasło konta administratora. Możesz też ustawić nowe hasło przez e-mail.');}
+    try {
+      await signInWithEmailAndPassword(auth,body.login.trim(),body.password);
+    } catch (error) {
+      if (error.code === 'auth/network-request-failed') throw Error('Brak połączenia z Firebase. Spróbuj ponownie.');
+      throw Error('Sprawdź e-mail i hasło konta administratora.');
+    }
+    await requireOwner();
     return;
   }
   if(path==='logout'){verified=null;await signOut(auth);return;}

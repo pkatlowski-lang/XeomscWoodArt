@@ -1,7 +1,7 @@
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply} from './backend.js?v=dialog';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=sesja2';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -21,8 +21,12 @@ function tab(name,recipient=null) {
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 async function enter() {
-  projects=await api('admin/projects');$('#login').hidden=true;$('#desk').hidden=false;$('#logout').hidden=false;
-  list(); refreshInbox().catch(feedback);tab('projects');
+  await requireOwner();
+  $('#session-check').hidden=true;$('#login').hidden=true;$('#desk').hidden=false;$('#logout').hidden=false;
+  tab('projects');
+  refreshInbox().catch(feedback);
+  try { projects=await api('admin/projects'); list(); }
+  catch(error) { feedback(error); }
 }
 bindForm($('#loginform'),async f=>{await api('login',Object.fromEntries(f));await enter();$('#loginform').reset();});
 $('#logout').onclick=async()=>{try{await api('logout',{});location.reload();}catch(e){feedback(e);}};
@@ -303,5 +307,23 @@ $('#reset-password').onclick=async()=>{
   try{await resetPassword(f.elements.login.value);out.textContent='Sprawdź wiadomość od Firebase w swojej skrzynce, także w spamie.';}
   catch(e){out.textContent=e.message;}
 };
-try{await enter();}catch(e){if(e.status!==401)$('#loginform output').textContent=e.message;}
+async function restoreSession() {
+  const retry = $('#session-retry');
+  retry.hidden = true;
+  $('#session-message').textContent = 'Przywracanie sesji panelu…';
+  try {
+    await enter();
+  } catch (error) {
+    if (error.status === 401 || error.code === 'permission-denied') {
+      $('#session-check').hidden = true;
+      $('#login').hidden = false;
+      if (error.code === 'permission-denied') $('#loginform output').textContent = 'To konto nie ma dostępu do panelu. Zaloguj się kontem administratora.';
+      return;
+    }
+    $('#session-message').textContent = 'Nie udało się sprawdzić sesji. Sprawdź połączenie i spróbuj ponownie.';
+    retry.hidden = false;
+  }
+}
+$('#session-retry').onclick = restoreSession;
+restoreSession();
 
