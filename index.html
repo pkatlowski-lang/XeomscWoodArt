@@ -5,20 +5,62 @@
 .order-details h2 { margin: 0 0 .65rem; font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
 .order-details p { margin: .25rem 0 0; }
 @media (max-width: 720px) { .order-details { grid-template-columns: 1fr; } }
-#recent-cards { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(.8rem,2vw,2rem); touch-action: pan-y pinch-zoom; }
-#recent-nav button { min-width: 44px; min-height: 44px; font-size: 1.2rem; }
-@media (max-width: 720px) { #recent-cards { grid-template-columns: 1fr; } }
+.recent-carousel {
+  position: relative;
+  --tracks: repeat(3, minmax(0, 1fr));
+  --gap: clamp(.8rem, 2vw, 2rem);
+  --photo-ratio: 1.55;
+}
+#recent-cards, #recent-nav {
+  display: grid;
+  grid-template-columns: var(--tracks);
+  gap: var(--gap);
+}
+#recent-cards { touch-action: pan-y pinch-zoom; }
+#recent-cards .frame { aspect-ratio: var(--photo-ratio); }
+#recent-nav {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  align-items: center;
+  pointer-events: none;
+}
+#recent-nav[hidden] { display: none; }
+/* Match the height of one photo, independently of the captions below. */
+#recent-nav::before {
+  content: "";
+  grid-area: 1 / 1;
+  width: 100%;
+  aspect-ratio: var(--photo-ratio);
+}
+#recent-nav button {
+  grid-row: 1;
+  width: 44px;
+  height: 44px;
+  margin-inline: .5rem;
+  padding: 0;
+  border-radius: 50%;
+  background: #fffdf6;
+  color: #23392d;
+  box-shadow: 0 2px 8px #0003;
+  font-size: 1.25rem;
+  pointer-events: auto;
+}
+#recent-prev { grid-column: 1; justify-self: start; }
+#recent-next { grid-column: -2; justify-self: end; }
+@media (max-width: 720px) { .recent-carousel { --tracks: minmax(0, 1fr); } }
 </style></head>
 <body><header><a class="brand" href="/"><i>✳</i> Xeomsc<span>Laser</span></a><nav><a href="#galeria">Realizacje</a><button class="navbutton ask">Kontakt ↗</button></nav></header><noscript><p>Kontakt z pracownią: <a href="tel:+48537191717">+48 537 191 717</a>.</p></noscript>
 <main><section class="hero"><div class="herocopy"><p class="eyebrow"><b></b> Pracownia cięcia i graweru</p><h1>Ze szkicu<br><em>w drewno.</em></h1><p>Wycinam i graweruję w sklejce – od pojedynczego napisu po wielowarstwowe logo Twojej firmy.</p><div class="actions"><a class="btn" href="#galeria">Odkryj realizacje <span>↓</span></a><button class="link ask">Zapytaj o projekt ↗</button></div></div><figure class="herofigure"><div class="fine tl"></div><div class="fine br"></div><img src="portfolio-studio/public/images/baza.jpg" alt="Wizualizacja drewnianej bazy z równym rzędem otworów wzdłuż krawędzi"><figcaption><span>Studium detalu</span>Sklejka · cięcie laserowe</figcaption></figure></section>
 <section id="ostatnio-wykonane" class="section" aria-labelledby="recent-title" hidden>
-  <div class="heading"><h2 id="recent-title">Ostatnio <em>wykonane.</em></h2>
-    <div class="row" id="recent-nav">
+  <div class="heading"><h2 id="recent-title">Ostatnio <em>wykonane.</em></h2></div>
+  <div class="recent-carousel">
+    <div id="recent-nav">
       <button class="outline" id="recent-prev" aria-label="Poprzednia realizacja" aria-controls="recent-cards">←</button>
       <button class="outline" id="recent-next" aria-label="Następna realizacja" aria-controls="recent-cards">→</button>
     </div>
+    <div id="recent-cards" aria-live="polite"></div>
   </div>
-  <div id="recent-cards" aria-live="polite"></div>
 </section>
 <section id="galeria" class="section"><div class="heading"><div><p class="eyebrow"><b></b> Portfolio pracowni</p><h2>Nasze <em>realizacje.</em></h2></div><label class="search">Szukaj projektu<input id="search" type="search" placeholder="Nazwa, materiał lub opis"></label></div><div id="filters" class="filters" aria-label="Kategorie"></div><p id="count" role="status"></p><div id="grid" class="grid">
 <a class="card" href="/realizacje/mapa-swiata-ze-sklejki/"><div class="frame"><img loading="lazy" src="/assets/realizacje/mapa-swiata.webp" alt="Drewniana mapa świata na ścianie, z grawerem granic i różą wiatrów"></div><small>Tabliczki i Dekoracje</small><h3>Mapa świata 3D</h3></a>
