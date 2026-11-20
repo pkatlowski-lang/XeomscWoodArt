@@ -1455,7 +1455,11 @@
     </div>
 
     <!-- LOGIKA SYSTEMU -->
+    <link rel="stylesheet" href="/realizacje/powiekszenie.css">
     <script type="module">
+        import {createPhotoViewer} from '/realizacje/powiekszenie.js';
+        import {catalogDescription} from '/realizacje/opisy.js';
+        const showProductPhoto = createPhotoViewer();
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, addDoc, collection, deleteDoc, updateDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -2315,7 +2319,8 @@
         window.openGallery = (catId, subId, prodIndex) => {
             const cat = siteData.categories[catId];
             if(!cat || !cat.subs || !cat.subs[subId]) return;
-            const sub = cat.subs[subId]; const product = sub.products[prodIndex]; if (!product) return;
+            const sub = cat.subs[subId]; const source = sub.products[prodIndex]; if (!source) return;
+            const product = {...source, desc:catalogDescription(source)};
             // Ukryj wszystkie widoki — może być wywołane z wyszukiwarki lub karuzeli
             ['main-content','subcategory-view','subcategories-full-view','custom-orders-full-view','legal-view'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.classList.add('hidden');
@@ -2351,7 +2356,23 @@
             window.currentImgIndex = 0;
 
             const mainImgEl = document.getElementById('main-product-img');
-            mainImgEl.src = allImages[0].src;
+            mainImgEl.src = allImages[0]?.src || '';
+            mainImgEl.alt = product.title || product.name || 'Zdjęcie produktu';
+            mainImgEl.tabIndex = 0;
+            mainImgEl.setAttribute('role','button');
+            mainImgEl.setAttribute('aria-label','Powiększ zdjęcie produktu');
+            mainImgEl.setAttribute('aria-haspopup','dialog');
+            const enlarge = (idx, trigger) => {
+                if (!allImages[idx]) return;
+                showProductPhoto(trigger, image => {
+                    image.alt = mainImgEl.alt + ' — zdjęcie ' + (idx+1);
+                    image.src = allImages[idx].src;
+                });
+            };
+            mainImgEl.onclick = () => enlarge(window.currentImgIndex, mainImgEl);
+            mainImgEl.onkeydown = event => {
+                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); mainImgEl.click(); }
+            };
 
             const thumbsContainer = document.getElementById('product-thumbnails');
             thumbsContainer.innerHTML = '';
@@ -2361,7 +2382,14 @@
                     // ZMIANA: Miniatury też object-contain i białe tło
                     thumb.src = img.src; 
                     thumb.className = `w-20 h-20 rounded-xl object-contain bg-stone-100 cursor-pointer hover:opacity-100 transition shadow-sm border border-stone-200 snap-center shrink-0 ${i === 0 ? 'thumb-active' : 'opacity-60'}`;
-                    thumb.onclick = () => { window.updateMainImage(i); };
+                    thumb.tabIndex = 0;
+                    thumb.setAttribute('role','button');
+                    thumb.setAttribute('aria-haspopup','dialog');
+                    thumb.alt = 'Powiększ zdjęcie ' + (i+1);
+                    thumb.onclick = () => { window.updateMainImage(i); enlarge(i, thumb); };
+                    thumb.onkeydown = event => {
+                        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); thumb.click(); }
+                    };
                     thumbsContainer.appendChild(thumb);
                 });
             } else { thumbsContainer.innerHTML = ''; }
@@ -4134,7 +4162,7 @@
             document.getElementById('edit-p-t').value = p.title || '';
             document.getElementById('edit-p-code').value = p.code || '';
             document.getElementById('edit-p-price').value = p.price || '';
-            document.getElementById('edit-p-desc').value = p.desc || '';
+            document.getElementById('edit-p-desc').value = catalogDescription(p);
             document.getElementById('edit-p-i').value = p.image || '';
             const mainThumb = document.getElementById('edit-p-main-thumb');
             if (p.image) { mainThumb.src = p.image; mainThumb.classList.remove('hidden'); } else { mainThumb.classList.add('hidden'); }
@@ -4186,7 +4214,9 @@
             p.title = document.getElementById('edit-p-t').value;
             p.code = document.getElementById('edit-p-code').value;
             p.price = document.getElementById('edit-p-price').value;
-            p.desc = document.getElementById('edit-p-desc').value;
+            const description = document.getElementById('edit-p-desc').value;
+            if (description !== catalogDescription(p)) p.customDescription = true;
+            p.desc = description;
             let img = document.getElementById('edit-p-i').value.trim();
             const galleryInputs = document.querySelectorAll('#edit-gallery-container .gallery-input');
             const galleryUrls = []; galleryInputs.forEach(inp => { if(inp.value.trim()) galleryUrls.push(inp.value.trim()); });

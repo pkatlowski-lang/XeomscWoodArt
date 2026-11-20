@@ -1,3 +1,4 @@
+import {refreshSavedDescription} from '../realizacje/opisy.js';
 import {workshopProjects} from '../assets/realizacje/projekty.js';
 
 const documents = 'https://firestore.googleapis.com/v1/projects/xeomsc-licencje/databases/(default)/documents/app_config/';
@@ -26,7 +27,9 @@ export function studioPhoto(p){const img=document.createElement('img');setPhoto(
 export function mergeProjects(base,changes) {
   const overlays=new Map(changes.map(p=>[p.id,p]));
   const originals=[...workshopProjects,...base].filter(p=>!overlays.has(p.id));
-  return [...changes.filter(p=>!p.removed),...originals].sort((a,b)=>Number(!!b.featured)-Number(!!a.featured));
+  const sourceById = new Map([...workshopProjects,...base].map(p=>[p.id,p]));
+  const edited = changes.filter(p=>!p.removed).map(p=>refreshSavedDescription(p,sourceById.get(p.id)));
+  return [...edited,...originals].sort((a,b)=>Number(!!b.featured)-Number(!!a.featured));
 }
 export async function publishedChanges() {
   const fields=await publicRecord('pf-catalog-v1');return JSON.parse(fields?.entries?.stringValue||'[]');

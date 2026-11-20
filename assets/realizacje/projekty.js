@@ -4,7 +4,7 @@ export const workshopProjects = [
     "title": "Mapa świata 3D",
     "category": "Tabliczki i Dekoracje",
     "material": "Sklejka",
-    "description": "Warstwowa mapa ścienna ze sklejki. Na kontynentach widać wygrawerowane granice i nazwy państw, a obok nich różę wiatrów.",
+    "description": "Kontynenty powstają z trzech warstw sklejki. Ich krawędzie tworzą wyraźny relief, a grawer na powierzchni pokazuje granice i nazwy państw. Obok lądów znajduje się róża wiatrów. Z daleka widać układ całego świata, z bliska można śledzić linie granic i odczytywać nazwy.\n\nWybierając rozmiar mapy, zmierz całą wolną przestrzeń na ścianie. Warto zostawić miejsce zarówno na odstępy między kontynentami, jak i na różę wiatrów. Podaj mi szerokość ściany i odległość, z której najczęściej będziesz oglądać mapę.",
     "published": true,
     "revision": 0,
     "photos": [
@@ -19,7 +19,7 @@ export const workshopProjects = [
     "title": "Bombki z herbami klubów",
     "category": "Dla Kibiców",
     "material": "Sklejka",
-    "description": "Osiem drewnianych bombek z klubowymi herbami. Każda ma wyciętą kokardę i grawer w naturalnym kolorze drewna.",
+    "description": "Klubowy herb graweruję na jasnej sklejce, a obrys bombki wycinam laserowo razem z kokardą u góry. Rysunek herbu tworzy ciemniejsza linia graweru, przez którą nadal widać naturalną powierzchnię drewna. W galerii możesz porównać osiem motywów, między innymi Legię Warszawa, Arsenal i FC Barcelona.\n\nMożesz wybrać jeden herb na całą choinkę lub zapytać o kilka różnych motywów na upominki dla kibiców. Do wyceny podaj nazwę klubu, średnicę bombki i liczbę sztuk każdego wzoru.",
     "published": true,
     "revision": 0,
     "photos": [
@@ -62,7 +62,7 @@ export const workshopProjects = [
     "title": "Świąteczne litery ze sklejki",
     "category": "Napisy i Literki",
     "material": "Sklejka",
-    "description": "Wycinane litery z grawerowanymi gwiazdkami, gałązkami ostrokrzewu i świątecznymi ozdobami. Zdjęcia pokazują dziewięć wzorów.",
+    "description": "Każda litera jest osobnym kształtem wyciętym ze sklejki. Świąteczny charakter nadaje jej grawer dopasowany do powierzchni znaku. Na zdjęciach zobaczysz między innymi ostrokrzew z jagodami, pasiastą laskę z kokardą, gwiazdy i twarz Mikołaja. Dziewięć przykładów pokazuje, jak różnie ten sam alfabet może wyglądać po zmianie motywu.\n\nZ liter możesz ułożyć imię, krótkie życzenia lub inicjał dołączony do prezentu. Prześlij dokładną treść, wysokość liter i informację, czy motyw ma się powtarzać w całym napisie.",
     "published": true,
     "revision": 0,
     "photos": [
@@ -109,7 +109,7 @@ export const workshopProjects = [
     "title": "Herb Ruchu Chorzów",
     "category": "Dla Kibiców",
     "material": "Sklejka",
-    "description": "Niebiesko-biały herb z przestrzenną literą R i osobnymi literami tworzącymi nazwę klubu.",
+    "description": "W tym herbie Ruchu Chorzów literę „R” wyciąłem ze sklejki jako osobny element. Wystaje ponad niebieskie tło, więc oglądana z boku odsłania krawędź i rzuca delikatny cień. Nazwę klubu układam z pojedynczych białych liter. To właśnie ich rozmieszczenie i odstępy nadają całemu znakowi czytelność, również gdy wisi na ścianie.\n\nJeśli planujesz podobny herb nad biurko, obok szalika kibica albo na prezent, podaj szerokość miejsca, w którym ma się znaleźć. Na tej podstawie dobiorę wielkość znaku i liter oraz przygotuję wycenę.",
     "published": true,
     "revision": 0,
     "photos": [
@@ -124,7 +124,7 @@ export const workshopProjects = [
     "title": "Herb Realu Madryt",
     "category": "Dla Kibiców",
     "material": "Sklejka",
-    "description": "Kolorowy herb z koroną. Granatowe litery i złote obramowanie odcinają się od jasnej podstawy.",
+    "description": "W herbie Realu Madryt uwagę przyciągają trzy detale: splecione granatowe litery na jasnym tle, złoty obrys i czerwono-złota korona. Wycinam elementy ze sklejki tak, by zachować prześwity między literami oraz drobne podziały korony. Z bliska widać konstrukcję znaku, a z większej odległości jego charakterystyczną sylwetkę.\n\nPrzy zamówieniu podaj preferowaną średnicę okrągłej części herbu albo całkowitą wysokość razem z koroną. To dwa różne wymiary, które warto rozróżnić, zwłaszcza jeśli dekoracja ma zmieścić się na konkretnej półce lub ścianie.",
     "published": true,
     "revision": 0,
     "photos": [
@@ -139,7 +139,7 @@ export const workshopProjects = [
     "title": "Bombka ze śnieżynką",
     "category": "Tabliczki i Dekoracje",
     "material": "Sklejka",
-    "description": "Okrągła ozdoba z grawerowaną śnieżynką. Ciemniejszy kontur podkreśla kształt bombki na jasnej sklejce.",
+    "description": "Na środku okrągłej bombki graweruję sześcioramienną śnieżynkę. Cienkie linie jej odgałęzień kontrastują z jasną sklejką, a ciemniejsza krawędź po cięciu wyraźnie oddziela ozdobę od tła. Naturalny kolor drewna dobrze komponuje się z zielenią choinki i papierem, jeśli chcesz wykorzystać bombkę jako ozdobę prezentu.\n\nPrzy wyborze rozmiaru weź pod uwagę, gdzie zawiśnie ozdoba. Na niewielkiej gałązce sprawdzi się mniejsza średnica, a większa lepiej pokaże szczegóły graweru. Do wyceny wystarczy średnica i liczba sztuk.",
     "published": true,
     "revision": 0,
     "photos": [

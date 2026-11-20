@@ -1,5 +1,6 @@
+import {createPhotoViewer} from './powiekszenie.js';
 import {liveProjects,samples} from '/portfolio-catalog.js';
-import {publishedChanges,mergeProjects,setPhoto,studioPhoto} from '/panel/photos.js?v=0c6b69a';
+import {publishedChanges,mergeProjects,setPhoto,studioPhoto} from '/panel/photos.js?v=opisy2';
 import {projectPath,rememberProjectLinks} from './adresy.js';
 
 const $=selector=>document.querySelector(selector);
@@ -17,9 +18,14 @@ function showPhoto(which){
   $('#counter').textContent=(index+1)+' / '+photos.length;
   $('#controls').hidden=photos.length<2;
 }
+const openViewer = createPhotoViewer();
+function enlarge(trigger) {
+  if (photos[index]) openViewer(trigger, image => setPhoto(image, photos[index]));
+}
+$('.viewer').onclick = event => enlarge(event.currentTarget);
 thumbs.onclick=event=>{
   const a=event.target.closest('a');
-  if(a && !event.ctrlKey && !event.metaKey){event.preventDefault();showPhoto([...thumbs.children].indexOf(a));}
+  if(a && !event.ctrlKey && !event.metaKey){event.preventDefault();showPhoto([...thumbs.children].indexOf(a));enlarge(a);}
 };
 $('#prev').onclick=()=>showPhoto(index-1);
 $('#next').onclick=()=>showPhoto(index+1);
@@ -58,7 +64,7 @@ async function load(){
   showPhoto(index);const ask=new URL('/zapytanie/',location.origin);
   ask.searchParams.set('zapytanie',p.title);if(p.code)ask.searchParams.set('kod',p.code);
   $('#ask').href=ask.href;
-  if(dynamic || p.revision){
+  if(dynamic || p.revision || p.customDescription){
     $('h1').textContent=p.title;$('#category').textContent=p.category;
     const description=p.description||p.title+' – realizacja pracowni Xeomsc Laser. Zobacz zdjęcia i zapytaj o szczegóły.';
     $('.prose').textContent=description;document.title=p.title+' | Xeomsc Laser';

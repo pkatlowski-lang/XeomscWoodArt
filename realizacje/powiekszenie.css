@@ -1,0 +1,16 @@
+html.photo-modal-open { overflow: hidden; }
+dialog.photo-dialog {
+  position: fixed; inset: 0; margin: auto; width: 100%; height: 100%;
+  max-width: none; max-height: none; box-sizing: border-box; border: 0;
+  padding: clamp(.75rem, 3vw, 2rem); background: rgba(19,24,21,.94); color: white;
+}
+dialog.photo-dialog[open] { display: grid; grid-template-rows: auto minmax(0,1fr); gap: .65rem; }
+.photo-dialog::backdrop { background: rgba(19,24,21,.5); }
+.photo-tools { display: flex; justify-content: flex-end; gap: .65rem; }
+.photo-tools button { min-height: 44px; padding: .45rem .95rem; border: 1px solid #9da59f; border-radius: .45rem; background: #26312b; color: white; font: inherit; cursor: pointer; }
+.photo-tools button:focus-visible { outline: 3px solid white; outline-offset: 2px; }
+.photo-pan { display: flex; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.photo-pan img.photo-full { flex: none; margin: auto; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; }
+.photo-pan img.magnified { max-width: none; max-height: none; cursor: zoom-out; }
+button.viewer { padding: 0; border: 0; width: 100%; cursor: zoom-in; }
+.project-body .thumbs a { cursor: zoom-in; }

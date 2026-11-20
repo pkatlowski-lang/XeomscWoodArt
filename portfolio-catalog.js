@@ -1,10 +1,11 @@
+import {catalogDescription} from './realizacje/opisy.js';
 const imageDir='portfolio-studio/public/images/';
 function study(title,category,description,files) {
   return {id:'sample-'+files[0],title,category,description,material:'Sklejka',photos:files.map(name=>({alt:title+' — wizualizacja',url:'/'+imageDir+name+'.jpg'}))};
 }
 export const samples=[
-  study('Baza do koszyka','Makrama','Wizualizacja okrągłej bazy z otworami do przeplatania sznurka. Średnica projektu 10 cm.',['baza','baza-rysunek']),
-  study('Krążki do personalizacji','Półfabrykaty','Wizualizacja elementów o średnicy 5 cm do ozdabiania i grawerowania.',['krazki','krazek'])
+  study('Baza do koszyka','Makrama','Okrągła baza o średnicy 10 cm wyznacza kształt dna niewielkiego koszyka. Otwory rozmieszczone wokół krawędzi pozwalają rozpocząć splot i poprowadzić sznurek wzdłuż obwodu. Wizualizacja i rysunek pokazują układ otworów względem środka.\n\nJeśli potrzebujesz bazy do innego splotu, podaj średnicę dna i grubość sznurka. Na tej podstawie można dobrać wielkość i rozstaw otworów.',['baza','baza-rysunek']),
+  study('Krążki do personalizacji','Półfabrykaty','Krążki ze sklejki o średnicy 5 cm mają prosty obrys i miejsce na drobny motyw, inicjały lub krótki napis. Na wizualizacji możesz ocenić proporcje elementu przed przygotowaniem własnej dekoracji. Krążek tej wielkości sprawdzi się jako mała etykieta prezentowa lub baza do ozdobienia.\n\nW zapytaniu podaj liczbę krążków i informację, czy chcesz otrzymać czystą powierzchnię, czy grawer według własnego wzoru.',['krazki','krazek'])
 ];
 
 function unpack(field) {
@@ -24,7 +25,7 @@ export function catalogRows(categories,galleries) {
         const unique=[...new Set(urls.map(u=>typeof u==='string'?u:u?.src).filter(u=>typeof u==='string' && (/^https:\/\//i.test(u)||/^data:image\/(jpeg|png|webp);base64,/i.test(u))))];
         if(!unique.length) continue;
         const title=String(p.title||p.name||'Projekt pracowni');
-        rows.push({id:JSON.stringify([catId,subId,p.id||p.code||title]),title,category:String(cat.title||'Realizacje'),description:String(p.desc||''),material:String(p.material||''),code:String(p.code||''),photos:unique.map((url,i)=>({url,alt:title+' — zdjęcie '+(i+1)}))});
+        rows.push({id:JSON.stringify([catId,subId,p.id||p.code||title]),title,category:String(cat.title||'Realizacje'),description:catalogDescription(p),customDescription:!!p.customDescription,material:String(p.material||''),code:String(p.code||''),photos:unique.map((url,i)=>({url,alt:title+' — zdjęcie '+(i+1)}))});
       }
     }
   }
