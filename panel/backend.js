@@ -67,8 +67,47 @@ async function changeProject(input,remove){
   return {id};
 }
 const inquiries=collection(db,'portfolio_inquiries');
+const messagesFor = (ref, key) => collection(ref, 'dialogs', key, 'messages');
+
+async function enableDialog(snap) {
+  const data = snap.data();
+  if (data.dialogKey || !data.replyKey || data.mailboxId !== snap.id) return data.dialogKey;
+  const key = crypto.randomUUID();
+  const envelope = await seal(data.replyKey, key);
+  return runTransaction(db, async tx => {
+    const latest = (await tx.get(snap.ref)).data();
+    if (!latest || latest.dialogKey) return latest?.dialogKey;
+    tx.update(snap.ref, {dialogKey:key});
+    tx.set(record('pf-reply-' + snap.id), {dialog:JSON.stringify(envelope), closed:latest.status === 'closed'}, {merge:true});
+    return key;
+  });
+}
+
+async function loadInbox() {
+  const snapshots = await getDocsFromServer(inquiries);
+  for (const snap of snapshots.docs) {
+    const data = snap.data();
+    if (data.sent?.length && !data.dialogKey) await enableDialog(snap);
+  }
+  return snapshots.docs.map(thread).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+
+async function deleteThread(id) {
+  const ref = doc(inquiries,id);
+  const key = await runTransaction(db, async tx => {
+    const data = (await tx.get(ref)).data();
+    if (!data) return null;
+    tx.delete(ref);
+    if (data.mailboxId === id) tx.delete(record('pf-reply-' + id));
+    return data.dialogKey;
+  });
+  if (key) {
+    const posts = await getDocsFromServer(messagesFor(ref,key));
+    await Promise.all(posts.docs.map(post => deleteDoc(post.ref)));
+  }
+}
 function thread(snap){
-  const m=snap.data();return {id:snap.id,name:m.name||'Klient',email:m.email||'',subject:(m.message||'Zapytanie').slice(0,75),unread:!m.read,closed:m.status==='closed',date:m.date?.toDate().toISOString()||''};
+  const m=snap.data();return {id:snap.id,name:m.name||'Klient',email:m.email||'',subject:(m.message||'Zapytanie').slice(0,75),unread:!m.read,closed:m.status==='closed',date:(m.lastClientAt || m.date)?.toDate().toISOString()||''};
 }
 export function signedReply(text) {
   const message = text.trim();
@@ -81,9 +120,14 @@ async function conversation(input){
   const snap=await getDocFromServer(ref);
   if(!snap.exists())throw Error('Brak tej rozmowy.');
   const m=snap.data(),addressable=typeof m.replyKey==='string' && /^[0-9a-f-]{36}$/.test(m.mailboxId||'');
+  const key = m.dialogKey || (addressable && (m.sent?.length || input.action === 'reply') ? await enableDialog(snap) : null);
   let closed=m.status==='closed';
   if(input.action==='close'||input.action==='open'){
-    closed=input.action==='close';await updateDoc(ref,{status:closed?'closed':'read',read:true});
+    closed=input.action==='close';
+    await runTransaction(db, async tx => {
+      tx.update(ref,{status:closed?'closed':'read',read:true});
+      if (key) tx.set(record('pf-reply-'+m.mailboxId),{closed},{merge:true});
+    });
   }
   if(addressable){
     const mailbox=record('pf-reply-'+m.mailboxId);
@@ -100,7 +144,7 @@ async function conversation(input){
         const previous=JSON.parse((await tx.get(mailbox)).data()?.letters||'[]');
         const serialized=JSON.stringify([...previous,envelope]);
         if(serialized.length>850000)throw Error('Ta rozmowa jest pełna. Odpowiedz e-mailem.');
-        tx.set(mailbox,{letters:serialized});
+        tx.set(mailbox,{letters:serialized},{merge:true});
         const post={body,created:envelope.created};
         if(input.requestId)post.requestId=input.requestId;
         sent=[...sent,post];
@@ -110,7 +154,21 @@ async function conversation(input){
     }
   }
   if(!m.read && input.action==='view')await updateDoc(ref,{read:true});
-  return {closed,addressable,attachment:m.attachment,posts:[{role:'client',body:m.message||'',created:m.date?.toDate().toISOString()},...(m.sent||[]).map(l=>({role:'studio',body:l.body,created:l.created}))]};
+  const posts = [{role:'client',body:m.message||'',created:m.date?.toDate().toISOString()},...(m.sent||[]).map(l=>({role:'studio',body:l.body,created:l.created}))];
+  if (key) {
+    try {
+      const replies = await getDocsFromServer(messagesFor(ref,key));
+      for (const post of replies.docs) {
+        const data = post.data();
+        posts.push({role:'client',body:data.body,created:data.created.toDate().toISOString()});
+      }
+    } catch (error) {
+      if (error.code !== 'permission-denied') throw error;
+      return {closed,addressable,attachment:m.attachment,posts, rulesPending:true};
+    }
+  }
+  posts.sort((a,b)=>String(a.created).localeCompare(String(b.created)));
+  return {closed,addressable,attachment:m.attachment,posts};
 }
 export async function api(path,body){
   if(path==='login'){
@@ -139,8 +197,8 @@ export async function api(path,body){
     return mergeProjects(base,current);
   }
   if(path==='admin/projects'||path==='admin/remove')return changeProject(body,path==='admin/remove');
-  if(path==='admin/inbox')return (await getDocsFromServer(inquiries)).docs.map(thread).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  if(path==='admin/delete-thread')return deleteDoc(doc(inquiries,body.id));
+  if(path==='admin/inbox')return loadInbox();
+  if(path==='admin/delete-thread')return deleteThread(body.id);
   if(path==='admin/thread')return conversation(body);
   throw Error('Nieznana operacja.');
 }

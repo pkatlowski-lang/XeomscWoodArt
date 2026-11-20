@@ -51,7 +51,7 @@ service cloud.firestore {
         isAnon()
         && resource.data.status == "unused"
         && request.resource.data.status == "activated"
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "activatedAt", "deviceId"])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "activatedAt", "deviceId"])
       );
     }
 
@@ -76,6 +76,34 @@ service cloud.firestore {
       }
       allow create: if isAnon() && validInquiry();
       allow get, list, update, delete: if isAdmin();
+
+      // The private link decrypts a separate, random key for this thread.
+      function dialogMatches(key) {
+        return isAnon() && get(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.dialogKey == key;
+      }
+
+      // Each notification must accompany a new post in the same atomic write.
+      allow update: if isAnon() && resource.data.status != 'closed'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['read', 'lastClientId', 'lastClientAt'])
+        && request.resource.data.read == false
+        && request.resource.data.lastClientAt == request.time
+        && request.resource.data.lastClientId.matches('[a-f0-9-]{36}')
+        && !exists(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(resource.data.dialogKey)/messages/$(request.resource.data.lastClientId))
+        && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(resource.data.dialogKey)/messages/$(request.resource.data.lastClientId)).data.created == request.time;
+
+      match /dialogs/{key}/messages/{post} {
+        allow read: if isAdmin() || dialogMatches(key);
+        allow delete: if isAdmin();
+        allow create: if dialogMatches(key) && post.matches('[a-f0-9-]{36}')
+          && get(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.status != 'closed'
+          && request.resource.data.keys().hasOnly(['body', 'created'])
+          && request.resource.data.body is string && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() <= 3500
+          && request.resource.data.created == request.time
+          && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.lastClientId == post
+          && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.lastClientAt == request.time;
+      }
     }
 
     // Wszystko inne — zablokowane.

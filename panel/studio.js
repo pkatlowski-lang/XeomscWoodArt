@@ -1,7 +1,7 @@
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply} from './backend.js?v=karuzela';
+import {api,resetPassword,signedReply} from './backend.js?v=dialog';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -229,7 +229,9 @@ async function openThread(t,action='view',text='') {
     const image=node('img');image.alt='Załącznik klienta';image.referrerPolicy='no-referrer';image.style.maxHeight='200px';image.src=data.attachment;attach.append(image);
   }
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
-  messages($('#history'),data.posts);$('#answer').hidden=data.closed;
+  messages($('#history'),data.posts);
+  if (data.rulesPending) $('#history').append(node('p','Aby odbierać dalsze wiadomości klientów, opublikuj zaktualizowane reguły Firestore.'));
+  $('#answer').hidden=data.closed;
   $('#quote').hidden=data.closed||!data.addressable;
   $('#close-thread').textContent=data.closed?'Otwórz ponownie':'Zamknij rozmowę';
   await refreshInbox().catch(feedback);
