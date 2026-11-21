@@ -32,7 +32,7 @@ export function catalogRows(categories,galleries) {
   return rows;
 }
 export const catalogConfig={"apiKey":"AIzaSyDeRtreUSAmNWvhZm2_Fkt9OcpWs07PrVw","authDomain":"xeomsc-a8edd.firebaseapp.com","projectId":"xeomsc-a8edd","storageBucket":"xeomsc-a8edd.firebasestorage.app","messagingSenderId":"43822805612","appId":"1:43822805612:web:d343653e47777d8ebf5e49"};
-export async function liveProjects() {
+export async function catalogFields(keys) {
   const config=catalogConfig;
   const [{initializeApp},{getAuth,signInAnonymously}]=await Promise.all([
     import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
@@ -41,8 +41,12 @@ export async function liveProjects() {
   const auth=getAuth(initializeApp(config));await auth.authStateReady();
   const user=auth.currentUser || (await signInAnonymously(auth)).user;
   const url=new URL('https://firestore.googleapis.com/v1/projects/'+config.projectId+'/databases/(default)/documents/artifacts/xeomsc-fusionart/public/data/siteConfig/main');
-  for(const key of ['categories','galleries'])url.searchParams.append('mask.fieldPaths',key);
+  for(const key of keys)url.searchParams.append('mask.fieldPaths',key);
   const response=await fetch(url,{headers:{Authorization:'Bearer '+await user.getIdToken()}});
   if(!response.ok) throw Error('Katalog jest chwilowo niedostępny.');
-  const {fields}=await response.json();return catalogRows(unpack(fields?.categories),unpack(fields?.galleries));
+  return (await response.json()).fields;
+}
+export async function liveProjects() {
+  const fields = await catalogFields(['categories','galleries']);
+  return catalogRows(unpack(fields?.categories),unpack(fields?.galleries));
 }

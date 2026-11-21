@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <script>if (new URLSearchParams(location.search).get('informacje') === 'prywatnosc') location.replace('/polityka-prywatnosci/');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Xeomsc Laser – Precyzyjne Wyroby Laserowe z Drewna i Sklejki</title>
@@ -2662,6 +2663,7 @@
         
         // NOWE FUNKCJE OBSŁUGI DOKUMENTÓW PRAWNYCH
         window.openLegal = (type) => {
+            if (type === 'privacy') { location.assign('/polityka-prywatnosci/'); return; }
             const container = document.getElementById('legal-view');
             const titleEl = document.getElementById('legal-title');
             const contentEl = document.getElementById('legal-content');
