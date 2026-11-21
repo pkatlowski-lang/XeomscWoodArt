@@ -3,39 +3,30 @@ import {$,node,button,dialogControls} from './portfolio-studio/public/common.js'
 import {samples, liveProjects} from './portfolio-catalog.js';
 import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
+import {setupGallery, staticProjects} from './realizacje/kategorie.js';
 import {initRecent} from './realizacje/ostatnie.js';
 import {projectPrices,formatPrice,publishedPrices} from './realizacje/ceny.js';
 let rates = [];
-let projects=[], selectedCategory='';
+let projects=[];
 function ask(project=null) {
   const address = new URL('/zapytanie/', location.href);
   address.searchParams.set('zapytanie', project ? project.title : '');
   if (project?.code) address.searchParams.set('kod', project.code);
   location.assign(address.href);
 }
-function projectCard(p) {
+function projectCard(p, showCategory = true) {
   const card=node('a','','card'), frame=node('div','','frame'), image=photo(p.photos[0]);
-  card.href=projectPath(p);
+  card.href=p.staticPath || projectPath(p);
   image.loading='lazy';frame.append(image,node('span',p.photos.length+' zdj.','number'));
-  card.append(frame,node('small',p.category),node('h3',p.title),node('p',p.material));
+  card.append(frame);
+  if (showCategory) card.append(node('small',p.category));
+  card.append(node('h3',p.title));
+  if (p.material) card.append(node('p',p.material));
   for (const line of projectPrices(p,rates)) card.append(node('p',line));
   return card;
 }
-function draw() {
-  const q=$('#search').value.trim().toLocaleLowerCase('pl');
-  const shown=projects.filter(p=>(!selectedCategory||p.category===selectedCategory)&&[p.title,p.description,p.material,p.category].join(' ').toLocaleLowerCase('pl').includes(q));
-  $('#count').textContent=shown.length?'Liczba realizacji: '+shown.length:'Brak pasujących realizacji.';
-  $('#grid').replaceChildren(...shown.map(projectCard));
-}
-function filters(){
-  $('#filters').replaceChildren(...['',...new Set(projects.map(p=>p.category))].map(c=>{
-    const b=button(c||'Wszystkie',()=>{selectedCategory=c;filters();draw();},'chip');
-    b.setAttribute('aria-pressed',String(c===selectedCategory));return b;
-  }));
-}
 dialogControls(); document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask());
-$('#search').oninput=draw;
-if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wykonane','#cennik'].includes(location.hash)) {
+if (location.hash && !location.hash.startsWith('#galeria/') && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wykonane','#cennik'].includes(location.hash)) {
   location.replace(location.hash==='#admin'?'/panel/':'pracownia.html'+location.search+location.hash);
 } else {
   publicRecord(homeDocument).then(fields => {
@@ -46,7 +37,8 @@ if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wy
     if (data.description === 'Wycinamy i grawerujemy w sklejce. Zobacz detale naszych projektów lub opowiedz nam, co chcesz stworzyć.') data.description = defaultHome.description;
     renderHome($('.hero'), data);
   }).catch(() => { /* The initial HTML already contains the workshop introduction. */ });
-  projects=mergeProjects(samples,[]);filters();
+  const fallback = staticProjects($('#category-grid'));
+  const updateGallery = setupGallery(fallback, projectCard);
   const [latest,changes,priceResult]=await Promise.allSettled([liveProjects(),publishedChanges(),publishedPrices(publicRecord)]);
   rates = priceResult.status === 'fulfilled' ? priceResult.value : [];
   if (rates.length) {
@@ -60,7 +52,15 @@ if (location.hash && !['#galeria','#start','#projekt-indywidualny','#ostatnio-wy
     if (location.hash === '#cennik') $('#cennik').scrollIntoView();
   }
   const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
-  rememberProjectLinks(base);projects=mergeProjects(base,changes.status==='fulfilled'?changes.value:[]);filters();draw();
+  rememberProjectLinks(base);
+  const overlays = changes.status === 'fulfilled' ? changes.value : [];
+  projects=mergeProjects(base, overlays);
+  if (latest.status === 'rejected') {
+    // Keep the published static catalog available during a legacy catalog outage.
+    const known = new Set([...projects,...overlays].map(projectPath));
+    projects.push(...fallback.filter(item => !known.has(item.staticPath)));
+  }
+  updateGallery(projects);
   initRecent(projects, changes.status === 'fulfilled' ? changes.value : [], projectCard);
 }
 
