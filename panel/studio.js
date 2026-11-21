@@ -257,6 +257,65 @@ function drawInbox() {
   }));
   if(!rows.length) $('#threads').textContent='Brak rozmów w tym widoku.';
 }
+function showAttachment(source, threadId) {
+  const area = $('#attachment');
+  area.replaceChildren();
+  if (typeof source !== 'string') return;
+  const inline = /^data:image\/(jpeg|png|webp);base64,/i.exec(source);
+  if (!inline && !/^https:\/\//i.test(source)) return;
+
+  const name = 'zalacznik-' + threadId.replace(/[^a-z0-9_-]/gi, '_').slice(0,80);
+  const image = node('img');
+  image.alt = 'Załącznik klienta';
+  image.referrerPolicy = 'no-referrer';
+  image.style.maxWidth = '100%';
+  image.style.height = 'auto';
+  image.src = source;
+  const preview = node('details');
+  preview.append(node('summary', 'Pokaż załącznik klienta'), image);
+  const link = node('a', 'Pobierz załącznik', 'outline');
+  link.href = source;
+  if (inline) {
+    const format = inline[1].toLowerCase();
+    link.download = name + '.' + (format === 'jpeg' ? 'jpg' : format);
+  } else {
+    // The download attribute alone is ignored for cross-origin images.
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.onclick = async event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      if (link.getAttribute('aria-busy') === 'true') return;
+      link.setAttribute('aria-busy', 'true');
+      try {
+        const response = await fetch(source, {credentials:'omit', referrerPolicy:'no-referrer'});
+        if (!response.ok) throw Error();
+        const blob = await response.blob();
+        const extensions = {'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif', 'image/avif':'avif'};
+        const ext = extensions[blob.type.toLowerCase()];
+        if (!ext) throw Error();
+        if (!link.isConnected) return;
+        const copy = node('a');
+        copy.href = URL.createObjectURL(blob);
+        copy.download = name + '.' + ext;
+        area.append(copy);
+        copy.click();
+        copy.remove();
+        setTimeout(() => URL.revokeObjectURL(copy.href), 60000);
+      } catch {
+        if (!link.isConnected) return;
+        link.onclick = null;
+        link.textContent = 'Otwórz obraz, aby go zapisać';
+        const note = node('p', 'Bezpośrednie pobranie jest niedostępne. Otwórz obraz i wybierz w przeglądarce „Zapisz obraz jako”.');
+        note.setAttribute('role', 'status');
+        area.append(note);
+      } finally {
+        link.removeAttribute('aria-busy');
+      }
+    };
+  }
+  area.append(link, preview);
+}
 async function openThread(t,action='view',text='') {
   const version = ++threadVersion;
   const data=await api('admin/thread',{id:t.id,action,text});
@@ -264,13 +323,7 @@ async function openThread(t,action='view',text='') {
   if(current?.id!==t.id) {$('#answer').reset();$('#answer output').textContent='';}
   current={...t,addressable:data.addressable,closed:data.closed};$('#choose').hidden=true;$('#conversation').hidden=false;
   $('#topic').textContent=t.subject;$('#sender').textContent=t.name+' · '+t.email;
-  const attach=$('#attachment');attach.replaceChildren();
-  if(typeof data.attachment==='string' && (/^data:image\/(png|jpeg|webp);base64,/i.test(data.attachment)||/^https:\/\//i.test(data.attachment))){
-    const image=node('img');image.alt='Załącznik klienta';image.referrerPolicy='no-referrer';image.style.maxWidth='100%';image.style.height='auto';image.src=data.attachment;
-    const preview=node('details');
-    preview.append(node('summary','Pokaż załącznik klienta'),image);
-    attach.append(preview);
-  }
+  showAttachment(data.attachment, t.id);
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
   messages($('#history'),data.posts);
   if (data.rulesPending) $('#history').append(node('p','Aby odbierać dalsze wiadomości klientów, opublikuj zaktualizowane reguły Firestore.'));
