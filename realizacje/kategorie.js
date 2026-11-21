@@ -1,4 +1,4 @@
-import {setPhoto} from '../panel/photos.js';
+import {setPhoto} from '../panel/photos.js?v=fade';
 import {categoryKey} from './ceny.js';
 
 export function staticProjects(grid) {
@@ -33,15 +33,34 @@ export function setupGallery(initial, projectCard) {
     if (!location.hash.startsWith('#galeria/')) return '';
     try { return categoryKey(decodeURIComponent(location.hash.slice(9))); } catch { return ''; }
   }
+  async function advance(preview) {
+    if (preview.loading || preview.link.matches(':hover, :focus-within')) return;
+    preview.loading = true;
+    const next = document.createElement('img');
+    const previous = preview.image;
+    preview.index = (preview.index + 1) % preview.items.length;
+    try {
+      await setPhoto(next,preview.items[preview.index].photos[0]);
+      await next.decode();
+      if (paused || document.hidden || tiles.hidden || !visible || !previous.isConnected ||
+          preview.link.matches(':hover, :focus-within')) return;
+      previous.after(next);
+      if (!reduced.matches && next.animate) {
+        await next.animate([{opacity:0},{opacity:1}],{duration:800,easing:'ease-in-out'}).finished;
+      }
+      previous.remove();
+      preview.image = next;
+    } catch {
+      next.remove();
+    } finally {
+      preview.loading = false;
+    }
+  }
   function startTimer() {
     clearInterval(timer);
     if (paused || document.hidden || !visible || !previews.length || tiles.hidden) return;
     timer = setInterval(() => {
-      for (const preview of previews) {
-        if (preview.link.matches(':hover, :focus-within')) continue;
-        preview.index = (preview.index + 1) % preview.items.length;
-        setPhoto(preview.image,preview.items[preview.index].photos[0]);
-      }
+      for (const preview of previews) advance(preview);
     },5000);
   }
   function render() {

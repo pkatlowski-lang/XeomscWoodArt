@@ -3,7 +3,7 @@ import {$,node,button,dialogControls} from './portfolio-studio/public/common.js'
 import {samples, liveProjects} from './portfolio-catalog.js';
 import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
 import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
-import {setupGallery, staticProjects} from './realizacje/kategorie.js';
+import {setupGallery, staticProjects} from './realizacje/kategorie.js?v=fade';
 import {initRecent} from './realizacje/ostatnie.js';
 import {projectPrices,formatPrice,publishedPrices} from './realizacje/ceny.js';
 let rates = [];

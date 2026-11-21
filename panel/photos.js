@@ -21,7 +21,7 @@ export function setPhoto(img,p) {
   const mark=Symbol();img._request=mark;img.alt=p?.alt||'Zdjęcie realizacji';
   if (!p?.asset) {if(p?.url || p?.data) img.src=p.url||p.data;return;}
   img.removeAttribute('src');
-  imageData(p.asset).then(url=>{if(img._request===mark)img.src=url;}).catch(()=>{if(img._request===mark)img.alt='Zdjęcie chwilowo niedostępne';});
+  return imageData(p.asset).then(url=>{if(img._request===mark)img.src=url;}).catch(()=>{if(img._request===mark)img.alt='Zdjęcie chwilowo niedostępne';});
 }
 export function studioPhoto(p){const img=document.createElement('img');setPhoto(img,p);return img;}
 export function mergeProjects(base,changes) {
