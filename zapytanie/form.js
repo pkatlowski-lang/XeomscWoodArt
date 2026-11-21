@@ -1,6 +1,6 @@
 import {getOwnerConfig} from '../panel/config.js';
 import {newMailbox} from '../panel/letter.js';
-import {prepareReference} from './obraz.js';
+import {prepareFile,packFile} from './pliki.js';
 
 const form = document.querySelector('#request');
 const btn = form.querySelector('[type="submit"]');
@@ -35,8 +35,8 @@ async function submit(event) {
   const file = fileInput.files[0];
   let preview;
   try {
-    status.textContent = file ? 'Przygotowywanie obrazu…' : 'Wysyłanie zapytania…';
-    preview = await prepareReference(file);
+    status.textContent = file ? 'Przygotowywanie pliku…' : 'Wysyłanie zapytania…';
+    preview = await prepareFile(file);
   } catch (error) {
     btn.disabled = false;
     status.textContent = error.message;
@@ -58,7 +58,9 @@ async function submit(event) {
       status:'new', read:false, mailboxId:pending.id, replyKey:pending.publicKey};
     if (preview) {
       inquiry.hasAttachment = true;
-      batch.set(doc(ref, 'files', 'reference'), {jpeg:Bytes.fromUint8Array(preview)});
+      batch.set(doc(ref, 'files', 'reference'), preview.format === 'jpg'
+        ? {jpeg:Bytes.fromUint8Array(preview.bytes)}
+        : packFile(preview, Bytes));
     }
     batch.set(ref, inquiry);
     await batch.commit();
@@ -70,7 +72,7 @@ async function submit(event) {
   } catch (error) {
     btn.disabled = false;
     status.textContent = preview && error.code === 'permission-denied'
-      ? 'Wysyłka zdjęcia jest niedostępna. Usuń załącznik i wyślij samo zapytanie lub prześlij zdjęcie e-mailem.'
+      ? 'Wysyłka załącznika jest niedostępna. Możesz usunąć plik i wysłać zapytanie lub przesłać plik e-mailem.'
       : 'Nie udało się wysłać zapytania. Spróbuj ponownie lub skontaktuj się z pracownią telefonicznie albo e-mailem.';
   }
 }

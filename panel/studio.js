@@ -1,8 +1,9 @@
+import {fileDownload} from '../zapytanie/pliki.js';
 import {categoryKey,formatPrice} from '../realizacje/ceny.js';
 import {defaultHome,defaultHomeImage} from './homepage.js';
-import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
+import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js?v=pliki2';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=zalacznik';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=pliki2';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -260,6 +261,10 @@ function drawInbox() {
 function showAttachment(source, threadId) {
   const area = $('#attachment');
   area.replaceChildren();
+  if (source?.content && source.name) {
+    area.append(fileDownload(source.name, () => source));
+    return;
+  }
   if (typeof source !== 'string') return;
   const inline = /^data:image\/(jpeg|png|webp);base64,/i.exec(source);
   if (!inline && !/^https:\/\//i.test(source)) return;
@@ -325,7 +330,7 @@ async function openThread(t,action='view',text='') {
   $('#topic').textContent=t.subject;$('#sender').textContent=t.name+' · '+t.email;
   showAttachment(data.attachment, t.id);
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
-  messages($('#history'),data.posts);
+  messages($('#history'),data.posts,post => post.fileName && fileDownload(post.fileName,post.loadFile));
   if (data.rulesPending) $('#history').append(node('p','Aby odbierać dalsze wiadomości klientów, opublikuj zaktualizowane reguły Firestore.'));
   $('#answer').hidden=data.closed;
   $('#quote').hidden=data.closed||!data.addressable;

@@ -2,7 +2,7 @@ import {priceDocument, parsePrice, categoryKey} from '../realizacje/ceny.js';
 import {homeDocument, homeChanges} from './homepage.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {initializeAuth,browserLocalPersistence,indexedDBLocalPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,deleteDoc} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,writeBatch} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import {getOwnerConfig} from './config.js';
 import {samples,liveProjects} from '../portfolio-catalog.js';
 import {mergeProjects} from './photos.js';
@@ -84,7 +84,7 @@ async function enableDialog(snap) {
   const envelope = await seal(data.replyKey, key);
   return runTransaction(db, async tx => {
     const latest = (await tx.get(snap.ref)).data();
-    if (!latest || latest.dialogKey) return latest?.dialogKey;
+    if (!latest || latest.deleting || latest.dialogKey) return latest?.dialogKey;
     tx.update(snap.ref, {dialogKey:key});
     tx.set(record('pf-reply-' + snap.id), {dialog:JSON.stringify(envelope), closed:latest.status === 'closed'}, {merge:true});
     return key;
@@ -102,18 +102,33 @@ async function loadInbox() {
 
 async function deleteThread(id) {
   const ref = doc(inquiries,id);
-  const key = await runTransaction(db, async tx => {
-    const data = (await tx.get(ref)).data();
-    if (!data) return null;
-    if (data.hasAttachment) tx.delete(doc(ref, 'files', 'reference'));
-    tx.delete(ref);
-    if (data.mailboxId === id) tx.delete(record('pf-reply-' + id));
-    return data.dialogKey;
+  const data = await runTransaction(db, async tx => {
+    const thread = (await tx.get(ref)).data();
+    if (!thread) return null;
+    // Keep the thread available for a retry until all its files and messages are gone.
+    tx.update(ref,{status:'closed',deleting:true});
+    if (thread.dialogKey) tx.set(record('pf-reply-' + id),{closed:true},{merge:true});
+    return thread;
   });
-  if (key) {
-    const posts = await getDocsFromServer(messagesFor(ref,key));
-    await Promise.all(posts.docs.map(post => deleteDoc(post.ref)));
+  if (!data) return;
+  if (data.dialogKey) {
+    const messages = messagesFor(ref,data.dialogKey);
+    for (;;) {
+      const page = await getDocsFromServer(query(messages,limit(100)));
+      if (page.empty) break;
+      const batch = writeBatch(db);
+      for (const post of page.docs) {
+        if (post.data().fileName) batch.delete(doc(post.ref,'files','reference'));
+        batch.delete(post.ref);
+      }
+      await batch.commit();
+    }
   }
+  const batch = writeBatch(db);
+  if (data.hasAttachment) batch.delete(doc(ref,'files','reference'));
+  if (data.mailboxId === id) batch.delete(record('pf-reply-' + id));
+  batch.delete(ref);
+  await batch.commit();
 }
 function thread(snap){
   const m=snap.data();return {id:snap.id,name:m.name||'Klient',email:m.email||'',subject:(m.message||'Zapytanie').slice(0,75),unread:!m.read,closed:m.status==='closed',date:(m.lastClientAt || m.date)?.toDate().toISOString()||''};
@@ -132,13 +147,17 @@ async function conversation(input){
   let attachment = m.attachment;
   if (m.hasAttachment) {
     const file = await getDocFromServer(doc(ref, 'files', 'reference'));
-    if (file.exists()) attachment = 'data:image/jpeg;base64,' + file.data().jpeg.toBase64();
+    if (file.exists()) {
+      const data = file.data();
+      attachment = data.jpeg ? 'data:image/jpeg;base64,' + data.jpeg.toBase64() : data;
+    }
   }
   const key = m.dialogKey || (addressable && (m.sent?.length || input.action === 'reply') ? await enableDialog(snap) : null);
   let closed=m.status==='closed';
   if(input.action==='close'||input.action==='open'){
     closed=input.action==='close';
     await runTransaction(db, async tx => {
+      if ((await tx.get(ref)).data()?.deleting) throw Error('Trwa usuwanie rozmowy.');
       tx.update(ref,{status:closed?'closed':'read',read:true});
       if (key) tx.set(record('pf-reply-'+m.mailboxId),{closed},{merge:true});
     });
@@ -174,7 +193,8 @@ async function conversation(input){
       const replies = await getDocsFromServer(messagesFor(ref,key));
       for (const post of replies.docs) {
         const data = post.data();
-        posts.push({role:'client',body:data.body,created:data.created.toDate().toISOString()});
+        posts.push({role:'client', body:data.body, created:data.created.toDate().toISOString(),
+          fileName:data.fileName, loadFile:async () => (await getDocFromServer(doc(post.ref,'files','reference'))).data()});
       }
     } catch (error) {
       if (error.code !== 'permission-denied') throw error;

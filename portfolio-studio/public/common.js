@@ -34,11 +34,13 @@ export function bindForm(form, action) {
     finally { submit.disabled = false; }
   };
 }
-export function messages(container, posts) {
+export function messages(container, posts, attachmentFor) {
   container.replaceChildren();
   for(const post of posts) {
     const item=node('article','','bubble '+post.role);
     item.append(node('small',(post.role==='studio'?'Pracownia':'Klient')+' · '+new Date(post.created).toLocaleString('pl-PL')),node('p',post.body));
+    const file = attachmentFor?.(post);
+    if (file) item.append(file);
     container.append(item);
   }
 }

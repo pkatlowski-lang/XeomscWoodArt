@@ -79,14 +79,22 @@ service cloud.firestore {
       allow create: if isAnon() && validInquiry();
       allow get, list, update, delete: if isAdmin();
 
+      function validFile(f) {
+        return f.keys().hasOnly(['name','format','content'])
+          && f.name is string && f.name.size() > 4 && f.name.size() <= 110
+          && f.format in ['jpg','svg','pdf'] && f.name.matches('.+[.]' + f.format)
+          && f.content is bytes && f.content.size() > 0
+          && f.content.size() <= (f.format == 'jpg' ? 350000 : 900000);
+      }
+
       match /files/reference {
         allow get, delete: if isAdmin();
         allow create: if isAnon()
           && !exists(/databases/$(database)/documents/portfolio_inquiries/$(id))
           && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.hasAttachment == true
-          && request.resource.data.keys().hasOnly(['jpeg'])
-          && request.resource.data.jpeg is bytes
-          && request.resource.data.jpeg.size() > 0 && request.resource.data.jpeg.size() <= 350000;
+          && ((request.resource.data.keys().hasOnly(['jpeg'])
+            && request.resource.data.jpeg is bytes && request.resource.data.jpeg.size() > 0
+            && request.resource.data.jpeg.size() <= 350000) || validFile(request.resource.data));
       }
 
       // The private link decrypts a separate, random key for this thread.
@@ -104,13 +112,25 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(resource.data.dialogKey)/messages/$(request.resource.data.lastClientId))
         && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(resource.data.dialogKey)/messages/$(request.resource.data.lastClientId)).data.created == request.time;
 
+      match /dialogs/{key}/messages/{post}/files/reference {
+        allow get: if isAdmin() || dialogMatches(key);
+        allow delete: if isAdmin();
+        allow create: if dialogMatches(key) && validFile(request.resource.data)
+          && !exists(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(key)/messages/$(post))
+          && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(key)/messages/$(post)).data.fileName == request.resource.data.name;
+      }
+
       match /dialogs/{key}/messages/{post} {
         allow read: if isAdmin() || dialogMatches(key);
         allow delete: if isAdmin();
         allow create: if dialogMatches(key) && post.matches('[a-f0-9-]{36}')
           && get(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.status != 'closed'
-          && request.resource.data.keys().hasOnly(['body', 'created'])
-          && request.resource.data.body is string && request.resource.data.body.size() > 0
+          && request.resource.data.keys().hasOnly(['body', 'created', 'fileName'])
+          && request.resource.data.body is string
+          && (!('fileName' in request.resource.data) || (
+            request.resource.data.fileName is string && request.resource.data.fileName ==
+              getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)/dialogs/$(key)/messages/$(post)/files/reference).data.name))
+          && (request.resource.data.body.size() > 0 || 'fileName' in request.resource.data)
           && request.resource.data.body.size() <= 3500
           && request.resource.data.created == request.time
           && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.lastClientId == post
