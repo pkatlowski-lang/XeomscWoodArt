@@ -296,13 +296,17 @@ function drawInbox() {
       },'mail-summary');
       toggle.setAttribute('aria-controls','conversation');
       toggle.append(node('span','','mail-name'),node('span','','mail-subject'),node('span','','mail-state'),node('time','','mail-date'));
-      row.append(toggle);
+      const trash = button('🗑',event => deleteThreadFromInbox(t.id,event.currentTarget),'mail-trash');
+      row.append(toggle,trash);
     }
     old.delete(t.id);
     const next = previous ? previous.nextElementSibling : list.firstElementChild;
     if (row !== next) list.insertBefore(row,next);
     previous = row;
     const toggle = row.firstElementChild;
+    const trash = row.children[1];
+    trash.title = 'Usuń rozmowę: ' + t.name + ' · ' + t.subject;
+    trash.setAttribute('aria-label',trash.title);
     const [name,subject,state,date] = toggle.children;
     name.textContent = t.name; subject.textContent = t.subject;
     state.textContent = [t.unread ? 'Nowa' : '', t.closed ? 'Zamknięta' : 'Otwarta'].filter(Boolean).join(' · ');
@@ -450,31 +454,38 @@ bindForm($('#answer'),async f=>{if(!current.addressable){
   $('#answer').reset();
   return 'Odpowiedź jest dostępna w rozmowie klienta.';});
 $('#close-thread').onclick=()=>openThread(current,current.closed?'open':'close').catch(feedback);
-$('#delete-thread').onclick = async () => {
-  const target = current;
+async function deleteThreadFromInbox(id,trigger) {
+  const target = threads.find(t => t.id === id);
   const inbox = $('#inbox');
   if (!target || inbox.inert) return;
-  if (!confirm('Usunąć ze skrzynki rozmowę z ' + target.name + ' dotyczącą „' + target.subject + '”?')) return;
+  if (!confirm('Usunąć całą rozmowę z ' + target.name + ' dotyczącą „' + target.subject + '” wraz z załącznikami?')) return;
+  const row = trigger.closest('.mail-row');
+  const adjacent = row?.nextElementSibling || row?.previousElementSibling;
   inbox.inert = true;
-  ++threadVersion;
+  if (expandedId === id) ++threadVersion;
   try {
-    await api('admin/delete-thread', {id:target.id});
+    await api('admin/delete-thread', {id});
     ++inboxVersion;
-    threads = threads.filter(thread => thread.id !== target.id);
-    collapseThread();
-    drafts.delete(target.id);
-    replyIndex.delete(target.id);
-    $('#answer').reset();
-    $('#history').replaceChildren();
-    $('#conversation').hidden = true;
-    drawInbox();
+    threads = threads.filter(t => t.id !== id);
+    if (expandedId === id) {
+      collapseThread();
+      $('#answer').reset();
+      $('#history').replaceChildren();
+    }
+    drafts.delete(id);
+    replyIndex.delete(id);
+    searchInbox();
     $('#feedback').textContent = 'Usunięto rozmowę ze skrzynki.';
   } catch (error) {
     feedback(error);
   } finally {
     inbox.inert = false;
-    (current ? $('#delete-thread') : $('#inboxfilter')).focus();
+    if (trigger.isConnected && !trigger.closest('[hidden]')) trigger.focus();
+    else (adjacent?.isConnected ? adjacent.firstElementChild : $('#inboxfilter')).focus();
   }
+}
+$('#delete-thread').onclick = event => {
+  if (current) deleteThreadFromInbox(current.id,event.currentTarget);
 };
 $('#quote').onclick=()=>tab('calc',current);
 const calc=$('#calcform');let quote='';

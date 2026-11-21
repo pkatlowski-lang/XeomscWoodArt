@@ -1,4 +1,4 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=poczta1"></script><style>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=kosz2"></script><style>
 #list .project-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
 #list .entry{flex:1;min-width:0;border:0}
 #list .entry[aria-pressed=true]{background:#eeefe4;font-weight:600}
@@ -8,7 +8,11 @@
 .mail-tools{display:grid;grid-template-columns:minmax(12rem,1fr) minmax(11rem,17rem) auto;align-items:end;gap:.85rem}
 .mail-tools input,.mail-tools select{width:100%;min-width:0}
 #mail-status{margin:.75rem 0}
-.mail-row{border-top:1px solid var(--line)}
+.mail-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border-top:1px solid var(--line)}
+.mail-row>#conversation{grid-column:1/-1}
+.mail-trash{width:44px;height:44px;display:grid;place-items:center;margin-inline:.25rem;border:1px solid var(--line);border-radius:.4rem;background:transparent;color:#70433c;font-size:1.25rem}
+.mail-trash:hover,.mail-trash:focus-visible{background:#fff0ec;border-color:#bb928a}
+.mail-summary{min-width:0}
 .mail-summary{display:grid;grid-template-columns:minmax(7rem,1fr) minmax(9rem,3fr) auto auto 1rem;gap:1rem;align-items:center;width:100%;min-height:3.6rem;padding:.8rem .75rem;border:0;text-align:left;background:transparent}
 .mail-summary:hover,.mail-summary[aria-expanded=true]{background:#eeefe4}
 .mail-summary::after{content:'';width:.48rem;height:.48rem;border-right:2px solid;border-bottom:2px solid;transform:rotate(45deg);justify-self:center}
