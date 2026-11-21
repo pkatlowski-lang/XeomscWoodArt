@@ -2,7 +2,7 @@ import {categoryKey,formatPrice} from '../realizacje/ceny.js';
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=cennik';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=zalacznik';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -266,7 +266,10 @@ async function openThread(t,action='view',text='') {
   $('#topic').textContent=t.subject;$('#sender').textContent=t.name+' · '+t.email;
   const attach=$('#attachment');attach.replaceChildren();
   if(typeof data.attachment==='string' && (/^data:image\/(png|jpeg|webp);base64,/i.test(data.attachment)||/^https:\/\//i.test(data.attachment))){
-    const image=node('img');image.alt='Załącznik klienta';image.referrerPolicy='no-referrer';image.style.maxHeight='200px';image.src=data.attachment;attach.append(image);
+    const image=node('img');image.alt='Załącznik klienta';image.referrerPolicy='no-referrer';image.style.maxWidth='100%';image.style.height='auto';image.src=data.attachment;
+    const preview=node('details');
+    preview.append(node('summary','Pokaż załącznik klienta'),image);
+    attach.append(preview);
   }
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
   messages($('#history'),data.posts);

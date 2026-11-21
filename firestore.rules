@@ -66,7 +66,9 @@ service cloud.firestore {
     match /portfolio_inquiries/{id} {
       function validInquiry() {
         let d = request.resource.data;
-        return d.keys().hasOnly(['name','email','message','date','status','read','mailboxId','replyKey'])
+        return d.keys().hasOnly(['name','email','message','date','status','read','mailboxId','replyKey','hasAttachment'])
+          && (!('hasAttachment' in d) || (d.hasAttachment == true
+            && existsAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)/files/reference)))
           && id.matches('[a-f0-9-]{36}') && d.mailboxId == id
           && d.name is string && d.name.size() > 0 && d.name.size() <= 90
           && d.email is string && d.email.size() <= 180 && d.email.matches('.+@.+')
@@ -76,6 +78,16 @@ service cloud.firestore {
       }
       allow create: if isAnon() && validInquiry();
       allow get, list, update, delete: if isAdmin();
+
+      match /files/reference {
+        allow get, delete: if isAdmin();
+        allow create: if isAnon()
+          && !exists(/databases/$(database)/documents/portfolio_inquiries/$(id))
+          && getAfter(/databases/$(database)/documents/portfolio_inquiries/$(id)).data.hasAttachment == true
+          && request.resource.data.keys().hasOnly(['jpeg'])
+          && request.resource.data.jpeg is bytes
+          && request.resource.data.jpeg.size() > 0 && request.resource.data.jpeg.size() <= 350000;
+      }
 
       // The private link decrypts a separate, random key for this thread.
       function dialogMatches(key) {

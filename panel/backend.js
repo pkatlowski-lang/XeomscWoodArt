@@ -105,6 +105,7 @@ async function deleteThread(id) {
   const key = await runTransaction(db, async tx => {
     const data = (await tx.get(ref)).data();
     if (!data) return null;
+    if (data.hasAttachment) tx.delete(doc(ref, 'files', 'reference'));
     tx.delete(ref);
     if (data.mailboxId === id) tx.delete(record('pf-reply-' + id));
     return data.dialogKey;
@@ -128,6 +129,11 @@ async function conversation(input){
   const snap=await getDocFromServer(ref);
   if(!snap.exists())throw Error('Brak tej rozmowy.');
   const m=snap.data(),addressable=typeof m.replyKey==='string' && /^[0-9a-f-]{36}$/.test(m.mailboxId||'');
+  let attachment = m.attachment;
+  if (m.hasAttachment) {
+    const file = await getDocFromServer(doc(ref, 'files', 'reference'));
+    if (file.exists()) attachment = 'data:image/jpeg;base64,' + file.data().jpeg.toBase64();
+  }
   const key = m.dialogKey || (addressable && (m.sent?.length || input.action === 'reply') ? await enableDialog(snap) : null);
   let closed=m.status==='closed';
   if(input.action==='close'||input.action==='open'){
@@ -172,11 +178,11 @@ async function conversation(input){
       }
     } catch (error) {
       if (error.code !== 'permission-denied') throw error;
-      return {closed,addressable,attachment:m.attachment,posts, rulesPending:true};
+      return {closed,addressable,attachment,posts, rulesPending:true};
     }
   }
   posts.sort((a,b)=>String(a.created).localeCompare(String(b.created)));
-  return {closed,addressable,attachment:m.attachment,posts};
+  return {closed,addressable,attachment,posts};
 }
 export async function api(path,body){
   if(path==='login'){

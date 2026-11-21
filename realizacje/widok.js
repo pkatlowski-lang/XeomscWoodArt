@@ -1,4 +1,4 @@
-import {projectPrices,publishedPrices} from './ceny.js';
+import {categoryKey,projectPrices,publishedPrices} from './ceny.js';
 import {createPhotoViewer} from './powiekszenie.js';
 import {liveProjects,samples} from '/portfolio-catalog.js';
 import {publishedChanges,mergeProjects,setPhoto,studioPhoto,publicRecord} from '/panel/photos.js?v=opisy2';
@@ -58,6 +58,11 @@ async function load(){
     return;
   }
   if(dynamic && projectPath(p).startsWith('/realizacje/')){location.replace(projectPath(p));return;}
+  if (p.category?.trim()) {
+    const back = $('.back');
+    back.href = '/#galeria/' + encodeURIComponent(categoryKey(p.category));
+    back.textContent = '← ' + p.category.trim();
+  }
   photos=p.photos;thumbs.replaceChildren(...photos.map((ph,i)=>{
     const a=document.createElement('a');a.href=ph.url||'#cover';
     a.setAttribute('aria-label','Zdjęcie '+(i+1));a.append(studioPhoto(ph));return a;
