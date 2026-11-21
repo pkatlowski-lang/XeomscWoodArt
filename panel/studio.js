@@ -3,7 +3,7 @@ import {categoryKey,formatPrice} from '../realizacje/ceny.js';
 import {defaultHome,defaultHomeImage} from './homepage.js';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js?v=pliki2';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=pliki2';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=poczta1';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -247,16 +247,97 @@ async function refreshInbox() {
   const result = await api('admin/inbox');
   if (version !== inboxVersion) return;
   threads = result;
-  drawInbox();
+  searchInbox();
+}
+const drafts = new Map(), replyIndex = new Map();
+const dateLabel = new Intl.DateTimeFormat('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+let expandedId = null, searchVersion = 0, searchTimer;
+const normalize = text => String(text || '').toLocaleLowerCase('pl').normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ł','l');
+function collapseThread() {
+  if (current) drafts.set(current.id,$('#answer textarea').value);
+  ++threadVersion;
+  expandedId = null;
+  current = null;
+  const panel = $('#conversation');
+  panel.hidden = true;
+  $('#mail-parking').append(panel);
+}
+function inFilter(t) {
+  const mode = $('#inboxfilter').value;
+  return mode === 'all' || (mode === 'new' && (t.unread || t.id === expandedId)) ||
+    (mode === 'open' && !t.closed) || (mode === 'closed' && t.closed);
+}
+function matchText(t,q) {
+  return !q || normalize([t.name,t.email,t.subject,t.details].join('\n')).includes(q);
 }
 function drawInbox() {
-  $('#badge').textContent=String(threads.filter(t=>t.unread).length);
-  const filter=$('#inboxfilter').value;
-  const rows=threads.filter(t=>filter==='all'||(filter==='new'&&t.unread)||(filter==='closed'&&t.closed)||(filter==='open'&&!t.closed));
-  $('#threads').replaceChildren(...rows.map(t=>{
-    const b=button('',()=>openThread(t).catch(feedback),'entry');b.append(node(t.unread?'strong':'span',(t.unread?'● ':'')+t.name+' · '+t.subject),node('small',t.closed?'Zamknięta':'Otwarta'));return b;
-  }));
-  if(!rows.length) $('#threads').textContent='Brak rozmów w tym widoku.';
+  const list = $('#threads'), panel = $('#conversation');
+  const q = normalize($('#mail-search').value.trim());
+  const rows = threads.filter(t => {
+    if (!inFilter(t)) return false;
+    const cached = replyIndex.get(t.id);
+    return matchText(t,q) || (cached?.version === t.lastClientId && cached?.text?.includes(q));
+  });
+  if (expandedId && !rows.some(t => t.id === expandedId)) collapseThread();
+  $('#badge').textContent = String(threads.filter(t => t.unread).length);
+  const old = new Map([...list.children].map(row => [row.dataset.id,row]));
+  let previous = null;
+  for (const t of rows) {
+    let row = old.get(t.id);
+    if (!row) {
+      row = node('div','','mail-row');
+      row.dataset.id = t.id;
+      const toggle = button('',() => {
+        if (expandedId === t.id) { collapseThread(); drawInbox(); }
+        else {
+          const thread = threads.find(item => item.id === t.id);
+          if (thread) openThread(thread).catch(feedback);
+        }
+      },'mail-summary');
+      toggle.setAttribute('aria-controls','conversation');
+      toggle.append(node('span','','mail-name'),node('span','','mail-subject'),node('span','','mail-state'),node('time','','mail-date'));
+      row.append(toggle);
+    }
+    old.delete(t.id);
+    const next = previous ? previous.nextElementSibling : list.firstElementChild;
+    if (row !== next) list.insertBefore(row,next);
+    previous = row;
+    const toggle = row.firstElementChild;
+    const [name,subject,state,date] = toggle.children;
+    name.textContent = t.name; subject.textContent = t.subject;
+    state.textContent = [t.unread ? 'Nowa' : '', t.closed ? 'Zamknięta' : 'Otwarta'].filter(Boolean).join(' · ');
+    date.dateTime = t.date;
+    date.textContent = t.date ? dateLabel.format(new Date(t.date)) : '';
+    toggle.classList.toggle('unread',t.unread);
+    toggle.setAttribute('aria-expanded',String(expandedId === t.id));
+    if (expandedId === t.id && panel.parentNode !== row) row.append(panel);
+  }
+  for (const row of old.values()) row.remove();
+  $('#mail-status').textContent = rows.length ? '' : (q ? 'Brak pasujących rozmów.' : 'Brak rozmów w tym widoku.');
+}
+function searchInbox() {
+  clearTimeout(searchTimer);
+  const version = ++searchVersion;
+  drawInbox();
+  const q = normalize($('#mail-search').value.trim());
+  if (!q) return;
+  const missing = threads.filter(t => inFilter(t) && t.dialogKey && t.lastClientId &&
+    !matchText(t,q) && replyIndex.get(t.id)?.version !== t.lastClientId);
+  if (!missing.length) return;
+  $('#mail-status').textContent = 'Przeszukiwanie treści rozmów…';
+  searchTimer = setTimeout(async () => {
+    let incomplete = false;
+    for (const t of missing) {
+      if (version !== searchVersion) return;
+      try {
+        const text = await api('admin/search-replies',{id:t.id,key:t.dialogKey});
+        replyIndex.set(t.id,{version:t.lastClientId,text:normalize(text)});
+      } catch { incomplete = true; }
+    }
+    if (version !== searchVersion) return;
+    drawInbox();
+    if (incomplete) $('#mail-status').textContent = 'Nie udało się przeszukać wszystkich wiadomości. Odśwież skrzynkę.';
+  },250);
 }
 function showAttachment(source, threadId) {
   const area = $('#attachment');
@@ -322,12 +403,30 @@ function showAttachment(source, threadId) {
   area.append(link, preview);
 }
 async function openThread(t,action='view',text='') {
+  const switching = expandedId !== t.id;
+  if (switching) {
+    collapseThread();
+    expandedId = t.id;
+    drawInbox();
+  }
+  if (expandedId !== t.id) return;
   const version = ++threadVersion;
-  const data=await api('admin/thread',{id:t.id,action,text});
+  if (switching) $('#mail-status').textContent = 'Wczytywanie rozmowy…';
+  let data;
+  try { data = await api('admin/thread',{id:t.id,action,text}); }
+  catch (error) {
+    if (version === threadVersion && switching) { collapseThread(); drawInbox(); }
+    throw error;
+  }
   if (version !== threadVersion) return;
-  if(current?.id!==t.id) {$('#answer').reset();$('#answer output').textContent='';}
-  current={...t,addressable:data.addressable,closed:data.closed};$('#choose').hidden=true;$('#conversation').hidden=false;
-  $('#topic').textContent=t.subject;$('#sender').textContent=t.name+' · '+t.email;
+  if (switching) {
+    $('#answer').reset();
+    $('#answer textarea').value = drafts.get(t.id) || '';
+    $('#answer output').textContent = '';
+  }
+  current={...t,addressable:data.addressable,closed:data.closed};
+  $('#conversation').hidden=false;
+  $('#sender').textContent=t.name+' · '+t.email;
   showAttachment(data.attachment, t.id);
   $('#answer button').textContent=data.addressable?'Wyślij do klienta':'Otwórz odpowiedź w poczcie';
   messages($('#history'),data.posts,post => post.fileName && fileDownload(post.fileName,post.loadFile));
@@ -337,13 +436,19 @@ async function openThread(t,action='view',text='') {
   $('#close-thread').textContent=data.closed?'Otwórz ponownie':'Zamknij rozmowę';
   await refreshInbox().catch(feedback);
 }
-$('#reload').onclick=()=>{(current?openThread(current):refreshInbox()).catch(feedback);};$('#inboxfilter').onchange=drawInbox;
+$('#reload').onclick=()=>{(current?openThread(current):refreshInbox()).catch(feedback);};$('#inboxfilter').onchange=()=>{collapseThread();searchInbox();};
+$('#mail-search').oninput=searchInbox;
 bindForm($('#answer'),async f=>{if(!current.addressable){
     if(!/^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(current.email))throw Error('Brak poprawnego adresu e-mail klienta.');
     location.href='mailto:'+encodeURIComponent(current.email)+'?subject='+encodeURIComponent('Odpowiedź pracowni Xeomsc Laser')+'&body='+encodeURIComponent(signedReply(f.get('text')));
     return 'Dokończ wysyłanie w swojej poczcie.';
   }
-  await openThread(current,'reply',f.get('text'));$('#answer').reset();return 'Odpowiedź jest dostępna w rozmowie klienta.';});
+  const id = current.id;
+  await openThread(current,'reply',f.get('text'));
+  drafts.delete(id);
+  if (current?.id !== id) return '';
+  $('#answer').reset();
+  return 'Odpowiedź jest dostępna w rozmowie klienta.';});
 $('#close-thread').onclick=()=>openThread(current,current.closed?'open':'close').catch(feedback);
 $('#delete-thread').onclick = async () => {
   const target = current;
@@ -356,11 +461,12 @@ $('#delete-thread').onclick = async () => {
     await api('admin/delete-thread', {id:target.id});
     ++inboxVersion;
     threads = threads.filter(thread => thread.id !== target.id);
-    current = null;
+    collapseThread();
+    drafts.delete(target.id);
+    replyIndex.delete(target.id);
     $('#answer').reset();
     $('#history').replaceChildren();
     $('#conversation').hidden = true;
-    $('#choose').hidden = false;
     drawInbox();
     $('#feedback').textContent = 'Usunięto rozmowę ze skrzynki.';
   } catch (error) {

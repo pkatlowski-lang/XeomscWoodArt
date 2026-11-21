@@ -1,10 +1,34 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=pliki2"></script><style>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel pracowni · Xeomsc Laser</title><link rel="stylesheet" href="/portfolio-studio/public/style.css"><script type="module" src="./studio.js?v=poczta1"></script><style>
 #list .project-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
 #list .entry{flex:1;min-width:0;border:0}
 #list .entry[aria-pressed=true]{background:#eeefe4;font-weight:600}
 #list .row-delete{flex:none;min-width:44px;min-height:44px;margin-inline:.35rem;border:1px solid #ccaaa6;border-radius:.5rem;background:#fff5f2;color:#8d3029;font-size:1.3rem}
 #list .row-delete:hover{background:#f7e1dc}
-#threads .entry strong{font-weight:700}
+#inbox h2{margin:0 0 1.25rem}
+.mail-tools{display:grid;grid-template-columns:minmax(12rem,1fr) minmax(11rem,17rem) auto;align-items:end;gap:.85rem}
+.mail-tools input,.mail-tools select{width:100%;min-width:0}
+#mail-status{margin:.75rem 0}
+.mail-row{border-top:1px solid var(--line)}
+.mail-summary{display:grid;grid-template-columns:minmax(7rem,1fr) minmax(9rem,3fr) auto auto 1rem;gap:1rem;align-items:center;width:100%;min-height:3.6rem;padding:.8rem .75rem;border:0;text-align:left;background:transparent}
+.mail-summary:hover,.mail-summary[aria-expanded=true]{background:#eeefe4}
+.mail-summary::after{content:'';width:.48rem;height:.48rem;border-right:2px solid;border-bottom:2px solid;transform:rotate(45deg);justify-self:center}
+.mail-summary[aria-expanded=true]::after{transform:rotate(225deg)}
+.mail-name,.mail-subject{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail-state,.mail-date{font-size:.88rem;white-space:nowrap}
+.mail-summary.unread .mail-name,.mail-summary.unread .mail-subject{font-weight:700}
+.mail-summary.unread .mail-state{color:#215b87}
+#conversation{border-inline-start:3px solid var(--forest);padding:.75rem clamp(.7rem,2.5vw,2rem) 1.5rem}
+#sender,#conversation .bubble button{overflow-wrap:anywhere}
+#conversation .bubble button{max-width:100%}
+@media(max-width:720px){
+ .mail-tools{grid-template-columns:minmax(0,1fr) auto}
+ .mail-tools label:first-child{grid-column:1/-1}
+ .mail-summary{grid-template-columns:minmax(0,1fr) auto .8rem;gap:.35rem .65rem}
+ .mail-name{grid-column:1;grid-row:1}.mail-state{grid-column:2;grid-row:1}
+ .mail-subject{grid-column:1/3;grid-row:2}.mail-date{grid-column:1/3;grid-row:3;color:#525b50}
+ .mail-summary::after{grid-column:3;grid-row:1/4}
+ #conversation .bubble{max-width:100%}
+}
 #delete-thread{color:#8d3029;border-color:#bb928a}
 @media(min-width:721px){
   #projects>aside{display:flex;flex-direction:column;max-height:85vh;max-height:85dvh}
@@ -55,5 +79,11 @@
     <button class="outline" id="home-retry" type="button" hidden>Wczytaj ponownie</button>
   </form>
 </section>
-<section id="inbox" class="split" hidden><aside class="panel"><h2>Skrzynka</h2><label>Pokaż<select id="inboxfilter"><option value="all">Wszystkie rozmowy</option><option value="new">Nowe wiadomości</option><option value="open">Otwarte rozmowy</option><option value="closed">Zamknięte rozmowy</option></select></label><button id="reload" class="link">Odśwież skrzynkę ↻</button><div id="threads"></div></aside><section class="panel"><p id="choose">Wybierz rozmowę ze skrzynki.</p><div id="conversation" hidden><h2 id="topic"></h2><p id="sender"></p><div id="attachment"></div><div id="history"></div><form id="answer"><label>Twoja odpowiedź<textarea name="text" required maxlength="4000" rows="4"></textarea></label><small>Automatyczny podpis: Pozdrawiam, Xeomsc Laser</small><button class="btn">Wyślij do klienta</button><output></output></form><div class="actions"><button id="quote" class="outline">Policz wycenę</button><button id="close-thread" class="outline"></button><button type="button" id="delete-thread" class="outline">Usuń rozmowę</button></div></div></section></section>
+<section id="inbox" class="panel" hidden>
+<h2>Skrzynka</h2>
+<div class="mail-tools"><label>Szukaj rozmowy<input type="search" id="mail-search" placeholder="Imię, e-mail lub treść wiadomości"></label>
+<label>Pokaż<select id="inboxfilter"><option value="all">Wszystkie rozmowy</option><option value="new">Nowe wiadomości</option><option value="open">Otwarte rozmowy</option><option value="closed">Zamknięte rozmowy</option></select></label>
+<button id="reload" type="button" class="outline">Odśwież skrzynkę</button></div>
+<p id="mail-status" role="status"></p><div id="threads"></div>
+<div id="mail-parking" hidden><div id="conversation" role="region" aria-label="Treść rozmowy" hidden><p id="sender"></p><div id="attachment"></div><div id="history"></div><form id="answer"><label>Twoja odpowiedź<textarea name="text" required maxlength="4000" rows="4"></textarea></label><small>Automatyczny podpis: Pozdrawiam, Xeomsc Laser</small><button class="btn">Wyślij do klienta</button><output></output></form><div class="actions"><button id="quote" class="outline">Policz wycenę</button><button id="close-thread" class="outline"></button><button type="button" id="delete-thread" class="outline">Usuń rozmowę</button></div></div></div></section>
 <section id="calc" class="panel calc" hidden><h2>Wycena projektu</h2><p>Wpisz wymiary prostokąta zajętego przez jedną sztukę. Czas, dodatki i opakowanie podaj dla całego zlecenia.</p><form id="calcform"><div class="pair"><label>Szerokość elementu (cm)<input name="width" type="number" min="0.1" step="any" value="10" required></label><label>Wysokość elementu (cm)<input name="height" type="number" min="0.1" step="any" value="10" required></label><label>Liczba sztuk<input name="qty" type="number" min="1" step="1" value="1" required></label><label>Cena arkusza (zł)<input name="sheetCost" type="number" min="0" step="any" value="18" required></label><label>Szerokość arkusza (cm)<input name="sheetW" type="number" min="0.1" step="any" value="76" required></label><label>Wysokość arkusza (cm)<input name="sheetH" type="number" min="0.1" step="any" value="76" required></label><label>Łączny czas lasera (min)<input name="minutes" type="number" min="0" step="any" value="0" required></label><label>Stawka (zł/min)<input name="rate" type="number" min="0" step="any" list="rates" value="1.20" required><datalist id="rates"><option value="1.20">Bezpośrednio</option><option value="1.40">Allegro</option></datalist></label><label>Dodatki i opakowanie (zł)<input name="extras" type="number" min="0" step="any" value="0" required></label></div></form><div id="total" role="status"></div><div id="quote-delivery" hidden><p id="quote-recipient"></p><div class="actions"><button class="btn" id="send-quote" type="button">Wyślij wycenę do klienta</button><button class="outline" id="insert">Wstaw do roboczej odpowiedzi</button></div><output id="quote-status" role="status"></output></div></section></div></main></body></html>

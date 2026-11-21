@@ -131,7 +131,13 @@ async function deleteThread(id) {
   await batch.commit();
 }
 function thread(snap){
-  const m=snap.data();return {id:snap.id,name:m.name||'Klient',email:m.email||'',subject:(m.message||'Zapytanie').slice(0,75),unread:!m.read,closed:m.status==='closed',date:(m.lastClientAt || m.date)?.toDate().toISOString()||''};
+  const m = snap.data();
+  return {id:snap.id, name:m.name || 'Klient', email:m.email || '',
+    subject:(m.message || 'Zapytanie').split('\n')[0], unread:!m.read, closed:m.status === 'closed',
+    date:(m.lastClientAt || m.date)?.toDate().toISOString() || '',
+    details:[m.message, ...(m.sent || []).map(post => post.body)].join('\n'),
+    dialogKey:m.dialogKey, lastClientId:m.lastClientId};
+
 }
 export function signedReply(text) {
   const message = text.trim();
@@ -255,6 +261,10 @@ export async function api(path,body){
     return mergeProjects(base,current);
   }
   if(path==='admin/projects'||path==='admin/remove')return changeProject(body,path==='admin/remove');
+  if (path === 'admin/search-replies') {
+    const posts = await getDocsFromServer(messagesFor(doc(inquiries,body.id),body.key));
+    return posts.docs.map(post => post.data().body || '').join('\n');
+  }
   if(path==='admin/inbox')return loadInbox();
   if(path==='admin/delete-thread')return deleteThread(body.id);
   if(path==='admin/thread')return conversation(body);

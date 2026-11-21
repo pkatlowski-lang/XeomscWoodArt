@@ -22,6 +22,10 @@ async function submit(event) {
   const lines = [m.message.trim()];
   if (m.dimensions.trim()) lines.push('Przybliżony wymiar (cm): ' + m.dimensions.trim());
   if (m.quantity) lines.push('Liczba sztuk: ' + m.quantity);
+  if (m.deadline) {
+    const [year, month, day] = m.deadline.split('-');
+    lines.push('Preferowany termin: ' + [day, month, year].join('.'));
+  }
   const message = lines.join('\n');
   if (!m.name.trim() || !m.message.trim()) {
     status.textContent = 'Uzupełnij imię i treść wiadomości.';
