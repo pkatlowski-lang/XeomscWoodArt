@@ -1,13 +1,4 @@
 import {catalogDescription} from './realizacje/opisy.js';
-const imageDir='portfolio-studio/public/images/';
-function study(title,category,description,files) {
-  return {id:'sample-'+files[0],title,category,description,material:'Sklejka',photos:files.map(name=>({alt:title+' — wizualizacja',url:'/'+imageDir+name+'.jpg'}))};
-}
-export const samples=[
-  study('Baza do koszyka','Makrama','Okrągła baza o średnicy 10 cm wyznacza kształt dna niewielkiego koszyka. Otwory rozmieszczone wokół krawędzi pozwalają rozpocząć splot i poprowadzić sznurek wzdłuż obwodu. Wizualizacja i rysunek pokazują układ otworów względem środka.\n\nJeśli potrzebujesz bazy do innego splotu, podaj średnicę dna i grubość sznurka. Na tej podstawie można dobrać wielkość i rozstaw otworów.',['baza','baza-rysunek']),
-  study('Krążki do personalizacji','Półfabrykaty','Krążki ze sklejki o średnicy 5 cm mają prosty obrys i miejsce na drobny motyw, inicjały lub krótki napis. Na wizualizacji możesz ocenić proporcje elementu przed przygotowaniem własnej dekoracji. Krążek tej wielkości sprawdzi się jako mała etykieta prezentowa lub baza do ozdobienia.\n\nW zapytaniu podaj liczbę krążków i informację, czy chcesz otrzymać czystą powierzchnię, czy grawer według własnego wzoru.',['krazki','krazek'])
-];
-
 function unpack(field) {
   if (!field) return undefined;
   if ('mapValue' in field) return Object.fromEntries(Object.entries(field.mapValue.fields||{}).map(([key,val])=>[key,unpack(val)]));
@@ -47,6 +38,6 @@ export async function catalogFields(keys) {
   return (await response.json()).fields;
 }
 export async function liveProjects() {
-  const fields = await catalogFields(['categories','galleries']);
-  return catalogRows(unpack(fields?.categories),unpack(fields?.galleries));
+  const fields = await catalogFields(['portfolioCategories','portfolioGalleries']);
+  return catalogRows(unpack(fields?.portfolioCategories),unpack(fields?.portfolioGalleries));
 }

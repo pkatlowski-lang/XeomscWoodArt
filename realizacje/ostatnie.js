@@ -1,10 +1,8 @@
-import {workshopProjects} from '../assets/realizacje/projekty.js';
-
 export function recentProjects(projects, changes) {
   const visible = new Map(projects.filter(p => p.photos?.length && p.published !== false).map(p => [p.id, p]));
   const added = changes.filter(p => !p.removed && (p.addedOrder || /^[0-9a-f-]{36}$/i.test(p.id)));
   added.sort((a, b) => (b.addedOrder || 0) - (a.addedOrder || 0));
-  const ids = new Set([...added, ...workshopProjects].map(p => p.id));
+  const ids = new Set(added.map(p => p.id));
   return Array.from(ids, id => visible.get(id)).filter(Boolean).slice(0, 12);
 }
 

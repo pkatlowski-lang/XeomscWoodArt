@@ -1,8 +1,8 @@
-import {categoryKey,projectPrices,publishedPrices} from './ceny.js';
+import {categoryKey,projectPrices,publishedPrices} from './ceny.js?v=nowy-katalog';
 import {createPhotoViewer} from './powiekszenie.js';
-import {liveProjects,samples} from '/portfolio-catalog.js';
-import {publishedChanges,mergeProjects,setPhoto,studioPhoto,publicRecord} from '/panel/photos.js?v=opisy2';
-import {projectPath,rememberProjectLinks} from './adresy.js';
+import {liveProjects} from '/portfolio-catalog.js?v=nowy-katalog';
+import {publishedChanges,mergeProjects,setPhoto,studioPhoto,publicRecord} from '/panel/photos.js?v=nowy-katalog';
+import {projectPath} from './adresy.js?v=nowy-katalog';
 
 const $=selector=>document.querySelector(selector);
 const article=$('.project-body'),thumbs=$('.thumbs'),notice=$('#notice');
@@ -48,8 +48,7 @@ function missing(){
 }
 async function load(){
   const [legacy,overlays,prices]=await Promise.allSettled([liveProjects(),publishedChanges(),publishedPrices(publicRecord)]);
-  const base=legacy.status==='fulfilled' && legacy.value.length?legacy.value:samples;
-  rememberProjectLinks(base);
+  const base=legacy.status==='fulfilled' ? legacy.value : [];
   const rows=mergeProjects(base,overlays.status==='fulfilled'?overlays.value:[]);
   const p=rows.find(item=>dynamic?item.id===id:projectPath(item)===location.pathname);
   if(!p){
@@ -86,8 +85,6 @@ async function load(){
     material.querySelector('dd').textContent = p.material.trim();
     material.hidden = false;
   }
-  const sampleSize = { 'sample-baza': 'Średnica 10 cm', 'sample-krazki': 'Średnica 5 cm' };
-  if (dynamic && sampleSize[p.id] && !p.revision) $('.project-specs div:last-child dd').textContent = sampleSize[p.id];
   if(dynamic || p.revision || p.customDescription){
     $('h1').textContent=p.title;$('#category').textContent=p.category;
     const description=p.description||p.title+' – realizacja pracowni Xeomsc Laser. Zobacz zdjęcia i zapytaj o szczegóły.';

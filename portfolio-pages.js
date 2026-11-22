@@ -1,11 +1,11 @@
-import {homeDocument, defaultHome, renderHome} from './panel/homepage.js';
+import {homeDocument, defaultHome, renderHome} from './panel/homepage.js?v=nowy-katalog';
 import {$,node,button,dialogControls} from './portfolio-studio/public/common.js';
-import {samples, liveProjects} from './portfolio-catalog.js';
-import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=0c6b69a';
-import {projectPath,rememberProjectLinks} from './realizacje/adresy.js';
-import {setupGallery, staticProjects} from './realizacje/kategorie.js?v=fade';
-import {initRecent} from './realizacje/ostatnie.js';
-import {projectPrices,formatPrice,publishedPrices} from './realizacje/ceny.js';
+import {liveProjects} from './portfolio-catalog.js?v=nowy-katalog';
+import {studioPhoto as photo,publishedChanges,mergeProjects,publicRecord} from './panel/photos.js?v=nowy-katalog';
+import {projectPath} from './realizacje/adresy.js?v=nowy-katalog';
+import {setupGallery} from './realizacje/kategorie.js?v=nowy-katalog';
+import {initRecent} from './realizacje/ostatnie.js?v=nowy-katalog';
+import {projectPrices,formatPrice,publishedPrices} from './realizacje/ceny.js?v=nowy-katalog';
 let rates = [];
 let projects=[];
 function ask(project=null) {
@@ -33,12 +33,11 @@ if (location.hash && !location.hash.startsWith('#galeria/') && !['#galeria','#st
     if (!fields) return;
     const data = {...defaultHome};
     for (const key of Object.keys(data)) data[key] = fields[key]?.stringValue ?? data[key];
-    data.image = fields.image?.stringValue;
+    data.image = fields.portfolioImage?.stringValue;
     if (data.description === 'Wycinamy i grawerujemy w sklejce. Zobacz detale naszych projektów lub opowiedz nam, co chcesz stworzyć.') data.description = defaultHome.description;
     renderHome($('.hero'), data);
   }).catch(() => { /* The initial HTML already contains the workshop introduction. */ });
-  const fallback = staticProjects($('#category-grid'));
-  const updateGallery = setupGallery(fallback, projectCard);
+  const updateGallery = setupGallery([], projectCard);
   const [latest,changes,priceResult]=await Promise.allSettled([liveProjects(),publishedChanges(),publishedPrices(publicRecord)]);
   rates = priceResult.status === 'fulfilled' ? priceResult.value : [];
   if (rates.length) {
@@ -51,15 +50,9 @@ if (location.hash && !location.hash.startsWith('#galeria/') && !['#galeria','#st
     $('#cennik').hidden = false; $('#price-link').hidden = false;
     if (location.hash === '#cennik') $('#cennik').scrollIntoView();
   }
-  const base=latest.status==='fulfilled' && latest.value.length?latest.value:samples;
-  rememberProjectLinks(base);
+  const base=latest.status==='fulfilled' ? latest.value : [];
   const overlays = changes.status === 'fulfilled' ? changes.value : [];
   projects=mergeProjects(base, overlays);
-  if (latest.status === 'rejected') {
-    // Keep the published static catalog available during a legacy catalog outage.
-    const known = new Set([...projects,...overlays].map(projectPath));
-    projects.push(...fallback.filter(item => !known.has(item.staticPath)));
-  }
   updateGallery(projects);
   initRecent(projects, changes.status === 'fulfilled' ? changes.value : [], projectCard);
 }

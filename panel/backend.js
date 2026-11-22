@@ -1,11 +1,11 @@
-import {priceDocument, parsePrice, categoryKey} from '../realizacje/ceny.js';
-import {homeDocument, homeChanges} from './homepage.js';
+import {priceDocument, parsePrice, categoryKey} from '../realizacje/ceny.js?v=nowy-katalog';
+import {homeDocument, homeChanges} from './homepage.js?v=nowy-katalog';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {initializeAuth,browserLocalPersistence,indexedDBLocalPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,doc,getDocFromServer,getDocsFromServer,query,where,documentId,limit,runTransaction,updateDoc,writeBatch} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import {getOwnerConfig} from './config.js';
-import {samples,liveProjects} from '../portfolio-catalog.js';
-import {mergeProjects} from './photos.js';
+import {liveProjects} from '../portfolio-catalog.js?v=nowy-katalog';
+import {catalogDocument,mergeProjects} from './photos.js?v=nowy-katalog';
 import {seal} from './letter.js';
 
 const owners=initializeApp(await getOwnerConfig(),'portfolio-owner');
@@ -14,7 +14,7 @@ const auth = initializeAuth(owners, {
 });
 const db = getFirestore(owners);
 const record=id=>doc(db,'app_config',id);
-const manifest=record('pf-catalog-v1');
+const manifest=record(catalogDocument);
 let verified=null, original=null;
 const denied=()=>Object.assign(Error('Zaloguj się kontem administratora pracowni.'),{status:401});
 export async function resetPassword(email){
@@ -27,14 +27,14 @@ export async function requireOwner(){
   if(!user || !user.email)throw denied();
   if(verified!==user.uid){
     // Server-side list permission is reserved for the owner by the existing rules.
-    await getDocsFromServer(query(collection(db,'app_config'),where(documentId(),'==','pf-catalog-v1'),limit(1)));
+    await getDocsFromServer(query(collection(db,'app_config'),where(documentId(),'==',catalogDocument),limit(1)));
     verified=user.uid;
   }
 }
 async function baseProjects(){
   if(!original){
     const legacy=await liveProjects();
-    original=(legacy.length?legacy:samples).map(p=>({...p,published:true,revision:0}));
+    original=legacy.map(p=>({...p,published:true,revision:0}));
   }
   return original;
 }
@@ -244,7 +244,10 @@ export async function api(path,body){
   }
   if (path === 'admin/homepage') {
     const ref = record(homeDocument);
-    if (!body) return (await getDocFromServer(ref)).data() || {};
+    if (!body) {
+      const data = (await getDocFromServer(ref)).data() || {};
+      return {...data,image:data.portfolioImage};
+    }
     const changes = homeChanges(body);
     return runTransaction(db, async tx => {
       const current = (await tx.get(ref)).data();

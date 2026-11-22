@@ -1,9 +1,9 @@
 import {fileDownload} from '../zapytanie/pliki.js';
-import {categoryKey,formatPrice} from '../realizacje/ceny.js';
-import {defaultHome,defaultHomeImage} from './homepage.js';
+import {categoryKey,formatPrice} from '../realizacje/ceny.js?v=nowy-katalog';
+import {defaultHome,defaultHomeImage} from './homepage.js?v=nowy-katalog';
 import {$,node,button,bindForm,messages} from '../portfolio-studio/public/common.js?v=pliki2';
 import {studioPhoto as photo} from './photos.js';
-import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=poczta1';
+import {api,resetPassword,signedReply,requireOwner} from './backend.js?v=nowy-katalog';
 import {estimate,money} from '../portfolio-studio/public/calculator.js';
 let projects=[], edit=null, pictures=[], threads=[], current=null, loadingImages=false, dirty=false;
 const form=$('#editor'), fields=form.elements;
@@ -161,6 +161,12 @@ const homeFile = $('#home-file');
 const homePreview = $('#home-preview');
 const homeStatus = homeForm.querySelector('output');
 let homeRevision = null, homeLoading = false, homeImage = defaultHomeImage, previewUrl = '';
+function showHomePreview() {
+  const src = previewUrl || homeImage;
+  homePreview.hidden = !src;
+  if (src) homePreview.src = src;
+  else homePreview.removeAttribute('src');
+}
 async function loadHome() {
   if (homeRevision !== null || homeLoading) return;
   homeLoading = true;
@@ -170,7 +176,7 @@ async function loadHome() {
     const data = await api('admin/homepage');
     for (const [key, value] of Object.entries(defaultHome)) homeForm.elements[key].value = data[key] ?? value;
     homeImage = data.image || defaultHomeImage;
-    homePreview.src = homeImage;
+    showHomePreview();
     homeRevision = data.revision || 0;
     homeFields.disabled = false;
     homeStatus.textContent = '';
@@ -184,7 +190,7 @@ homeFile.onchange = () => {
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   const file = homeFile.files[0];
   previewUrl = file ? URL.createObjectURL(file) : '';
-  homePreview.src = previewUrl || homeImage;
+  showHomePreview();
   homeStatus.textContent = '';
 };
 bindForm(homeForm, async values => {
@@ -194,10 +200,10 @@ bindForm(homeForm, async values => {
     if (homeFile.files[0]) input.image = (await compress(homeFile.files[0])).data;
     homeRevision = await api('admin/homepage', input);
     if (input.image) homeImage = input.image;
-    homePreview.src = homeImage;
     homeFile.value = '';
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = '';
+    showHomePreview();
     return 'Opublikowano zmiany na stronie głównej.';
   } finally { homeFields.disabled = false; }
 });

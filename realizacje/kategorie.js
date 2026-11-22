@@ -1,15 +1,6 @@
 import {setPhoto} from '../panel/photos.js?v=fade';
 import {categoryKey} from './ceny.js';
 
-export function staticProjects(grid) {
-  return [...grid.querySelectorAll('details')].flatMap(group => {
-    const category = group.querySelector('strong').textContent;
-    return [...group.querySelectorAll('li a')].map(link => ({
-      title:link.textContent, category, staticPath:link.getAttribute('href'),
-      photos:[{url:link.dataset.cover,alt:link.textContent}]
-    }));
-  });
-}
 export function groupedProjects(projects) {
   const groups = new Map();
   for (const project of projects) {
@@ -68,6 +59,8 @@ export function setupGallery(initial, projectCard) {
     const query = search.value.trim().toLocaleLowerCase('pl');
     const overview = !key && !query;
     active = key;
+    select('gallery-empty').hidden = groups.size > 0;
+    select('gallery-search').hidden = groups.size === 0;
     heading.textContent = group?.name || (key ? 'Kategoria realizacji' : query ? 'Wyniki wyszukiwania' : 'Kategorie realizacji');
     back.hidden = overview;
     tiles.hidden = !overview;
@@ -120,7 +113,6 @@ export function setupGallery(initial, projectCard) {
     if (location.hash === '#galeria') {event.preventDefault();navigate();}
   };
   search.oninput = render;
-  select('gallery-search').hidden = false;
   if (categoryFromHash()) navigate(); else render();
   return projects => { groups = groupedProjects(projects); render(); };
 }

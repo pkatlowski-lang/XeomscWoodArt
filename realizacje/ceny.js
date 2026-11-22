@@ -1,4 +1,4 @@
-export const priceDocument = 'pf-prices-v1';
+export const priceDocument = 'pf-prices-v2';
 
 export function categoryKey(name) {
   return name.trim().replace(/\s+/g, ' ').toLocaleLowerCase('pl');

@@ -1511,7 +1511,7 @@
 
         // Dane domyślne
         const initialData = {
-            heroItems: [{ id: 1, type: 'image', url: 'https://images.unsplash.com/photo-1622623363380-45c128919616?q=80&w=2070' }],
+            heroItems: [],
             categories: {},
             galleries: {},
             customOrders: [],
@@ -4495,12 +4495,23 @@
             const el = document.getElementById('data-source-indicator');
         }
 
+        function readPortfolio(data) {
+            const {portfolioCategories = {}, portfolioGalleries = {}, portfolioOrders = [], portfolioHero = [], ...settings} = data;
+            return {...settings, categories:portfolioCategories, galleries:portfolioGalleries, customOrders:portfolioOrders, heroItems:portfolioHero};
+        }
+
+        function writePortfolio(data) {
+            const {categories, galleries, customOrders, heroItems, ...settings} = data;
+            return {...settings, portfolioCategories:categories, portfolioGalleries:galleries, portfolioOrders:customOrders, portfolioHero:heroItems};
+        }
+
         async function saveData() {
             try {
                 siteData.categories = siteData.categories || {};
-                localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                const payload = writePortfolio(siteData);
+                localStorage.setItem('xeomsc_portfolio_v2', JSON.stringify(payload));
                 if(isOnline && auth && auth.currentUser) {
-                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), siteData);
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), payload, {mergeFields:Object.keys(payload)});
                     console.log("Zapisano w chmurze");
                 }
             } catch(e) { console.error("Błąd zapisu", e); showToast("Błąd zapisu!"); }
@@ -4525,12 +4536,12 @@
                             if(sessionStorage.getItem('xeomsc_admin') === 'true') { startMessageListener(); }
                             onSnapshot(doc(db, `artifacts/${appId}/public/data/siteConfig`, 'main'), (snap) => {
                                 if (snap.exists()) {
-                                    siteData = snap.data();
+                                    siteData = readPortfolio(snap.data());
                                     window.siteData = siteData;
                                     if (typeof window.xeomscPriceRefresh === 'function') window.xeomscPriceRefresh();
                                     updateDataSourceIndicator('cloud');
                                     if(!siteData.textContent) siteData.textContent = initialData.textContent;
-                                    localStorage.setItem('xeomsc_cached_data', JSON.stringify(siteData));
+                                    localStorage.setItem('xeomsc_portfolio_v2', JSON.stringify(writePortfolio(siteData)));
                                     renderHero(); renderMain(); renderTexts();
                                     if(!document.getElementById('admin-panel').classList.contains('hidden')) { 
                                         if(siteData.imgbbKey && document.getElementById('edit-imgbb-key')) { document.getElementById('edit-imgbb-key').value = siteData.imgbbKey; } 
@@ -4546,7 +4557,7 @@
             } catch (e) { console.log("Tryb offline", e); updateStatusUI(false, e.message); updateDataSourceIndicator('local', true); renderHero(); renderMain(); renderTexts(); }
         }
 
-        siteData = JSON.parse(localStorage.getItem('xeomsc_cached_data')) || initialData;
+        siteData = readPortfolio(JSON.parse(localStorage.getItem('xeomsc_portfolio_v2') || 'null') || initialData);
         window.siteData = siteData;
         renderHero(); renderMain(); renderTexts(); start();
         // Zapytanie z publicznego portfolio. Tekst trafia do pola formularza.
