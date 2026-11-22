@@ -520,7 +520,26 @@ $('#send-quote').onclick=async()=>{
   }catch(error){if(quoteTarget?.id===target.id)$('#quote-status').textContent=error.message;}
   finally{sendingQuote=false;calculate();}
 };
-calc.oninput=()=>{$('#quote-status').textContent='';calculate();};calc.onsubmit=e=>e.preventDefault();calculate();
+function refreshEstimate() {
+  $('#quote-status').textContent = '';
+  calculate();
+}
+calc.elements.plywood.onchange = () => {
+  const price = calc.elements.plywood.value;
+  if (price !== 'custom') {
+    calc.elements.sheetCost.value = price;
+    calc.elements.sheetW.value = 76;
+    calc.elements.sheetH.value = 76;
+  }
+  refreshEstimate();
+};
+calc.oninput = event => {
+  const name = event.target.name;
+  if (name === 'plywood') return;
+  if (['sheetCost','sheetW','sheetH'].includes(name)) calc.elements.plywood.value = 'custom';
+  refreshEstimate();
+};
+calc.onsubmit=e=>e.preventDefault();calculate();
 $('#insert').onclick=()=>{if(current&&!current.closed&&quote){tab('inbox');const box=$('#answer textarea');box.value=(box.value.trim()+'\n'+quote).trim();box.focus();}};
 $('#reset-password').onclick=async()=>{
   const f=$('#loginform'),out=f.querySelector('output');
