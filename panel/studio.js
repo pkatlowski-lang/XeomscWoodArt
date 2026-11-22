@@ -497,8 +497,17 @@ $('#quote').onclick=()=>tab('calc',current);
 const calc=$('#calcform');let quote='';
 function calculate(){
   $('#send-quote').disabled=true;
-  if(!calc.checkValidity()){quote='';$('#total').textContent='Uzupełnij poprawnie pola kalkulatora.';return;}
-  const f=new FormData(calc),r=estimate(f);
+  if (!calc.checkValidity()) {
+    quote = '';
+    $('#total').textContent = calc.elements.laserTime.validity.valid
+      ? 'Uzupełnij poprawnie pola kalkulatora.'
+      : 'Podaj czas w minutach i sekundach, np. 1.40. Sekundy mogą wynosić od 0 do 59.';
+    return;
+  }
+  const f = new FormData(calc);
+  const [minutes, seconds = '0'] = f.get('laserTime').split(/[.,:]/);
+  f.set('minutes', String(Number(minutes) + Number(seconds) / 60));
+  const r = estimate(f);
   if(!Number.isFinite(r.total)){quote='';$('#total').textContent='Sprawdź wartości.';return;}
   quote='Wycena dla '+f.get('qty')+' szt.: '+money(r.total)+' łącznie ('+money(r.unit)+' za sztukę).';
   $('#send-quote').disabled=sendingQuote || !quoteTarget || r.total<=0 || (quoteAttempt?.delivered && quoteAttempt.target===quoteTarget.id && quoteAttempt.body===quote);
