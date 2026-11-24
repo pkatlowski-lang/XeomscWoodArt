@@ -162,8 +162,8 @@ const formerDescriptions = new Map([
 ]);
 
 const medalDetails = new Map([
-  ['a795fe19-81f2-4880-b139-6f6f40260d1c', {range:[285, 620], description:'Medal z grawerem laserowym na zawody, turnieje i uroczystości. Projekt graweru może powstać w pracowni na zamówienie lub zostać dostarczony przez zamawiającego. Zdjęcie przedstawia przykładową realizację.\n\nMedal jest wycinany ze sklejki brzozowej klasy 1/2 o grubości 4 mm.'}],
-  ['9473098e-f584-4f5b-9e80-64859fae1636', {range:[89, 145], description:'Okrągły medal ze sklejki brzozowej klasy 1/2 o grubości 4 mm. Gładka powierzchnia nadaje się do malowania i ręcznego zdobienia, także podczas zajęć plastycznych.\n\nTarcza i uchwyt na wstążkę są wycinane laserowo z jednego kawałka sklejki.'}]
+  ['a795fe19-81f2-4880-b139-6f6f40260d1c', {range:[285, 620], description:'Medal z grawerem laserowym na zawody, turnieje i uroczystości. Projekt graweru może powstać w pracowni na zamówienie lub zostać dostarczony przez zamawiającego. Zdjęcie przedstawia przykładową realizację.\n\nMedal jest wycinany ze sklejki brzozowej o grubości 4 mm.'}],
+  ['9473098e-f584-4f5b-9e80-64859fae1636', {range:[89, 145], description:'Okrągły medal ze sklejki brzozowej o grubości 4 mm. Gładka powierzchnia nadaje się do malowania i ręcznego zdobienia, także podczas zajęć plastycznych.\n\nTarcza i uchwyt na wstążkę są wycinane laserowo z jednego kawałka sklejki.'}]
 ]);
 
 export function refreshSavedDescription(project, original) {
