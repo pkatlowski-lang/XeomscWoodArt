@@ -80,6 +80,7 @@ async function load(){
     }
     $('.project-specs').after(box);
   }
+  if (p.dimensions && $('#project-dimensions')) $('#project-dimensions').textContent = p.dimensions;
   const material = $('#project-material');
   if (material && p.material?.trim()) {
     material.querySelector('dd').textContent = p.material.trim();

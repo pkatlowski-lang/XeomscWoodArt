@@ -16,7 +16,9 @@ export function projectPrices(project, rates) {
   const rate = rates.find(row => categoryKey(row.category) === categoryKey(project.category || ''));
   const lines = [];
   if (rate) lines.push('Cena w kategorii od ' + formatPrice(rate.amount) + (rate.variant ? ' · ' + rate.variant : ''));
-  if (project.actualGrosze > 0) lines.push('Cena tej realizacji: ' + formatPrice(project.actualGrosze));
+  if (project.priceRange && project.actualGrosze === project.priceRange[0]) {
+    lines.push('Cena za sztukę: ' + project.priceRange.map(formatPrice).join(' – '));
+  } else if (project.actualGrosze > 0) lines.push('Cena tej realizacji: ' + formatPrice(project.actualGrosze));
   return lines;
 }
 export async function publishedPrices(publicRecord) {

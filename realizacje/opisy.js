@@ -161,7 +161,16 @@ const formerDescriptions = new Map([
   ]
 ]);
 
+const medalDetails = new Map([
+  ['a795fe19-81f2-4880-b139-6f6f40260d1c', {range:[285, 620], description:'Medal z grawerem laserowym przygotowuję na konkretne wydarzenie. Pływak i napis „Zawody pływackie” na zdjęciu to przykładowy wzór. Mogę zaprojektować dla Ciebie motyw z nazwą zawodów, datą lub logo albo wykonać grawer według przesłanego przez Ciebie projektu.\n\nRysunek i litery wypalam bezpośrednio w jasnej sklejce brzozowej klasy 1/2 o grubości 4 mm. W zapytaniu podaj średnicę medalu, liczbę sztuk i treść graweru. Jeśli masz własną grafikę, dołącz ją do wiadomości.'}],
+  ['9473098e-f584-4f5b-9e80-64859fae1636', {range:[89, 145], description:'Okrągły medal bez nadruku i graweru to baza do własnej dekoracji. Na jasnym drewnie możesz namalować barwy drużyny, wpisać imię uczestnika lub zostawić widoczny rysunek słojów. Sprawdzi się na szkolnych zawodach i warsztatach, podczas których uczestnicy sami ozdabiają swoje medale.\n\nTarczę i uchwyt na wstążkę wycinam laserowo z jednego kawałka sklejki brzozowej klasy 1/2 o grubości 4 mm. W zapytaniu podaj średnicę i liczbę sztuk.'}]
+]);
+
 export function refreshSavedDescription(project, original) {
+  const medal = medalDetails.get(project.id);
+  if (medal) return {...project, description:project.description || medal.description,
+    dimensions:'Średnica tarczy 7–11 cm bez uchwytu. Uchwyt wystaje 9 mm ponad tarczę. Otwór na wstążkę ma 15 × 5,5 mm.',
+    priceRange:medal.range};
   if (!original || !project.description || project.removed) return project;
   const key = formerDescriptions.has(original.id) ? original.id : original.title;
   if (project.description !== formerDescriptions.get(key)) return project;
